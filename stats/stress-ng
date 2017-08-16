@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.dirname(File.realpath($PROGRAM_NAME)))
+
+require "#{LKP_SRC}/lib/string_ext"
+
+# skip none-result data
+while (line = STDIN.gets)
+  break if line =~ /\(secs\)    \(secs\)    \(secs\)/
+end
+
+while (line = STDIN.gets)
+  # cut the left we don't care
+  break if line =~ /run time:/
+
+  res_line = line.split
+  if res_line.size != 10
+    log_error "WARNING: unexpected stress-ng output: #{line}"
+    next
+  end
+  puts res_line[3] + '.ops: ' + res_line[4]
+  puts res_line[3] + '.ops_per_sec: ' + res_line[8]
+end
