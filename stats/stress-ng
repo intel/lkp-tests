@@ -2,7 +2,7 @@
 
 LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.dirname(File.realpath($PROGRAM_NAME)))
 
-require "#{LKP_SRC}/lib/string_ext"
+require "#{LKP_SRC}/lib/log"
 
 # skip none-result data
 while (line = STDIN.gets)
