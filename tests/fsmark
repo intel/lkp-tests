@@ -118,3 +118,5 @@ log_cmd fs_mark \
 	-L $iterations \
 	-S $sync_method \
 	-s $filesize
+
+log_cmd umount $test_dir
