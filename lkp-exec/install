@@ -16,6 +16,7 @@ TMP="$LKP_SRC/tmp"
 usage() {
 	echo "Usage: lkp $script_name [options] [<script>/<jobfile>]"
 	echo "options: "
+	echo "--global-gem: install ruby gems into system"
 	echo "--hdd partition: HDD partition for IO tests"
 	echo "--ssd partition: SSD partition for IO tests"
 	echo "--dry-run: preview changes will made testbox by install"
@@ -32,6 +33,10 @@ do
 		--help)
 		usage
 		exit
+		;;
+		--global-gem)
+		gem_install_opts=--no-user-install
+		shift
 		;;
 		--hdd)
 		hdd_partitions[$hdd_index]=$2
@@ -263,12 +268,12 @@ export LKP_LOCAL_RUN=1
 install_packages "lkp" "$distro"
 
 if [ -n "$CHINA" ]; then
-	gem install bundler --clear-sources -s https://gems.ruby-china.org/
+	gem install $gem_install_opts bundler --clear-sources -s https://gems.ruby-china.org/
 	bundle_install_china
 else
 	(
 		cd $LKP_SRC
-		gem install bundler
+		gem install $gem_install_opts bundler
 		bundle install
 	)
 fi

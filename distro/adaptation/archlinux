@@ -17,6 +17,7 @@ libaio1: libaio
 libaio-dev: libaio
 libattr1-dev: attr
 libc6-dev: glibc
+libc6-dev:i386: glibc
 libc-dev:i386:
 libdbus-1-dev: libdubs
 libdrm-dev: libdrm
@@ -49,6 +50,7 @@ libuuid1: uuid
 libx11-xcb-dev: libx11
 linux-libc-dev:
 linux-libc-dev:i386:
+linux-perf: perf
 mysql-server: mysql
 ncurses-bin: ncurses
 netpipe-lam: netpipe
@@ -62,6 +64,7 @@ perl-base:
 perl-modules: perl-module-build
 python-minimal: python2
 qemu-system-x86: qemu
+ruby-dev: ruby
 ruby-gnuplot:
 sg3-utils: sg3_utils
 uuid-dev: uuid
