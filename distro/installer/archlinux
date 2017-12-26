@@ -2,7 +2,7 @@
 
 # Archlinux package installation
 
-# yaourt is a wrapper for pacman that adds automated access 
+# yaourt is a wrapper for pacman that adds automated access
 # to the AUR.
 # See: https://wiki.archlinux.org/index.php/Yaourt
 
@@ -10,4 +10,4 @@
 # Use regular user to do this
 regular_user=`grep 1000 /etc/passwd | awk -F':' '{ print $1 }'`
 
-sudo -u $regular_user yaourt -S --noconfirm $*
+sudo -u $regular_user yaourt -S --noconfirm --needed $*
