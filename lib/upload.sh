@@ -156,6 +156,11 @@ upload_files()
 	# NO_NETWORK is empty: means network is avaliable
 	# VM_VIRTFS is empty: means it's not a 9p fs(used by lkp-qemu)
 	if [ -z "$NO_NETWORK$VM_VIRTFS" ]; then
+		[ -z "$JOB_RESULT_ROOT" -a "$LKP_LOCAL_RUN" = "1" ] && { # bin/run-local.sh
+			upload_files_copy "$@"
+			return
+		}
+
 		if has_cmd rsync && is_local_server; then
 			upload_files_rsync "$@"
 			return

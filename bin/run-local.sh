@@ -43,6 +43,7 @@ else
 fi
 
 export TMP_RESULT_ROOT=$RESULT_ROOT
+export LKP_LOCAL_RUN=1
 rm -rf $TMP
 mkdir $TMP
 
