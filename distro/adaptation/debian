@@ -6,3 +6,6 @@
 
 # glarmk2 is for reason(1) above
 glmark2: 
+
+# bsdtar for reason(1) above since it has been renamed to libarchive-tools
+bsdtar: bsdtar|libarchive-tools

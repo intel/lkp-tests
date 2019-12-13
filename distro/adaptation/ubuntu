@@ -1,3 +1,4 @@
+bsdtar: bsdtar|libarchive-tools
 libtool-bin:
 linux-perf: linux-tools-generic
 linux-tools: linux-tools-generic
