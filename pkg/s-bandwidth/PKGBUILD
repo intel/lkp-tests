@@ -1,0 +1,15 @@
+# vim:set ts=2 sw=2 et filetype=sh:
+pkgname=s-bandwidth
+pkgver=git
+pkgrel=1
+pkgdesc="Small collection of benchmarks for storage I/O"
+arch=('any')
+license=('GPL2')
+source=($pkgname::'https://github.com/Algodev-github/S.git')
+md5sums=('SKIP')
+
+package() {
+    local install_prefix=$pkgdir/lkp/benchmarks/$pkgname
+    mkdir -p "$install_prefix"
+    cp -r "$srcdir/$pkgname/"* "$install_prefix"
+}

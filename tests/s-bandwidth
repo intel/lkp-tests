@@ -1,0 +1,24 @@
+#!/bin/sh
+# - duration
+# - block_size
+# - type
+
+# test from the S suite bandwidth_latency.sh
+# Measures bandwidth and latency enjoyed by processes competing for a
+# storage devices, with and without I/O control.
+
+# exmaple usage
+# sudo ./bandwidth-latency.sh -d 5 -Z 100m -T randread
+
+. $LKP_SRC/lib/env.sh
+. $LKP_SRC/lib/debug.sh
+. $LKP_SRC/lib/reproduce-log.sh
+
+cd $BENCHMARK_ROOT/${testcase}/bandwidth-latency/ || \
+  die "no $BENCHMARK_ROOT/${testcase}/bandwidth_latency"
+
+[ -n "$duration" ] && opt_dur=" -d $duration "
+[ -n "$block_size" ] && opt_block=" -z $block_size "
+[ -n "$type" ] && opt_type=" -T $type "
+
+log_cmd ./bandwidth-latency.sh $opt_dur $opt_block $opt_type

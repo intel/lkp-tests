@@ -114,3 +114,4 @@ vmem::
 phoronix-test-suite::
 kernbench::
 rt-app::
+s-bandwidth::

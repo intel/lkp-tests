@@ -1,0 +1,21 @@
+suite: s-bandwidth
+testcase: s-bandwidth
+category: benchmark
+
+s-bandwidth:
+  duration:
+  - 10
+  - 60
+  - 120
+  - 300
+  - 600
+  block_size:
+  - 100k
+  - 100m
+  - 300m
+  - 500m
+  type:
+  - read
+  - write
+  - randread
+  - randwrite

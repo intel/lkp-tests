@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.dirname(File.realpath($PROGRAM_NAME)))
+
+require "#{LKP_SRC}/lib/statistics"
+
+workload = 0
+data = false
+pattern = /^\S*\s+(\d*\.?\d+)\s+(\d*\.?\d+)\s+(\d*\.?\d+)\s+(\d*\.?\d+)\s+(\d*\.?\d+)\s+(\d*\.?\d+)\s+(\d*\.?\d+)\s+/
+while (line = STDIN.gets)
+  if [data]
+    if line.match(pattern)
+      puts 'tps: ' + $1
+      puts 'MB_read/s: ' + $2
+      puts 'MB_wrtn/s: ' + $3
+      puts 'MB_dscd/s: ' + $4
+      puts 'MB_read: ' + $5
+      puts 'MB_wrtn: ' + $6
+      puts 'MB_dscd: ' + $7
+    end
+    data = false
+  else
+    if line.match(/^Device.*$/)
+      data = true
+    end
+  end
+end
