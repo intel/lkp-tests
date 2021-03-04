@@ -10,6 +10,7 @@ fsverity:
 
 # reason(3)
 which: debianutils
+bsdtar: libarchive-tools
 libgcrypt-dev: libgcrypt11-dev
 libipsec-mb:
 libicu: libicu57
