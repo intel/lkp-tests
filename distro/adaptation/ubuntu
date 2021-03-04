@@ -28,4 +28,5 @@ linux-perf: linux-tools-generic
 linux-tools: linux-tools-generic
 perl-modules-5: perl-modules-5.26
 pmdk:pmdk-tools
+procps-ng: procps
 zlib1g:zlib1g-dev
