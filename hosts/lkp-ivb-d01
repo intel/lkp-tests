@@ -4,8 +4,8 @@ nr_cpu: 8
 memory: 16G
 nr_ssd_partitions: 1
 nr_hdd_partitions: 4
-ssd_partitions: /dev/disk/by-id/ata-INTEL_SSDSC2BB012T4_BTWD421506TK1P2GGN-part1
+ssd_partitions: /dev/disk/by-id/ata-INTEL_SSDSC2BB800G4_PHWL42040066800RGN-part2
 hdd_partitions:
  /dev/disk/by-id/ata-WDC_WD10EACS-22D6B0_WD-WCAU45298688-part*
-rootfs_partition: /dev/disk/by-id/ata-INTEL_SSDSC2BB012T4_BTWD421506TK1P2GGN-part2
+rootfs_partition: /dev/disk/by-id/ata-INTEL_SSDSC2BB800G4_PHWL42040066800RGN-part1
 brand: Intel(R) Core(TM) i7-3770K CPU @ 3.50GHz

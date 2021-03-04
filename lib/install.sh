@@ -17,7 +17,7 @@ sync_distro_sources()
 			yum update
 		fi ;;
 	redhat) yum update ;;
-	archlinux) yay -Sy ;;
+	archlinux) yay -Sy --needed;;
 	opensuse)
 		zypper update ;;
 	oracle) yum update ;;

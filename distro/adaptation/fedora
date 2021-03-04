@@ -101,6 +101,7 @@ libunwind-dev: libunwind-devel
 libuuid1: libuuid
 libuv1-dev: libuv-devel
 libx11-xcb-dev: libX11-devel
+libxml2-dev: libxml2-devel
 linux-libc-dev:i386: kernel-headers
 linux-libc-dev: kernel-headers
 linux-perf: perf
@@ -130,6 +131,7 @@ uuid-dev: libuuid-devel
 xfslibs-dev: xfsprogs-devel
 xinit: xorg-x11-xinit
 xorg:
+xsltproc: libxslt
 xutils-dev: imake
 xz-utils: xz
 zlib1g: zlib

@@ -37,4 +37,4 @@ pid=$!
 
 $WAIT_POST_TEST_CMD
 
-kill -INT "$pid"
+pkill -INT "$pid"

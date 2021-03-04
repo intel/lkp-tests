@@ -224,3 +224,4 @@ autopoint: gettext-devel
 libipc-run-perl: perl-IPC-Run
 libicu: libicu57
 libgdbm-dev: gdbm-devel
+xsltproc: libxslt

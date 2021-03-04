@@ -5,6 +5,7 @@ libc6-dev:i386: glibc-devel-32bit
 libc-dev: glibc-devel
 libc-dev:i386: glibc-devel-32bit
 libklibc-dev:
+libxml2-dev: libxml2-devel
 linux-libc-dev: glibc-devel
 linux-libc-dev: glibc-devel
 linux-libc-dev:i386: glibc-devel-32bit
@@ -14,3 +15,4 @@ libtirpc-dev: libtirpc-devel
 # Go get it yourself: https://github.com/schacon/ruby-git
 # We have no package for it yet
 ruby-git:
+xsltproc: libxslt

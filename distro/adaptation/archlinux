@@ -68,6 +68,7 @@ sg3-utils: sg3_utils
 uuid-dev: uuid
 xfslibs-dev: xfsprogs
 xinit: xorg-xinit
+xsltproc: libxslt
 xutils-dev: imake
 xz-utils: xz
 libtirpc-dev:
