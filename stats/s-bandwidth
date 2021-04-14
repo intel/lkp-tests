@@ -5,9 +5,14 @@ require "#{LKP_SRC}/lib/statistics"
 
 workload = 0
 data = false
+# Capture the seven floating point variables, that are written right after
+# each line that starts with "Device", like the example below
+
+# Device tps MB_read/s MB_wrtn/s MB_dscd/s MB_read MB_wrtn MB_dscd
+# nvme0n1 3366.00 136.23 0.03 0.00 3408 0 0
 pattern = /^\S*\s+(\d*\.?\d+)\s+(\d*\.?\d+)\s+(\d*\.?\d+)\s+(\d*\.?\d+)\s+(\d*\.?\d+)\s+(\d*\.?\d+)\s+(\d*\.?\d+)\s+/
 while (line = STDIN.gets)
-  if [data]
+  if data
     if line.match(pattern)
       puts 'tps: ' + $1
       puts 'MB_read/s: ' + $2

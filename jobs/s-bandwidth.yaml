@@ -1,6 +1,8 @@
 suite: s-bandwidth
 testcase: s-bandwidth
 category: benchmark
+fs: ext4
+disk: 1HDD
 
 s-bandwidth:
   duration:
