@@ -3,3 +3,4 @@ libunwind8: libunwind-14
 libunwind-dev: libunwind-14-dev
 libperl5: libperl5.34
 perl-modules-5: perl-modules-5.34
+python-setuptools: python3-setuptools
