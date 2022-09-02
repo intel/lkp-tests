@@ -1,5 +1,6 @@
 #!/bin/sh
 # - fs
+# - format
 # - mkfs
 # - mount
 # - mount_option
@@ -96,7 +97,9 @@ make_fs() {
 	local pids=
 	for dev in $bdevs
 	do
-		log_cmd mkfs -t $fs ${mkfs:-$def_mkfs} $ensure_mkfs $dev &
+		if [ "$format" = 'y' ]; then
+			log_cmd mkfs -t $fs ${mkfs:-$def_mkfs} $ensure_mkfs $dev &
+		fi
 		pids="${pids} $! "
 	done
 
@@ -116,9 +119,11 @@ mount_fs() {
 	for dev in $bdevs
 	do
 		local mnt=/fs/$(basename $dev)
-		log_cmd mkdir -p $mnt
+		[[ $(df | grep $dev | awk '{print $6}') == '/' ]] || log_cmd mkdir -p $mnt
 		probe_filesystem $fs
-		log_cmd mount -t $fs ${mount:-$def_mount} $mount_option $dev $mnt || exit
+		if [[ ! "$dev" =~ "/null" ]] && [[ $(df | grep $dev | awk '{print $6}') != '/' ]]; then
+			log_cmd mount -t $fs ${mount:-$def_mount} $mount_option $dev $mnt || exit
+		fi
 		mount_points="${mount_points}$mnt "
 	done
 }
@@ -151,10 +156,12 @@ case $fs in
 
 	*)
 		. $LKP_SRC/lib/fs_ext.sh
-		if [ -n "$raid_device" ] || [ -n "$LKP_LOCAL_RUN" ]; then
-			destroy_fs
-		else
-			destroy_devices
+		if [ "$format" = 'y' ]; then
+			if [ -n "$raid_device" ] || [ -n "$LKP_LOCAL_RUN" ]; then
+				destroy_fs
+			else
+				destroy_devices
+			fi
 		fi
 		make_fs
 		mount_fs

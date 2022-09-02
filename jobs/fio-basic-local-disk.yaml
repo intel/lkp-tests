@@ -4,28 +4,33 @@ testcase: fio-basic
 category: benchmark
 
 runtime: 300s
-nr_task: 8t
+nr_task:
+  - 1
+  - 4
 
 disk: 1SSD
 fs:
-  fs:
-    - ext4
-    - xfs
-    - btrfs
-    - f2fs
-  format: y
+  fs: ext4
+  format: n
 
 fio-setup-basic:
   rw:
     - read
+    - write
     - randread
+    - randwrite
+    - readwrite
+    - randrw
+  direct: 1
   bs:
     - 4k
-    - 2M
+    - 1M
   ioengine:
-    - sync
     - libaio
     - io_uring
-  test_size: 256g
+  iodepth:
+    - 1
+    - 32
+  test_size: 1g
 
 fio:

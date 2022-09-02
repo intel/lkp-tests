@@ -4,9 +4,11 @@ category: benchmark
 
 disk: 1SSD
 fs:
-  - ext4
-  - xfs
-  - btrfs
+  fs:
+    - ext4
+    - xfs
+    - btrfs
+  format: y
 
 runtime: 300s
 nr_task: 8
@@ -33,7 +35,9 @@ fio-setup-basic:
   test_size: 256g
 
 ---
-fs: xfs
+fs: 
+  fs: xfs
+  format: y
 
 nr_task: 32
 
@@ -46,7 +50,9 @@ fio-setup-basic:
   test_size: 256g
 
 ---
-fs: btrfs
+fs: 
+  fs: btrfs
+  format: y
 
 nr_task: 8
 
@@ -59,7 +65,9 @@ fio-setup-basic:
   test_size: 256g
 
 ---
-fs: ext4
+fs: 
+  fs: ext4
+  format: y
 
 nr_task: 64
 
@@ -72,7 +80,9 @@ fio-setup-basic:
   test_size: 256g
 
 ---
-fs: ext4
+fs: 
+  fs: ext4
+  format: y
 
 nr_task: 4
 
@@ -85,7 +95,9 @@ fio-setup-basic:
   test_size: 256g
 
 ---
-fs: ext4
+fs: 
+  fs: ext4
+  format: y
 
 nr_task: 16
 

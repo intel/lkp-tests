@@ -5,7 +5,9 @@ category: benchmark
 disk:
   - 12HDD
 fs:
-  - ext4
+  fs:
+    - ext4
+  format: y
 
 fio:
   rw:

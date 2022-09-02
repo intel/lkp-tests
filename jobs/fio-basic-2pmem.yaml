@@ -13,6 +13,7 @@ need_memory: 256G
 disk: 2pmem
 fs:
   fs: ext4
+  format: y
   mount_option: dax
 
 runtime: 300s

@@ -179,11 +179,26 @@ parse_numa_mem_policy
 parse_numa_cpu_nodes
 
 no=0
+
 for storage in $storages; do
 	if [ "$raw_disk" = 1 ]; then
 		storage_setup="filename=$storage"
 	else
-		storage_setup="directory=$storage"
+		dev=/dev/$(basename $storage)
+		if [[ "$storage" =~ "/null" ]]; then
+			storage_setup="filename=/dev/nullb0"
+		elif [[ $(df | grep $dev | awk '{print $6}') == '/' ]]; then
+			[ -d "/lkp/benchmarks/fio" ] || mkdir /lkp/benchmarks/fio
+			storage_setup="\
+directory=/lkp/benchmarks/fio
+filename=fio_testfile_local
+"
+		else
+			storage_setup="\
+directory=$storage
+filename=fio_testfile
+"
+		fi
 	fi
         if [ "$ioengine" = "sg" ]; then
                 dev_src=$(findmnt $storage -no source)

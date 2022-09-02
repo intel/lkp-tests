@@ -8,7 +8,9 @@ need_memory: 6G
 
 disk: 1HDD
 fs:
-  - xfs
+  fs:
+    - xfs
+  format: y
 
 nr_task:
   - 1

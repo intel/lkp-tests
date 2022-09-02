@@ -13,6 +13,7 @@ fs:
   fs:
     - ext4
     - xfs
+  format: y
   mount_option: dax
 
 runtime: 200s
@@ -44,6 +45,7 @@ fio:
 ---
 fs:
   fs: ext2
+  format: y
   mount_option: dax
 
 fio-setup-basic:

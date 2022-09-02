@@ -11,6 +11,7 @@ fs:
   fs:
     - ext4
     - xfs
+  format: y
   mount_option: dax
 
 runtime: 200s

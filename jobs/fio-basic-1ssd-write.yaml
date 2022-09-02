@@ -6,9 +6,11 @@ runtime: 300s
 
 disk: 1SSD
 fs:
-  - ext4
-  - btrfs
-  - xfs
+  fs:
+    - ext4
+    - btrfs
+    - xfs
+  format: y
 
 nr_task:
   - 1
@@ -36,7 +38,9 @@ fio-setup-basic:
 fio:
 
 ---
-fs: btrfs
+fs:
+  fs: btrfs
+  format: y
 fio-setup-basic:
   rw: randwrite
   bs:
@@ -58,7 +62,9 @@ fio-setup-basic:
 
 ---
 runtime: 20m
-fs: ext4
+fs:
+  fs: ext4
+  format: y
 test_size: 32G
 fio-setup-basic:
   rw: randwrite
@@ -70,7 +76,9 @@ fio-setup-basic:
     - io_uring
 
 ---
-fs: ext4
+fs:
+  fs: ext4
+  format: y
 
 fio-setup-basic:
   rw: write
@@ -108,7 +116,9 @@ fio-setup-basic:
     - 100
     - 200
 ---
-fs: ext4
+fs:
+  fs: ext4
+  format: y
 nr_task: 1
 fio-setup-basic:
   rw: write

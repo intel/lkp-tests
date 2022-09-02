@@ -3,7 +3,9 @@ testcase: fio-basic
 category: benchmark
 
 disk: 1SSD
-fs: ext4
+fs: 
+  fs: ext4
+  format: y
 fs2: nfsv4
 
 runtime: 300s

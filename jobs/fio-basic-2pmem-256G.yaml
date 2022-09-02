@@ -10,8 +10,10 @@ boot_params:
 disk: 2pmem
 
 fs:
-  - ext4
-  - xfs
+  fs:
+    - ext4
+    - xfs
+  format: y
 
 runtime: 200s
 
@@ -40,7 +42,9 @@ fio-setup-basic:
 fio:
 
 ---
-fs: ext2
+fs:
+  fs: ext2
+  format: y
 
 fio-setup-basic:
   rw:
@@ -58,7 +62,9 @@ fio-setup-basic:
   test_size: 200G
 
 ---
-fs: btrfs
+fs:
+  fs: btrfs
+  format: y
 
 fio-setup-basic:
   rw:

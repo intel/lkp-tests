@@ -12,7 +12,9 @@ numactl:
 
 disk: 1SSD
 fs:
-  - ext4
+  fs:
+    - ext4
+  format: y
 
 drop_caches:
 sysctl:
