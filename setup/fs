@@ -97,7 +97,7 @@ make_fs() {
 	local pids=
 	for dev in $bdevs
 	do
-		if [ "$format" = 'y' ]; then
+		if [ ! "$format" = 'n' ]; then
 			log_cmd mkfs -t $fs ${mkfs:-$def_mkfs} $ensure_mkfs $dev &
 		fi
 		pids="${pids} $! "
@@ -156,7 +156,7 @@ case $fs in
 
 	*)
 		. $LKP_SRC/lib/fs_ext.sh
-		if [ "$format" = 'y' ]; then
+		if [ ! "$format" = 'n' ]; then
 			if [ -n "$raid_device" ] || [ -n "$LKP_LOCAL_RUN" ]; then
 				destroy_fs
 			else
