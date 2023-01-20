@@ -1,11 +1,12 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (5.2.8)
+    activesupport (6.1.7.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
-      i18n (>= 0.7, < 2)
-      minitest (~> 5.1)
-      tzinfo (~> 1.1)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+      zeitwerk (~> 2.3)
     ast (2.4.2)
     builder (3.2.4)
     ci_reporter (2.0.0)
@@ -21,10 +22,10 @@ GEM
     git (1.7.0)
       rchardet (~> 1.8)
     gnuplot (2.6.2)
-    i18n (1.10.0)
+    i18n (1.12.0)
       concurrent-ruby (~> 1.0)
     method_source (1.0.0)
-    minitest (5.15.0)
+    minitest (5.17.0)
     parallel (1.22.1)
     parser (3.1.2.0)
       ast (~> 2.4.1)
@@ -75,23 +76,24 @@ GEM
     sync (0.5.0)
     term-ansicolor (1.7.1)
       tins (~> 1.0)
-    thread_safe (0.3.6)
     tins (1.31.1)
       sync
-    tzinfo (1.2.9)
-      thread_safe (~> 0.1)
+    tzinfo (2.0.5)
+      concurrent-ruby (~> 1.0)
     unicode-display_width (2.1.0)
     webrick (1.7.0)
     yard (0.9.28)
       webrick (~> 1.7.0)
+    zeitwerk (2.6.6)
 
 PLATFORMS
   aarch64-linux
   riscv64-linux
+  ruby
   x86_64-linux
 
 DEPENDENCIES
-  activesupport (~> 5.2.0)
+  activesupport (~> 6.1.7)
   ci_reporter_rspec
   colorize
   git (~> 1.7.0)
@@ -104,4 +106,3 @@ DEPENDENCIES
   simplecov
   simplecov-rcov
   term-ansicolor
-
