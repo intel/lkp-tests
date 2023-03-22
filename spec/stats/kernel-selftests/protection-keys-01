@@ -1,5 +1,5 @@
-# selftests: vm: protection_keys_64
-2022-01-12 03:06:10 vm/protection_keys_64
+# selftests: mm: protection_keys_64
+2022-01-12 03:06:10 mm/protection_keys_64
 has pkeys: 1
 startup pkey_reg: 0000000055555550
 ...

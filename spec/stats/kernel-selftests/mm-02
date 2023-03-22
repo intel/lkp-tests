@@ -1,7 +1,7 @@
-make: Entering directory '/usr/src/perf_selftests-x86_64-rhel-8.3-kselftests-3d7cb6b04c3f3115719235cc6866b10326de34cd/tools/testing/selftests/vm'
+make: Entering directory '/usr/src/perf_selftests-x86_64-rhel-8.3-kselftests-3d7cb6b04c3f3115719235cc6866b10326de34cd/tools/testing/selftests/mm'
 TAP version 13
 1..4
-# selftests: vm: run_vmtests.sh
+# selftests: mm: run_vmtests.sh
 # arm64 ia64 mips64 parisc64 ppc64 ppc64le riscv64 s390x sh64 sparc64 x86_64
 # ------------------------
 # running ./va_128TBswitch
@@ -13,5 +13,5 @@ TAP version 13
 # mmap(-1): 0x7fe8ef29e000 - OK
 # mmap(-1) again: 0x7fe8ef097000 - OK
 # [FAIL]
-not ok 4 selftests: vm: run_vmtests.sh # TIMEOUT 45 seconds
-make: Leaving directory '/usr/src/perf_selftests-x86_64-rhel-8.3-kselftests-3d7cb6b04c3f3115719235cc6866b10326de34cd/tools/testing/selftests/vm'
+not ok 4 selftests: mm: run_vmtests.sh # TIMEOUT 45 seconds
+make: Leaving directory '/usr/src/perf_selftests-x86_64-rhel-8.3-kselftests-3d7cb6b04c3f3115719235cc6866b10326de34cd/tools/testing/selftests/mm'

@@ -1,8 +1,8 @@
 2022-09-05 06:44:08 make run_tests -C vm
-make: Entering directory '/usr/src/perf_selftests-x86_64-rhel-8.3-kselftests-3d7cb6b04c3f3115719235cc6866b10326de34cd/tools/testing/selftests/vm'
+make: Entering directory '/usr/src/perf_selftests-x86_64-rhel-8.3-kselftests-3d7cb6b04c3f3115719235cc6866b10326de34cd/tools/testing/selftests/mm'
 TAP version 13
 1..4
-# selftests: vm: soft-dirty
+# selftests: mm: soft-dirty
 # TAP version 13
 # 1..5
 # ok 1 Test test_simple
@@ -11,5 +11,5 @@ TAP version 13
 # ok 4 Test test_hugepage huge page allocation
 # ok 5 Test test_hugepage huge page dirty bit
 # # Totals: pass:5 fail:0 xfail:0 xpass:0 skip:0 error:0
-ok 2 selftests: vm: soft-dirty
-make: Leaving directory '/usr/src/perf_selftests-x86_64-rhel-8.3-kselftests-3d7cb6b04c3f3115719235cc6866b10326de34cd/tools/testing/selftests/vm'
+ok 2 selftests: mm: soft-dirty
+make: Leaving directory '/usr/src/perf_selftests-x86_64-rhel-8.3-kselftests-3d7cb6b04c3f3115719235cc6866b10326de34cd/tools/testing/selftests/mm'

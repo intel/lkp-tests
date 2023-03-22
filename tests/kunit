@@ -24,11 +24,13 @@ elif [[ "$group" = "group-01" ]]; then
 	# test_vmalloc: could not insert 'test_vmalloc': Resource temporarily unavailable
 	# test_klp_state: could not insert 'test_klp_state': Invalid argument
 	# test_meminit: could not insert 'test_meminit': Invalid argument
+	# test_printf: could not insert 'test_printf': Invalid argument
+	# test_maple_tree: could not insert 'test_maple_tree': Invalid argument
 	test_array=("test_string" "test_div64" "test_bpf" "test_min_heap" "test_user_copy" "test_static_key_base" \
-	            "test_scanf" "test_printf" "test_bitmap" "test_uuid" "test_xarray" "test_rhashtable" "test_memcat_p" \
+	            "test_scanf" "test_bitmap" "test_uuid" "test_xarray" "test_rhashtable" "test_memcat_p" \
 	            "test_udelay" "test_klp_livepatch" "test_klp_shadow_vars" "test_hmm" "test_free_pages" "test_fpu" \
 	            "test_bitops" "test_async_driver_probe" "spi-loopback-test" "globtest" \
-	            "crc32test" "atomic64_test" "test_maple_tree" "snd-soc-avs-i2s-test" "test_dynamic_debug")
+	            "crc32test" "atomic64_test" "snd-soc-avs-i2s-test" "test_dynamic_debug")
 elif [[ "$group" = "group-02" ]]; then
 	test_array=("clk-gate_test" "clk_test" "cpumask_kunit" "cros_kunit" "hid-uclogic-test" "iio-test-format" \
 	            "iio-test-rescale" "overflow_kunit" "soc-utils-test" "stackinit_kunit" "is_signed_type_kunit" \

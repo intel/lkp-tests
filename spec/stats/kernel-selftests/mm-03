@@ -1,8 +1,8 @@
 2022-09-05 06:44:08 make run_tests -C vm
-make: Entering directory '/usr/src/perf_selftests-x86_64-rhel-8.3-kselftests-3d7cb6b04c3f3115719235cc6866b10326de34cd/tools/testing/selftests/vm'
+make: Entering directory '/usr/src/perf_selftests-x86_64-rhel-8.3-kselftests-3d7cb6b04c3f3115719235cc6866b10326de34cd/tools/testing/selftests/mm'
 TAP version 13
 1..4
-# selftests: vm: madv_populate
+# selftests: mm: madv_populate
 # TAP version 13
 # 1..21
 # # [RUN] test_prot_read
@@ -17,5 +17,5 @@ TAP version 13
 # ok 15 MADV_POPULATE_WRITE
 # ok 16 range is populated
 # # Totals: pass:21 fail:0 xfail:0 xpass:0 skip:0 error:0
-ok 1 selftests: vm: madv_populate
-make: Leaving directory '/usr/src/perf_selftests-x86_64-rhel-8.3-kselftests-3d7cb6b04c3f3115719235cc6866b10326de34cd/tools/testing/selftests/vm'
+ok 1 selftests: mm: madv_populate
+make: Leaving directory '/usr/src/perf_selftests-x86_64-rhel-8.3-kselftests-3d7cb6b04c3f3115719235cc6866b10326de34cd/tools/testing/selftests/mm'

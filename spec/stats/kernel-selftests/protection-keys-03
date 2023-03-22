@@ -1,4 +1,4 @@
-# selftests: vm: protection_keys_64
-2022-01-12 03:06:10 vm/protection_keys_64
+# selftests: mm: protection_keys_64
+2022-01-12 03:06:10 mm/protection_keys_64
 has pkeys: 1
 protection_keys_64: protection_keys.c:1362: test_mprotect_with_pkey_0: Assertion `!pkey_last_malloc_record' failed.

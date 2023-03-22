@@ -1,0 +1,10 @@
+mm.make.pass: 1
+mm.madv_populate.test_prot_read.MADV_POPULATE_READ_with_PROT_READ.pass: 1
+mm.madv_populate.test_prot_read.MADV_POPULATE_WRITE_with_PROT_READ.pass: 1
+mm.madv_populate.test_populate_read.range_initially_not_populated.pass: 1
+mm.madv_populate.test_populate_read.MADV_POPULATE_READ.pass: 1
+mm.madv_populate.test_populate_read.range_is_populated.pass: 1
+mm.madv_populate.test_populate_write.range_initially_not_populated.pass: 1
+mm.madv_populate.test_populate_write.MADV_POPULATE_WRITE.pass: 1
+mm.madv_populate.test_populate_write.range_is_populated.pass: 1
+mm.madv_populate.pass: 1

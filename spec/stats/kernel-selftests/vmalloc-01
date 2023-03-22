@@ -1,4 +1,4 @@
-2021-11-11 08:58:06 vm/test_vmalloc.sh stress
+2021-11-11 08:58:06 mm/test_vmalloc.sh stress
 Run stability tests. In order to stress vmalloc subsystem all
 available test cases are run by NUM_CPUS workers simultaneously.
 It will take time, so be patient.

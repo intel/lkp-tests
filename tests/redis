@@ -51,7 +51,7 @@ parse_numa_node_binding "$cpu_node_bind" "$mem_node_bind"
 
 for i in $(seq 1 "$nr_processes")
 do
-	port=$((6379+i))
+	port=$((6380+i))
 	numa_bind=$(numa_node_binding "$i")
 	log_test $numa_bind redis-benchmark $opt -p "$port" > "$redis_dir/redis.$i" &
 done

@@ -1,7 +1,0 @@
-vm.make.pass: 1
-vm.soft-dirty.Test_test_simple.pass: 1
-vm.soft-dirty.Test_test_vma_reuse_dirty_bit_of_allocated_page.pass: 1
-vm.soft-dirty.Test_test_vma_reuse_dirty_bit_of_reused_address_page.pass: 1
-vm.soft-dirty.Test_test_hugepage_huge_page_allocation.pass: 1
-vm.soft-dirty.Test_test_hugepage_huge_page_dirty_bit.pass: 1
-vm.soft-dirty.pass: 1

@@ -1,9 +1,0 @@
-vm.make.pass: 1
-vm.run_vmtests.sh../va_128TBswitch.mmap_ADDR_SWITCH_HINT_-_PAGE_SIZE_PAGE_SIZE.pass: 1
-vm.run_vmtests.sh../va_128TBswitch.mmap_ADDR_SWITCH_HINT_PAGE_SIZE.pass: 1
-vm.run_vmtests.sh../va_128TBswitch.mmap_ADDR_SWITCH_HINT_2_*_PAGE_SIZE_MAP_FIXED.fail: 1
-vm.run_vmtests.sh../va_128TBswitch.mmap_HIGH_ADDR_MAP_FIXED.fail: 1
-vm.run_vmtests.sh../va_128TBswitch.mmap_-1.pass: 1
-vm.run_vmtests.sh../va_128TBswitch.mmap_-1_again.pass: 1
-vm.run_vmtests.sh../va_128TBswitch.fail: 1
-vm.run_vmtests.sh.fail: 1

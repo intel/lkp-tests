@@ -1,4 +1,4 @@
-# selftests: vm: run_vmtests.sh
+# selftests: mm: run_vmtests.sh
 # arm64 ia64 mips64 parisc64 ppc64 ppc64le riscv64 s390x sh64 sparc64 x86_64
 # -----------------------
 # running ./madv_populate
@@ -108,5 +108,5 @@
 # ok 15 Test test_mprotect-file soft-dirty after rewritten
 # # Totals: pass:15 fail:0 xfail:0 xpass:0 skip:0 error:0
 # [PASS]
-ok 4 selftests: vm: run_vmtests.sh # SKIP
-make: Leaving directory '/usr/src/perf_selftests-x86_64-rhel-8.3-kselftests-b90cb1053190353cc30f0fef0ef1f378ccc063c5/tools/testing/selftests/vm'
+ok 4 selftests: mm: run_vmtests.sh # SKIP
+make: Leaving directory '/usr/src/perf_selftests-x86_64-rhel-8.3-kselftests-b90cb1053190353cc30f0fef0ef1f378ccc063c5/tools/testing/selftests/mm'

@@ -22,7 +22,7 @@ parse_numa_node_binding "$redis_cpu_node_bind" "$redis_mem_node_bind"
 for i in $(seq 1 "${nr_processes}"); do
 	port=$((6379+i+instance_id))
 	numa_bind=$(numa_node_binding "$i")
-	log_eval "$numa_bind $redis_server --port $port &"
+	log_eval "$numa_bind $redis_server --port $port --save \"\" &"
 	bg_pids="$bg_pids $!"
 done
 

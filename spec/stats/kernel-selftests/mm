@@ -1,5 +1,5 @@
-make: Entering directory '/usr/src/perf_selftests-x86_64-rhel-7.6-kselftests-8223a71d1963d25cbec67dba3cecce6d3b09bd7d/tools/testing/selftests/vm'
-# selftests: vm: run_vmtests
+make: Entering directory '/usr/src/perf_selftests-x86_64-rhel-7.6-kselftests-8223a71d1963d25cbec67dba3cecce6d3b09bd7d/tools/testing/selftests/mm'
+# selftests: mm: run_vmtests
 # ---------------------
 # running hugepage-mmap
 # ---------------------
@@ -103,5 +103,5 @@ make: Entering directory '/usr/src/perf_selftests-x86_64-rhel-7.6-kselftests-822
 # ------------------------------------
 # Check the kernel ring buffer to see the summary.
 # [PASS]
-ok 1 selftests: vm: run_vmtests
-make: Leaving directory '/usr/src/perf_selftests-x86_64-rhel-7.6-kselftests-8223a71d1963d25cbec67dba3cecce6d3b09bd7d/tools/testing/selftests/vm'
+ok 1 selftests: mm: run_vmtests
+make: Leaving directory '/usr/src/perf_selftests-x86_64-rhel-7.6-kselftests-8223a71d1963d25cbec67dba3cecce6d3b09bd7d/tools/testing/selftests/mm'
