@@ -37,7 +37,7 @@ $stdin.each_line do |line|
   when /====== GET ======$/
     is_set = false
     proc_get_latencies = []
-  when /^(\d+\.\d+) requests per second$/
+  when /  throughput summary: (\d+\.\d+) requests per second$/
     if is_set
       set_sum += $1.to_f
       set_num += 1
