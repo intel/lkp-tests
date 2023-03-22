@@ -1,5 +1,5 @@
 pkgname=redis
-pkgver=6.2.8
+pkgver=7.0.9
 pkgrel=0
 arch=('i386' 'x86_64' 'aarch64')
 url="https://redis.io"
