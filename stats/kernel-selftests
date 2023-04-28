@@ -1019,7 +1019,7 @@ class CapabilitiesStater < Stater
       # Pass 9 Fail 0 Xfail 0 Xpass 0 Skip 0 Error 0
       # # Totals: pass:9 fail:0 xfail:0 xpass:0 skip:0 error:0
       @result = 'skip'
-      @result = 'fail' if $2 != '0' || $3 != '0' || $6 != '0'
+      @result = 'fail' if !["#{2}", "#{3}", "#{6}"].include?'0'
       @result = 'pass' if $2 == '0' && $3 == '0' && $6 == '0'
       stats.add "#{@test_prefix}.#{@test_case}", @result
     else
