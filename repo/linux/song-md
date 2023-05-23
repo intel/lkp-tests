@@ -6,6 +6,6 @@ subsystems:
 - raid5-cache
 - raid5
 - md-cluster
-notify_build_success_branch: .*
+notify_build_success_branch: md-.*
 mail_to: Song Liu <song@kernel.org>
 mail_cc: linux-raid@vger.kernel.org
