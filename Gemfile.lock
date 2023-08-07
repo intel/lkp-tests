@@ -78,7 +78,7 @@ GEM
     thread_safe (0.3.6)
     tins (1.31.1)
       sync
-    tzinfo (1.2.9)
+    tzinfo (1.2.10)
       thread_safe (~> 0.1)
     unicode-display_width (2.1.0)
     webrick (1.7.0)
@@ -88,6 +88,7 @@ GEM
 PLATFORMS
   aarch64-linux
   riscv64-linux
+  ruby
   x86_64-linux
 
 DEPENDENCIES
@@ -104,4 +105,3 @@ DEPENDENCIES
   simplecov
   simplecov-rcov
   term-ansicolor
-
