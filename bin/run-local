@@ -153,7 +153,6 @@ save_paths(result_root, user)
 
 system 'killall', '-q', "#{LKP_SRC}/bin/event/wakeup"
 system job_script, 'run_job'
-system "#{LKP_SRC}/bin/run-with-job", job_script, "#{LKP_SRC}/bin/post-run"
 system "#{LKP_SRC}/bin/event/wakeup", 'job-finished'
 
 job.save "#{result_root}/job.yaml"
@@ -164,6 +163,7 @@ stats = create_stats_matrix ENV['RESULT_ROOT']
 stats['stats_source'] = "#{result_root}/stats.json"
 unite_to(stats, _result_root)
 system("#{LKP_SRC}/sbin/unite-params", result_root)
+system "#{LKP_SRC}/bin/run-with-job", job_script, "#{LKP_SRC}/bin/post-run"
 
 MResultRootTableSet.create_tables_layout
 convert_mrt(_result_root)
