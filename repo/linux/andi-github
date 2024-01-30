@@ -1,0 +1,6 @@
+url: https://github.com/ashyti/linux
+owner: Andi Shyti <andi.shyti@kernel.org>
+mail_to: Andi Shyti <andi.shyti@kernel.org>
+branch_denylist: .*
+branch_allowlist: test/.*
+notify_build_success_branch: .*
