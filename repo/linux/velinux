@@ -1,0 +1,28 @@
+url: https://github.com/bytedance/kernel.git
+test_old_branches: .*
+arch_denylist: .*
+arch_allowlist: x86_64|arm64|loongarch
+branch_allowlist: 5.15-velinux|6.6-velinux
+branch_denylist: .*
+compiler: gcc
+mail_to:
+- jason.zeng@intel.com
+- wu.zheng@intel.com
+- pei.p.jia@intel.com
+private_report_branch: .*
+notify_build_success_branch: .*
+tests:
+  - branch: 6.6-velinux
+    parameters:
+      kconfig: x86_64-velinux_base_config
+      base_commit: v6.6.40
+      mail_to:
+        - wu.zheng@intel.com
+        - oliver.sang@intel.com
+  - branch: 5.15-velinux
+    parameters:
+      kconfig: x86_64-velinux_base_config
+      base_commit: v5.15.152
+      mail_to:
+        - wu.zheng@intel.com
+        - oliver.sang@intel.com
