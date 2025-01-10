@@ -4,6 +4,7 @@ category: benchmark
 
 nr_processes: 100%
 nr_threads: 2t
+thp: true
 
 perf-bench-numa-mem:
   mem_proc: 300M

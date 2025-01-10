@@ -2,7 +2,7 @@
 # - nr_processes
 # - nr_threads
 # - mem_proc
-# - thp_opt
+# - thp
 # - extra_params
 
 ## perf began as a tool for using the performance counters
@@ -16,10 +16,11 @@
 
 set_perf_path "/lkp/benchmarks/perf/perf"
 
+[ "$thp" = "true" ] && thp_num=1 || thp_num=-1
 [ -n "$nr_processes" ] || nr_processes=$nr_cpu
 
 mb_proc=$(to_mb $mem_proc)
 
 log_cmd numactl --hard || die "Test needs available numa"
 
-log_cmd  $perf bench numa mem -p $nr_processes -t $nr_threads -m -0 -P $mb_proc --thp $thp_opt $extra_params
+log_cmd  $perf bench numa mem -p $nr_processes -t $nr_threads -m -0 -P $mb_proc --thp $thp_num $extra_params

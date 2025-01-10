@@ -8,7 +8,7 @@ parameters:
  nr_processes:
  nr_threads:
  mem_proc:
- thp_opt:
+ thp:
  extra_params:
 
 results:
