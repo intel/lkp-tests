@@ -190,8 +190,9 @@ install_crosstool_gcc()
 	if [[ $gcc_version ]]; then
 		# for arch has more than 1 cross tool available, like x86_64-gcc-9.3.0-nolibc_arm-linux-gnueabi.tar.xz
 		# and x86_64-gcc-9.3.0-nolibc_arm-linux-gnueabihf.tar.xz for arm, match "arm-linux-gnueabi." instead of
-		# "arm-linux-gnueabi" to get single tool package which match exactly.
-		file=$(grep "${gcc_arch_pattern}\..*tar\.xz$" $list | grep "${gcc_version}" | tail -1)
+		# "arm-linux-gnueabi" to get single tool package which match exactly. Also, avoid wrong matching of cross
+		# tool for an other architecture like arc-linux.tar.xz and sparc-linux.tar.xz
+		file=$(grep "\-${gcc_arch_pattern}\.tar\.xz$" $list | grep "${gcc_version}" | tail -1)
 	else
 		file=$(grep "${gcc_arch_pattern}\..*tar\.xz$" $list | tail -1)
 	fi
