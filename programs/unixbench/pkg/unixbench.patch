@@ -46,21 +46,21 @@ diff --git a/UnixBench/Run b/UnixBench/Run
 index 34d2c72..205fd01 100755
 --- a/UnixBench/Run
 +++ b/UnixBench/Run
-@@ -839,7 +839,7 @@ sub getSystemInfo {
+@@ -999,7 +999,7 @@ sub getSystemInfo {
      }
- 
+
      # Get graphics hardware info.
 -    $info->{'graphics'} = getCmdOutput("3dinfo | cut -f1 -d\'(\'");
 +    #$info->{'graphics'} = getCmdOutput("3dinfo | cut -f1 -d\'(\'");
- 
+
      # Get system run state, load and usage info.
      $info->{'runlevel'} = getCmdOutput("who -r | awk '{print \$3}'");
-@@ -1900,7 +1900,7 @@ sub main {
+@@ -2066,7 +2066,7 @@ sub main {
      my @creatingDirectories = ( ${TMPDIR}, ${RESULTDIR} );
      createDirrectoriesIfNotExists(@creatingDirectories);
- 
+
 -    preChecks();
 +    #preChecks();
-     my $systemInfo = getSystemInfo();
- 
+     my $systemInfo = getSystemInfo($verbose);
+
      # If the number of copies to run was not set, set it to 1
