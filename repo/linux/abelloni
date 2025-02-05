@@ -1,7 +1,7 @@
 url: https://git.kernel.org/pub/scm/linux/kernel/git/abelloni/linux.git
 integration_testing_branches: rtc-next
-mail_cc: rtc-linux@googlegroups.com
-owner: Alexandre Belloni <alexandre.belloni@free-electrons.com>
+mail_cc: linux-rtc@vger.kernel.org
+owner: Alexandre Belloni <alexandre.belloni@bootlin.com>
 subsystems:
 - at91
 - arm
@@ -9,5 +9,5 @@ subsystems:
 - rtc
 - clk
 private_report_branch: .*
-mail_to: Alexandre Belloni <alexandre.belloni@free-electrons.com>
+mail_to: Alexandre Belloni <alexandre.belloni@bootlin.com>
 public_report_branch: rtc-*
