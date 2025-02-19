@@ -6,7 +6,7 @@ arch=('i386' 'x86_64' 'aarch64')
 url="https://git.kernel.org/cgit/utils/rt-tests/rt-tests.git/"
 license=('GPL')
 source=("https://www.kernel.org/pub/linux/utils/rt-tests/rt-tests-$pkgver.tar.gz")
-md5sums=('1034236660c2be3f8b6b1a9cdfd3bc7f')
+md5sums=('4548521cc25e6d01f636dcd460bb0019')
 
 build() {
         cd "$srcdir/$pkgname-$pkgver"
