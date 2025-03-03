@@ -69,6 +69,8 @@ libbinutils:
 libblas3: blas
 libblkid-dev: libblkid-devel
 libbpf-dev: libbpf-devel
+libbrlapi-dev: brlapi-devel
+libbrlapi0.8: brlapi
 libbsd-dev: libbsd-devel
 libbsd0: libbsd
 libbz2-1.0:
@@ -88,6 +90,7 @@ libc6: glibc.x86_64
 libcairo2-dev: cairo-devel
 libcairo2:
 libcap-dev: libcap-devel
+libcap-ng0:
 libcap-ng-dev: libcap-ng-devel
 libcap2-bin: libcap
 libcapstone-dev: capstone-devel
@@ -121,6 +124,7 @@ libevent-dev: libevent-devel
 libevent-openssl-2:
 libexpat1-dev: expat-devel
 libfabric-dev: libfabric-devel
+libfdt1:
 libfdt-dev: libfdt-devel
 libffi-dev: libffi-devel
 libfile-stripnondeterminism-perl:
@@ -154,6 +158,8 @@ libgoogle-perftools-dev: gperftools-devel
 libgsl-dev:
 libgsl:
 libgssapi-krb5-2:
+libgtk-3-0: gtk3
+libgtk-3-dev: gtk3-devel
 libgtk2.0-dev: gtk2-devel
 libhugetlbfs-bin:
 libhugetlbfs-dev:
@@ -191,15 +197,19 @@ liblz4-1:
 liblz4-dev:
 liblzma-dev: xz-devel
 liblzma5:
+liblzo2-2: lzo
+liblzo2-dev: lzo-devel
 libmariadb-dev: mysql-devel
 libmariadb3: mariadb-connector-c
 libmnl-dev: libmnl-devel
 libmount-dev: libmount-devel
 libmpfr-dev: mpfr-devel
 libmpfr6: mpfr
+libncurses5: ncurses
 libncurses5-dev: ncurses-devel
 libncursesw5-dev:
 libndctl-dev: ndctl-devel
+libnfs13: libnfs
 libnfs-dev: libnfs-devel
 libnl-3-200: libnl3
 libnl-3-dev: libnl3-devel
@@ -254,29 +264,37 @@ libpulse-dev: pulseaudio-libs-devel
 libpython2:
 libpython3: python3-libs
 libqt5opengl5-dev:
+librbd-dev: librbd-devel
 librdmacm-dev: librdmacm-devel
 librdmacm1: librdmacm
 libreadline-dev: compat-readline5-devel
 libreadline5: compat-readline5
-libsasl2-2:
+libsasl2-2: cyrus-sasl
+libsasl2-dev: cyrus-sasl-devel
 libsctp-dev: lksctp-tools-devel
 libsctp1: lksctp-tools
+libsdl2-2.0-0: SDL2
 libsdl2-dev: SDL2-devel
 libseccomp-dev: libseccomp-devel
-libseccomp2: libseccomp2
+libseccomp2: libseccomp
 libselinux1-dev: libselinux-devel
 libselinux1: libselinux
 libsigsegv2:
 libslang2-dev: slang-devel
+libslirp0: libslirp
 libslirp-dev: libslirp-devel
 libsmbclient-dev:
 libsnappy-dev: snappy-devel
 libsnappy1v5: snappy
+libsndio7.0:
 libsodium-dev:
 libspice-protocol-dev: spice-protocol
+libspice-server1: spice-server
 libspice-server-dev: spice-server-devel
 libsqlite3-0: libsqlite3x
 libsqlite3-dev: libsqlite3x-devel
+libssh-4: libssh
+libssh-dev: libssh-devel
 libssl-dev: openssl-devel
 libssl: openssl-devel
 libtasn1-6:
@@ -294,10 +312,15 @@ libunwind-dev: libunwind-devel
 liburcu-dev: userspace-rcu-devel
 liburcu: userspace-rcu
 liburing-dev: liburing-devel
+libusb-1.0-0: libusb1
+libusb-1.0-0-dev: libusb-compat-0.1-devel
 libuuid1: libuuid
 libuv1-dev: libuv-devel
 libv4l-dev: libv4l-devel
+libvde-dev:
+libvde0:
 libvdeplug-dev:
+libvdeplug2:
 libvirt-clients: libvirt-client
 libvirt-daemon-system: libvirt-client libvirt-daemon
 libvirt-dev: libvirt-devel
