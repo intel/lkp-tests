@@ -150,7 +150,7 @@ module Compare
       @allowed_stat = nil
       @exclude_result_roots = nil
       @perf_profile_threshold = 5
-      set_params params
+      apply_params params
       @stat_calc_funcs = [Compare.method(:calc_stat_change)]
     end
 
@@ -168,7 +168,7 @@ module Compare
 
     public
 
-    def set_params(params)
+    def apply_params(params)
       set_prop(*params.flatten) if params
       self
     end
@@ -390,7 +390,7 @@ module Compare
       cms.map { |m| matrix_cols m }
     end
 
-    def get_all_stat_keys
+    def all_stat_keys
       stat_keys = []
       matrixes.each do |m|
         stat_keys |= m.keys
@@ -428,11 +428,11 @@ module Compare
       end.flatten
     end
 
-    def get_include_stat_keys
+    def include_stat_keys
       stat_key_res = @comparer.include_stat_keys
       return [] unless stat_key_res
 
-      do_filter_stat_keys get_all_stat_keys, stat_key_res
+      do_filter_stat_keys all_stat_keys, stat_key_res
     end
 
     def filter_stat_keys(stats)
@@ -453,10 +453,10 @@ module Compare
       stats
     end
 
-    def get_include_all_failure_stat_keys
+    def include_all_failure_stat_keys
       return [] unless @comparer.include_all_failure_stat_keys
 
-      get_all_stat_keys.select { |stat_key| function_stat?(stat_key) }
+      all_stat_keys.select { |stat_key| function_stat?(stat_key) }
     end
 
     def do_filter_testcase_stat_keys(stats)
@@ -466,8 +466,8 @@ module Compare
       end
     end
 
-    def get_testcase_stat_keys
-      do_filter_testcase_stat_keys get_all_stat_keys
+    def testcase_stat_keys
+      do_filter_testcase_stat_keys all_stat_keys
     end
 
     def filter_testcase_stat_keys(stats)
@@ -488,16 +488,16 @@ module Compare
 
     def calc_changed_stat_keys(matrixes_in)
       stat_keys = if @comparer.use_all_stat_keys
-                    get_all_stat_keys
+                    all_stat_keys
                   elsif @comparer.use_stat_keys
                     @comparer.use_stat_keys
                   elsif @comparer.use_testcase_stat_keys
-                    get_testcase_stat_keys
+                    testcase_stat_keys
                   else
                     _calc_changed_stat_keys(matrixes_in)
                   end
-      stat_keys |= get_include_stat_keys
-      stat_keys |= get_include_all_failure_stat_keys
+      stat_keys |= include_stat_keys
+      stat_keys |= include_all_failure_stat_keys
       stat_keys = filter_stat_keys stat_keys
       stat_keys = filter_testcase_stat_keys stat_keys if @comparer.filter_testcase_stat_keys
       stat_keys = filter_kpi_stat_keys stat_keys, matrixes_in if @comparer.filter_kpi_stat_keys
@@ -656,7 +656,7 @@ module Compare
         @data_types.first
       end
 
-      def set_data_type(dt)
+      def apply_data_type(dt)
         @data_types[0] = dt
         self
       end
@@ -1052,7 +1052,7 @@ module Compare
     comparer.set_mresult_roots(_result_roots)
             .set_sort_mresult_roots(false)
             .set_compare_axis_keys(compare_axis_keys)
-            .set_params(params)
+            .apply_params(params)
   end
 
   def self.compare_commits(commits, params = nil)
@@ -1071,7 +1071,7 @@ module Compare
     comparer.set_mresult_roots(_rts)
             .set_sort_mresult_roots(false)
             .set_compare_axis_keys(compare_axis_keys)
-            .set_params(params)
+            .apply_params(params)
   end
 
   def self.ncompare_commits(commits, params = nil)
