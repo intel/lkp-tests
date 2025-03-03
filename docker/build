@@ -53,7 +53,9 @@ opt_test_dir=${opt_test_dir:-$LKP_DOCKER_TEST_DIR}
 	exit 1
 }
 
-cmd="docker build . -f $LKP_SRC/docker/${opt_image%%/*}/Dockerfile -t lkp-tests/${opt_image} --build-arg hostname=${opt_hostname} --build-arg base_image=${opt_image//\//:}"
+cd $LKP_SRC
+
+cmd="docker build . -f docker/${opt_image%%/*}/Dockerfile -t lkp-tests/${opt_image} --build-arg hostname=${opt_hostname} --build-arg base_image=${opt_image//\//:}"
 [[ $opt_proxy ]] && cmd="$cmd --build-arg http_proxy=${opt_proxy} --build-arg https_proxy=${opt_proxy}"
 
 exec_cmd $cmd

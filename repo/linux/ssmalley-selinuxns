@@ -1,0 +1,7 @@
+url: https://github.com/stephensmalley/selinux-kernel
+branch_allowlist: working-selinuxns
+branch_denylist: .*
+mail_to: stephen.smalley.work@gmail.com
+private_report_branch: working-selinuxns
+notify_build_success_branch: working-selinuxns
+owner: Stephen Smalley <stephen.smalley.work@gmail.com>

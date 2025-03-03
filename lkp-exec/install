@@ -71,28 +71,28 @@ done
 
 validate_parameters()
 {
-    local ret=0
-    for filename in "$@"
-    do
-        if [ -x "$filename" ]; then
-            continue
-        elif [ ${filename##*.} = "yaml" ]; then
-            if [ -f $filename ]; then
-                grep -q '^arch: ' $filename || {
-                    echo "only atomic jobs can be installed" >&2
-                    echo "Please run lkp split-job $filename first" >&2
-                    ret=1
-                }
-            else
-                echo "$0: cannot find file $filename" >&2
-                ret=1
-            fi
-        else
-            echo "$0: skip unknown parameter $filename" >&2
-            ret=1
-        fi
-    done
-    return $ret
+	local ret=0
+	for filename in "$@"
+	do
+		if [ -x "$filename" ]; then
+			continue
+		elif [ ${filename##*.} = "yaml" ]; then
+			if [ -f $filename ]; then
+				grep -q '^arch: ' $filename || {
+					echo "only atomic jobs can be installed" >&2
+					echo "Please run lkp split-job $filename first" >&2
+					ret=1
+				}
+			else
+				echo "$0: cannot find file $filename" >&2
+				ret=1
+			fi
+		else
+			echo "$0: skip unknown parameter $filename" >&2
+			ret=1
+		fi
+	done
+	return $ret
 }
 
 make_wakeup() {
@@ -297,7 +297,7 @@ install_fakeroot()
 			cd fakeroot || exit
 			libtoolize && aclocal && autoconf && autoheader && automake --add-missing || exit
 			./configure --prefix /usr && make && make install || exit
-                        cd .. && rm -rf fakeroot || exit
+			cd .. && rm -rf fakeroot || exit
 		)
 	fi
 }
@@ -360,18 +360,19 @@ install_base_support()
 	create_host_config
 }
 
-enable_centos_source(){
-    if ! yum list installed | grep -q yum-utils; then
-        yum install -y yum-utils
-    fi
+enable_centos_source()
+{
+	if ! yum list installed | grep -q yum-utils; then
+		yum install -y yum-utils
+	fi
 
-    if [ "$_system_version" = 9 ]; then
-	echo "enable source crb"
-        dnf config-manager --set-enabled crb
-    elif [ "$_system_version" = 8 ]; then
-	echo "enable source powertools"
-        dnf config-manager --set-enabled powertools
-    fi
+	if [ "$_system_version" = 9 ]; then
+		echo "enable source crb"
+		dnf config-manager --set-enabled crb
+	elif [ "$_system_version" = 8 ]; then
+		echo "enable source powertools"
+		dnf config-manager --set-enabled powertools
+	fi
 
 }
 

@@ -6,6 +6,7 @@ cgroup-tools:
 cryptsetup-bin: cryptsetup
 cython3: python3-cython
 default-jdk:
+docbook-xml:
 exfat-utils: exfatprogs
 freeglut3-dev: freeglut-devel
 grub-common: grub2-common

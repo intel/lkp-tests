@@ -7,7 +7,6 @@ Metrics/AbcSize:
   Exclude:
     - lib/changed_stat.rb
     - lib/compare.rb
-    - lib/dmesg.rb
     - lib/hash.rb
     - lib/job.rb
     - lib/job2sh.rb
@@ -43,7 +42,6 @@ Metrics/PerceivedComplexity:
 Metrics/BlockNesting:
   Exclude:
     - lib/hash.rb
-    - programs/suspend/parse
 
 Metrics/ClassLength:
   Enabled: false
@@ -134,11 +132,7 @@ Lint/EmptyWhen:
 
 Naming/AccessorMethodName:
   Exclude:
-    - 'lib/compare.rb'
-    - 'lib/data_store.rb'
-    - 'lib/nresult_root.rb'
     - 'lib/property.rb'
-    - 'lib/result_root.rb'
 
 Naming/HeredocDelimiterNaming:
   Enabled: false

@@ -35,4 +35,6 @@ load_container()
 
 		[[ $value ]] && eval "opt_$key=$value"
 	done < $container
+
+	return 0
 }
