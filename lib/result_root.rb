@@ -83,6 +83,9 @@ end
 class ResultRootCollection
   include Enumerable
 
+  attr_writer :date_glob
+  attr_writer :queue
+
   def initialize(conditions = {})
     @conditions = conditions
     @date_glob = nil
@@ -98,16 +101,8 @@ class ResultRootCollection
     self
   end
 
-  def set_date_glob(glob)
-    @date_glob = glob
-  end
-
-  def set_date(time)
+  def apply_date(time)
     @date_glob = str_date(time)
-  end
-
-  def set_queue(queue)
-    @queue = queue
   end
 
   def each
