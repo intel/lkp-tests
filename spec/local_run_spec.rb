@@ -4,12 +4,13 @@ require 'fileutils'
 require 'tmpdir'
 require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/yaml"
+require "#{LKP_SRC}/lib/lkp_tmpdir"
 
 describe 'local run' do
   before(:all) do
     @tmp_dir = LKP::TmpDir.new('local-run-spec-')
-    FileUtils.chmod 'go+rwx', @tmp_dir.to_s
-    @tmp_file = "#{@tmp_dir}/run-env-tmp.rb"
+    @tmp_dir.add_permission
+    @tmp_file = @tmp_dir.path('run-env-tmp.rb')
     FileUtils.cp "#{LKP_SRC}/lib/run_env.rb", @tmp_file
     s = ''
     File.open(@tmp_file, 'r') do |f|
@@ -20,7 +21,7 @@ describe 'local run' do
 
     require @tmp_file
     @hostname = `hostname`.chomp
-    @hostfile = "#{@tmp_dir}/#{@hostname}"
+    @hostfile = @tmp_dir.path(@hostname)
   end
 
   def write_host_file(content)
