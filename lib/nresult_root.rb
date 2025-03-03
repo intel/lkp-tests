@@ -370,16 +370,15 @@ class NMResultRootCollection
     self
   end
 
-  def set_date(date)
-    @date = date
-  end
+  attr_writer :date
 
   def each(&b)
     return enum_for(__method__) unless block_given?
 
     table_each = lambda do |tbl|
       col = DataStore::Collection.new tbl, @conditions
-      col.set_date(@date).set_exact(@exact)
+      col.date = @date
+      col.exact = @exact
       col.each(&b)
     end
 
