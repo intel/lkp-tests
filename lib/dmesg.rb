@@ -233,14 +233,7 @@ def oops_to_bisect_pattern(line)
 end
 
 def analyze_error_id(line)
-  line = line.sub(/^(kern  |user  |daemon):......: /, '')
-
-  # remove caller information from CONFIG_PRINTK_CALLER
-  # [   55.954373][    T1] UBI error: cannot initialize UBI, error -1 => [   55.954373] UBI error: cannot initialize UBI, error -1
-  line.sub!(/\[ {0,4}[A-Z][0-9]{1,5}\] /, ' ')
-
-  line.sub!(/^[^a-zA-Z]+/, '')
-  # line.sub!(/^\[ *[0-9]{1,6}\.[0-9]{6}\] )/, '') # the above pattern includes this one
+  line = preprocess_line(line)
 
   case line
   when /(INFO: rcu[_a-z]* self-detected stall on CPU)/,
@@ -349,6 +342,24 @@ def analyze_error_id(line)
     bug_to_bisect = oops_to_bisect_pattern line
   end
 
+  error_id = generate_error_id(line)
+
+  [error_id, bug_to_bisect]
+end
+
+def preprocess_line(line)
+  line = line.sub(/^(kern  |user  |daemon):......: /, '')
+
+  # remove caller information from CONFIG_PRINTK_CALLER
+  # [   55.954373][    T1] UBI error: cannot initialize UBI, error -1 => [   55.954373] UBI error: cannot initialize UBI, error -1
+  line.sub!(/\[ {0,4}[A-Z][0-9]{1,5}\] /, ' ')
+
+  line.sub!(/^[^a-zA-Z]+/, '')
+  # line.sub!(/^\[ *[0-9]{1,6}\.[0-9]{6}\] )/, '') # the above pattern includes this one
+  line
+end
+
+def generate_error_id(line)
   error_id = line
 
   error_id.gsub!(/\ \]$/, '') # [ INFO: possible recursive locking detected ]
@@ -383,7 +394,7 @@ def analyze_error_id(line)
   error_id.gsub!(/[^\/a-zA-Z0-9_]\w[0-9]+\W/, '#') # dmesg.BUG:soft_lockup-CPU##stuck_for#s![trinity-c0:#]
   error_id.gsub!(/\W\w[0-9]+[^\/a-zA-Z0-9_]/, '#') # dmesg.BUG:soft_lockup-CPU##stuck_for#s![kworker/u258:#:#]
 
-  [error_id, bug_to_bisect]
+  error_id
 end
 
 def get_crash_stats(dmesg_file)
