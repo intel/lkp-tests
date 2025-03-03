@@ -317,9 +317,9 @@ setup_cross_vars()
 			# for earlier gcc version, will failed to find arceb-elf for
 			# big endian arceb-elf tool chain
 			if is_config_enabled CONFIG_CPU_BIG_ENDIAN; then
-				crosstool=arceb-elf
+				crosstool=arceb-linux
 			else
-				crosstool=arc-elf
+				crosstool=arc-linux
 			fi
 			;;
 		c6x)
