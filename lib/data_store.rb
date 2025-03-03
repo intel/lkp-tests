@@ -668,7 +668,8 @@ module DataStore
 
     def collection
       c = Collection.new(table, axes)
-      c.set_date create_time
+      c.date = create_time
+      c
     end
 
     def delete
@@ -713,6 +714,8 @@ module DataStore
     include Enumerable
     include Property
 
+    attr_writer :date
+
     def initialize(table, conditions = {})
       @table = table
       @conditions = {}
@@ -732,11 +735,6 @@ module DataStore
 
     def unset(key, _value)
       @conditions.delete key
-      self
-    end
-
-    def set_date(date)
-      @date = date
       self
     end
 

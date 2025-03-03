@@ -4,6 +4,33 @@ cycle = 1
 srhash = {}
 srmaxhash = {}
 phase = 'none'
+
+def handle_suspend_enter(stage, timestamp, srhash, cycle)
+  srhash["suspend_overall_#{cycle}"] = timestamp if stage == 'begin'
+end
+
+def handle_machine_suspend(stage, timestamp, srhash, cycle)
+  if stage == 'begin'
+    cost = (timestamp.to_f - srhash["suspend_overall_#{cycle}"].to_f) * 1000
+    srhash["suspend_overall_#{cycle}"] = cost.to_i
+  else
+    srhash["resume_overall_#{cycle}"] = timestamp
+  end
+end
+
+def handle_thaw_processes(stage, timestamp, srhash, cycle)
+  if stage == 'end'
+    cost = (timestamp.to_f - srhash["resume_overall_#{cycle}"].to_f) * 1000
+    srhash["resume_overall_#{cycle}"] = cost.to_i
+    cycle += 1
+  end
+  cycle
+end
+
+def handle_dpm(stage, phase)
+  stage == 'begin' ? phase : 'none'
+end
+
 while (line = $stdin.gets)
   line.chomp!
   case line
@@ -29,26 +56,13 @@ while (line = $stdin.gets)
 
     case step
     when 'suspend_enter'
-      srhash["suspend_overall_#{cycle}"] = timestamp if stage == 'begin'
+      handle_suspend_enter(stage, timestamp, srhash, cycle)
     when 'machine_suspend'
-      if stage == 'begin'
-        cost = (timestamp.to_f - srhash["suspend_overall_#{cycle}"].to_f) * 1000
-        srhash["suspend_overall_#{cycle}"] = cost.to_i
-      else
-        srhash["resume_overall_#{cycle}"] = timestamp
-      end
+      handle_machine_suspend(stage, timestamp, srhash, cycle)
     when 'thaw_processes'
-      if stage == 'end'
-        cost = (timestamp.to_f - srhash["resume_overall_#{cycle}"].to_f) * 1000
-        srhash["resume_overall_#{cycle}"] = cost.to_i
-        cycle += 1
-      end
+      cycle = handle_thaw_processes(stage, timestamp, srhash, cycle)
     when /^dpm_(.*)$/
-      phase = if stage == 'begin'
-                $1
-              else
-                'none'
-              end
+      phase = handle_dpm(stage, $1)
     end
   when /^ *.* \[\d{3}\] .... *(\d{1,6}\.\d{6}): device_pm_callback_start: (.*) (.*), parent: .*$/
     timestamp = $1
@@ -61,7 +75,7 @@ while (line = $stdin.gets)
                 else
                   timestamp
                 end
-  when /^ *.* \[\d{3}\] .... *(\d{1,6}\.\d{6}): device_pm_callback_end: (.*) (.*), err=(\d?)/
+  when /^ *.* \[\d{3}\] .... *(\d{1,6}\.\d{6}): device_pm_callback_end: (.*) (.*), err=(\d?)$/
     timestamp = $1
     bus = $2
     device = $3.strip
