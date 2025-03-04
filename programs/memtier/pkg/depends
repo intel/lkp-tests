@@ -1,7 +1,9 @@
 autoconf
 bc
 libevent
+libevent-dev
 libevent-openssl-2
 libpcre3
+libpcre3-dev
 pkg-config
 zlib1g
