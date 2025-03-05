@@ -29,6 +29,7 @@ libpfm4: libpfm
 libpng12-dev:
 libpython2:
 libpython3: python3-libs
+libsndio7.0:
 libusb-1.0-0-dev: libusb-devel
 libusb-1.0-0: libusb
 llvm-dev: llvm-devel
