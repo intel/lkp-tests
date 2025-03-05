@@ -3,6 +3,7 @@
 LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.dirname(File.dirname(File.realpath($PROGRAM_NAME))))
 
 require "#{LKP_SRC}/lib/log"
+require "#{LKP_SRC}/lib/string"
 
 stats = Hash.new { |h, k| h[k] = [] }
 
@@ -13,10 +14,10 @@ while (line = $stdin.gets)
     stats[key] = line.split[1]
   when /.*:.*ms.*ms.*us.*ms$/
     key = line.split[0].gsub(/:$/, '_ms')
-    stats[key] = line.split[2].gsub(/ms/, '')
+    stats[key] = line.split[2].remove(/ms/)
   when /^Totals/
     key = line.split[0].gsub(/s:/, '_ms')
-    stats[key] = line.split[2].gsub(/ms/, '')
+    stats[key] = line.split[2].remove(/ms/)
   end
 end
 

@@ -3,6 +3,7 @@
 LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.dirname(File.dirname(File.realpath($PROGRAM_NAME))))
 
 require "#{LKP_SRC}/lib/statistics"
+require "#{LKP_SRC}/lib/string"
 require "#{LKP_SRC}/lib/log"
 require "#{LKP_SRC}/lib/ruby"
 
@@ -38,7 +39,7 @@ while (line = $stdin.gets)
   case line
   when /(.*).log$/
     puts_one_task(task, run, period, slack, wu_lat)
-    task = $1.gsub('./', '')
+    task = $1.remove('./')
     run.clear
     period.clear
     slack.clear

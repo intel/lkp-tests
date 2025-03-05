@@ -35,7 +35,7 @@ while (line = $stdin.gets)
   case line
   when /^\[.*\] ([A-Za-z_]+)-torture.*End of test: (.*):.*onoff_interval=([0-9]+).*/
     type = $1
-    result = ($2.downcase.delete ' ').gsub('[debug]', '')
+    result = ($2.downcase.delete ' ').remove('[debug]')
     cpuhotplug = true unless $3.eql? '0'
     break
   end

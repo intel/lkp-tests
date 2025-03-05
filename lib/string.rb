@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
+require 'active_support/core_ext/string/filters'
 
 REGEX_ANSI_COLOR = /\e\[([0-9;]+m|[mK])/.freeze
-
 class String
   # for converting log lines into "Content-Type: text/plain;" emails
   def plain_text

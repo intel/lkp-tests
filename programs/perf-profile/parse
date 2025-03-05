@@ -15,8 +15,12 @@
 #
 exit unless $stdin.gets =~ /^# ========$| --header/
 
+LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.dirname(File.dirname(File.realpath($PROGRAM_NAME))))
+
+require "#{LKP_SRC}/lib/string"
+
 def fixup_symbol_name(symbol)
-  symbol.gsub(/\.(isra|constprop|part)\.[0-9]+/, '')
+  symbol.remove(/\.(isra|constprop|part)\.[0-9]+/)
 end
 
 # Bypass lines before cs records:

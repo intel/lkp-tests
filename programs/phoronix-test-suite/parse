@@ -14,7 +14,7 @@ is_begin_of_subtest = false
 
 while (line = $stdin.gets)
   line = line.resolve_invalid_bytes
-             .gsub(/.\[1;(\d+)m|.\[0m/, '') # remove color control info
+             .remove(/.\[1;(\d+)m|.\[0m/) # remove color control info
              .chomp
 
   case test_name
@@ -29,7 +29,7 @@ while (line = $stdin.gets)
   when 'compress-lz4'
     case line
     when /Compression Level: (.+) - (.+):/
-      subtest_name = "#{$1}.#{$2}".gsub(/\s+/, '')
+      subtest_name = "#{$1}.#{$2}".remove(/\s+/)
     when /Average: ([0-9.]+) (.*)/
       stats["#{test_name}.#{subtest_name}.#{$2}"] = $1
     end
@@ -37,7 +37,7 @@ while (line = $stdin.gets)
   when 'intel-mlc'
     case line
     when /Test: (.+) - (.+):/
-      subtest_name = "#{$1}.#{$2}".gsub(/\s+/, '')
+      subtest_name = "#{$1}.#{$2}".remove(/\s+/)
     when /Average: ([0-9.]+) (.*)/
       stats["#{test_name}.#{subtest_name}.#{$2}"] = $1
     end
@@ -60,7 +60,7 @@ while (line = $stdin.gets)
     if line =~ /(?:pts|system)\/(?:\S+)-[0-9.]+ \[(?<params>.+)\]/
       params = Regexp.last_match[:params] # "Test: Furmark - Resolution: 800 x 600 - Mode: Windowed"
       test_subname << params.split(' - ') # ["Test: Furmark", "Resolution: 800 x 600", "Mode: Windowed"]
-                            .map { |param| param.split(': ').last.gsub(/\s+/, '') } # ["Furmark", "800x600", "Windowed"]
+                            .map { |param| param.split(': ').last.remove(/\s+/) } # ["Furmark", "800x600", "Windowed"]
                             .join('.') # "Furmark.800x600.Windowed"
     end
 

@@ -3,6 +3,7 @@
 LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.dirname(File.dirname(File.realpath($PROGRAM_NAME))))
 
 require "#{LKP_SRC}/lib/tests/stats"
+require "#{LKP_SRC}/lib/string"
 
 stats = LKP::Stats.new
 
@@ -24,7 +25,7 @@ while (line = $stdin.gets)
     results["dmesg.#{$2.sub!(/\b(0x)?ffff[[:xdigit:]]{12}\b/, '').delete(' ')}"] = 1
     leaking_number += 1
   when /^\[\d+ ([^\d])([^\]]+)\](.*)/
-    results["proc.#{$1}#{$2}.#{$3.sub!(/\b(0x)?ffff[[:xdigit:]]{12}\b/, '').gsub(/\s+/, '')}"] = 1
+    results["proc.#{$1}#{$2}.#{$3.sub!(/\b(0x)?ffff[[:xdigit:]]{12}\b/, '').remove(/\s+/)}"] = 1
     leaking_number += 1
   end
 end
