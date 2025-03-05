@@ -5,6 +5,7 @@ require 'time'
 require 'json'
 require 'fileutils'
 require "#{LKP_SRC}/lib/log"
+require "#{LKP_SRC}/lib/string"
 
 # The below is an example of mpstat output, read it then parse it into hash data.
 # {"sysstat": {
@@ -170,7 +171,7 @@ mpstat_hash['sysstat']['hosts'][0]['statistics'].each do |item|
     elsif k == 'timestamp'
       # Append UTC to timestamp to fix the timezone as no timezone is provided by
       # mpstat, otherwise the parsed result is related to the timezone of local system.
-      time = Time.parse([data, v, 'UTC'].join(' ')).to_i
+      time = [data, v, 'UTC'].join(' ').to_time.to_i
       results['time'] = time
     end
   end

@@ -15,8 +15,8 @@ while (line = $stdin.gets)
   when /^Benchmark Run: .+ (\d+:\d+:\d+) - (\d+:\d+:\d+)$/
     # Benchmark Run: Tue Jan 01 2019 15:48:24 - 15:56:36
     # We only care about the difference value between end time and start time
-    start_time = Time.parse($1).to_f
-    end_time = Time.parse($2).to_f
+    start_time = $1.to_time.to_f
+    end_time = $2.to_time.to_f
     duration = if end_time > start_time
                  end_time - start_time
                else

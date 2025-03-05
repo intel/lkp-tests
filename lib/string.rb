@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+require 'active_support/core_ext/string/conversions'
 
 REGEX_ANSI_COLOR = /\e\[([0-9;]+m|[mK])/.freeze
 

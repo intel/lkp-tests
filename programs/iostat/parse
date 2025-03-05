@@ -7,8 +7,10 @@
 # Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
 # sda               0.15    12.76    3.02    9.81    63.05   126.27    29.51     0.16   12.72    3.96   15.42   1.55   1.99
 # sdd               0.09    34.01    8.43   20.57   189.15   750.68    64.80     0.79   27.07    1.31   37.63   0.45   1.31
+LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.dirname(File.dirname(File.realpath($PROGRAM_NAME))))
 
 require 'time'
+require "#{LKP_SRC}/lib/string"
 
 def normalize_key(key)
   key.sub('%', '')
@@ -45,7 +47,7 @@ while (line = $stdin.gets)
   case line
   when /^[0-9T:+-]{24}$/ # "2013-04-02T13:58:40+0800", by 'S_TIME_FORMAT=ISO isotat -t'
     time = line.chomp('\n')
-    puts "time: #{Time.parse(time).to_i}"
+    puts "time: #{time.to_time.to_i}"
   when /^avg-cpu:/
     extract_avg_cpu line
   when /^Device:/

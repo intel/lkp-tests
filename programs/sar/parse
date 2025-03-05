@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
+LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.dirname(File.dirname(File.realpath($PROGRAM_NAME))))
 
 require 'time'
 require 'json'
-
+require "#{LKP_SRC}/lib/string"
 RESULT_ROOT = ENV['RESULT_ROOT']
 
 # The below is part of the sar json file, read it then parse it into hash data.
@@ -96,7 +97,7 @@ sar_hash['sysstat']['hosts'][0]['statistics'].each do |item|
         elsif v_.instance_of?(Hash)
           get_hash_result k_, v_, results
         elsif k == 'timestamp'
-          timestamp = Time.parse([v['data'], v['time']].join(' ')).to_i
+          timestamp = [v['data'], v['time']].join(' ').to_time.to_i
           results['timestamp'] = timestamp
         else
           results["#{k}.#{k_}"] = v_

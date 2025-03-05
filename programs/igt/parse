@@ -13,7 +13,7 @@ subtest_name = nil
 has_dynamic_subtest = false
 
 def valid_datetime?(datetime_str)
-  Time.parse(datetime_str)
+  datetime_str.to_time
 rescue StandardError
   false
 end

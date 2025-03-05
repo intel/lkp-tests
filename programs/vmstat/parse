@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
-
+LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.dirname(File.dirname(File.realpath($PROGRAM_NAME))))
 require 'time'
-
+require "#{LKP_SRC}/lib/string"
 # procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu----- -----timestamp-----
 #  r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st                 PST
 #  2  0      0 224636  33636 6760228    0    0    54   141  129   23  1  1 98  0  0 2015-01-11 20:18:35
@@ -29,7 +29,7 @@ while (line = $stdin.gets)
 
   data = line.split
   if data.size == keys.size + 1 # has "date time" in end of line
-    time = Time.parse(data.pop(2).join(' ')).to_i
+    time = data.pop(2).join(' ').to_time.to_i
     data.push time
     show_record keys, data
   elsif data.size == keys.size - 1  # no timestamp in old versions of vmstat
