@@ -54,6 +54,12 @@ docker exec -it $hostname bash
 /lkp/lkp-tests# lkp rt hackbench
 ```
 
+The alternative method to attach to a terminal in the docker container is 
+
+```
+lkp docker attach --container $hostname
+```
+
 The alternative method to run the job is
 
 ```

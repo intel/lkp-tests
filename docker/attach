@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -e
+
+[[ -n "$LKP_SRC" ]] || LKP_SRC=$(dirname $(dirname $(readlink -e -v $0)))
+
+. $LKP_SRC/lib/docker.sh
+
+while getopts "t:-:" opt; do
+    case $opt in
+        t)
+            opt_container="$OPTARG"
+            ;;
+        -)
+            case "${OPTARG}" in
+                container)
+                    opt_container="${!OPTIND}"
+                    OPTIND=$((OPTIND + 1))
+                    ;;
+                *)
+                    echo "Unknown option --${OPTARG}"
+                    exit 1
+                    ;;
+            esac
+            ;;
+    esac
+done
+
+shift $((OPTIND - 1))
+
+echo $
+
+cd $LKP_SRC
+
+cmd="docker exec -it $opt_container bash"
+
+exec_cmd $cmd
