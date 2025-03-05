@@ -25,6 +25,9 @@ while getopts "d:i:j:g:t:-:" opt; do
 			;;
 		-)
 			case "${OPTARG}" in
+			    any)
+				    opt_any="--any"
+					;;
 				container)
 					opt_container="${!OPTIND}"
 					OPTIND=$((OPTIND + 1))
@@ -84,15 +87,16 @@ test()
 	local pattern="$2"
 	local action="$3"
 	local proxy="$4"
+	local opt_any="$5"
 
-	# echo "$(whoami): $FUNCNAME: '$job_yaml' '$pattern' '$proxy'"
+	# echo "$(whoami): $FUNCNAME: '$job_yaml' '$pattern' '$proxy' '$opt_any'"
 
 	[[ "$job_yaml" == /* ]] || job_yaml=/lkp/lkp-tests/jobs/$job_yaml
 
 	local job_dir=/lkp/jobs/$(basename "$job_yaml")
 
 	mkdir -p $job_dir
-	lkp split-job "$job_yaml" -o $job_dir || return
+	lkp split-job "$job_yaml" $opt_any -o $job_dir || return
 
 	local jobs=($job_dir/*$pattern*.yaml)
 
@@ -113,9 +117,9 @@ script_name=$(basename $0)
 
 case $script_name in
 install)
-	docker exec $opt_hostname bash -c "$(declare -f test); test \"$opt_job_yaml\" \"$opt_pattern\" \"install\" \"$opt_proxy\""
+	docker exec $opt_hostname bash -c "$(declare -f test); test \"$opt_job_yaml\" \"$opt_pattern\" \"install\" \"$opt_proxy\" \"$opt_any\""
 	;;
 test)
-	docker exec $opt_hostname bash -c "$(declare -f test); test \"$opt_job_yaml\" \"$opt_pattern\" \"test\" \"$opt_proxy\""
+	docker exec $opt_hostname bash -c "$(declare -f test); test \"$opt_job_yaml\" \"$opt_pattern\" \"test\" \"$opt_proxy\" \"$opt_any\""
 	;;
 esac

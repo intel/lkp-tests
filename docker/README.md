@@ -58,6 +58,9 @@ The alternative method to run the job is
 
 ```
 lkp docker test -i $image -j hackbench.yaml -g pipe-8-process-1600 --hostname $hostname
+
+# The flag --any can be set to let lkp randomly choose a job from the suite
+lkp docker test -i $image -j hackbench.yaml --any --hostname $hostname
 ```
 
 ## Test by lkp docker
