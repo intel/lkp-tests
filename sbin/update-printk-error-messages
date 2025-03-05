@@ -177,7 +177,7 @@ kmsg_denylist = File.read(LKP::Path.src('etc', 'kmsg-denylist.raw')).split "\n"
       nr_line_short += 1 if line.size < MIN_MSG_LEN
       next
     end
-    next if str.gsub(/[^a-zA-Z]/, '').size <= MIN_MSG_LEN / 2
+    next if str.remove(/[^a-zA-Z]/).size <= MIN_MSG_LEN / 2
     next unless kmsg_denylist.grep(str).empty?
 
     errids << str
