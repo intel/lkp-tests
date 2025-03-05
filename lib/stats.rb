@@ -407,22 +407,19 @@ def latency_stat?(stats_field)
 end
 
 def failure_stat?(stats_field)
-  $metric_failure.each { |pattern| return true if stats_field =~ %r{^#{pattern}} }
-  false
+  $metric_failure.any? { |pattern| stats_field =~ %r{^#{pattern}} }
 end
 
 def pass_stat?(stats_field)
-  $metric_pass.each { |pattern| return true if stats_field =~ %r{^#{pattern}} }
-  false
+  $metric_pass.any? { |pattern| stats_field =~ %r{^#{pattern}} }
 end
 
 def memory_change?(stats_field)
   stats_field =~ /^(boot-meminfo|boot-memory|proc-vmstat|numa-vmstat|meminfo|memmap|numa-meminfo)\./
 end
 
-def should_add_max_latency(stats_field)
-  $metric_add_max_latency.each { |pattern| return true if stats_field =~ %r{^#{pattern}$} }
-  false
+def add_max_latency?(stats_field)
+  $metric_add_max_latency.any? { |pattern| stats_field =~ %r{^#{pattern}$} }
 end
 
 def sort_remove_margin(array, max_margin = nil)
@@ -436,7 +433,7 @@ def sort_remove_margin(array, max_margin = nil)
 end
 
 # NOTE: array *must* be sorted
-def get_min_mean_max(array)
+def min_mean_max(array)
   return [0, 0, 0] if array.to_a.empty?
 
   [array[0], array[array.size / 2], array[-1]]
