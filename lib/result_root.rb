@@ -2,6 +2,7 @@ LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
 
 require 'time'
 
+require "#{LKP_SRC}/lib/string"
 require "#{LKP_SRC}/lib/common"
 require "#{LKP_SRC}/lib/property"
 require "#{LKP_SRC}/lib/yaml"
@@ -128,7 +129,7 @@ end
 class Completion
   def initialize(line)
     fields = line.split
-    @time = Time.parse(fields[0..2].join(' '))
+    @time = fields[0..2].join(' ').to_time
     @_rt = MResultRoot.new fields[4]
     @status = fields.drop(4).join ' '
   end
