@@ -3,8 +3,9 @@ apt-file:
 autotools-dev: autoconf
 binutils-dev: binutils-devel
 btrfs-tools: btrfs-progs
-build-essential: make automake gcc gcc-c++ kernel-uek-devel rpm-build rpmdevtools
+build-essential: make automake gcc gcc-c++ rpm-build rpmdevtools
 cgroup-bin: libcgroup
+default-jdk: java-1.8.0-openjdk-devel
 dpkg-dev: dpkg-devel
 f2fs-tools:
 fsmark: fs_mark
@@ -15,44 +16,73 @@ iozone3: gnuplot*
 klibc-utils:
 libacl1-dev: libacl-devel
 libaio-dev: libaio-devel
+libapparmor-dev:
+libapparmor1:
 libarchive-dev: libarchive-devel
+libarchive-tools: libarchive bsdtar
 libattr1-dev: libattr-devel
 libaudit-dev: audit-libs-devel
+libbabeltrace-dev: libbabeltrace-devel
 libblas3: liblas-libs
 libblkid-dev: libblkid-devel
+libbsd-dev: libbsd-devel
+libbsd0: libbsd
 libc6-dev-i386: glibc-devel.i686 glibc-static.i686
+libc6-dev-x32: glibc-devel
 libc6-dev: glibc-devel glibc-static
 libc6-dev:i386: glibc-devel.i686 glibc-static.i686
 libcairo2-dev: cairo-devel
 libcap-dev: libcap-devel
 libcap-ng-dev: libcap-ng-devel
+libcapstone-dev: capstone-devel
+libclang-dev: clang-devel
 libdbd-mysql-perl: perl-DBD-MySQL
 libdbi-perl: perl-DBI
 libdbus-1-dev: dbus-devel
 libdrm-dev: libdrm-devel
 libdw-dev: libdwarf-devel
+libdw1: libdwarves1
+libegl-dev: mesa-libEGL-devel
 libegl1-mesa-dev: mesa-libEGL-devel
+libegl1: mesa-libEGL
 libelf-dev: elfutils-libelf-devel
 libfabric-dev: libfabric-devel
 libfdt-dev:
 libfuse-dev: fuse-devel
 libgbm-dev: mesa-libgbm-devel
+libgbm1: mesa-libgbm
+libgcrypt-dev: libgcrypt-devel
+libgcrypt20: libgcrypt
 libgl1-mesa-dev: mesa-libglapi
+libgles2-mesa-dev: mesa-libGL-devel
 libgles2-mesa: mesa-libGLES
+libgles2: mesa-libGL
 libglib2.0-0: glib
 libglib2.0-dev: glib2-devel
 libglu-dev: mesa-libGLU-devel
 libgomp1: libgomp
+libgtk2.0-dev: gtk2-devel
 libhwloc-dev: hwloc-devel
 libiberty-dev:
 libibverbs-dev: libibverbs-devel
+libipc-run-perl: perl-IPC-Run
+libipsec-mb-dev:
+libipsec-mb:
+libjpeg-dev: libjpeg-turbo-devel
+libjpeg62-turbo: libjpeg-turbo
 libjson-c-dev: json-c-devel
+libjudy-dev:
+libjudydebian1:
+libkeyutils-dev: keyutils-libs-devel
+libkeyutils1: keyutils-libs
 libklibc-dev:
 libkmod-dev: kmod-devel
 libkmod2: kmod-libs
 liblz-dev:
 liblzma-dev: xz-devel
 libmount-dev: libmount-devel
+libmpfr-dev: mpfr-devel
+libmpfr6: mpfr
 libncurses5-dev: ncurses-devel
 libnl-3-200: libnl3
 libnl-3-dev: libnl3-devel
@@ -65,29 +95,45 @@ liboop-dev:
 liboop-dev: liboop
 libpcap-dev: libpcap-devel
 libpciaccess-dev: libpciaccess-devel
+libperl-dev: perl
 libperl5: perl-libs
+libpfm4-dev: libpfm-devel
+libpfm4: libpfm
 libpixman-1-dev: pixman-devel
 libpng12-dev: libpng12-devel
 libpopt-dev: popt-devel
 libpopt0: popt
+libpthread-stubs0-dev:
+libpython2:
+libpython3: python3-libs
 librdmacm-dev: librdmacm-devel
 libreadline5: readline
 libsctp-dev: lksctp-tools-devel
+libsctp1: lksctp-tools
 libselinux1:
+libslang2-dev: slang-devel
 libsqlite3-dev: sqlite-devel
 libssl-dev: openssl-devel
 libssl: openssl-devel
 libtool-bin: libtool
+libtraceevent-dev: libtraceevent-devel
+libtraceevent1: libtraceevent
+libtracefs-dev: libtracefs-devel
 libudev-dev: systemd-devel
 libudev1: systemd-libs
 libunwind-dev: libunwind-devel
 libuuid1: libuuid
 libuv1-dev: libuv-devel
 libx11-xcb-dev: libX11-devel
+libxxhash-dev:
+libxxhash0:
+libzstd-dev: libzstd-devel
+linux-cpupower: kernel-tools
 linux-libc-dev:
 linux-libc-dev:i386:
 linux-perf: perf
 linux-tools: perf
+llvm-dev: llvm-devel
 mysql-server: mariadb
 ncurses-bin: ncurses
 netpipe-lam:
@@ -103,18 +149,21 @@ pixz: pxz
 pkg-config: pkgconfig
 plzip:
 postmark:
+python-dev: python3-devel
 python-minimal: python2
 python-numpy: numpy
 python3-mako: python-pyramid-mako
 python3-markupsafe: python34-markupsafe
 python3-numpy: python34-numpy
 python3-six: python34-six
+rng-tools5: rng-tools
 rt-tests: numactl-devel
 ruby-dev: ruby-devel
 ruby-git:
 ruby-gnuplot:
 sg3-utils: sg3_utils
 stress-ng:
+systemtap-sdt-dev: systemtap-sdt-devel
 trinity:
 tshark: wireshark
 uuid-dev: libuuid-devel
@@ -124,3 +173,4 @@ xorg:
 xutils-dev: imake
 xz-utils: xz
 zlib1g-dev: zlib-devel
+zlib1g: zlib
