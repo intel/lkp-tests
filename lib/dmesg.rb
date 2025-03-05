@@ -196,10 +196,10 @@ def common_error_id(line)
       .gsub(/\ \ +/, ' ')
       .gsub(/([^a-zA-Z0-9])\ /, '\1')
       .gsub(/\ ([^a-zA-Z])/, '\1')
-      .gsub(/^\ /, '')
+      .remove(/^\ /)
       .gsub(/\  _/, '_')
       .tr(' ', '_')
-      .gsub(/[-_.,;:#!*\[(]+$/, '')
+      .remove(/[-_.,;:#!*\[(]+$/)
 end
 
 # # <4>[  256.557393] [ INFO: possible circular locking dependency detected ]
@@ -362,12 +362,12 @@ end
 def generate_error_id(line)
   error_id = line
 
-  error_id.gsub!(/\ \]$/, '') # [ INFO: possible recursive locking detected ]
-  error_id.gsub!(/\/c\/kernel-tests\/src\/[^\/]+\//, '')
-  error_id.gsub!(/\/c\/(wfg|yliu)\/[^\/]+\//, '')
-  error_id.gsub!(/\/lkp\/[^\/]+\/linux[0-9]*\//, '')
-  error_id.gsub!(/\/kernel-tests\/linux[0-9]*\//, '')
-  error_id.gsub!(/\.(isra|constprop|part)\.[0-9]+/, '')
+  error_id.remove!(/\ \]$/) # [ INFO: possible recursive locking detected ]
+  error_id.remove!(/\/c\/kernel-tests\/src\/[^\/]+\//)
+  error_id.remove!(/\/c\/(wfg|yliu)\/[^\/]+\//)
+  error_id.remove!(/\/lkp\/[^\/]+\/linux[0-9]*\//)
+  error_id.remove!(/\/kernel-tests\/linux[0-9]*\//)
+  error_id.remove!(/\.(isra|constprop|part)\.[0-9]+/)
 
   # [   31.694592] ADFS-fs error (device nbd10): adfs_fill_super: unable to read superblock
   # [   33.147854] block nbd15: Attempted send on closed socket
@@ -379,17 +379,17 @@ def generate_error_id(line)
   error_id.gsub!(/\b[0-9a-f]{8}\b/, '#')
   error_id.gsub!(/\b[0-9a-f]{16}\b/, '#')
   error_id.gsub!(/(=)[0-9a-f]+\b/, '\1#')
-  error_id.gsub!(/[+\/]0x[0-9a-f]+\b/, '')
-  error_id.gsub!(/[+\/][0-9a-f]+\b/, '')
+  error_id.remove!(/[+\/]0x[0-9a-f]+\b/)
+  error_id.remove!(/[+\/][0-9a-f]+\b/)
 
   # [   14.476643][    C0] BUG kmalloc-512 (Tainted: G S      W       T ): Right Redzone overwritten
   # [  264.548980][    C1] BUG kmalloc-rnd-02-96 (Tainted: G        W       TN): Freechain corrupt
-  error_id.gsub!(/ \(Tainted:.+\)/, '')
+  error_id.remove!(/ \(Tainted:.+\)/)
 
   error_id = common_error_id(error_id)
 
   error_id.gsub!(/([a-z]:)[0-9]+\b/, '\1') # WARNING: at arch/x86/kernel/cpu/perf_event.c:1077 x86_pmu_start+0xaa/0x110()
-  error_id.gsub!(/#:\[<#>\]\[<#>\]/, '') # RIP: 0010:[<ffffffff91906d8d>]  [<ffffffff91906d8d>] validate_chain+0xed/0xe80
+  error_id.remove!(/#:\[<#>\]\[<#>\]/) # RIP: 0010:[<ffffffff91906d8d>]  [<ffffffff91906d8d>] validate_chain+0xed/0xe80
   error_id.gsub!(/RIP:#:/, 'RIP:')       # RIP: 0010:__might_sleep+0x72/0x80
   error_id.gsub!(/[^\/a-zA-Z0-9_]\w[0-9]+\W/, '#') # dmesg.BUG:soft_lockup-CPU##stuck_for#s![trinity-c0:#]
   error_id.gsub!(/\W\w[0-9]+[^\/a-zA-Z0-9_]/, '#') # dmesg.BUG:soft_lockup-CPU##stuck_for#s![kworker/u258:#:#]
@@ -400,7 +400,7 @@ end
 def get_crash_stats(dmesg_file)
   if dmesg_file =~ /\.xz$/
     `xz -d -k #{dmesg_file}`
-    uncompressed_dmesg = dmesg_file.gsub(/\.xz$/, '')
+    uncompressed_dmesg = dmesg_file.remove(/\.xz$/)
     dmesg_file = uncompressed_dmesg
   end
 
@@ -457,7 +457,7 @@ def get_crash_calltraces(dmesg_file)
   in_decode = false
   end_decode = false
   decode_stacktrace = dmesg_content.include?(DECODE_FLAG)
-  dmesg_content.gsub!(/kbuild\/src\/[^\/]+\//, '')
+  dmesg_content.remove!(/kbuild\/src\/[^\/]+\//)
 
   dmesg_content.each_line do |line|
     if line =~ /---\[ cut here | BUG: | WARNING: | INFO: | UBSAN: | kernel BUG at /

@@ -12,7 +12,7 @@ while (line = $stdin.gets)
   #   ...
   next unless val
 
-  key = key.gsub(/^\s+/, '').gsub(/ \([^)]+\)/, '').gsub(/\s+/, '_').downcase
+  key = key.remove(/^\s+/).remove(/ \([^)]+\)/).gsub(/\s+/, '_').downcase
   case key
   when 'elapsed_time'
     times = val.split ':'
