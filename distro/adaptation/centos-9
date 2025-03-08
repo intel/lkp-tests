@@ -12,7 +12,6 @@ freeglut3-dev: freeglut-devel
 grub-common: grub2-common
 libbabeltrace-ctf-dev: libbabeltrace-devel
 libbabeltrace-ctf1: libbabeltrace
-libbabeltrace-dev: libbabeltrace-devel
 libbpf-dev: libbpf-devel
 libclang-dev: clang-devel
 libcunit1-dev: CUnit-devel
@@ -25,11 +24,7 @@ libgoogle-perftools-dev:
 libjudy-dev: Judy-devel
 libjudydebian1: Judy
 libpcre3-dev: pcre-devel
-libpfm-dev: libpfm-devel
-libpfm: libpfm
 libpng12-dev:
-libpython2:
-libpython3: python3-libs
 libsndio7.0:
 libusb-1.0-0-dev: libusb-devel
 libusb-1.0-0: libusb
@@ -55,7 +50,6 @@ python3-pyrad:
 python3-six:
 python3-venv: python3-virtualenv
 python: python3
-rng-tools5: rng-tools
 rstatd:
 rusersd:
 udhcpc: busybox

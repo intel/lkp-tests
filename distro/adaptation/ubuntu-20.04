@@ -5,7 +5,6 @@ fsverity:
 lib32gcc-dev: lib32gcc-10-dev
 libcurl: libcurl4
 libevent-openssl: libevent-openssl-2.1-7
-libgcrypt-dev: libgcrypt20-dev
 libgsl: libgsl23
 libipsec-mb: libipsec-mb0
 libjson: libjson-c4
@@ -16,7 +15,6 @@ libpipewire: libpipewire-0.2-1
 libpolly-dev: libpolly-18-dev
 libprocps: libprocps8
 libpython3: libpython3.9
-libssl: libssl1.1
 libtirpc: libtirpc3
 libtraceevent-dev:
 libtraceevent1:

@@ -8,7 +8,6 @@ libasan: libasan5
 libevent-openssl: libevent-openssl-2.1-6
 libevent: libevent-2.1-6
 libgcc-dev: libgcc-8-dev
-libgcrypt-dev: libgcrypt20-dev
 libglut-dev:
 libglut3:
 libgsl: libgsl23

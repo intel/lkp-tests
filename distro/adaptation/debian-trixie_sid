@@ -17,7 +17,6 @@ libdw1: libdw1t64
 libevent-openssl: libevent-openssl-2.1-7
 libevent: libevent-2.1-7
 libgcc-dev: libgcc-11-dev
-libgcrypt-dev: libgcrypt20-dev
 libglut3: libglut3.12
 libgsl: libgsl27
 libhugetlbfs: libhugetlbfs0
