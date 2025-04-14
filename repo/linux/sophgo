@@ -1,9 +1,13 @@
 url: https://github.com/sophgo/linux.git
 branch_denylist: .*
-branch_allowlist: .*for-next|.*fixes
+branch_allowlist: .*for-next-test|.*fixes-test
 integration_testing_branches:
 - for-next
 - fixes
+- soc-for-next
+- soc-fixes
+- rtc-for-next
+- rtc-fixes
 notify_build_success_branch: .*
 owner:
 - Chen Wang <unicorn_wang@outlook.com>
