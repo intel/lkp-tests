@@ -16,3 +16,4 @@ subsystems:
 - pcie
 - aer
 notify_build_success_branch: .*
+branch_denylist: for-kernelci
