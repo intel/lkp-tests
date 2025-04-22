@@ -1,1 +1,4 @@
 url: https://git.kernel.org/pub/scm/linux/kernel/git/abelvesa/linux.git
+integration_testing_branches: for-next
+owner: Abel Vesa <abelvesa@kernel.org>
+notify_build_success_branch: .*
