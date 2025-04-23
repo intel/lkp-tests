@@ -1,0 +1,5 @@
+url: https://git.kernel.org/pub/scm/linux/kernel/git/a.hindborg/linux-lkp.git
+owner: Andreas Hindborg <a.hindborg@kernel.org>
+mail_to: Andreas Hindborg <a.hindborg@kernel.org>
+notify_build_success_branch: .*
+private_report_branch: .*
