@@ -1,0 +1,9 @@
+url: https://git.kernel.org/pub/scm/linux/kernel/git/alexghiti/linux.git
+owner: Alexandre Ghiti <alexghiti@kernel.org>
+mail_to: Alexandre Ghiti <alexghiti@kernel.org>
+subsystems:
+- riscv
+private_report_branch: .*
+notify_build_success_branch: .*
+fetch_tags: true
+git_am_branch: for-next
