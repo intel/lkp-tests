@@ -1,0 +1,4 @@
+url: https://git.kernel.org/pub/scm/linux/kernel/git/sven/linux.git
+owner: Sven Peter <sven@kernel.org>
+mail_to: Sven Peter <sven@kernel.org>
+private_report_branch: .*
