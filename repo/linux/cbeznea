@@ -1,0 +1,14 @@
+url: https://github.com/claudiubeznea/linux.git
+owner: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+mail_to:
+- Claudiu Beznea <claudiu.beznea@tuxon.dev>
+subsystems:
+- clk
+- at91
+- pm
+- dt
+- arm
+- arm64
+notify_build_success_branch: .*
+private_report_branch: .*
+integration_testing_branches: tests
