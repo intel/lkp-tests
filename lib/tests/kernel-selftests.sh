@@ -702,11 +702,7 @@ run_tests()
 		[[ $exit_status = 2 ]] && return $exit_status
 		[[ $exit_status = 0 ]] || die "fixup_$group failed as $exit_status"
 
-		if grep -E -q -m 1 "^TARGETS \+?=  ?$group" Makefile; then
-			log_cmd make -j${nr_cpu} -C $group 2>&1
-		else
-			log_cmd make -j${nr_cpu} TARGETS=$group 2>&1
-		fi
+		log_cmd make -j${nr_cpu} TARGETS=$group 2>&1
 
 		# vmalloc performance and stress, can not use 'make run_tests' to run
 		if [[ $test =~ ^vmalloc\-(performance|stress)$ ]]; then
