@@ -3,3 +3,5 @@ owner: Tzung-Bi Shih <tzungbi@kernel.org>
 mail_to: Tzung-Bi Shih <tzungbi@kernel.org>
 notify_build_success_branch: .*
 private_report_branch: .*
+branch_allowlist: trybuild.*
+branch_denylist: .*
