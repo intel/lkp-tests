@@ -4,7 +4,7 @@ pkgrel=0
 arch=('i386' 'x86_64' 'riscv64' 'aarch64')
 url="https://github.com/HewlettPackard/netperf"
 license=('GPL')
-source=("https://github.com/HewlettPackard/netperf/archive/netperf-$pkgver.$pkgrel.tar.gz" "http://savannah.gnu.org/cgi-bin/viewcvs/*checkout*/config/config/config.guess" "http://savannah.gnu.org/cgi-bin/viewcvs/*checkout*/config/config/config.sub")
+source=("https://github.com/HewlettPackard/netperf/archive/netperf-$pkgver.$pkgrel.tar.gz" "https://git.savannah.gnu.org/cgit/config.git/plain/config.guess" "https://git.savannah.gnu.org/cgit/config.git/plain/config.sub")
 md5sums=('e0d45b5bca1eee2aef0155de82366202' 'SKIP' 'SKIP')
 
 build()
