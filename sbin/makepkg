@@ -274,7 +274,7 @@ get_url() {
 
 # extract the protocol from a source entry - return "local" for local sources
 get_protocol() {
-	if [[ $1 =~ \.git ]]; then
+	if [[ $1 =~ \.git$ ]]; then
 		printf "%s\n" "git"
 	elif [[ $1 = *://* ]]; then
 		# strip leading filename
