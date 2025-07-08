@@ -4,14 +4,16 @@ pkgrel=0
 arch=('i386' 'x86_64' 'riscv64' 'aarch64')
 url="https://github.com/HewlettPackard/netperf"
 license=('GPL')
-source=("https://github.com/HewlettPackard/netperf/archive/netperf-$pkgver.$pkgrel.tar.gz" "https://git.savannah.gnu.org/cgit/config.git/plain/config.guess" "https://git.savannah.gnu.org/cgit/config.git/plain/config.sub")
-md5sums=('e0d45b5bca1eee2aef0155de82366202' 'SKIP' 'SKIP')
+source=("https://github.com/HewlettPackard/netperf/archive/netperf-$pkgver.$pkgrel.tar.gz")
+md5sums=('e0d45b5bca1eee2aef0155de82366202')
 
 build()
 {
 	cd "$srcdir/$pkgname-$pkgname-$pkgver.$pkgrel"
 	if [[ $CARCH == 'riscv64' ]]; then
-	    cp ../config.guess ../config.sub .
+            . $LKP_SRC/lib/reproduce-log.sh
+            log_cmd wget https://git.savannah.gnu.org/cgit/config.git/plain/config.guess -O config.guess
+	    log_cmd wget https://git.savannah.gnu.org/cgit/config.git/plain/config.sub -O config.sub
 	fi
 
 	# sendfile_tcp_stream() misses assignment of len and it is possible
