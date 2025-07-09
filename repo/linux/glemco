@@ -2,5 +2,6 @@ url: https://gitlab.com/glemco/linux
 owner: Gabriele Monaco <gmonaco@redhat.com>
 notify_build_success_branch: .*
 private_report_branch: .*
+mail_to: Gabriele Monaco <gmonaco@redhat.com>
 branch_allowlist: staging_.*
 branch_denylist: .*
