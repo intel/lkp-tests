@@ -56,7 +56,7 @@ nvdimm: ndctl
 nvml::
 ocfs2test::
 oltp::
-otc_ddt::
+otc-ddt::
 packetdrill::
 pbzip2::
 perf-bench-futex: perf
