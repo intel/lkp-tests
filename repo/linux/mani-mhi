@@ -1,6 +1,6 @@
 url: https://git.kernel.org/pub/scm/linux/kernel/git/mani/mhi.git
 integration_testing_branches: mhi-next
-owner: 	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+owner: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
 mail_to: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
 mail_cc: mhi@lists.linux.dev
 notify_build_success_branch: .*
