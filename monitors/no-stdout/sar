@@ -7,8 +7,13 @@
 . $LKP_SRC/lib/common.sh
 . $LKP_SRC/lib/wait.sh
 
-sadc="/lkp/benchmarks/sysstat/usr/local/lib/sa/sadc"
-sadf="/lkp/benchmarks/sysstat/usr/local/bin/sadf"
+for sadc in /lkp/benchmarks/sysstat/usr/local/lib/sa/sadc /usr/lib/sysstat/sadc /usr/lib64/sa/sadc; do
+	[ -x $sadc ] && break
+done
+
+for sadf in /lkp/benchmarks/sysstat/usr/local/bin/sadf /usr/bin/sadf; do
+	[ -x $sadf ] && break
+done
 
 : "${activity:=ALL}"
 : "${interval:=1}"
