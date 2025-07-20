@@ -29,7 +29,7 @@ set_local_variables()
 	export arch=$(get_system_arch)
 	export compiler=$(grep -o "gcc version [0-9]*" /proc/version | awk '{print "gcc-"$NF}')
 	export compiler=${compiler:-gcc}
-	export rootfs=$(grep -m1 ^ID= /etc/os-release | awk -F= '{print $2}')
+	export rootfs=$(source /etc/os-release; echo $ID)
 	export rootfs=${rootfs:-default_rootfs}
 
 	export testbox=$HOSTNAME
