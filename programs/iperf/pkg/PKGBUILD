@@ -1,0 +1,27 @@
+pkgname=iperf
+pkgver=git
+pkgrel=1
+url='https://github.com/esnet/iperf'
+arch=('i686' 'x86_64' 'aarch64')
+license=('BSD')
+source=('https://github.com/esnet/iperf.git')
+md5sums=('SKIP')
+
+. $LKP_SRC/lib/tests/pkgbuild.sh
+
+build()
+{
+	cd_src_pkg_dir $pkgname
+	./configure
+	if [[ $? -ne 0 ]];then
+		./bootstrap.sh
+		./configure
+	fi
+	make
+}
+
+package()
+{
+	cd_src_pkg_dir $pkgname
+	make DESTDIR="$pkgdir" install
+}
