@@ -27,6 +27,7 @@ hackbench::
 hwsim::
 igt::
 iozone::
+iperf::
 jitter::
 kbuild::
 kernbench::
