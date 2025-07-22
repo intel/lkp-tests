@@ -1,0 +1,27 @@
+pkgname=iperf
+pkgver=git
+pkgrel=1
+url='https://github.com/esnet/iperf'
+arch=('i386' 'x86_64' 'aarch64')
+license=('BSD')
+source=('https://github.com/esnet/iperf.git')
+md5sums=('SKIP')
+
+build()
+{
+	cd $srcdir/$pkgname
+	./configure
+	if [[ $? -ne 0 ]];then
+		./bootstrap.sh
+		./configure
+	fi
+	make
+	make install
+}
+
+package()
+{
+	 benchmark_path="${pkgdir}/lkp/benchmarks/${pkgname}"
+	 mkdir -p $benchmark_path
+	 cp -r "$srcdir/$pkgname/" "$benchmark_path/".
+}
