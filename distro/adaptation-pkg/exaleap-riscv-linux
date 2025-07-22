@@ -27,6 +27,7 @@ hackbench::
 hwsim::
 igt::
 iozone::
+iperf::
 kbuild::
 ku-latency::
 kvm-unit-tests-qemu::
