@@ -42,9 +42,10 @@ build_rusers()
 
 	local distro=$(basename $rootfs)
 	if [[ "$distro" =~ "debian-12" ]]; then
+		:	
+	fi
 		sed -i '/^DEFAULT_INCLUDES =/ s/$/ -I\/usr\/include\/tirpc/' Makefile
 		sed -i '/^LIBS =/ s/$/ -ltirpc/' Makefile
-	fi
 	make
 }
 
