@@ -1,7 +1,7 @@
 pkgname=kernel-selftests
 pkgver=git
 pkgrel=1
-arch=('i686' 'x86_64' 'aarch64')
+arch=('x86_64' 'aarch64')
 url="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git"
 license=('GPL')
 source=('https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git' 'https://git.kernel.org/pub/scm/devel/pahole/pahole.git' 'https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git' 'https://github.com/nhorman/dropwatch.git')

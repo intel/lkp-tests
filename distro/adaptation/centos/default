@@ -83,12 +83,7 @@ libc-dev-bin: glibc-common
 libc-dev: glibc-devel
 libc-l10n:
 libc6-dbg:
-libc6-dev-i386: glibc-devel.i686 glibc-static.i686
-libc6-dev-x32:
 libc6-dev: glibc-devel glibc-static
-libc6-dev:i386: glibc-devel.i686 glibc-static.i686
-libc6-i386:
-libc6-x32:
 libc6:
 libcairo2-dev: cairo-devel
 libcairo2: cairo

@@ -157,6 +157,9 @@ map_python_packages()
 		rocky-[9]*)
 			map_python2_to_python3
 			;;
+		rocky-[10]*)
+			map_python2_to_python3
+			;;
 		oracle-[9]*)
 			map_python2_to_python3
 			;;
