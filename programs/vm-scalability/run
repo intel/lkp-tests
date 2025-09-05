@@ -11,6 +11,7 @@
 # - repeat
 # - cpu_delay
 # - sync_free
+# - timed_wp
 
 # The value of "pre_setup" can be 0 or 1.
 # 0 is the default value, means setup by vm-scalability itself.
@@ -35,6 +36,7 @@ export SYNC_FREE=$sync_free
 export BIND_CPU=$bind_cpu
 export REPEAT_COUNT=$repeat
 export DELAY=$cpu_delay
+export TIMED_WP=$timed_wp
 
 echo 1		> /proc/sys/vm/overcommit_memory
 echo $((1<<30)) > /proc/sys/vm/max_map_count
