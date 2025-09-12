@@ -152,7 +152,9 @@ user = ENV['USER']
 save_paths(result_root, user)
 
 system 'killall', '-q', "#{LKP_SRC}/bin/event/wakeup"
-system job_script, 'run_job'
+
+with_thp_enabled { system job_script, 'run_job' }
+
 system "#{LKP_SRC}/bin/run-with-job", job_script, "#{LKP_SRC}/bin/post-run"
 system "#{LKP_SRC}/bin/event/wakeup", 'job-finished'
 
