@@ -1,0 +1,3 @@
+url: https://github.com/hying-caritas/linux.git
+owner: Huang Ying <ying.huang@linux.alibaba.com>
+notify_build_success_branch: .*
