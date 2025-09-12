@@ -6,6 +6,8 @@ require 'timeout'
 require 'pathname'
 require 'fileutils'
 require 'stringio'
+require 'fiddle'
+
 require "#{LKP_SRC}/lib/array"
 require "#{LKP_SRC}/lib/log"
 require "#{LKP_SRC}/lib/string"
@@ -318,4 +320,28 @@ end
 
 def delete_file_if_exist(file)
   File.delete(file) if File.exist?(file)
+end
+
+LIBC = Fiddle.dlopen(nil)
+
+# Import the prctl function
+PRCTL = Fiddle::Function.new(
+  LIBC['prctl'],
+  [Fiddle::TYPE_INT, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],
+  Fiddle::TYPE_INT)
+
+PR_SET_THP_DISABLE = 41
+PR_GET_THP_DISABLE = 42
+
+def get_thp_disable
+  disable = PRCTL.call PR_GET_THP_DISABLE, 0, 0, 0, 0
+  if disable == -1
+    return 0
+  else
+    return disable
+  end
+end
+
+def set_thp_disable(disable)
+  PRCTL.call PR_SET_THP_DISABLE, disable, 0, 0, 0
 end

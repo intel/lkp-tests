@@ -152,7 +152,12 @@ user = ENV['USER']
 save_paths(result_root, user)
 
 system 'killall', '-q', "#{LKP_SRC}/bin/event/wakeup"
+
+thp_disable = get_thp_disable
+set_thp_disable 0
 system job_script, 'run_job'
+set_thp_disable thp_disable
+
 system "#{LKP_SRC}/bin/run-with-job", job_script, "#{LKP_SRC}/bin/post-run"
 system "#{LKP_SRC}/bin/event/wakeup", 'job-finished'
 
