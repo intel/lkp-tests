@@ -2,6 +2,9 @@
 # - thp_enabled
 # - thp_defrag
 # - shmem_enabled
+# - enabled_64kB
+# - enabled_32kB
+# - enabled_16kB
 
 . $LKP_SRC/lib/reproduce-log.sh
 
@@ -15,4 +18,16 @@ fi
 
 if [ -n "$shmem_enabled" ]; then
 	log_eval "echo '$shmem_enabled' > /sys/kernel/mm/transparent_hugepage/shmem_enabled"
+fi
+
+if [ -n "$enabled_64kB" ]; then
+	log_eval "echo '$enabled_64kB' > /sys/kernel/mm/transparent_hugepage/hugepages-64kB/enabled"
+fi
+
+if [ -n "$enabled_32kB" ]; then
+	log_eval "echo '$enabled_32kB' > /sys/kernel/mm/transparent_hugepage/hugepages-32kB/enabled"
+fi
+
+if [ -n "$enabled_16kB" ]; then
+	log_eval "echo '$enabled_16kB' > /sys/kernel/mm/transparent_hugepage/hugepages-16kB/enabled"
 fi
