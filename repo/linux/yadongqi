@@ -1,0 +1,3 @@
+url: https://github.com/YadongQi/linux.git
+owner: Yadong Qi <yadong.qi@linux.alibaba.com>
+notify_build_success_branch: .*
