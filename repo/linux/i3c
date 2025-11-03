@@ -1,2 +1,9 @@
 url: https://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux.git
-owner: Boris Brezillon <bbrezillon@kernel.org>
+integration_testing_branches: i3c/next
+mail_cc: linux-i3c@lists.infradead.org
+owner: Alexandre Belloni <alexandre.belloni@bootlin.com>
+subsystems:
+- i3c
+private_report_branch: .*
+mail_to: Alexandre Belloni <alexandre.belloni@bootlin.com>
+public_report_branch: i3c/*
