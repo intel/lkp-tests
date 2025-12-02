@@ -14,6 +14,7 @@ parameters:
   runtime:
   protocol:
   sessions:
+  numactl:
 
 results:
   iperf.tcp.receiver.bps:
