@@ -1,21 +1,16 @@
 #!/bin/sh
 
+threads_to_iterate=1
+export nr_node=$(echo /sys/devices/system/node/node* | wc -w)
+
+threads_per_core=$(lscpu | awk '/Thread\(s\) per core:/ { print $4 }')
+nr_l3=$(lscpu | grep 'L3' | awk -F '[()]' '{print $2}' | awk '{print $1}')
+nr_l2=$(lscpu | grep 'L2' | awk -F '[()]' '{print $2}' | awk '{print $1}')
+cores_per_llc=$((nr_l2 / nr_l3))
+export cores_per_node=$((nr_cpu / nr_node / threads_per_core))
+
 setup_threads_to_iterate()
 {
-	threads_to_iterate=1
-	nr_node=$(echo /sys/devices/system/node/node* | wc -w)
-
-	local threads_per_core
-	local cores_per_node
-	local cores_per_llc
-	local nr_l3
-	local nr_l2
-	threads_per_core=$(lscpu | awk '/Thread\(s\) per core:/ { print $4 }')
-	nr_l3=$(lscpu | grep 'L3' | awk -F '[()]' '{print $2}' | awk '{print $1}')
-	nr_l2=$(lscpu | grep 'L2' | awk -F '[()]' '{print $2}' | awk '{print $1}')
-	cores_per_llc=$((nr_l2 / nr_l3))
-	cores_per_node=$((nr_cpu / nr_node / threads_per_core))
-
 	# [    0.000000] Intel MultiProcessor Specification v1.4
 	# [    0.000000]   mpc: 12-f012
 	# [    0.000000] MPTABLE: bad signature [
