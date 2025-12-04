@@ -1,0 +1,8 @@
+url: https://gitlab.freedesktop.org/lyudess/linux.git
+owner: Lyude Paul <lyude@redhat.com>
+mail_to: Lyude Paul <lyude@redhat.com>
+notify_build_success_branch: .*
+branch_denylist: .*
+branch_allowlist: the-cki-zone.*
+fetch_tags: false
+upstream: false
