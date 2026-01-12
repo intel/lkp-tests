@@ -3,4 +3,4 @@ owner:
 - Brendan Jackman <jackmanb@google.com>
 - Brendan Jackman <brendan.jackman@linux.dev>
 branch_denylist: .*
-branch_allowlist: asi/next
+branch_allowlist: asi/next|lkp/*
