@@ -1,0 +1,8 @@
+url: https://github.com/bennolossin/linux
+owner: Benno Lossin <lossin@kernel.org>
+notify_build_success_branch: pin-init/sync
+branch_allowlist: pin-init/sync
+branch_denylist: .*
+private_report_branch: .*
+mail_to:
+- Benno Lossin <lossin@kernel.org>
