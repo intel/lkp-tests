@@ -43,7 +43,6 @@ Metrics/AbcSize:
     - lib/job2sh.rb
     - lib/matrix.rb
     - lib/plot.rb
-    - lib/stats.rb
     - sbin/compare
 
 Metrics/BlockLength:
@@ -52,7 +51,6 @@ Metrics/BlockLength:
     - 'Rakefile'
     - '**/*.rake'
     - 'spec/**/*.rb'
-    - lib/stats.rb
 
 Metrics/ClassLength:
   Max: 250
@@ -64,7 +62,6 @@ Metrics/CyclomaticComplexity:
   Exclude:
     - lib/job2sh.rb
     - lib/matrix.rb
-    - lib/stats.rb
 
 Metrics/MethodLength:
   Max: 50
@@ -73,7 +70,6 @@ Metrics/MethodLength:
     - lib/job2sh.rb
     - lib/job.rb
     - lib/matrix.rb
-    - lib/stats.rb
 
 Metrics/ModuleLength:
   Max: 250
@@ -88,7 +84,6 @@ Metrics/PerceivedComplexity:
   Exclude:
     - lib/job2sh.rb
     - lib/matrix.rb
-    - lib/stats.rb
 
 Naming/AccessorMethodName:
   Exclude:

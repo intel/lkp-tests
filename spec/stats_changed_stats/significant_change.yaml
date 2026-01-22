@@ -1,0 +1,29 @@
+matrix_a:
+  cpu.usage: [10, 10, 10]
+matrix_b:
+  cpu.usage: [20, 20, 20]
+options:
+  more: true
+expected:
+  cpu.usage:
+    stat: cpu.usage
+    interval: "[ 10         - 10         ] -- [ 20         - 20         ]"
+    a: [10, 10, 10]
+    b: [20, 20, 20]
+    is_function_stat: false
+    is_latency: false
+    ratio: 2.0
+    delta: 10
+    mean_a: 10
+    mean_b: 20
+    x: 0
+    y: 10
+    z: 0
+    min_a: 10
+    max_a: 10
+    min_b: 20
+    max_b: 20
+    max: 20
+    nr_run: 3
+    more: true
+    gap_distance: 2

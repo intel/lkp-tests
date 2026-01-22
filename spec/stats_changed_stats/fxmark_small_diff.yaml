@@ -1,0 +1,20 @@
+matrix_a:
+  fxmark.ssd_ext4_no_jnl_MRPL_4_bufferedio.works/sec:
+    - 7415950.517791
+    - 7363113.100274
+    - 7412635.583085
+    - 7422347.724252
+    - 7442603.302947
+    - 7367030.480747
+matrix_b:
+  fxmark.ssd_ext4_no_jnl_MRPL_4_bufferedio.works/sec:
+    - 7560045.052608
+    - 7455475.99254
+    - 7613649.203754
+    - 7527162.999455
+    - 7385809.108594
+    - 7502933.963499
+options:
+  variance: 1.0
+expect_skip_small_change: true
+expected: {}

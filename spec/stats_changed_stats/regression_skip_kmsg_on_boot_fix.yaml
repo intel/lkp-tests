@@ -1,0 +1,22 @@
+matrix_a:
+  dmesg.boot_failures:
+    - 0
+    - 0
+    - 0
+  kmsg.error:
+    - 5
+    - 5
+    - 5
+matrix_b:
+  dmesg.boot_failures:
+    - 1
+    - 1
+    - 1
+  kmsg.error:
+    - 0
+    - 0
+    - 0
+options:
+  regression-only: true
+  more: true
+expected: {}

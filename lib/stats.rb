@@ -93,56 +93,6 @@ def reasonable_perf_change?(name, delta, max)
   true
 end
 
-def changed_stats?(sorted_a, min_a, mean_a, max_a,
-                   sorted_b, min_b, mean_b, max_b,
-                   is_function_stat, is_latency_stat,
-                   stat, options)
-  if options['perf-profile'] && stat =~ /^perf-profile\./ && options['perf-profile'].is_a?(mean_a.class)
-    return mean_a > options['perf-profile'] ||
-           mean_b > options['perf-profile']
-  end
-
-  return max_a != max_b if is_function_stat
-
-  if is_latency_stat
-    if options['distance']
-      # auto start bisect only for big regression
-      return false if sorted_b.size <= 3 && sorted_a.size <= 3
-      return false if sorted_b.size <= 3 && min_a < 2 * options['distance'] * max_b
-      return false if max_a < 2 * options['distance'] * max_b
-      return false if mean_a < options['distance'] * max_b
-
-      return true
-    elsif options['gap']
-      gap = options['gap']
-      return true if min_b > max_a && (min_b - max_a) > (mean_b - mean_a) * gap
-      return true if min_a > max_b && (min_a - max_b) > (mean_a - mean_b) * gap
-    else
-      return true if max_a > 3 * max_b
-      return true if max_b > 3 * max_a
-
-      return false
-    end
-  end
-
-  len_a = max_a - min_a
-  len_b = max_b - min_b
-  if options['variance']
-    return true if len_a * mean_b > options['variance'] * len_b * mean_a
-    return true if len_b * mean_a > options['variance'] * len_a * mean_b
-  elsif options['gap']
-    gap = options['gap']
-    return true if min_b > max_a && (min_b - max_a) > (mean_b - mean_a) * gap
-    return true if min_a > max_b && (min_a - max_b) > (mean_a - mean_b) * gap
-  else # options['distance']
-    cs = LKP::ChangedStat.new stat, sorted_a, sorted_b, options
-
-    return true if cs.change?
-  end
-
-  false
-end
-
 # sort key for reporting all changed stats
 def stat_relevance(record)
   stat = record['stat']
@@ -206,7 +156,7 @@ def load_base_matrix_for_notag_project(git, rp, axis)
   load_release_matrix(base_matrix_file)
 end
 
-def load_base_matrix(matrix_path, head_matrix, options)
+def load_base_matrix(matrix_path, head_matrix, options) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
   matrix_path = File.realpath matrix_path
   matrix_path = File.dirname matrix_path if File.file? matrix_path
   log_debug "matrix_path is #{matrix_path}"
@@ -311,8 +261,6 @@ def load_base_matrix(matrix_path, head_matrix, options)
     log_debug "base_matrix_file: #{base_matrix_file}"
     rc_matrix = load_release_matrix base_matrix_file
     next unless rc_matrix
-
-    expand_matrix(rc_matrix, options)
 
     add_stats_to_matrix(rc_matrix, matrix)
     tags_merged << tag
@@ -445,34 +393,294 @@ def samples_remove_boot_fails(matrix, samples)
   perf_samples
 end
 
-def expand_matrix(matrix, options)
-  return unless options['stat']
-  return unless options['stat'].include?('.virtual.')
+class StatSummary
+  attr_reader :sorted, :min, :mean, :max
 
-  # stat is like will-it-scale.per_process_ops.virtual.relative_stddev
-  # the suffix is the conversion function name which can be found in statistics.rb
-  stat = options['stat']
+  def initialize(array, max_margin = nil)
+    @sorted = sort_remove_margin(array, max_margin)
+    @min, @mean, @max = min_mean_max(@sorted)
+  end
 
-  # real stat is like will-it-scale.per_process_ops
-  real_stat = stat.sub(/\.virtual\.[^.]*$/, '')
-  real_values = matrix[real_stat]
-  return unless real_values.is_a?(Array)
+  def len
+    @max - @min
+  end
 
-  # convert function is like relative_stddev
-  convert_function = stat.sub(/.*\.virtual\./, '')
-  return unless real_values.respond_to?(convert_function)
+  def size
+    @sorted.size
+  end
 
-  # remove the incompleted run to avoid misleading data, e.g. min can be 0 if
-  # any result is incompleted, or relative stddev can be inaccurate when 0 is counted
-  real_values = samples_remove_boot_fails(matrix, real_values)
-  return if real_values.empty?
+  def empty?
+    @sorted.empty?
+  end
+end
 
-  converted_values = real_values.public_send(convert_function)
-  case converted_values
-  when Array
-    matrix[stat] = converted_values
-  when Numeric
-    matrix[stat] = Array.new(matrix_cols(matrix), converted_values)
+class StatCompare
+  attr_reader :k, :a_k, :b, :options, :is_incomplete_run, :cols_a, :cols_b, :resize, :is_force_stat, :is_function_stat, :is_latency_stat
+
+  def initialize(k, a, b, is_incomplete_run, options)
+    @k = k
+    @a_k = a[k]
+    @b = b
+    @options = options
+    @is_incomplete_run = is_incomplete_run
+    @cols_a = matrix_cols(a)
+    @cols_b = matrix_cols(b)
+    @resize = options['resize']
+
+    @is_force_stat = options["force_#{k}"]
+    @is_function_stat = function_stat?(k)
+    @is_latency_stat = latency_stat?(k)
+  end
+
+  def process
+    return if skip_stat?
+
+    # newly added monitors don't have values to compare in the base matrix
+    return unless b[k] ||
+                  is_function_stat ||
+                  (k =~ /^(lock_stat|perf-profile)\./ && monitored_by_b?($1))
+
+    summary_a, summary_b = calculate_matrix_values
+    return unless summary_a
+
+    return if !is_force_stat && !changed_stats?(summary_a, summary_b)
+
+    return if skip_critical_stat?(summary_a)
+
+    max, x, y, z, delta, ratio = StatCompare.calc_stats_metrics(summary_a, summary_b)
+    return if skip_small_change?(ratio, delta, max)
+
+    { 'stat' => k,
+      'interval' => StatCompare.format_interval(summary_a, summary_b),
+      'a' => summary_a.sorted,
+      'b' => summary_b.sorted,
+      'ttl' => Time.now,
+      'is_function_stat' => is_function_stat,
+      'is_latency' => is_latency_stat,
+      'ratio' => ratio,
+      'delta' => delta,
+      'mean_a' => summary_a.mean,
+      'mean_b' => summary_b.mean,
+      'x' => x,
+      'y' => y,
+      'z' => z,
+      'min_a' => summary_a.min,
+      'max_a' => summary_a.max,
+      'min_b' => summary_b.min,
+      'max_b' => summary_b.max,
+      'max' => max,
+      'nr_run' => a_k.size }
+  end
+
+  private
+
+  def monitored_by_b?(key)
+    @b_monitors ||= {}
+    return @b_monitors[key] if @b_monitors.key?(key)
+
+    @b_monitors[key] = b.keys.any? { |k| stat_key_base(k) == key }
+  end
+
+  def changed_function_stat?(a, b)
+    a.max != b.max
+  end
+
+  def changed_latency_stat?(a, b)
+    if options['distance']
+      # auto start bisect only for big regression
+      return false if b.size <= 3 && a.size <= 3
+      return false if b.size <= 3 && a.min < 2 * options['distance'] * b.max
+      return false if a.max < 2 * options['distance'] * b.max
+      return false if a.mean < options['distance'] * b.max
+
+      true
+    elsif options['gap']
+      gap?(a, b, options['gap'])
+    else
+      return true if a.max > 3 * b.max
+      return true if b.max > 3 * a.max
+
+      false
+    end
+  end
+
+  def changed_perf_stat?(a, b)
+    if options['variance']
+      return true if a.len * b.mean > options['variance'] * b.len * a.mean
+      return true if b.len * a.mean > options['variance'] * a.len * b.mean
+    elsif options['gap']
+      return true if gap?(a, b, options['gap'])
+    else # options['distance']
+      cs = LKP::ChangedStat.new k, a.sorted, b.sorted, options
+
+      return true if cs.change?
+    end
+
+    false
+  end
+
+  def changed_stats?(a, b)
+    if options['perf-profile'] && k =~ /^perf-profile\./ && options['perf-profile'].is_a?(a.mean.class)
+      return a.mean > options['perf-profile'] ||
+             b.mean > options['perf-profile']
+    end
+
+    return changed_function_stat?(a, b) if is_function_stat
+    return changed_latency_stat?(a, b) if is_latency_stat
+
+    changed_perf_stat?(a, b)
+  end
+
+  # Check if there is a significant separation between the value ranges of two datasets
+  #
+  # Condition for b > a (and vice versa for a > b):
+  #
+  #       [  Range A  ]                   [   Range B   ]
+  #       |___________|                   |_____________|
+  #      min         max                 min           max
+  #                   <--- Gap Width --->
+  #                   |                 |
+  #      |           |                   |             |
+  #    mean A        |                   |           mean B
+  #                  |                   |
+  #                  |<--- Mean Diff --->|
+  #
+  #    Gap Width > Mean Diff * gap_factor
+  #
+  def gap?(a, b, gap)
+    return true if b.min > a.max && (b.min - a.max) > (b.mean - a.mean) * gap
+    return true if a.min > b.max && (a.min - b.max) > (a.mean - b.mean) * gap
+
+    false
+  end
+
+  def skip_critical_stat?(summary_a)
+    return false unless (options['regression-only'] || options['all-critical']) && is_function_stat
+
+    if summary_a.max.zero?
+      options['has_boot_fix'] = true if k =~ /^dmesg\./
+      return true if options['regression-only'] ||
+                     (!LKP::DmesgKillPattern.instance.contain?(k) && options['all-critical'])
+    end
+
+    # this relies on the fact dmesg.* comes ahead
+    # of kmsg.* in etc/default_stats.yaml
+    return true if options['has_boot_fix'] && k =~ /^kmsg\./
+
+    false
+  end
+
+  def skip_function_stat?
+    return false if is_force_stat
+    return false if k =~ /^(dmesg|kmsg|last_state|stderr)\./
+
+    # if stat is packetdrill.packetdrill/gtests/net/tcp/mtu_probe/basic-v6_ipv6.fail,
+    # base rt stats should contain 'packetdrill.packetdrill/gtests/net/tcp/mtu_probe/basic-v6_ipv6.pass'
+    stat_base = k.sub(/\.[^.]*$/, '')
+    # only consider pass and fail temporarily
+    return true if k =~ /\.(error|warn|fail)$/ && !b.key?("#{stat_base}.pass")
+    return true if k =~ /\.pass$/ && b.keys.none? { |stat| stat =~ /^#{stat_base}\.(error|warn|fail)$/ }
+
+    false
+  end
+
+  def skip_regular_stat?
+    # for none-failure stats field, we need asure that
+    # at least one matrix has 3 samples.
+    return true if !is_force_stat && cols_a < 3 && cols_b < 3 && !options['whole']
+
+    # virtual hosts are dynamic and noisy
+    return true if options['tbox_group'] =~ /^vh-/
+    # VM boxes' memory stats are still good
+    return true if options['tbox_group'] =~ /^vm-/ && !options['is_perf_test_vm'] && memory_change?(k)
+
+    false
+  end
+
+  def skip_small_change?(ratio, delta, max)
+    return false if is_force_stat
+    return false if options['perf-profile'] && k =~ /^perf-profile\./
+
+    return true unless ratio > 1.01 # time.elapsed_time only has 0.01s precision
+    return true unless ratio > 1.05 || perf_metric?(k)
+    return true unless reasonable_perf_change?(k, delta, max)
+
+    false
+  end
+
+  def skip_stat?
+    return true if a_k[-1].is_a?(String)
+    return true if options['perf'] && !perf_metric?(k)
+    return true if is_incomplete_run && k !~ /^(dmesg|last_state|stderr)\./
+    return true if !options['more'] && !bisectable_stat?(k) && !LKP::ReportAllowlist.instance.contain?(k)
+
+    if is_function_stat
+      return true if skip_function_stat?
+    elsif skip_regular_stat?
+      return true
+    end
+
+    false
+  end
+
+  def calculate_matrix_values
+    max_margin = if is_function_stat || is_latency_stat
+                   0
+                 else
+                   3
+                 end
+
+    b_k = b[k] || ([0] * cols_b)
+    b_k << 0 while b_k.size < cols_b
+    a_k << 0 while a_k.size < cols_a
+
+    summary_b = StatSummary.new(b_k, max_margin)
+    return if summary_b.empty?
+
+    a_k.pop(a_k.size - resize) if resize && a_k.size > resize
+
+    max_margin = 1 if b_k.size <= 3 && max_margin > 1
+
+    summary_a = StatSummary.new(a_k, max_margin)
+    return if summary_a.empty?
+
+    [summary_a, summary_b]
+  end
+
+  class << self
+    def format_interval(a, b)
+      interval_a = format('[ %-10.5g - %-10.5g ]', a.min, a.max)
+      interval_b = format('[ %-10.5g - %-10.5g ]', b.min, b.max)
+
+      "#{interval_a} -- #{interval_b}"
+    end
+
+    def calc_stats_metrics(a, b)
+      max = [b.max, a.max].max
+      x = a.len
+      z = b.len
+      x = z if a.size <= 2 && x < z
+
+      if a.mean > b.mean
+        y, delta, ratio = calc_diff_metrics(a, b)
+      else
+        y, delta, ratio = calc_diff_metrics(b, a)
+      end
+
+      y = 0 if y.negative?
+      ratio = MAX_RATIO if ratio > MAX_RATIO
+      [max, x, y, z, delta, ratio]
+    end
+
+    def calc_diff_metrics(high, low)
+      y = high.min - low.max
+      delta = high.mean - low.mean
+
+      ratio = MAX_RATIO
+      ratio = high.mean.to_f / low.mean if low.mean.positive?
+
+      [y, delta, ratio]
+    end
   end
 end
 
@@ -481,152 +689,22 @@ end
 def __get_changed_stats(a, b, is_incomplete_run, options)
   changed_stats = {}
 
-  has_boot_fix = (b['last_state.booting'] && !a['last_state.booting'] if options['regression-only'] || options['all-critical'])
-
-  resize = options['resize']
+  (b['last_state.booting'] && !a['last_state.booting'] if options['regression-only'] || options['all-critical'])
 
   cols_a = matrix_cols a
   cols_b = matrix_cols b
 
   return if options['variance'] && (cols_a < 10 || cols_b < 10)
 
-  # Before: matrix = { "will-it-scale.per_process_ops" => [1183733, 1285303, 721524, 858073, 1207794] }
-  # After:  matrix = { "will-it-scale.per_process_ops" => [1183733, 1285303, 721524, 858073, 1207794],
-  #                    "expand_stat.will-it-scale.per_process_ops.relative_stddev" => [20.964567773186214, 20.964567773186214, 20.964567773186214, 20.964567773186214, 20.964567773186214]}
-  expand_matrix(a, options)
-  expand_matrix(b, options)
+  b.each_key { |k| a[k] = [0] * cols_a unless a.include?(k) }
 
-  b_monitors = {}
-  b.each_key { |k| b_monitors[stat_key_base(k)] = true }
+  a.each_key do |k|
+    comparator = StatCompare.new(k, a, b, is_incomplete_run, options)
 
-  b.each_key { |k| a[k] = [0] * cols_a unless a.include?(k) } # rubocop:disable Style/CombinableLoops
+    changed_stat = comparator.process
+    next unless changed_stat
 
-  a.each do |k, v|
-    is_force_stat = options["force_#{k}"]
-
-    next if v[-1].is_a?(String)
-    next if options['perf'] && !perf_metric?(k)
-    next if is_incomplete_run && k !~ /^(dmesg|last_state|stderr)\./
-    next if !options['more'] && !bisectable_stat?(k) && !LKP::ReportAllowlist.instance.contain?(k)
-
-    is_function_stat = function_stat?(k)
-    if !is_force_stat && is_function_stat && k !~ /^(dmesg|kmsg|last_state|stderr)\./
-      # if stat is packetdrill.packetdrill/gtests/net/tcp/mtu_probe/basic-v6_ipv6.fail,
-      # base rt stats should contain 'packetdrill.packetdrill/gtests/net/tcp/mtu_probe/basic-v6_ipv6.pass'
-      stat_base = k.sub(/\.[^.]*$/, '')
-      # only consider pass and fail temporarily
-      next if k =~ /\.(error|warn|fail)$/ && b.keys.none?("#{stat_base}.pass")
-      next if k =~ /\.pass$/ && b.keys.none? { |stat| stat =~ /^#{stat_base}\.(error|warn|fail)$/ }
-    end
-
-    is_latency_stat = latency_stat?(k)
-    max_margin = if is_function_stat || is_latency_stat
-                   0
-                 else
-                   3
-                 end
-
-    unless is_function_stat
-      # for none-failure stats field, we need asure that
-      # at least one matrix has 3 samples.
-      next if !is_force_stat && cols_a < 3 && cols_b < 3 && !options['whole']
-
-      # virtual hosts are dynamic and noisy
-      next if options['tbox_group'] =~ /^vh-/
-      # VM boxes' memory stats are still good
-      next if options['tbox_group'] =~ /^vm-/ && !options['is_perf_test_vm'] && memory_change?(k)
-    end
-
-    # newly added monitors don't have values to compare in the base matrix
-    next unless b[k] ||
-                is_function_stat ||
-                (k =~ /^(lock_stat|perf-profile)\./ && b_monitors[$1])
-
-    b_k = b[k] || ([0] * cols_b)
-    b_k << 0 while b_k.size < cols_b
-    v << 0 while v.size < cols_a
-
-    sorted_b = sort_remove_margin b_k, max_margin
-    next if sorted_b.empty?
-
-    min_b, mean_b, max_b = min_mean_max sorted_b
-    next unless max_b
-
-    v.pop(v.size - resize) if resize && v.size > resize
-
-    max_margin = 1 if b_k.size <= 3 && max_margin > 1
-    sorted_a = sort_remove_margin v, max_margin
-    next if sorted_a.empty?
-
-    min_a, mean_a, max_a = min_mean_max sorted_a
-    next unless max_a
-
-    if !is_force_stat && !changed_stats?(sorted_a, min_a, mean_a, max_a,
-                                         sorted_b, min_b, mean_b, max_b,
-                                         is_function_stat, is_latency_stat,
-                                         k, options)
-      next
-    end
-
-    if (options['regression-only'] || options['all-critical']) && is_function_stat
-      if max_a.zero?
-        has_boot_fix = true if k =~ /^dmesg\./
-        next if options['regression-only'] ||
-                (!LKP::DmesgKillPattern.instance.contain?(k) && options['all-critical'])
-      end
-      # this relies on the fact dmesg.* comes ahead
-      # of kmsg.* in etc/default_stats.yaml
-      next if has_boot_fix && k =~ /^kmsg\./
-    end
-
-    max = [max_b, max_a].max
-    x = max_a - min_a
-    z = max_b - min_b
-    x = z if sorted_a.size <= 2 && x < z
-    ratio = MAX_RATIO
-    if mean_a > mean_b
-      y = min_a - max_b
-      delta = mean_a - mean_b
-      ratio = mean_a.to_f / mean_b if mean_b.positive?
-    else
-      y = min_b - max_a
-      delta = mean_b - mean_a
-      ratio = mean_b.to_f / mean_a if mean_a.positive?
-    end
-    y = 0 if y.negative?
-    ratio = MAX_RATIO if ratio > MAX_RATIO
-
-    if !is_force_stat && !(options['perf-profile'] && k =~ /^perf-profile\./)
-      next unless ratio > 1.01 # time.elapsed_time only has 0.01s precision
-      next unless ratio > 1.05 || perf_metric?(k)
-      next unless reasonable_perf_change?(k, delta, max)
-    end
-
-    interval_a = format('[ %-10.5g - %-10.5g ]', min_a, max_a)
-    interval_b = format('[ %-10.5g - %-10.5g ]', min_b, max_b)
-    interval = "#{interval_a} -- #{interval_b}"
-
-    changed_stats[k] = { 'stat' => k,
-                         'interval' => interval,
-                         'a' => sorted_a,
-                         'b' => sorted_b,
-                         'ttl' => Time.now,
-                         'is_function_stat' => is_function_stat,
-                         'is_latency' => is_latency_stat,
-                         'ratio' => ratio,
-                         'delta' => delta,
-                         'mean_a' => mean_a,
-                         'mean_b' => mean_b,
-                         'x' => x,
-                         'y' => y,
-                         'z' => z,
-                         'min_a' => min_a,
-                         'max_a' => max_a,
-                         'min_b' => min_b,
-                         'max_b' => max_b,
-                         'max' => max,
-                         'nr_run' => v.size }
-    changed_stats[k].merge! options
+    changed_stats[k] = changed_stat.merge(options)
     next unless options['base_matrixes']
 
     changed_stats[k].delete('base_matrixes')
