@@ -21,6 +21,7 @@ prepare()
 	# use https protocol to avoid network access failure of git protocol
 	sed -i "s|git://git.kernel.org|https://git.kernel.org|g" .gitmodules
 	git submodule update --init --recursive
+	git submodule update --remote
 }
 
 build()
