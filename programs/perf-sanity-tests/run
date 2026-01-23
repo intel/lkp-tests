@@ -47,5 +47,5 @@ prepare_test_range
 # FIXME: using sudo to workaround it temporarily.
 for num in $(seq $start $end)
 do
-	log_cmd sudo $perf test $num -v 2>&1
+	log_cmd sudo ASAN_OPTIONS=fast_unwind_on_malloc=0 $perf test $num -v 2>&1
 done
