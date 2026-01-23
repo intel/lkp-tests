@@ -34,4 +34,11 @@ fi
 
 cleanup_ltp $test
 
-upload_files -t results /tmp/kirk.$(whoami)/latest/*
+kirk_latest="/tmp/kirk.$(whoami)/latest"
+if [ -d "$kirk_latest" ]; then
+    upload_files -t results "$kirk_latest"/* 2>&1
+else
+    echo "$kirk_latest is not found"
+fi
+
+exit 0
