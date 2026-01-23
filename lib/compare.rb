@@ -132,7 +132,7 @@ module Compare
               :filter_testcase_stat_keys, :filter_kpi_stat_keys,
               :filter_kpi_stat_strict_keys,
               :exclude_stat_keys, :exclude_result_roots,
-              :stats_field, :allowed_stat,
+              :allowed_stat,
               :gap, :more_stats, :perf_profile_threshold,
               :group_by_stat, :show_empty_group, :compact_show,
               :sort_by_group
@@ -146,7 +146,6 @@ module Compare
       @sort_mresult_roots = true
       @dedup_mresult_roots = true
       @gap = nil
-      @stats_field = nil
       @allowed_stat = nil
       @exclude_result_roots = nil
       @perf_profile_threshold = 5
@@ -228,7 +227,6 @@ module Compare
 
         Group.new self, g.axes, g.group_axeses, g.axes_data,
                   'compare_runs' => @compare_runs,
-                  'stats_field' => @stats_field,
                   'allowed_stat' => @allowed_stat,
                   'exclude_result_roots' => convert_exclude_result_roots
       end
@@ -325,7 +323,6 @@ module Compare
       @mresult_roots = mresult_roots
       @compare_axeses = compare_axeses
       @compare_runs = options['compare_runs'] || []
-      @stats_field = options['stats_field'] || ''
       @allowed_stat = options['allowed_stat'] || ''
       @exclude_result_roots = options['exclude_result_roots'] || {}
     end
@@ -404,7 +401,6 @@ module Compare
       changed_stat_keys = []
       ms = deepcopy(matrixes_in)
       m0 = ms[0]
-      expand_matrix(m0, 'stat' => @stats_field)
 
       options = {
         'gap' => @comparer.gap,
@@ -414,7 +410,6 @@ module Compare
       options["force_#{@allowed_stat}"] = true unless @allowed_stat.empty?
 
       ms.drop(1).each do |m|
-        expand_matrix(m, 'stat' => @stats_field)
         changes = _get_changed_stats(m, m0, options)
         changed_stat_keys |= changes.keys if changes
       end
@@ -528,20 +523,12 @@ module Compare
       changed_stat_keys(ms).each do |stat_key|
         failure = function_stat?(stat_key)
         tms = failure ? ms : cms
-        values = if stat_key == @stats_field
-                   deepcopy(tms).map do |m|
-                     expand_matrix(m, 'stat' => @stats_field)
-                     m[stat_key]
-                   end
-                 else
-                   tms.map { |m| m[stat_key] }
-                 end
         truns = failure ? aruns : cruns
         stat = {
           STAT_KEY => stat_key,
           FAILURE => failure,
           GROUP => self,
-          VALUES => values,
+          VALUES => tms.map { |m| m[stat_key] },
           RUNS => truns
         }
         calc_funcs.each do |calc_func|

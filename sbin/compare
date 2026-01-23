@@ -78,7 +78,6 @@ opt_parser = OptionParser.new do |opts| # rubocop:disable Metrics/BlockLength
 
   opts.on('-f FIELD', '--field FIELD', 'FIELD to evaluate: vmstat.cpu.sy, iostat.sda.util, etc.') do |field|
     $opt_field = field
-    $options['stat'] = field
   end
 
   opts.on('-g PATTERN', '--grep PATTERN', 'only compare result roots that match PATTERN') do |pattern|
@@ -198,8 +197,8 @@ def setup_project
 end
 
 def get_json_field(file, key, is_rt)
-  matrix = load_json file
-  expand_matrix(matrix, 'stat' => key)
+  matrix = load_json file, true
+
   if is_rt
     # convert stats.json data structure to that of matrix.json
     nmatrix = {}
@@ -325,10 +324,8 @@ def get_valid_average(matrix, key)
 end
 
 def process_index_stats(k, v, matrix_file1, matrix_file2)
-  matrix1 = load_json matrix_file1
-  expand_matrix(matrix1, 'stat' => $opt_field)
-  matrix2 = load_json matrix_file2
-  expand_matrix(matrix2, 'stat' => $opt_field)
+  matrix1 = load_json matrix_file1, true
+  matrix2 = load_json matrix_file2, true
   $all_index.each do |stat, weight|
     next if stat.index('iostat\.') && k !~ /\/(dd-write)\//
 
@@ -743,10 +740,8 @@ end
 def call_mmplot
   $cases.each_key do |_rt|
     file = "#{_rt}/matrix.json"
-    matrix1 = load_json file
-    expand_matrix(matrix1, 'stat' => $opt_field)
-    matrix2 = load_json file.sub($opt_dims[0], $opt_dims[1])
-    expand_matrix(matrix2, 'stat' => $opt_field)
+    matrix1 = load_json file, true
+    matrix2 = load_json file.sub($opt_dims[0], $opt_dims[1]), true
     mmplot(matrix2, matrix1, [$opt_field], File.dirname(_rt, 2))
   end
 end
