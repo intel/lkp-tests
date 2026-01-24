@@ -69,11 +69,12 @@ fixup_env()
 specify_tmpdir()
 {
 	[ -z "$partitions" ] && return 1
+
 	ltp_partition="${partitions%% *}"
 	mount_point=/fs/$(basename $ltp_partition)
 
-	mkdir -p $mount_point/tmpdir || return 1
-	tmpdir_opt="-d $mount_point/tmpdir"
+	mkdir -p $mount_point/tmpdir || return
+	tmpdir_opt="--env TMPDIR=$mount_point/tmpdir"
 
 	return 0
 }
@@ -121,12 +122,12 @@ fixup_test()
 		[ -z "$partitions" ] && exit
 		big_dev="${partitions%% *}"
 		umount $big_dev
-		big_dev_opt="-Z $fs -z $big_dev"
+		big_dev_opt="--env LTP_BIG_DEV_FS_TYPE=$fs --env LTP_BIG_DEV=$big_dev"
 		;;
 	fs_ext4)
 		[ -z "$partitions" ] && exit
 		big_dev="${partitions%% *}"
-		big_dev_opt="-z $big_dev"
+		big_dev_opt="--env LTP_BIG_DEV=$big_dev"
 		# match logic of is_excluded
 		sed -i "s/\t/ /g" runtest/fs_ext4
 		;;
