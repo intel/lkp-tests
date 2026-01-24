@@ -20,7 +20,7 @@ build_module()
 
 	local benchmark_path=$(get_benchmark_path)
 
-	log_cmd make -j${nr_cpu} -C $kdir M=$benchmark_path/$mdir
+	log_cmd make -j${nr_cpu} -C $kdir M=$benchmark_path/$mdir 2>&1
 
 	cp $benchmark_path/$mdir/*.ko $benchmark_path/testcases/bin/
 }
