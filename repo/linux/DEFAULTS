@@ -1,6 +1,6 @@
 release_tag_pattern:
 - v(?<major>2)\.(?<minor>\d+)\.?(?<micro>[23][0-9])?(-rc(?<prerelease>\d+))?
-- v(?<major>[3-9])\.(?<minor>\d+)\.?(?<micro>)(-rc(?<prerelease>\d+))?
+- v(?<major>[3-9])\.(?<minor>\d{1,2})\.?(?<micro>)(-rc(?<prerelease>\d+))?
 release_tag_committer: Linus Torvalds
 default_branch_denylist: (.*experimental.*|.*dont-build|origin/.*|remotes/.*|.*/orphan-.*)
 default_kbuild_mail_cc: oe-kbuild-all@lists.linux.dev
