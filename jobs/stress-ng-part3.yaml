@@ -17,6 +17,7 @@ stress-ng:
     - nice
     - nop
     - "null"
+    # - null
     - numa
     - opcode
     - pagemove
