@@ -1,4 +1,2 @@
 need_kconfig:
  - F2FS_FS: m
-
-rootfs: debian-11-x86_64.cgz
