@@ -20,28 +20,11 @@ need_kconfig:
   - EXPERT: y
 
   # preempt related settings to have fair comparison between different commits
-  - PREEMPT_VOLUNTARY: y
   - PREEMPT_NONE: n
+  # - PREEMPT_VOLUNTARY: y
   - PREEMPT: n
   - PREEMPT_RT: n
-  # c597bfddc9e9 ("sched: Provide Kconfig support for default dynamic preempt mode")
-  #
-  # this commit changes kconfig and below ones are now required to set
-  # explicitly to make sure PREEMPT_VOLUNTARY is still selected.
   - PREEMPT_DYNAMIC: n
-  - PREEMPT_VOLUNTARY_BEHAVIOUR: y
-  - PREEMPT_BEHAVIOUR: n
-  - PREEMPT_NONE_BEHAVIOUR: n
-  # a8b76910e465 ("preempt: Restore preemption model selection configs")
-  #
-  # this commit changes kconfig back to use PREEMPT_VOLUNTARY which
-  # "select PREEMPT_VOLUNTARY_BUILD if !PREEMPT_DYNAMIC". Below settings
-  # are duplicated to above ones, just specify them here to be clear
-  - PREEMPT_DYNAMIC: n
-  - PREEMPT_VOLUNTARY: y
-  - PREEMPT_NONE: n
-  - PREEMPT: n
-  - PREEMPT_RT: n
 
 # default monitors
 kmsg:
