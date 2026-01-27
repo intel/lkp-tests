@@ -1,6 +1,7 @@
 #!/bin/bash
 
 . $LKP_SRC/lib/git.sh
+. $LKP_SRC/lib/tests/pkgbuild.sh
 
 pre_download()
 {
@@ -114,7 +115,7 @@ pack()
 		echo /lkp/benchmarks/$BM_NAME
 		find /lkp/benchmarks/$BM_NAME/*
 	} |
-	cpio --quiet -o -H newc --owner=root.root | gzip -n -9 > /lkp/benchmarks/${BM_NAME}.cgz
+	pack_to_cgz "/lkp/benchmarks/${BM_NAME}.cgz" --owner=root.root
 	[[ $arch ]] && mv "/lkp/benchmarks/${BM_NAME}.cgz" "/lkp/benchmarks/${BM_NAME}-${arch}.cgz"
 }
 

@@ -5,6 +5,7 @@ shopt -s nullglob
 . $LKP_SRC/lib/install.sh
 . $LKP_SRC/distro/common
 . $LKP_SRC/lib/debug.sh
+. $LKP_SRC/lib/tests/pkgbuild.sh
 
 fixup_distro_mirror()
 {
@@ -85,7 +86,7 @@ pack()
 
 	mv $downloaded_rpms $target_dir
 
-	find $target_dir | cpio --quiet -o -H newc --owner=root.root | gzip -n -9 >$pack_to/${BM_NAME}_$date.cgz
+	find $target_dir | pack_to_cgz "$pack_to/${BM_NAME}_$date.cgz" --owner=root.root
 
 	ln -sf ${BM_NAME}_$date.cgz $pack_to/${BM_NAME}.cgz || return
 	chown .lkp $pack_to/${BM_NAME}_$date.cgz $pack_to/${BM_NAME}.cgz || return

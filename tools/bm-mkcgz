@@ -1,5 +1,9 @@
 #!/bin/bash
 
+[ -n "$LKP_SRC" ] || export LKP_SRC=$(dirname $(dirname $(readlink -e -v $0)))
+
+. $LKP_SRC/lib/tests/pkgbuild.sh
+
 usage()
 {
 	echo "Usage: $(basename $0) <benchmark>"
@@ -18,4 +22,4 @@ bm_path=/lkp/benchmarks/$BM_NAME
 	exit 1
 }
 
-find $bm_path | cpio -o -H newc | gzip -n -9 > $BM_NAME.cgz
+find $bm_path | pack_to_cgz "$BM_NAME.cgz"

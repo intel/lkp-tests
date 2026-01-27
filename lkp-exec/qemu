@@ -7,6 +7,7 @@
 . $LKP_SRC/lib/job-init.sh
 . $LKP_SRC/lib/lkp_cmd.sh
 . $LKP_SRC/lib/lkp_path.sh
+. $LKP_SRC/lib/tests/pkgbuild.sh
 
 script_name=$(basename $0)
 
@@ -124,7 +125,6 @@ create_job_initrd()
 	mkdir -p $CACHE_DIR/$job_initrd_dir
 	cp $job_script $job_sh
 	chmod +x $job_sh
-	local archive=$CACHE_DIR/job
 	(
 		cd $CACHE_DIR || exit
 		{
@@ -135,9 +135,7 @@ create_job_initrd()
 				echo $dir
 			done
 			find ${job_initrd_dir#/}/*
-		} | cpio -o -H newc -F $archive.cpio
-		gzip -n -9 $archive.cpio
-		mv -f $archive.cpio.gz $CACHE_DIR/$job_initrd
+		} | pack_to_cgz $CACHE_DIR/$job_initrd
 	)
 }
 

@@ -274,3 +274,10 @@ pack_qemu()
 	# create /bin/kvm link that app like avocado list requires kvm bin
 	log_cmd ln -s qemu-system-x86_64 $pkgdir/usr/bin/kvm
 }
+
+pack_to_cgz()
+{
+	local output="$1"
+	shift
+	cpio -o -H newc --quiet "$@" | gzip -n -9 > "$output"
+}

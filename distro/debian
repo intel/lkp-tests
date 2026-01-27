@@ -5,6 +5,7 @@ shopt -s nullglob
 . $LKP_SRC/lib/install.sh
 . $LKP_SRC/distro/common
 . $LKP_SRC/lib/debug.sh
+. $LKP_SRC/lib/tests/pkgbuild.sh
 
 update()
 {
@@ -125,9 +126,7 @@ pack()
 
 		local pkg_dir=$(get_pkg_dir $BM_NAME)
 		[[ -d $pkg_dir && -f $pkg_dir/allowlist ]] && cat $pkg_dir/allowlist
-	} |
-	cpio --quiet -o -H newc --owner=root.root |
-	gzip -n -9 >	$pack_to/${BM_NAME}_$date.cgz	|| return
+	} | pack_to_cgz "$pack_to/${BM_NAME}_$date.cgz" --owner=root.root || return
 
 	ln -sf			 ${BM_NAME}_$date.cgz \
 			$pack_to/${BM_NAME}.cgz		|| return
