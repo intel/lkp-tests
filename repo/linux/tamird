@@ -1,0 +1,5 @@
+url: https://github.com/tamird/linux
+owner: Tamir Duberstein <tamird@kernel.org>
+mail_to: Tamir Duberstein <tamird@kernel.org>
+notify_build_success_branch: .*
+private_report_branch: .*
