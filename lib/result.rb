@@ -58,7 +58,7 @@ class ResultPath < Hash
     if ps.include?('commit')
       each_commit do |_type, commit|
         return false unless self[commit]
-        return false if !is_local_run && !sha1_40?(self[commit])
+        return false if !is_local_run && !Git.sha1_40?(self[commit])
       end
     end
 

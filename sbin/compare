@@ -414,7 +414,7 @@ def setup_longest_dims
   if $opt_dimension =~ /^(.*_)?commit$/
     git = Git.open(project: $project, working_dir: GIT_WORK_TREE) if Dir.exist?(GIT_WORK_TREE)
     unless git
-      puts 'info: "export LKP_GIT_WORK_TREE=/path/to/project/git/repo/" to enable parsing non-sha1 commit names.' if ARGV.any? { |v| !sha1_40?(v) }
+      puts 'info: "export LKP_GIT_WORK_TREE=/path/to/project/git/repo/" to enable parsing non-sha1 commit names.' if ARGV.any? { |v| !Git.sha1_40?(v) }
       puts 'info: "export LKP_GIT_WORK_TREE=/path/to/project/git/repo/" to enable guessing what to compare.' if ARGV.size == 1
     end
 
@@ -423,7 +423,7 @@ def setup_longest_dims
       if ARGV[0].index('/') # looks like a branch? compare its BASE_RC..HEAD
         tag = git.gcommit($opt_dims[0]).base_rc_tag
         $opt_dims.unshift git.gcommit(tag).sha
-      elsif sha1_40?(ARGV[0]) # compare with parent commit(s)
+      elsif Git.sha1_40?(ARGV[0]) # compare with parent commit(s)
         # FIXME rli9 deduce project info from opt_dimensions
         git.gcommit(ARGV[0]).parent_shas.reverse_each { |parent| $opt_dims.unshift parent }
       elsif $opt_index

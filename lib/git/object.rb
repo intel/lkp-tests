@@ -15,7 +15,7 @@ module Git
         # this is to convert non sha1 40 such as tag name to corresponding commit sha
         # otherwise Object::AbstractObject uses @base.lib.revparse(@objectish) to get sha
         # which sometimes is not as expected when we give a tag name
-        self.objectish = command('rev-list', ['-1', objectish]) unless sha1_40?(objectish)
+        self.objectish = command('rev-list', ['-1', objectish]) unless Git.sha1_40?(objectish)
       end
 
       def project

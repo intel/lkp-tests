@@ -59,7 +59,7 @@ end
 opt_parser.parse!(ARGV)
 
 unless $opt_kernel.empty?
-  unless sha1_40?($opt_kernel)
+  unless Git.sha1_40?($opt_kernel)
     git = Git.open
     $opt_kernel = git.gcommit($opt_kernel).sha
   end

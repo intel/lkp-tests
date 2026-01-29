@@ -159,7 +159,7 @@ module Compare
       return if @exclude_result_roots.to_s.empty?
 
       arr = @exclude_result_roots.split('/')
-      return { arr[0] => arr[1].split(',').delete_if(&:empty?) } if arr.size == 2 && sha1_40?(arr[0]) && arr[1] =~ /[0-9,]+/
+      return { arr[0] => arr[1].split(',').delete_if(&:empty?) } if arr.size == 2 && Git.sha1_40?(arr[0]) && arr[1] =~ /[0-9,]+/
 
       log_error "invalid exclude_result_roots #{@exclude_result_roots}, should be '<commit_sha_40>/<num_1>,<num_2>'"
       nil
