@@ -47,7 +47,7 @@ $nr_gm = {}
 $header_shown = {}
 
 def expand_possible_commit(s)
-  return s unless commit_name? s
+  return s unless Git.commit_name? s
 
   git = Git.open(working_dir: ENV.fetch('SRC_ROOT', nil))
   return s unless git.commit_exist? s

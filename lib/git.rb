@@ -50,5 +50,9 @@ module Git
     def sha1_40?(commit)
       commit =~ /^[\da-f]{40}$/
     end
+
+    def commit_name?(name)
+      name =~ /^[\da-f~^]{7,}$/ || name =~ /^v\d+\.\d+/ || sha1_40?(name)
+    end
   end
 end
