@@ -54,5 +54,9 @@ module Git
     def commit_name?(name)
       name =~ /^[\da-f~^]{7,}$/ || name =~ /^v\d+\.\d+/ || sha1_40?(name)
     end
+
+    def normalize_url(url)
+      url.partition('://').last.chomp('.git')
+    end
   end
 end
