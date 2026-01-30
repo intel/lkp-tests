@@ -22,6 +22,8 @@ module Git
       $remotes[@remote] || $remotes["internal-#{@remote}"]
     end
 
+    alias rev_parse revparse
+
     # add tag_names because Base::tags is slow to obtain all tag objects
     # FIXME consider to cache this method
     def tag_names
