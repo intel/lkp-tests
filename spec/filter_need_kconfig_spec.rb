@@ -17,7 +17,7 @@ describe 'filters/need_kconfig.rb' do
   end
 
   after do
-    @tmp_dir.cleanup!
+    @tmp_dir.clean!
   end
 
   def generate_kconfigs_yaml(kconfigs_kernel_versions)

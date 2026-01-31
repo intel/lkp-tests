@@ -13,7 +13,7 @@ describe 'filter/disk' do
   end
 
   after(:all) do
-    @tmp_dir.cleanup!
+    @tmp_dir.clean!
   end
 
   def generate_job(contents)

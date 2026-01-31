@@ -16,7 +16,7 @@ describe 'log_cmd' do
   end
 
   after(:all) do
-    @tmp_dir.cleanup!
+    @tmp_dir.clean!
     Dir.chdir(@pwd)
   end
 

@@ -17,7 +17,7 @@ describe 'lkp-split-job' do
   end
 
   after(:all) do
-    @tmp_src_dir.cleanup!
+    @tmp_src_dir.clean!
   end
 
   before do
@@ -25,7 +25,7 @@ describe 'lkp-split-job' do
   end
 
   after do
-    @tmp_dir.cleanup!
+    @tmp_dir.clean!
   end
 
   def verify_split_job_output(id)

@@ -10,7 +10,7 @@ describe 'filter/need_kernel_version.rb' do
   end
 
   after do
-    @tmp_dir.cleanup!
+    @tmp_dir.clean!
   end
 
   def generate_context(compiler, kernel_version)

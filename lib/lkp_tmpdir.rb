@@ -23,7 +23,7 @@ module LKP
       File.join([@path] + args)
     end
 
-    def cleanup!
+    def clean!
       FileUtils.rm_r(@path) unless ENV['debug'] == '1'
     end
   end

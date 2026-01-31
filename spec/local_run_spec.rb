@@ -29,7 +29,7 @@ describe 'local run' do
   end
 
   after(:all) do
-    @tmp_dir.cleanup!
+    @tmp_dir.clean!
   end
 
   describe 'local_run' do
