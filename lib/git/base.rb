@@ -143,6 +143,10 @@ module Git
       release_tags_with_order.keys.grep(/^v[0-9]*\.[0-9]*(|\.[0-9]*)$/)
     end
 
+    def latest_release_tag
+      ordered_release_tags.first
+    end
+
     def release_shas
       @release_shas ||= release_tags.map { |release_tag| command('rev-list', ['-1', release_tag]) }
     end
