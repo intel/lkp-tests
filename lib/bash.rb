@@ -3,65 +3,91 @@ LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
 require 'English'
 require 'open3'
 require 'shellwords'
+require 'tty-command'
 
 # rli9 FIXME: find a way to combine w/ misc
 module Bash
   class BashCallError < StandardError
+    attr_reader :command, :stdout, :stderr, :exitstatus
+
+    def initialize(command, stdout, stderr, exitstatus)
+      @command = command
+      @stdout = stdout
+      @stderr = stderr
+      @exitstatus = exitstatus
+
+      super("Command failed with exit #{exitstatus}: #{truncate(command)}")
+    end
+
+    private
+
+    def truncate(str, limit = 100)
+      str.length > limit ? "#{str[0...limit]}..." : str
+    end
+  end
+
+  class TimeoutError < StandardError
+    attr_reader :command
+
+    def initialize(command)
+      @command = command
+      super("Command timed out: #{command}")
+    end
   end
 
   class << self
-    # http://greyblake.com/blog/2013/09/21/how-to-call-bash-not-shell-from-ruby/
-    def call(command, options = {})
-      options[:exitstatus] ||= [0]
+    # Usage:
+    #   Bash.run("ls -l")                           # Runs in bash
+    #   Bash.run("ls", "-l")                        # Runs directly (safer)
+    #   Bash.run("grep x", returns: [0,1]) # Custom success codes
+    #   Bash.run("slow", stream: true) { |line| ... } # Stream lines
+    def run(*args, **options, &block)
+      returns = options.delete(:returns) || [0]
+      verbose = options.delete(:verbose)
+      stream = options.delete(:stream)
+      unsetenv_others = options.delete(:unsetenv_others)
 
-      output = `bash -c #{Shellwords.escape(command)}`.chomp
-      raise Bash::BashCallError, options[:show_output] ? "#{command}\n#{output}" : command unless options[:exitstatus].include?($CHILD_STATUS.exitstatus)
+      # Default block meant for streaming output if none provided (stream mode only)
+      block ||= ->(line) { puts line } if stream
 
-      output
-    end
+      cmd = TTY::Command.new(printer: verbose ? :pretty : :null, uuid: false, **options)
 
-    def call2(*command)
-      stdout, stderr, status = Open3.capture3(*command)
+      env = args.first.is_a?(Hash) ? args.shift : {}
 
-      return stdout if status.success?
-
-      raise Bash::BashCallError, "#{command}\n#{stderr}#{stdout}" unless block_given?
-
-      yield stdout, stderr, status
-    end
-  end
-end
-
-module Bashable
-  def exec_cmd(cmd, do_exec: true, verbose: false, pipe: false, &block)
-    if do_exec
-      puts cmd if verbose
-
-      block ||= ->(line) { puts line }
-
-      lines = []
-      IO.popen(cmd, err: %i(child out)) do |io|
-        io.each_line do |line|
-          block.call line.chomp if pipe
-
-          lines << line
-        end
-
-        io.flush
+      if unsetenv_others
+        # Manually construct `env -i` command because TTY::Command unsetenv_others is unreliable
+        env_vars = env.map { |k, v| "#{k}=#{v}" }
+        args = if args.size == 1
+                 ['env', '-i'] + env_vars + ['bash', '-c', args.first]
+               else
+                 ['env', '-i'] + env_vars + args
+               end
+      else
+        # Normalize args to force bash for single strings (legacy support)
+        args = ['bash', '-c', args.first] if args.size == 1
+        args.unshift(env) unless env.empty?
       end
 
-      unless $CHILD_STATUS.success?
-        puts lines.join unless pipe || lines.empty?
-        raise "cmd: #{cmd}, exitstatus: #{$CHILD_STATUS.exitstatus}"
+      result = cmd.run!(*args) do |out, err|
+        next unless stream
+
+        # Streaming mode: yield lines to block
+        # TTY::Command yields chunks, split them to match line-based expectation.
+        (out || err).each_line { |line| block.call(line.chomp) }
       end
 
-      lines.join
-    elsif verbose
-      puts "$ #{cmd}"
+      # Legacy Bash.run behavior (Post-run yield) if NOT streaming
+      # Note: legacy behavior requires yielding (stdout, stderr, exit_status)
+      if block && !stream
+        block.call(result.out, result.err, result.exit_status)
+      elsif !(options[:dry_run] || returns.include?(result.exit_status))
+        # In dry_run mode, exit_status is 0, so this passes.
+        raise BashCallError.new(args.join(' '), result.out, result.err, result.exit_status)
+      end
+
+      result.out.chomp
+    rescue TTY::Command::TimeoutExceeded
+      raise TimeoutError.new(args.join(' '))
     end
   end
-end
-
-module Bash
-  extend Bashable
 end

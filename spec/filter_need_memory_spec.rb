@@ -4,7 +4,7 @@ require 'tmpdir'
 require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/job"
 
-system_free_mem_gb = Integer(Bash.call("free -g | sed -n '2, 1p' | awk '{print $7}'"))
+system_free_mem_gb = Integer(Bash.run("free -g | sed -n '2, 1p' | awk '{print $7}'"))
 
 describe 'filters/need_memory' do
   before(:all) do

@@ -10,7 +10,7 @@ describe 'xfstests' do
     def is_test_in_group(test, groups)
       groups = Array(groups).map { |group| "\"#{group}\"" }.join(' ')
 
-      Bash.call <<EOF
+      Bash.run <<EOF
         source #{LKP_SRC}/lib/tests/xfstests.sh
 
         export BENCHMARK_ROOT=#{@benchmark_root}
@@ -76,7 +76,7 @@ EOF
     ].each do |entry|
       it "map #{entry[:fs]} #{entry[:pattern]}" do
         pkg_dir = LKP::Programs.find_pkg_dir(:xfstests)
-        expect(Bash.call("source #{pkg_dir}/PKGBUILD; pattern_to_test \"#{entry[:fs]}\" \"#{entry[:pattern]}\"")).to eq(entry[:test])
+        expect(Bash.run("source #{pkg_dir}/PKGBUILD; pattern_to_test \"#{entry[:fs]}\" \"#{entry[:pattern]}\"")).to eq(entry[:test])
       end
     end
   end

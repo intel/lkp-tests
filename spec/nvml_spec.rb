@@ -15,7 +15,7 @@ describe 'nvml' do
         { group: 'scope', testcases: 'scope' },
         { group: 'traces', testcases: 'traces_custom_function traces_pmem traces' }
       ].each do |entry|
-        expect(Bash.call("source #{LKP_SRC}/lib/tests/nvml.sh; BENCHMARK_ROOT=#{@benchmark_root} group=#{entry[:group]} suite=nvml check_group_param 1>/dev/null; echo $testcases")).to eq(entry[:testcases])
+        expect(Bash.run("source #{LKP_SRC}/lib/tests/nvml.sh; BENCHMARK_ROOT=#{@benchmark_root} group=#{entry[:group]} suite=nvml check_group_param 1>/dev/null; echo $testcases")).to eq(entry[:testcases])
       end
     end
 
@@ -24,7 +24,7 @@ describe 'nvml' do
         { group: 'wronggroup', output: 'Parameter group wronggroup is invalid' },
         { group: 'wrong_group', output: 'single test wrong_group is not found' }
       ].each do |entry|
-        expect(Bash.call("source #{LKP_SRC}/lib/tests/nvml.sh; BENCHMARK_ROOT=#{@benchmark_root} group=#{entry[:group]} suite=nvml check_group_param 2>&1 1>/dev/null", exitstatus: [99])).to match(/#{entry[:output]}/)
+        expect(Bash.run("source #{LKP_SRC}/lib/tests/nvml.sh; BENCHMARK_ROOT=#{@benchmark_root} group=#{entry[:group]} suite=nvml check_group_param 2>&1 1>/dev/null", returns: [99])).to match(/#{entry[:output]}/)
       end
     end
   end

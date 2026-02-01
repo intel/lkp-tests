@@ -7,6 +7,7 @@ gem 'pry'
 gem 'pry-doc'
 gem 'rake'
 gem 'term-ansicolor'
+gem 'tty-command'
 
 group :development, :test do
   gem 'ci_reporter_rspec'
