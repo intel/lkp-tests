@@ -186,7 +186,7 @@ install_crosstool_gcc()
 	get_toolchain_list || return
 
 	local file
-	local gcc_arch_pattern=$(echo "${crosstool}" | sed 's/*/.*/g')
+	local gcc_arch_pattern=${crosstool//\*/.*}
 
 	local gcc_version
 	[[ $COMPILER =~ - ]] && gcc_version=${COMPILER##*-}
@@ -381,7 +381,7 @@ if [[ ! "$0" =~ 'make.cross' && "$0" =~ make\.([a-z0-9_]+) ]]; then
 	export ARCH="${BASH_REMATCH[1]}"
 elif [[ "$*" =~ ARCH=([a-z0-9_]+) ]]; then
 	export ARCH="${BASH_REMATCH[1]}"
-elif [[ ${PWD##*-} =~ ^($(echo $KBUILD_SUPPORTED_ARCHS | sed 's/ /|/g'))$ ]]; then
+elif [[ ${PWD##*-} =~ ^(${KBUILD_SUPPORTED_ARCHS// /|})$ ]]; then
 	echo "ARCH set to ${PWD##*-}"
 	export ARCH=${PWD##*-}
 elif [[ ! $ARCH ]]; then

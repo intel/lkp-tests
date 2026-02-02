@@ -59,9 +59,11 @@ cd $LKP_SRC
 # Special for opensuse/leap or opensuse/tumbleweed, does not affect it
 # 	(example: opensuse/leap:latest -> opensuse/leap:latest)
 if [[ "$opt_image" == opensuse/* ]]; then
-	base_image=$(echo "$opt_image" | sed 's|opensuse/\([^/]*\)/|opensuse/\1:|')
+	base_image=${opt_image#opensuse/}
+	base_image="opensuse/${base_image/\//:}"
 elif [[ "$opt_image" == redhat/* ]]; then
-	base_image=$(echo "$opt_image" | sed 's|redhat/\([^/]*\)/|redhat/\1:|')
+	base_image=${opt_image#redhat/}
+	base_image="redhat/${base_image/\//:}"
 else
 	base_image=${opt_image//\//:}
 fi

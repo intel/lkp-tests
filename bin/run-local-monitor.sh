@@ -58,7 +58,7 @@ job_script=$(readlink -e -v $job_script) || exit 1
 
 shift
 mytest_cmdline="${@}"
-mytest_cmdline=$(echo $mytest_cmdline | sed 's/^.*-- //')
+mytest_cmdline=${mytest_cmdline##*-- }
 
 . $job_script export_top_env
 set_local_variables

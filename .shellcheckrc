@@ -21,7 +21,6 @@ disable=SC2206 # Quote to prevent word splitting/globbing, or split robustly wit
 disable=SC2207 # Prefer mapfile or read -a to split command output (or quote to avoid splitting)
 disable=SC2220 # Invalid flags are not handled. Add a *) case
 
-disable=SC2001 # See if you can use ${variable//search/replace} instead
 disable=SC2028 # echo won't expand escape sequences. Consider printf.
 disable=SC2039 # In POSIX sh, something is undefined.
 disable=SC2044 # For loops over find output are fragile. Use find -exec or a while read loop.
