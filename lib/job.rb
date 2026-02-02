@@ -29,9 +29,7 @@ def expand_shell_var(env, o)
   return s unless local_run?
 
   if s.index('$')
-    f = IO.popen(env, ['/bin/bash', '-c', "eval echo \"#{s}\""], 'r')
-    s = f.read.chomp
-    f.close
+    s = Bash.run(env, "eval echo \"#{s}\"").chomp
   elsif s.index('/dev/disk/')
     files = {}
     s.split.each do |f|

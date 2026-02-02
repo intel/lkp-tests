@@ -114,5 +114,19 @@ describe Bash do
         end.to raise_error(Bash::TimeoutError)
       end
     end
+
+    context 'with input' do
+      it 'passes string input to stdin' do
+        out = described_class.run('cat', input: 'hello world')
+        expect(out).to eq('hello world')
+      end
+
+      it 'handles multiline input' do
+        input = "line1\nline2"
+        out = described_class.run('cat', input: input)
+        expect(out).to include('line1')
+        expect(out).to include('line2')
+      end
+    end
   end
 end

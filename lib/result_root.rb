@@ -1,6 +1,7 @@
 LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
 
 require 'time'
+require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/common"
 require "#{LKP_SRC}/lib/constant"
 require "#{LKP_SRC}/lib/nresult_root"
@@ -295,12 +296,9 @@ class MResultRootCollection
       cmdline += " | grep -e '#{ocond}'"
     end
     cmdline += " | sed -e 's#[0-9]\\+/$##' | sort | uniq"
-    IO.popen(cmdline) do |io|
-      io.each_line do |_rtp|
-        _rtp = _rtp.strip
-        yield MResultRoot.new _rtp.strip if MResultRoot.valid? _rtp
-      end
-      Process.waitpid io.pid
+    Bash.run(cmdline, stream: true) do |line|
+      _rtp = line.strip
+      yield MResultRoot.new _rtp.strip if MResultRoot.valid? _rtp
     end
   end
 

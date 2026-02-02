@@ -6,6 +6,7 @@ RESULT_ROOT = ENV.fetch('RESULT_ROOT', nil)
 
 LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 2)
 
+require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/log"
 require "#{LKP_SRC}/lib/noise"
 
@@ -75,7 +76,7 @@ end
 def parse_syscalls(time)
   process_lines = {}
   lines = if File.exist?("#{RESULT_ROOT}/ftrace.data.xz")
-            IO.popen("xzcat #{RESULT_ROOT}/ftrace.data.xz").readlines
+            Bash.run("xzcat #{RESULT_ROOT}/ftrace.data.xz").lines
           elsif File.exist?("#{RESULT_ROOT}/ftrace.data")
             File.readlines("#{RESULT_ROOT}/ftrace.data")
           end
