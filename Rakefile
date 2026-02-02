@@ -62,20 +62,13 @@ rescue StandardError => e
   puts e
 end
 
-def bash(cmd)
-  output = `bash -c #{Shellwords.escape(cmd)}`
-  puts output unless output.empty?
-
-  raise "bash exitstatus: #{$CHILD_STATUS.exitstatus}" unless $CHILD_STATUS.success?
-end
-
 desc 'Run syntax check'
 task :syntax do
   executables = `find -type f -executable ! -path "./.git*" ! -path "./vendor*" ! -size +100k`.split("\n").join(' ')
 
-  bash "grep -s -l '^#!/.*ruby$' #{executables} | xargs -n1 ruby -c >/dev/null"
-  bash "grep -s -l '^#!/.*bash$' #{executables} | xargs -n1 bash -n"
-  bash "grep -s -l '^#!/bin/sh$' #{executables} | xargs -n1 dash -n"
+  sh "grep -s -l '^#!/.*ruby$' #{executables} | xargs -n1 ruby -c >/dev/null", verbose: false
+  sh "grep -s -l '^#!/.*bash$' #{executables} | xargs -n1 bash -n", verbose: false
+  sh "grep -s -l '^#!/bin/sh$' #{executables} | xargs -n1 dash -n", verbose: false
 
   puts 'syntax OK'
 end
@@ -89,7 +82,7 @@ task :shellcheck do
   base_cmd = "shellcheck -S warning -f #{format}"
   base_cmd += " -i #{ENV['code']}" if ENV['code']
 
-  bash "#{base_cmd} #{executables}"
+  sh "#{base_cmd} #{executables}", verbose: false
 
   puts 'shellcheck OK'
 end
