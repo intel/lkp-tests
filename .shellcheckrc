@@ -34,7 +34,6 @@ disable=SC2090 # Quotes/backslashes in this variable will not be respected.
 disable=SC2116 # Useless echo? Instead of 'cmd $(echo foo)', just use 'cmd foo'.
 disable=SC2124 # Assigning an array to a string! Assign as array, or use * instead of @ to concatenate
 disable=SC2125 # Brace expansions and globs are literal in assignments. Quote it or use an array.
-disable=SC2144 # -e doesn't work with globs. Use a for loop.
 disable=SC2145 # Argument mixes string and array. Use * or separate argument
 disable=SC2155 # Declare and assign separately to avoid masking return values
 disable=SC2163 # This does not export FOO. Remove $/${} for that, or use ${var?} to quiet.
