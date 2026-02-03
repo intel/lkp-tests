@@ -82,7 +82,7 @@ log_cmd ./start.sh $start_opt || {
 	exit 1
 }
 
-while read testcase
+while read -r testcase
 do
 	is_excluded $testcase && echo "LKP SKIP $testcase" && continue
 

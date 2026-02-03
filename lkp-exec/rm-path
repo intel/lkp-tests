@@ -133,7 +133,7 @@ if [[ $opt_y = 1 ]]; then
 	answer="yes"
 else
 	echo -n "!!! Do you really want to do that? [No/yes]: "
-	read answer
+	read -r answer
 fi
 
 if [[ $answer = "yes" ]]; then

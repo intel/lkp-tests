@@ -37,7 +37,6 @@ disable=SC2125 # Brace expansions and globs are literal in assignments. Quote it
 disable=SC2144 # -e doesn't work with globs. Use a for loop.
 disable=SC2145 # Argument mixes string and array. Use * or separate argument
 disable=SC2155 # Declare and assign separately to avoid masking return values
-disable=SC2162 # read without -r will mangle backslashes
 disable=SC2163 # This does not export FOO. Remove $/${} for that, or use ${var?} to quiet.
 disable=SC2184 # Quote arguments to unset so they're not glob expanded.
 disable=SC2199 # Arrays implicitly concatenate in [[ ]]. Use a loop (or explicit * instead of @)

@@ -212,7 +212,7 @@ for IFACE in $IFACES; do
 	;;
 	custom)
 		echo -n "Input cores for $IFACE (ex. 0-7,15-23): "
-		read CORES
+		read -r CORES
 	;;
 	[0-9]*)
 		CORES=$AFF

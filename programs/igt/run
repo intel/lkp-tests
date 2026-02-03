@@ -27,7 +27,7 @@ denylist=$BENCHMARK_ROOT/igt/tests/intel-ci/blacklist.txt
 cat $denylist | grep -v -e ^# -e ^$ > $(dirname $denylist)/denylist
 denylist=$(dirname $denylist)/denylist
 
-while read testcase
+while read -r testcase
 do
 	if [[ $test ]]; then
 		# get subtests from test

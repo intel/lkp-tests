@@ -7,7 +7,7 @@ read_env_vars()
 	local key
 	local val
 
-	while read key val
+	while read -r key val
 	do
 		[ "${key%[a-zA-Z0-9_]:}" != "$key" ] || continue
 		key=${key%:}
@@ -141,7 +141,7 @@ wait_other_nodes()
 
 	wait_cluster_state 'wait_ready'
 
-	while read line; do
+	while read -r line; do
 		[ "${line#\#}" != "$line" ] && continue
 		export "$line"
 	done <<EOF

@@ -142,7 +142,7 @@ show_one_path()
 	esac
 }
 
-while read path
+while read -r path
 do
 	[[ ! "$opt_file" || -e "$path/$opt_file" ]] &&
 	show_one_path "$path/$opt_file"

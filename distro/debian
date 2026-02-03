@@ -25,7 +25,7 @@ download()
 
 hardlink_to_symlink()
 {
-	while read line
+	while read -r line
 	do
 		local hard_links=($line)
 		for i in {1..9}

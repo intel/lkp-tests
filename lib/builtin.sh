@@ -9,7 +9,7 @@ sleep()
 	[[ $seconds =~ 'h' ]] && seconds=$(( ${seconds%h} * 3600 ))
 
 	exec 50< /dev/tty50
-	read -t $seconds -u 50
+	read -r -t $seconds -u 50
 }
 
 cat()

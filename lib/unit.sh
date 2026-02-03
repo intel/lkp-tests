@@ -4,7 +4,7 @@ export_meminfo()
 {
 	local key val unit
 
-	while read key val unit
+	while read -r key val unit
 	do
 		key="${key%%:}"
 		key="${key%%)}"

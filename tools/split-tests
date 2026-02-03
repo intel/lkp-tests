@@ -17,7 +17,7 @@ tests_file=$1
 group_size=$2
 group_name_prefix=$3
 
-while read test
+while read -r test
 do
 	if [[ $test =~ ^[0-9]+$ ]]; then
 		# convert t to 10 base, otherwise value like 008 is treated as octal number

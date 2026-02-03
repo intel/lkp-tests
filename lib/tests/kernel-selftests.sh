@@ -140,7 +140,7 @@ check_kconfig()
 	local dependent_config=$1
 	local kernel_config=$2
 
-	while read line
+	while read -r line
 	do
 		# Avoid commentary on config
 		[[ "$line" =~ ^"CONFIG_" ]] || continue

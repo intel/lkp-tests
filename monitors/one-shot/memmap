@@ -8,13 +8,13 @@ memmap_read()
 	local end
 	local type
 
-	read start	< $file/start || return
+	read -r start	< $file/start || return
 	[ -n "$start" ] || return
 
-	read end	< $file/end || return
+	read -r end	< $file/end || return
 	[ -n "$end" ] || return
 
-	read type	< $file/type || return
+	read -r type	< $file/type || return
 	[ -n "$type" ] || return
 
 	echo "${m##*/},$start,$end,$(( end - start + 1 )),$type"

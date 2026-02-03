@@ -8,7 +8,7 @@ exec 3<>/dev/tcp/$pmeter_server/$port
 
 echo $RESULT_ROOT >&3
 echo $dev_node >&3
-read response <&3
+read -r response <&3
 
 if [ "$response" != 'power meter started' ]; then
 	echo "pmeter server does not start correctly" >&2
@@ -19,11 +19,11 @@ fi
 wait_post_test
 
 echo "done" >&3
-read result <&3
+read -r result <&3
 if [ "$result" != 'power meter read value OK' ]; then
 	echo "pmeter doesn't output value" >&2
 	exit 1
 fi
 
-read power <&3
+read -r power <&3
 echo "Average_Active_Power: $power"

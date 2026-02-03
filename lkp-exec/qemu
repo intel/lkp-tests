@@ -60,7 +60,7 @@ create_lkp_home()
 	EOF
 
 	local dir
-	read -p "$HOME/.lkp => " dir
+	read -r -p "$HOME/.lkp => " dir
 
 	[[ $dir ]] && {
 	dir=$(realpath $dir)

@@ -12,12 +12,12 @@ do
 
 	for cpu in $(cd /sys/devices/system/cpu && echo cpu[0-9]*)
 	do
-		while read state time_in_state
+		while read -r state time_in_state
 		do
 			echo "${cpu}.time_in_state.$state: $time_in_state"
 		done < /sys/devices/system/cpu/$cpu/cpufreq/stats/time_in_state
 
-		read total_trans < /sys/devices/system/cpu/$cpu/cpufreq/stats/total_trans
+		read -r total_trans < /sys/devices/system/cpu/$cpu/cpufreq/stats/total_trans
 		echo "${cpu}.total_trans: $total_trans"
 	done
 

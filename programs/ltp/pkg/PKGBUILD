@@ -56,7 +56,7 @@ split_syscalls_tests()
 
 	# standalone
 	standalone_file=$(get_pkg_dir $pkgname)/addon/tests/syscalls-standalone
-	while read line
+	while read -r line
 	do
 		grep -q "^$line$" syscalls || {
 			echo "standalone test \"$line\" is not found in syscalls"
@@ -102,7 +102,7 @@ split_tests()
 	# DOR002 dio_read -n 20 -i 15 -r 512k -w 512k -s 32M
 	# DOR003 dio_read -n 100 -i 4 -r 512k -w 512k -s 32M
 	# split out DOR tests as standalone
-	grep DOR ltp-aiodio.part4 | while read line
+	grep DOR ltp-aiodio.part4 | while read -r line
 	do
 		local dor_test=$(echo $line | cut -d' ' -f1)
 		echo "$line" > ltp-aiodio.part4-$dor_test

@@ -47,12 +47,12 @@ calc_cpu_utilization()
 	local sleep_secs=${1:-10}
 	local cpu user_t nice_t system_t previdle_t idle_t rest
 
-	read cpu user_t nice_t system_t previdle_t rest < /proc/stat
+	read -r cpu user_t nice_t system_t previdle_t rest < /proc/stat
 	local prevtotal_t=$((user_t+nice_t+system_t+previdle_t))
 
 	sleep $sleep_secs
 
-	read cpu user_t nice_t system_t idle_t rest < /proc/stat
+	read -r cpu user_t nice_t system_t idle_t rest < /proc/stat
 	local total_t=$((user_t+nice_t+system_t+idle_t))
 
 	if [ $prevtotal_t -eq $total_t ]; then

@@ -346,7 +346,7 @@ download_file() {
 
 	# find the client we should use for this URL
 	local -a cmdline
-	IFS=' ' read -a cmdline < <(get_downloadclient "$proto")
+	IFS=' ' read -r -a cmdline < <(get_downloadclient "$proto")
 	(( ${#cmdline[@]} )) || exit
 
 	local filename=$(get_filename "$netfile")
@@ -1911,7 +1911,7 @@ tidy_install() {
 		msg2 "$(gettext "Compressing man and info pages...")"
 		local file files inode link
 		while read -rd ' ' inode; do
-			read file
+			read -r file
 			find ${MAN_DIRS[@]} -type l 2>/dev/null |
 			while read -r link ; do
 				if [[ "${file}" -ef "${link}" ]] ; then

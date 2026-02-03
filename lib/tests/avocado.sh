@@ -48,7 +48,7 @@ run_test()
 		echo "$group total tests $(avocado list | grep \.$group | wc -l)"
 
 		local test
-		log_cmd avocado list | grep \.$group | cut -d' ' -f2 | while read test; do
+		log_cmd avocado list | grep \.$group | cut -d' ' -f2 | while read -r test; do
 			log_cmd avocado run $test 2>&1
 		done
 	fi

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 total_time=0
-while read line
+while read -r line
 do
 	utime=$(echo $line| cut -d " " -f 14)
 	stime=$(echo $line| cut -d " " -f 15)

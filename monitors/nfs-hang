@@ -25,7 +25,7 @@ nfs_hang()
 	local loadavg
 	local misc
 
-	read loadavg misc < /proc/loadavg
+	read -r loadavg misc < /proc/loadavg
 	[ ${loadavg%.*} -ge $((3 * nr_cpu + 10)) ] && {
 	# If loadavg is high, but cpu ulilization(without counting iowait time)
 	# is low, it indicates many jobs are waiting for I/O(state D), may due

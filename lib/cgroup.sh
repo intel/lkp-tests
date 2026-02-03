@@ -9,7 +9,7 @@ clear_cgroup()
 
 	if [ -n "$cgmounts" ]; then
 		echo "$cgmounts" |
-		while read line
+		while read -r line
 		do
 			subsys=$(echo $line | awk '{ print $1 }')
 			subsys_mount=$(echo $line | awk '{ print $2 }')
@@ -103,7 +103,7 @@ reset_current_cpuset()
 
 	if [ -n "$cgmounts" ]; then
 		echo "$cgmounts" |
-		while read line
+		while read -r line
 		do
 			subsys_mount=$(echo $line | awk '{ print $1 }')
 			# find the cpuset subsystem

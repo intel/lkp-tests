@@ -30,7 +30,7 @@ remove()
 	local path
 	local stale_links
 
-	while read path
+	while read -r path
 	do
 		remove_from_mrtts $path
 		stale_links="$stale_links $(find $(dirname "$path") -xtype l)"
@@ -79,7 +79,7 @@ else
 fi
 
 echo -n "!!! Do you really want to do that? [No/yes]: "
-read answer
+read -r answer
 if [[ $answer = "yes" ]]; then
 
 	remove

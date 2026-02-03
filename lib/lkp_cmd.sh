@@ -4,7 +4,7 @@ create_lkp_user() {
 	grep -q ^lkp: /etc/passwd && return
 
 	echo -n "Do you agree to create lkp users for testing? [Y/n] "
-	read input
+	read -r input
 	case $input in
 		N|n)
 			echo "error: lkp user is required to run lkp tests"
