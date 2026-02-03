@@ -27,7 +27,7 @@ remove_index()
 	for path; do
 		path=$(abs_path "$path")
 		[[ -d "$path" ]] || continue
-		cleanup_path_record_from_result_root "$path"
+		clean_path_record_from_result_root "$path"
 	done
 }
 

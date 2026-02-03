@@ -83,7 +83,7 @@ cleanup_path_record_from_patterns()
 
 }
 
-cleanup_path_record_from_result_root()
+clean_path_record_from_result_root()
 {
 
 	local path=$1
