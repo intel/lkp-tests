@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/sh
 #
 # rc.local
 #
@@ -100,10 +100,14 @@ lkp_jobfile_append_var()
 	network="down"
 	while [ $network = "down" ]
 	do
-		for interface in $(ls /sys/class/net/)
+		for interface in /sys/class/net/*
 		do
+			[ -e "$interface" ] || continue
+
+			interface=${interface##*/}
 			ip -o route | grep default | grep $interface > /dev/null
 			[ $? -eq 0 ] || continue
+
 			network=$interface
 			break
 		done
@@ -167,8 +171,8 @@ lkp_jobfile_append_var()
 
 			while read -r line
 			do
-				k=$(echo $line | awk '{print $1}')	
-				v=$(echo $line | awk -F"$k " '{print $2}')	
+				k=$(echo $line | awk '{print $1}')
+				v=$(echo $line | awk -F"$k " '{print $2}')
 				case $k in
 				kernel)
 					#echo $v > $LKP_JOB_DIR/kernel

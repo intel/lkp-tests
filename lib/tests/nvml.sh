@@ -189,7 +189,7 @@ build_generate_testgroup()
 	#     c. keyword: require_fs_type pmem -> put into fs_type pmem
 	#     d. keyword: require_fs_type any -> put into fs_type both non-pmem and pmem
 	#     e. no keyword 'require_fs_type' -> put into fs_type both non-pmem and pmem
-	for nvml_case in `ls`
+	for nvml_case in *
 	do
 		[ -f "$nvml_case/TEST0" ] || continue
 		[ -x "$nvml_case/TEST0" ] || continue

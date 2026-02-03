@@ -349,6 +349,7 @@ install_deb()
 
 	# round two, install all debs one by one accroding to keep-deb which is in sequence
 	# sort keep-deb.${benchmark} by time, handle the oldest keep-deb.${benchmark} first
+	# shellcheck disable=SC2045
 	for keepfile in $(ls -rt /opt/deb/keep-deb*)
 	do
 		echo "handle $keepfile..."
@@ -364,7 +365,7 @@ install_deb()
 				echo "error: dpkg -i /opt/deb/$filename failed." 1>&2
 				return 1
 			}
-		done < $keepfile
+		done < "$keepfile"
 	done
 }
 

@@ -144,8 +144,12 @@ setaff()
 
 	irqs=$(grep "$queues" /proc/interrupts | cut -f1 -d:)
 	[ -z "$irqs" ] && irqs=$(grep $IFACE /proc/interrupts | cut -f1 -d:)
-	[ -z "$irqs" ] && irqs=$(for i in $(ls -Ux /sys/class/net/$IFACE/device/msi_irqs) ;\
-	                         do grep "$i:.*TxRx" /proc/interrupts | grep -v fdir | cut -f 1 -d : ;\
+	[ -z "$irqs" ] && irqs=$(for i in /sys/class/net/$IFACE/device/msi_irqs/* ;\
+	                         do
+	                             [ -e "$i" ] || continue
+
+	                             i=${i##*/}
+	                             grep "$i:.*TxRx" /proc/interrupts | grep -v fdir | cut -f 1 -d : ;\
 	                         done)
 	[ -z "$irqs" ] && echo "Error: Could not find interrupts for $IFACE"
 
@@ -177,7 +181,9 @@ CORES=$(</sys/devices/system/cpu/online)
 
 # Core list for each node from sysfs
 node_dir=/sys/devices/system/node
-for i in $(ls -d $node_dir/node*); do
+for i in "$node_dir"/node*; do
+	[ -e "$i" ] || continue
+
 	i=${i/*node/}
 	corelist[$i]=$(<$node_dir/node${i}/cpulist)
 done

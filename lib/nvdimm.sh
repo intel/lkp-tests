@@ -18,7 +18,9 @@ configure_namespace()
 
 configure_nvdimm()
 {
-	for ns in $(ls -d /sys/bus/nd/devices/namespace*); do
+	for ns in /sys/bus/nd/devices/namespace*; do
+		[ -e "$ns" ] || continue
+
 		configure_namespace $ns $(echo -n $mode)
 	done
 

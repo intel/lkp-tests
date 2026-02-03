@@ -6,8 +6,12 @@
 
 wifi_dev=
 
-for i in $(ls /sys/class/net)
+for i in /sys/class/net/*
 do
+       [ -e "$i" ] || continue
+
+       i=${i##*/}
+
        cat /sys/class/net/$i/uevent | grep wlan
        [ $? -ne 0 ] && continue
        wifi_dev=$i
