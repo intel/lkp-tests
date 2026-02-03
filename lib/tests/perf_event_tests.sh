@@ -40,7 +40,7 @@ setup_test_env()
 	mount -t tracefs nodev /sys/kernel/tracing
 }
 
-cleanup_test_env()
+clean_test_env()
 {
 	if [ -e "/tmp/paranoid_old_value" ]; then
 		local orig_value=$(cat /tmp/paranoid_old_value)

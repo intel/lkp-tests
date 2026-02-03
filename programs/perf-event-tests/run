@@ -16,4 +16,4 @@ setup_test_env "$paranoid"
 
 log_cmd ./run_tests.sh
 
-cleanup_test_env
+clean_test_env
