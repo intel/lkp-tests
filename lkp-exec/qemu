@@ -87,7 +87,7 @@ replace_script_partition_val()
 
 	VDISK_NUM=$((nr_hdd_partitions+nr_ssd_partitions+nr_swap_vdisk+nr_rootfs_vdisk))
 
-	[[ "$hdd_partitions$ssd_partitions$swap_partitions$rootfs_partition" =~ '/dev/vda' ]] && return
+	[[ "$hdd_partitions$ssd_partitions$swap_partitions$rootfs_partition" == *"/dev/vda"* ]] && return
 
 	if ((VDISK_NUM)); then
 		local index=0

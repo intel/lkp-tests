@@ -27,7 +27,6 @@ disable=SC2044 # For loops over find output are fragile. Use find -exec or a whi
 disable=SC2048 # Use "$@" (with quotes) to prevent whitespace problems
 disable=SC2054 # Use spaces, not commas, to separate array elements.
 disable=SC2068 # Double quote array expansions to avoid re-splitting elements
-disable=SC2076 # Don't quote rhs of =~, it'll match literally rather than as a regex.
 disable=SC2087 # Quote 'EOF' to make here document expansions happen on the server side rather than on the client
 disable=SC2089 # Quotes/backslashes will be treated literally. Use an array.
 disable=SC2090 # Quotes/backslashes in this variable will not be respected.

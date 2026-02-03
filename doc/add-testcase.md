@@ -113,7 +113,7 @@ export PATH=$BENCHMARK_ROOT/netperf/bin:$PATH
 netserver
 
 # load `sctp` module first if it's a SCTP related test
-[[ $test =~ 'SCTP' ]] && modprobe sctp 2>/dev/null
+[[ $test == *"SCTP"* ]] && modprobe sctp 2>/dev/null
 sleep 1
 
 [[ "$send_size" ]] && test_options="-- -m $send_size"

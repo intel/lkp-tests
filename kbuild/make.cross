@@ -216,7 +216,7 @@ install_crosstool_gcc()
 
 install_crosstool()
 {
-	if [[ "$COMPILER" =~ "clang" ]]; then
+	if [[ "$COMPILER" == *"clang"* ]]; then
 		install_crosstool_clang || {
 			echo "clang crosstool install failed"
 			return 1
@@ -356,7 +356,7 @@ setup_crosstool_clang()
 
 setup_crosstool()
 {
-	if [[ "$COMPILER" =~ "clang" ]]; then
+	if [[ "$COMPILER" == *"clang"* ]]; then
 		setup_crosstool_clang
 	else
 		setup_crosstool_gcc
@@ -377,7 +377,7 @@ shopt -s nullglob
 
 COMPILER=${COMPILER:-"gcc"}
 
-if [[ ! "$0" =~ 'make.cross' && "$0" =~ make\.([a-z0-9_]+) ]]; then
+if [[ ! "$0" == *"make.cross"* && "$0" =~ make\.([a-z0-9_]+) ]]; then
 	export ARCH="${BASH_REMATCH[1]}"
 elif [[ "$*" =~ ARCH=([a-z0-9_]+) ]]; then
 	export ARCH="${BASH_REMATCH[1]}"
@@ -422,7 +422,7 @@ setup_crosstool || {
 	opt_jobs="--jobs=$((nr_cpu * 2))"
 }
 
-[[ "$*" =~ "ARCH=$ARCH" ]] || {
+[[ "$*" == *"ARCH=$ARCH"* ]] || {
 	opt_arch="ARCH=$ARCH"
 }
 

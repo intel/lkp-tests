@@ -88,7 +88,7 @@ setup_qemu_console()
 
 setup_qemu_netdev()
 {
-	[[ $model =~ '-netdev ' ]] && return
+	[[ $model == *"-netdev "* ]] && return
 
 	qemu_netdev_option="-device e1000,netdev=net0 "
 	qemu_netdev_option+="-netdev user,id=net0"

@@ -116,7 +116,7 @@ is_llvm_equal_one_supported()
 		#    * - sparc (sparc64 only)
 		#      - ``CC=clang LLVM_IAS=0`` (LLVM >= 20)
 		return 1
-	elif [[ $ARCH =~ "powerpc" || $ARCH =~ "mips" || $ARCH =~ "riscv" ]]; then
+	elif [[ $ARCH == *"powerpc"* || $ARCH == *"mips"* || $ARCH == *"riscv"* ]]; then
 		# https://www.kernel.org/doc/html/v5.18/kbuild/llvm.html
 		# https://www.kernel.org/doc/html/v5.19/kbuild/llvm.html
 		is_kernel_version "<" 5.18 && return 1
@@ -129,14 +129,14 @@ setup_llvm_ias()
 {
 	local opt_cc=$1
 
-	if [[ $ARCH =~ "powerpc" ]]; then
+	if [[ $ARCH == *"powerpc"* ]]; then
 		# [v5.15-rc1] f12b034afeb3 ("scripts/Makefile.clang: default to LLVM_IAS=1")
 		# Above commit enables clang integrated assembler by default, which raises below errors:
 		# clang-14: error: unsupported argument '-mpower4' to option 'Wa,'
 		# clang-14: error: unsupported argument '-many' to option 'Wa,'
 		# explicitly set LLVM_IAS=0 to disable integrated assembler and switch back to gcc assembler
 		is_kernel_version ">" 5.14 && is_kernel_version "<" 5.18 && echo "LLVM_IAS=0"
-	elif [[ $ARCH =~ "hexagon" ]]; then
+	elif [[ $ARCH == *"hexagon"* ]]; then
 		is_kernel_version "<" 5.15 && echo "LLVM_IAS=1"
 	elif [[ $ARCH =~ arm ]]; then
 		is_kernel_version "<" 5.15 && [[ $opt_cc = "LLVM=1" ]] && echo "LLVM_IAS=1"
@@ -212,7 +212,7 @@ is_config_enabled()
 	# 0
 	# $ echo "CONFIG_CPU_BIG_ENDIAN=n" | grep "^CONFIG_CPU_BIG_ENDIAN=[^n]"; echo $?
 	# 1
-	[[ $config =~ '=' ]] || config+='=[^n]'
+	[[ $config == *"="* ]] || config+='=[^n]'
 	grep -q "^$config" "$config_file"
 }
 

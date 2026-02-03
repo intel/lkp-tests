@@ -143,10 +143,10 @@ check_kconfig()
 	while read -r line
 	do
 		# Avoid commentary on config
-		[[ "$line" =~ ^"CONFIG_" ]] || continue
+		[[ "$line" =~ ^CONFIG_ ]] || continue
 
 		# only kernel <= v5.0 has CONFIG_NFT_CHAIN_NAT_IPV4 and CONFIG_NFT_CHAIN_NAT_IPV6
-		[[ "$line" =~ "CONFIG_NFT_CHAIN_NAT_IPV" ]] && continue
+		[[ "$line" == *"CONFIG_NFT_CHAIN_NAT_IPV"* ]] && continue
 
 		# Some kconfigs are required as m, but they may set as y alreadly.
 		# So don't check y/m, just match kconfig name
@@ -399,7 +399,7 @@ fixup_bpf()
 		ln -fs bash /bin/sh
 
 	local python_version=$(python3 --version)
-	if [[ "$python_version" =~ "3.5" ]] && [[ -e "bpf/test_bpftool.py" ]]; then
+	if [[ "$python_version" == *"3.5"* ]] && [[ -e "bpf/test_bpftool.py" ]]; then
 		sed -i "s/res)/res.decode('utf-8'))/" bpf/test_bpftool.py
 	fi
 

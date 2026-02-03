@@ -14,9 +14,9 @@ function l()
 	[[ $(find "$@" -maxdepth 0 -size +1M 2>/dev/null) ]] && {
 		opt_less+='-n '
 
-		if [[ "$1" =~ 'log' ]]; then
+		if [[ "$1" == *"log"* ]]; then
 			opt_less+='+G '
-		elif [[ "$PWD" =~ 'log' && ! "$1" =~ ^/ ]]; then
+		elif [[ "$PWD" == *"log"* && ! "$1" =~ ^/ ]]; then
 			opt_less+='+G '
 		fi
 	}

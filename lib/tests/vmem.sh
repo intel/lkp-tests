@@ -46,7 +46,7 @@ run_vmem()
 	if [ "$LKP_LOCAL_RUN" != "1" ]; then
 		log_cmd chown lkp:lkp -R "$BENCHMARK_ROOT/$casename"
 		log_cmd chown lkp:lkp -R /tmp
-		[[ "$group" =~ "vmem" ]] && log_cmd chown lkp:lkp -R /dev/dax0.0
+		[[ "$group" == *"vmem"* ]] && log_cmd chown lkp:lkp -R /dev/dax0.0
 	fi
 
 	log_cmd cd "$BENCHMARK_ROOT/$casename/src/test"

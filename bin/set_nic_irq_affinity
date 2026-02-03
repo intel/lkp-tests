@@ -122,7 +122,7 @@ parse_range ()
 	for r in $RANGE; do
 		# eval lets us use vars in {#..#} range
 		# shellcheck disable=SC1083 # This { is literal. Check expression (missing ;/\n?) or quote it
-		[[ $r =~ '..' ]] && r="$(eval echo {$r})"
+		[[ $r == *".."* ]] && r="$(eval echo {$r})"
 		LIST+=" $r"
 	done
 	echo $LIST

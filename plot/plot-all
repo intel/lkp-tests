@@ -6,7 +6,7 @@ umask 002
 export PATH=$PATH:$LKP_SRC/plot
 export TERM=xterm
 
-[[ $RESULT_ROOT =~ '/dd-write/' ]] || exit
+[[ $RESULT_ROOT == *"/dd-write/"* ]] || exit
 [[ -f ftrace.gz ]] || exit
 
 [[ -f pid ]] || grep '^kill -9' dd | cut -f3- -d' ' > pid
@@ -16,7 +16,7 @@ plot-global_dirty_state &
 plot-writeback_single_inode &
 plot-task-bw &
 
-if [[ $RESULT_ROOT =~ '/nfs' ]]; then
+if [[ $RESULT_ROOT == *"/nfs"* ]]; then
 	plot-nfs-commit &
 else
 	plot-iostat &

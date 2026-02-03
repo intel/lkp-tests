@@ -100,7 +100,7 @@ build_dropwatch()
 	#    Aborting...
 	# so, keeps 1.5.3 in Debian 10/Debian 11.
 	local distro=$(basename $rootfs)
-	if [[ "$distro" =~ "debian-12" ]]; then
+	if [[ "$distro" == *"debian-12"* ]]; then
 		git checkout v1.5.4
 	else
 		git checkout v1.5.3

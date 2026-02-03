@@ -85,7 +85,7 @@ setup_config()
 	}
 
 	# install the filebench command
-	[[ "$test" =~ "filebench" ]] && {
+	[[ "$test" == *"filebench"* ]] && {
 		ln -s $BENCHMARK_ROOT/$testcase/filebench/bin/filebench /usr/bin/filebench
 	}
 
