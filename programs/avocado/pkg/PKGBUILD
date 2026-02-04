@@ -4,8 +4,8 @@ pkgrel=1
 arch=('i386' 'x86_64')
 url="https://github.com/avocado-framework"
 license=('GPL')
-source=("https://github.com/avocado-framework/avocado.git" "https://github.com/intel/lkvs.git" "https://github.com/tianocore/edk2.git")
-md5sums=('SKIP' 'SKIP' 'SKIP')
+source=("https://github.com/avocado-framework/avocado.git" "https://github.com/intel/lkvs.git")
+md5sums=('SKIP' 'SKIP')
 
 . $LKP_SRC/lib/debug.sh
 . $LKP_SRC/lib/install.sh
@@ -15,8 +15,6 @@ md5sums=('SKIP' 'SKIP' 'SKIP')
 build()
 {
 	cd_src_pkg_dir
-
-	build_edk2
 }
 
 package()
@@ -29,6 +27,4 @@ package()
 
 	# required by lkvs/KVM/qemu/tests/x86_cpuid.py
 	pack_contents "$srcdir/lkvs/BM" "${pkgdir}/lkp/benchmarks/lkvs"
-
-	pack_edk2
 }

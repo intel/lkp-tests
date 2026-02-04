@@ -1,0 +1,25 @@
+pkgname=edk2
+pkgver=git
+pkgrel=1
+arch=('i386' 'x86_64')
+url="https://github.com/tianocore/edk2"
+license=('GPL')
+source=("https://github.com/tianocore/edk2.git")
+md5sums=('SKIP')
+
+. $LKP_SRC/lib/debug.sh
+. $LKP_SRC/lib/install.sh
+. $LKP_SRC/lib/reproduce-log.sh
+. $LKP_SRC/lib/tests/pkgbuild.sh
+
+build()
+{
+	cd_src_pkg_dir
+
+	build_edk2
+}
+
+package()
+{
+	pack_edk2
+}

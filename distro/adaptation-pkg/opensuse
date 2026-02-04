@@ -94,6 +94,7 @@ qat::
 qemu-next::
 qperf::
 reaim::
+edk2::
 redis-server::
 rocksdb::
 rt-app::

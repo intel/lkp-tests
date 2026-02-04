@@ -95,6 +95,7 @@ qperf::
 reaim::
 redis-server::
 rocksdb::
+edk2::
 rt-app::
 sar::
 schbench::

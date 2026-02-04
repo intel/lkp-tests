@@ -19,6 +19,7 @@ dbench:
 device-dax: ndctl
 eatmem: vm-scalability
 ebizzy::
+edk2::
 energy: perf
 filebench::
 fio::

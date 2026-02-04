@@ -82,6 +82,7 @@ qemu-next::
 qperf::
 reaim::
 redis-server::
+edk2::
 rocksdb::
 schbench::
 simd-stress::

@@ -131,13 +131,13 @@ build_edk2()
 
 	log_cmd make -C BaseTools/Source/C 2>&1
 
-	# generate Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd
+	# generate Build/OvmfX64/DEBUG_GCC*/FV/OVMF.fd
 	log_cmd OvmfPkg/build.sh -a X64 -n 112
 }
 
 pack_edk2()
 {
-	pack_contents "$srcdir/edk2/Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd" "${pkgdir}/lkp/benchmarks/edk2/Build/OvmfX64/DEBUG_GCC5/FV"
+	pack_contents "$srcdir/edk2/Build/OvmfX64/DEBUG_GCC*/FV/OVMF.fd" "${pkgdir}/lkp/benchmarks/edk2/Build/OvmfX64/DEBUG_GCC/FV"
 }
 
 pack_avocado_vt()

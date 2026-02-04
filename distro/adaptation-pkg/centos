@@ -93,6 +93,7 @@ reaim::
 redis-server::
 rocksdb::
 rt-app::
+edk2::
 rt-tests::
 schbench::
 simd-stress::

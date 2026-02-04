@@ -94,6 +94,7 @@ reaim::
 redis-server::
 rocksdb::
 rt-app::
+edk2::
 schbench::
 simd-stress::
 sockperf::

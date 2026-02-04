@@ -91,6 +91,7 @@ redis-server::
 rocksdb::
 rt-app::
 rt-tests::
+edk2::
 schbench::
 simd-stress::
 sockperf::
