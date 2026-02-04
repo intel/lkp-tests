@@ -13,7 +13,8 @@ cd_benchmark $suite/gtests/net/packetdrill
 # fix the issue: open tun device: No such file or directory
 lsmod | grep -q tun || modprobe tun
 
-for f in $(find . -name "*.pkt" ! -name "*diag-ipv6*" | sort); do
+find . -name "*.pkt" ! -name "*diag-ipv6*" | sort |
+while read -r f; do
 	echo "Running $f ..."
 	ip tcp_metrics flush all > /dev/null 2>&1
 	# default tolerance_usecs is 4000 us, allow 10 times(4000 us) on LKP

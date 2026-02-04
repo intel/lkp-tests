@@ -66,7 +66,9 @@ remove_from_mrtts()
 	for path; do
 		path=$(abs_path "$path")
 		[[ -d "$path" ]] || continue
-		for dir in $(find $path -type d); do
+
+		find "$path" -type d |
+		while read -r dir; do
 			is_mrt "$dir" && echo "$dir"
 		done | $LKP_SRC/bin/lkp delete_mrts
 	done

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-for i in $(find $LKP_SRC/lib -type f -name "*.rb"); do
-	irb_options+="-r $i "
-done
+irb_options=$(find "$LKP_SRC/lib" -type f -name "*.rb" -printf "-r %p ")
 
 irb $irb_options

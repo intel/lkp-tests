@@ -35,7 +35,7 @@ hardlink_to_symlink()
 			ln -sf ${hard_links[0]#.} ${hard_links[$i]}
 			ln -sf ${hard_links[0]#.} ${hard_links[$i]}
 		done
-	done < <(for i in $(find . -type f -links +1); do find . -samefile $i | awk '{printf "%s ", $1}'; printf "\n"; done | sort | uniq)
+	done < <(find . -type f -links +1 | while read i; do find . -samefile "$i" | awk '{printf "%s ", $1}'; printf "\n"; done | sort | uniq)
 }
 
 install()

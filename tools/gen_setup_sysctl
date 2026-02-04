@@ -4,7 +4,8 @@ output=$LKP_SRC/setup/sysctl
 echo "#!/bin/sh" > $output
 
 # params
-for i in $(find /proc/sys -maxdepth 2 -type f |sort -u)
+find /proc/sys -maxdepth 2 -type f | sort -u |
+while read -r i
 do
 	j=$(basename $i | sed -r 's/-/_/g')
 	echo "# - sc_$j" >> $output
