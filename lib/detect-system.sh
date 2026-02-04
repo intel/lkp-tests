@@ -108,7 +108,7 @@ detect_libc_version()
 	local libc_version
 
 	local file
-	for file in $rootfs/lib/libc-*.*.so $rootfs/lib/*-linux-gnu/libc-*.*.so
+	for file in "$rootfs"/lib/libc-*.*.so "$rootfs"/lib/*-linux-gnu/libc-*.*.so
 	do
 		[ -x "$file" ] || continue
 		libc_version=${file#*/libc-}

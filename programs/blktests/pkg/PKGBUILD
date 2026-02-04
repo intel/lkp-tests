@@ -46,7 +46,7 @@ package()
 
 generate_new_tests()
 {
-	for tests in $(get_pkg_dir ${pkgname})/addon/tests/*
+	for tests in "$(get_pkg_dir "${pkgname}")"/addon/tests/*
 	do
 		cat $tests | grep -v '^#' > $benchmark_path/tests/$(basename $tests)
 	done

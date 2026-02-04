@@ -94,7 +94,7 @@ done
 
 if parse_bool -q "$cg_bind"; then
 	#Set PPID to first cgroup tasks
-	for subsys_tasks in $CGROUP_MNT/*/$testcase.1/tasks; do
+	for subsys_tasks in "$CGROUP_MNT"/*/"$testcase".1/tasks; do
 		log_eval "echo '$PPID' > '$subsys_tasks'"
 	done
 fi

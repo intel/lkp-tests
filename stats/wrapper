@@ -265,7 +265,7 @@ warn_empty_stats
 }
 
 if [[ $program = 'ftrace' ]]; then
-	for file in $RESULT_ROOT/$program.*.yaml
+	for file in "$RESULT_ROOT/$program".*.yaml
 	do
 		stats_group=$(basename $file .yaml)
 		dump_stat $stats_group $file $stat_file

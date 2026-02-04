@@ -60,7 +60,7 @@ kill_bg_procs()
 	local pids
 	local pid
 
-	for pidfile in $TMP/pid-bg-proc-*
+	for pidfile in "$TMP"/pid-bg-proc-*
 	do
 		[ -s "$pidfile" ] || continue
 
@@ -104,7 +104,7 @@ grep -q perf-profile $TMP/program_list && {
 	[ -f $TMP_RESULT_ROOT/post-run.perf-profile ] || echo "perf-profile recording was started but not correctly done" >&2
 }
 
-for post_run in $TMP_RESULT_ROOT/post-run.* $LKP_SRC/post-run/*; do
+for post_run in "$TMP_RESULT_ROOT"/post-run.* "$LKP_SRC"/post-run/*; do
 	[ -f "$post_run" ] && {
 		echo "$(date +'%F %T') executing post-run script: $post_run"
 		sh "$post_run"
@@ -183,7 +183,7 @@ copy_time_files()
 {
 	local ret_copy_time_files=0
 
-	for time_file in $TMP/*.time
+	for time_file in "$TMP"/*.time
 	do
 		[ -e "$time_file" ] || return
 

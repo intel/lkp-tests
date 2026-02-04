@@ -37,7 +37,7 @@ while :
 do
 	echo time: $(date +%s)
 	cd "$cgdir" || exit
-	for cg in $cgname*; do
+	for cg in "$cgname"*; do
 		[ -f "$cg/$file" ] || continue
 		echo "cgroup: $cg"
 		cat "$cg/$file"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in $LKP_SRC/lib/*.rb
+for i in "$LKP_SRC"/lib/*.rb
 do
 	opt_libs+="-r $i "
 done

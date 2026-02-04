@@ -21,7 +21,7 @@ setup_cgroup()
 
 	if [ "$cgroup_ver" = 1 ]; then
 		local subsys_tasks
-		for subsys_tasks in $CGROUP_MNT/*/$1/tasks
+		for subsys_tasks in "$CGROUP_MNT"/*/"$1"/tasks
 		do
 			log_eval "echo \$\$ > '$subsys_tasks'"
 		done

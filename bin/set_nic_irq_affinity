@@ -144,7 +144,7 @@ setaff()
 
 	irqs=$(grep "$queues" /proc/interrupts | cut -f1 -d:)
 	[ -z "$irqs" ] && irqs=$(grep $IFACE /proc/interrupts | cut -f1 -d:)
-	[ -z "$irqs" ] && irqs=$(for i in /sys/class/net/$IFACE/device/msi_irqs/* ;\
+	[ -z "$irqs" ] && irqs=$(for i in /sys/class/net/"$IFACE"/device/msi_irqs/* ;\
 	                         do
 	                             [ -e "$i" ] || continue
 

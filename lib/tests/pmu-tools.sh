@@ -18,7 +18,7 @@ create_links()
     if [ "$cpu_family" -eq 6 ] && [ "$model" -eq 85 ]; then
         stepping=$(cpu_info "stepping")
         [ -z "$stepping" ] && exit
-        for f in $pmu_dir/GenuineIntel-6-55-*$stepping*.json; do
+        for f in "$pmu_dir"/GenuineIntel-6-55-*"$stepping"*.json; do
             # remove stepping field from file name.
             # GenuineIntel-6-55-56789ABCDEF-core.json
             name=${f##*-}

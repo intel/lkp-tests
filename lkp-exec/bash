@@ -8,7 +8,7 @@ source $HOME/.bashrc
 export PS1="LKP:$PS1"
 EOF
 
-for lib in $LKP_SRC/lib/*.sh; do
+for lib in "$LKP_SRC"/lib/*.sh; do
 	echo "source $lib" >> $rc_file
 done
 

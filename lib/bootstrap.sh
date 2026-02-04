@@ -309,7 +309,7 @@ install_initrd()
 	mkdir -vp /lkp/benchmarks
 
 	local dir
-	for dir in $keep_initrd_dir/lkp/benchmarks/*/
+	for dir in "$keep_initrd_dir"/lkp/benchmarks/*/
 	do
 		[ -d "$dir" ] || continue
 
