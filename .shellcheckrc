@@ -21,7 +21,6 @@ disable=SC2206 # Quote to prevent word splitting/globbing, or split robustly wit
 disable=SC2207 # Prefer mapfile or read -a to split command output (or quote to avoid splitting)
 disable=SC2220 # Invalid flags are not handled. Add a *) case
 
-disable=SC2028 # echo won't expand escape sequences. Consider printf.
 disable=SC2039 # In POSIX sh, something is undefined.
 disable=SC2048 # Use "$@" (with quotes) to prevent whitespace problems
 disable=SC2054 # Use spaces, not commas, to separate array elements.

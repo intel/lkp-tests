@@ -116,7 +116,7 @@ do_recover()
 
 run()
 {
-	echo -e "Y\nY" | ./bin/run-fxmark.py
+	printf "Y\nY\n" | ./bin/run-fxmark.py
 }
 
 sleep 5

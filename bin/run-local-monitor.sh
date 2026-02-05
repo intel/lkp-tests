@@ -88,7 +88,7 @@ elif [[ $result_root_template ]]; then
 	done
 else
 	echo "$0 exit due to RESULT_ROOT is not specified, you can use either"
-	echo "\"-o RESULT_ROOT\" or \"export RESULT_ROOT=<result_root>\" to specify it.\n"
+	printf "\"-o RESULT_ROOT\" or \"export RESULT_ROOT=<result_root>\" to specify it.\n\n"
 	usage
 fi
 

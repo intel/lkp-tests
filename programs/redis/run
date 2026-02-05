@@ -27,7 +27,7 @@ export PATH="$BENCHMARK_ROOT/redis/bin:$PATH"
 : "${requests_multiple:=1}"
 
 [ -n "$key_len" ] || {
-	echo "$(basename $0) key_len must be specified!\n";
+	printf "%s key_len must be specified!\n\n" "$(basename "$0")"
 	exit 1
 }
 

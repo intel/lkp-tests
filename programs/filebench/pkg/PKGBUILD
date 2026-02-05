@@ -21,7 +21,7 @@ build()
 	for file in $(ls workloads/*.f); do
 		# Add run command if workload doesn't include run command.  Fix
 		# "Warning: no run command in the WML script!" error during test.
-		grep -q ^run $file || echo -e "\nrun 60" >>$file
+		grep -q ^run "$file" || printf "\nrun 60\n" >> "$file"
 		# Remove obsolete cached attribute because filebench commit 7080d60
 		# has deleted it.  Fix "syntax error at 'cached'" during test.
 		sed -i '/set \$cached=false/d' $file
