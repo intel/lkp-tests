@@ -418,7 +418,11 @@ module Compare
 
     def do_filter_stat_keys(stats, filters)
       filters.map do |sre|
-        re = Regexp.new(sre)
+        begin
+          re = Regexp.new(sre)
+        rescue RegexpError
+          re = Regexp.new(Regexp.escape(sre))
+        end
         stats.select { |stat_key| re.match stat_key }
       end.flatten
     end
