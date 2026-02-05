@@ -51,7 +51,7 @@ strip_object_files()
 	# output meaningful information
 	[[ -d "/lkp/benchmarks/$BM_NAME" ]] &&
 	find /lkp/benchmarks/$BM_NAME/ -type f -executable -size +10k \
-	  \( ! -name "*.awk" -a ! -name "*.pl" -a ! -name "*.sh" -a ! -name "*.rb" -a ! -name "*.py" \) | xargs strip -d &> /dev/null
+	  \( ! -name "*.awk" -a ! -name "*.pl" -a ! -name "*.sh" -a ! -name "*.rb" -a ! -name "*.py" \) | xargs -P$(nproc) strip -d &> /dev/null
 }
 
 pack_deb()

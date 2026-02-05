@@ -66,16 +66,16 @@ desc 'Run syntax check'
 task :syntax do
   executables = `find -type f -executable ! -path "./.git*" ! -path "./vendor*" ! -size +100k`.split("\n").join(' ')
 
-  sh "grep -s -l '^#!/.*ruby$' #{executables} | xargs -n1 ruby -c >/dev/null", verbose: false
-  sh "grep -s -l '^#!/.*bash$' #{executables} | xargs -n1 bash -n", verbose: false
-  sh "grep -s -l '^#!/bin/sh$' #{executables} | xargs -n1 dash -n", verbose: false
+  sh "grep -s -l '^#!/.*ruby$' #{executables} | xargs -P$(nproc) -n1 ruby -c >/dev/null", verbose: false
+  sh "grep -s -l '^#!/.*bash$' #{executables} | xargs -P$(nproc) -n1 bash -n", verbose: false
+  sh "grep -s -l '^#!/bin/sh$' #{executables} | xargs -P$(nproc) -n1 dash -n", verbose: false
 
   puts 'syntax OK'
 end
 
 desc 'Run shellcheck'
 task :shellcheck do
-  executables = `find -type f -executable ! -path "./.git*"  ! -path "./vendor*" ! -size +100k | xargs grep -s -l -e '^#!/.*bash$' -e '^#!/bin/sh$'`.split("\n").join(' ')
+  executables = `find -type f -executable ! -path "./.git*"  ! -path "./vendor*" ! -size +100k | xargs -P$(nproc) grep -s -l -e '^#!/.*bash$' -e '^#!/bin/sh$'`.split("\n").join(' ')
 
   format = ENV['format'] || 'tty'
 

@@ -110,7 +110,7 @@ collect()
 	local cmd="grep -lr '$pattern' tests/$fs"
 
 	for pattern in "$@"; do
-		cmd+=" | xargs grep -l '$pattern'"
+		cmd+=" | xargs -P$(nproc) grep -l '$pattern'"
 	done
 
 	eval $cmd | cut -d/ -f3 | grep -v -f <(cat $benchmark_path/tests/$fs-*) | sort

@@ -491,7 +491,7 @@ prepare_for_selftest_mfs()
 	else
 		selftest_mfs=$(find $group -name Makefile)
 		# assume the Makefile is a valid make TARGETS if including lib.mk
-		selftest_mfs=$(echo "$selftest_mfs" | xargs -r grep -l '/lib.mk')
+		selftest_mfs=$(echo "$selftest_mfs" | xargs -P$(nproc) -r grep -l '/lib.mk')
 	fi
 
 	[ -n "$selftest_mfs" ] || die "empty selftest_mfs"
@@ -556,7 +556,7 @@ fixup_x86()
 fixup_livepatch()
 {
 	# livepatch check if dmesg meet expected exactly, so disable redirect stdout&stderr to kmsg
-	[[ -s "/tmp/pid-tail-global" ]] && cat /tmp/pid-tail-global | xargs kill -9 && echo "" >/tmp/pid-tail-global
+	[[ -s "/tmp/pid-tail-global" ]] && cat /tmp/pid-tail-global | xargs -P$(nproc) kill -9 && echo "" >/tmp/pid-tail-global
 
 	return 0
 }

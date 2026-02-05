@@ -36,7 +36,7 @@ remove()
 		stale_links="$stale_links $(find $(dirname "$path") -xtype l)"
 	done < $temp_file_sort
 
-	cat $temp_file_sort | xargs rm -rf
+	cat $temp_file_sort | xargs -P$(nproc) rm -rf
 
 	rm -vf $stale_links
 	rm -f $temp_file_unsort

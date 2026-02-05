@@ -67,4 +67,4 @@ sed -r -i \
 	$files
 
 checkbashisms $files
-echo "$files" | xargs -n1 bash -n
+echo "$files" | xargs -P$(nproc) -n1 bash -n

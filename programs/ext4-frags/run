@@ -37,14 +37,14 @@ log_cmd mount -t ext2 $partition $mnt 2>/dev/null ||
 log_cmd mount -t ext4 $partition $mnt             || die
 log_cmd mkdir $mnt/a
 log_cmd cd $mnt/a
-log_echo "seq 1 $nr_1Mfiles | xargs -n 1 fallocate -l 1m"
-seq 1 $nr_1Mfiles | xargs -n 1 fallocate -l 1m || die
-log_echo "seq 1 2 $nr_1Mfiles | xargs /bin/rm"
-seq 1 2 $nr_1Mfiles | xargs /bin/rm || die
+log_echo "seq 1 $nr_1Mfiles | xargs -P$(nproc) -n 1 fallocate -l 1m"
+seq 1 $nr_1Mfiles | xargs -P$(nproc) -n 1 fallocate -l 1m || die
+log_echo "seq 1 2 $nr_1Mfiles | xargs -P$(nproc) /bin/rm"
+seq 1 2 $nr_1Mfiles | xargs -P$(nproc) /bin/rm || die
 log_cmd mkdir $mnt/b
 log_cmd cd $mnt/b
-log_echo "seq 1 $nr_1Gfiles | xargs -n 1 fallocate -l 1g"
-seq 1 $nr_1Gfiles | xargs -n 1 fallocate -l 1g || die
+log_echo "seq 1 $nr_1Gfiles | xargs -P$(nproc) -n 1 fallocate -l 1g"
+seq 1 $nr_1Gfiles | xargs -P$(nproc) -n 1 fallocate -l 1g || die
 log_cmd cd /
 log_cmd umount $mnt
 log_cmd mount -t ext4 -o commit=10000 $partition $mnt || die

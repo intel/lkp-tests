@@ -160,7 +160,7 @@ EOT
 
 	# reduce package size
 	rm -rf $avocado_data_dir/avocado-vt/images/*
-	find $avocado_data_dir/avocado-vt/virttest/test-providers.d -name .git -type d | xargs rm -rf
+	find $avocado_data_dir/avocado-vt/virttest/test-providers.d -name .git -type d | xargs -P$(nproc) rm -rf
 
 	pack_contents "$avocado_conf_file"
 	pack_contents "$avocado_data_dir"
