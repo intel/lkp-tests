@@ -36,8 +36,10 @@ split_tests()
 
 	local standalone="$(get_pkg_dir $pkgname)/addon/tests/standalone"
 	# standalone test
-	for test in $(cat $standalone | grep -v '^#')
+	grep -v '^#' "$standalone" |
+	while read -r test
 	do
+		[ -n "$test" ] || continue
 		echo $test > ./$test
 	done
 

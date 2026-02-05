@@ -31,6 +31,7 @@ read_kernel_cmdline_vars()
 {
 	[ -f /proc/cmdline ] || return 1
 
+	# shellcheck disable=SC2013
 	for i in $(cat /proc/cmdline)
 	do
 		[ "${i#user=}" != "$i" ] && export $i

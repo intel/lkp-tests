@@ -16,12 +16,12 @@ cd /sys/kernel/debug/tracing || die "no /sys/kernel/debug/tracing"
 
 do_test()
 {
-	for tracer in $(cat available_tracers)
-	do
+	while read -r tracer || [ -n "$tracer" ]; do
+		[ -n "$tracer" ] || continue
 		log_eval "echo $tracer > current_tracer"
 		log_eval "echo 1 > tracing_on"
 		log_eval "echo 0 > tracing_on"
-	done
+	done < available_tracers
 }
 
 runtime_loop

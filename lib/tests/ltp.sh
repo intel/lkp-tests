@@ -32,14 +32,16 @@ is_excluded()
 	cp $exclude_file ./exclude
 
 	# regex match
-	for regex in $(cat "$exclude_file" | grep -v '^#' | grep -w ^${test}:.*:regex$ | awk -F: 'NF == 3 {print $2}')
+	grep -v '^#' "$exclude_file" | grep -w "^${test}:.*:regex$" | awk -F: 'NF == 3 {print $2}' |
+	while read -r regex
 	do
 		echo "# regex: $regex generated" >> ./exclude
 		cat runtest/$test | awk '{print $1}' | grep -G "$regex" | awk -v prefix=$test":" '$0=prefix$0' >> ./exclude
 	done
 
 	orig_test=$(echo "$test" | sed 's/-[0-9]\{2\}$//')
-	for i in $(cat ./exclude | grep -v '^#' | grep -w ^$orig_test | awk -F: 'NF == 2')
+	grep -v '^#' ./exclude | grep -w "^$orig_test" | awk -F: 'NF == 2' |
+	while read -r i
 	do
 		ignore=$(echo $i | awk -F: '{print $2}')
 		grep -q "^${ignore}" runtest/${test} || continue

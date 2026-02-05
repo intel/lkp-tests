@@ -5,20 +5,20 @@ kill -USR1 $(cat $TMP/pidfile)
 
 any_pid_alive()
 {
-        local pidfile=$1
-        for pid in $(cat $pidfile)
-        do
-                test -d /proc/$pid && return
-        done
-        return 1
+	local pidfile=$1
+	while read -r pid || [ -n "$pid" ]; do
+		[ -n "$pid" ] || continue
+		test -d "/proc/$pid" && return
+	done < "$pidfile"
+	return 1
 }
 
 # wait till those detached processes exit
 while true
 do
-        sleep 5
-        any_pid_alive $TMP/pidfile && continue
-        break
+	sleep 5
+	any_pid_alive $TMP/pidfile && continue
+	break
 done
 
 rm $TMP/pidfile

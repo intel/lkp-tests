@@ -20,10 +20,10 @@ any_pid_alive()
 		echo "$ps_out" | grep -qFwf $pidfile
 	else
 		is_busybox_ps=1
-		for pid in $(cat $pidfile)
-		do
-			test -d /proc/$pid && return
-		done
+		while read -r pid || [ -n "$pid" ]; do
+			[ -n "$pid" ] || continue
+			test -d "/proc/$pid" && return
+		done < "$pidfile"
 		return 1
 	fi
 }

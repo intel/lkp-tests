@@ -79,12 +79,13 @@ zcat ftrace.gz | grep -F balance_dirty_pages | awk '/<...>-[0-9]+/{print $1; exi
 
 # dd=$(cat pid | cut -f1 -d' ')
 # [[ -n "$dd" ]] || exit
-for dd in $(cat pid fio-pid more-pid 2>/dev/null)
+while read -r dd
 do
+	[ -n "$dd" ] || continue
 	zcat ftrace.gz |\
 		grep -- "-$dd \+\[" |\
 		grep -qc1 -F balance_dirty_pages && break
-done
+done < <(cat pid fio-pid more-pid 2>/dev/null)
 test $? = 0 || exit
 test "$dd" || exit
 

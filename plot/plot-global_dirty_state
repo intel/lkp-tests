@@ -47,13 +47,13 @@ zcat ftrace.gz | trace_tab global_dirty_state | awk '!x[substr($1, 0, length($1)
 
 plot $trace-flusher
 
-for dd in $(cat pid)
+while read -r dd || [ -n "$dd" ]
 do
+	[ -n "$dd" ] || continue
 	zcat ftrace.gz | grep -F $dd | grep -- "-$dd \+\[" |\
 		trace_tab global_dirty_state > $trace
 	test -s $trace && break
-		# grep -vF 'bdi 0:15:' |\
-done
+done < pid
 test -s $trace || { rm $trace*; exit; }
 
 lines=$(wc -l < $trace)
