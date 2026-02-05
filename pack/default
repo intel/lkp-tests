@@ -2,6 +2,7 @@
 
 . $LKP_SRC/lib/git.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
+. $LKP_SRC/lib/common.sh
 
 pre_download()
 {
@@ -128,7 +129,7 @@ pack_pkg()
 	rm -fr "${BUILD_DIR:?}/$pkg_name" || return
 
 	if [[ "$BM_NAME" != "lkp-src" ]]; then
-		[[  "$(ls -A $BM_ROOT)" ]] || return 0
+		is_dir_empty "$BM_ROOT" && return
 	fi
 
 	case $distro in

@@ -104,3 +104,9 @@ is_rt()
 		[[ -f "$path/job.yaml" ]] &&
 		[[ -f "$dn/stddev.json" ]]
 }
+
+is_dir_empty()
+{
+	[[ -d $1 ]] || return 0
+	! find "$1" -mindepth 1 -maxdepth 1 -print -quit | grep -q .
+}

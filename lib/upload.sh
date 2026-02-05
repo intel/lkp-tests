@@ -2,6 +2,13 @@
 
 . $LKP_SRC/lib/env.sh
 
+is_dir_empty()
+{
+	[ -d "$1" ] || return 0
+
+	! find "$1" -mindepth 1 -maxdepth 1 -print -quit | grep -q .
+}
+
 is_local_server()
 {
 	echo "$LKP_SERVER" | grep -q -E -f $LKP_SRC/etc/trustable-lkp-server
@@ -49,7 +56,7 @@ upload_files_lftp()
 	for file
 	do
 		if [ -d "$file" ]; then
-			[ "$(ls -A $file)" ] && lftp -c "$LFTP_TIMEOUT; open '$UPLOAD_HOST'; mirror -R '$file' '$JOB_RESULT_ROOT/'" || ret=$?
+			! is_dir_empty "$file" && lftp -c "$LFTP_TIMEOUT; open '$UPLOAD_HOST'; mirror -R '$file' '$JOB_RESULT_ROOT/'" || ret=$?
 		else
 			[ -s "$file" ] || continue
 			dest_file=$JOB_RESULT_ROOT/$(basename $file)
