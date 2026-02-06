@@ -35,6 +35,7 @@ RSpec::Core::RakeTask.new do |t|
   puts "ENV['LKP_SRC'] = #{ENV.fetch('LKP_SRC', nil)}"
 
   spec = ENV['spec'] || '*'
+  spec = spec.sub(/_spec$/, '')
   t.pattern = "spec/**{,/*/**}/#{spec}_spec.rb"
   t.rspec_opts = "--example '#{ENV['example']}'" if ENV['example']
 end
