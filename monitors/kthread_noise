@@ -10,7 +10,7 @@ do
 	if [ -d $i ]; then
 		readlink $i/exe >/dev/null 2>&1 && continue
 		stat=$(cat $i/stat 2>/dev/null)
-		[ $? -eq 0 ] || continue
+		[ -n "$stat" ] || continue
 		pid=$(echo $stat |cut -d " " -f 1)
 		kthread_pids="$kthread_pids $pid"
 	fi
@@ -26,7 +26,7 @@ do
 	if [ -d /proc/$i ]; then
 		stat=/proc/$i/stat
 		stat_content=$(cat $stat 2>/dev/null)
-		[ $? -eq 0 ] || continue
+		[ -n "$stat_content" ] || continue
 		echo $stat_content
 	fi
 done

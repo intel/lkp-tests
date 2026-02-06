@@ -66,8 +66,7 @@ do
 	retry=30
 	while true
 	do
-		ping -c 1 -W 1 internal-lkp-server > /dev/null
-		[ $? -eq 0 ] && break
+		ping -c 1 -W 1 internal-lkp-server > /dev/null && break
 		echo network not ready
 		echo network not ready >> $log_file
 		retry=$((retry - 1))

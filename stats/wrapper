@@ -201,8 +201,7 @@ LKP_SRC_ETC=$(lkp_src)/etc
 # on server node due to the current Job2sh algorithm.
 
 # default stats are not in the program_list
-grep -q "^$program\:" $LKP_SRC_ETC/default_stats.yaml
-if [ $? -ne 0 ]; then
+if ! grep -q "^$program\:" $LKP_SRC_ETC/default_stats.yaml; then
 	[ -f $RESULT_ROOT/program_list ] && {
 		grep -q "$program" $RESULT_ROOT/program_list || exit 0
 	}

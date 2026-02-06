@@ -51,9 +51,7 @@ esac
 
 ftrace_mem=$((total_mem - process_mem - result_mem))
 
-echo $option | grep "\-f" > /dev/null
-if [ $? -eq 0 ]
-then
+if echo $option | grep -q "\-f"; then
 	fmem=$((500 * 1024))
 else
 	fmem=$((50 * 1024))
@@ -82,8 +80,7 @@ do
 	retry=30
 	while true
 	do
-		ping -c 1 -W 1 internal-lkp-server > /dev/null
-		[ $? -eq 0 ] && break
+		ping -c 1 -W 1 internal-lkp-server > /dev/null && break
 		echo $(date +%T): network not ready >> $f_log
 		retry=$((retry - 1))
 		[ $retry -eq 0 ] && break
@@ -93,9 +90,7 @@ do
 	if [ $retry -eq 0 ]
 	then
 		$LKP_SRC/bin/run-ipconfig
-		ping -c 1 -W 1 internal-lkp-server > /dev/null
-		if [ $? -ne 0 ]
-		then
+		if ! ping -c 1 -W 1 internal-lkp-server > /dev/null; then
 			echo network down >> $f_log
 			[ -n "$debug" ] && sleep 72000
 			exit 1

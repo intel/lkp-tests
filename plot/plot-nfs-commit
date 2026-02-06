@@ -32,9 +32,7 @@ zcat $trace_file | grep -F "nfs_commit_unstable_pages" |\
 	grep -vF 'ret=0' |\
 	sed 's/.*\]//' |\
 	sed 's/bdi [^ ]\+//' |\
-	sed 's/[^0-9.-]\+/ /g' > trace-commit
-
-[[ $? -eq 0 ]] || exit
+	sed 's/[^0-9.-]\+/ /g' > trace-commit || exit
 
 zcat $trace_file | grep -F "nfs_commit_release" |\
 	grep -vF 'bdi 0:15:' |\

@@ -15,7 +15,6 @@ disable=SC2153 # Possible misspelling: may not be assigned, but is
 disable=SC2154 # is referenced but not assigned
 disable=SC2166 # Prefer [ p ] || [ q ] as [ p -o q ] is not well defined
 disable=SC2178 # Variable was used as an array but is now assigned a string
-disable=SC2181 # Check exit code directly with e.g. 'if mycmd;', not indirectly with $?
 disable=SC2185 # Some finds don't have a default path. Specify '.' explicitly
 disable=SC2206 # Quote to prevent word splitting/globbing, or split robustly with mapfile or read -a.
 disable=SC2207 # Prefer mapfile or read -a to split command output (or quote to avoid splitting)

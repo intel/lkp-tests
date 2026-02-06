@@ -637,8 +637,7 @@ is_same_kernel_and_rootfs()
 	if [ "$kernel" = "$next_kernel" ]; then
 		# check run_on_local_disk flag in current and next job files
 		# if run_on_local_disk setting is different, reboot is required
-		grep -q "^run_on_local_disk: [a-zA-Z0-9_]*" $job
-		if [ $? -eq 0 ]; then
+		if grep -q "^run_on_local_disk: [a-zA-Z0-9_]*" $job; then
 			[ -n "$run_on_local_disk" ] || return 1
 		else
 			[ -n "$run_on_local_disk" ] && return 1

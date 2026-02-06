@@ -250,8 +250,7 @@ build_install_benchmarks() {
 	local pkg_name
 	pkg_name=$(printf '%s-LKP\n' "$script" | sed 's/_/-/g')
 
-	$LKP_SRC/sbin/pack -d $distro -c $force_install $script
-	if [ $? -eq 0 ]; then
+	if $LKP_SRC/sbin/pack -d $distro -c $force_install $script; then
 		echo "Installing $pkg_name"
 
 		case $distro in

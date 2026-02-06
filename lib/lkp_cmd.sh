@@ -11,8 +11,7 @@ create_lkp_user() {
 			exit 1
 		;;
 		*)
-			useradd -m -s /bin/bash lkp
-			if [ $? -eq 0 ]; then
+			if useradd -m -s /bin/bash lkp; then
 				echo "Create lkp user successfully."
 			else
 				echo "Create lkp user failed."

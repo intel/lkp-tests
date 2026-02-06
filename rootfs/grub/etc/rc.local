@@ -52,8 +52,7 @@ else
 	echo "This is in LKP Default kernel"
 fi
 
-cat /proc/cmdline | grep "lkp_grub=off" > /dev/null
-[ $? -eq 0 ] && exit 0
+grep -q "lkp_grub=off" /proc/cmdline && exit 0
 
 escape_cgi_param()
 {
@@ -105,8 +104,7 @@ lkp_jobfile_append_var()
 			[ -e "$interface" ] || continue
 
 			interface=${interface##*/}
-			ip -o route | grep default | grep $interface > /dev/null
-			[ $? -eq 0 ] || continue
+			ip -o route | grep default | grep -q $interface || continue
 
 			network=$interface
 			break
@@ -159,9 +157,7 @@ lkp_jobfile_append_var()
 			[ $(date +%s) -ge $reboot_timeout ] && reboot
 
 			# Get Job configuration
-			$WGET_CMD --directory-prefix="$LKP_JOB_DIR/" $LKP_CONFIG_URL
-			if [ $? -ne 0 ]
-			then
+			if ! $WGET_CMD --directory-prefix="$LKP_JOB_DIR/" $LKP_CONFIG_URL; then
 				lkp_log "Failed to get job config file from $LKP_CONFIG_URL"
 				sleep 10
 				continue
@@ -211,17 +207,13 @@ lkp_jobfile_append_var()
 
 		#Install next Job
 		lkp_log "Getting Job kernel from $wkernel"
-		$WGET_CMD --directory-prefix="$LKP_JOB_DIR/" $wkernel > /dev/null
-		if [ $? -ne 0 ]
-		then
+		if ! $WGET_CMD --directory-prefix="$LKP_JOB_DIR/" $wkernel > /dev/null; then
 			lkp_log "Failed to get kernel from $wkernel"
 			continue
 		fi
 
 		lkp_log "Getting Job initrd from $winitrd"
-		$WGET_CMD --directory-prefix="$LKP_JOB_DIR/" $winitrd > /dev/null
-		if [ $? -ne 0 ]
-		then
+		if ! $WGET_CMD --directory-prefix="$LKP_JOB_DIR/" $winitrd > /dev/null; then
 			lkp_log "Failed to get initrd from $winitrd"
 			continue
 		fi
@@ -255,8 +247,7 @@ lkp_jobfile_append_var()
 	lkp_log ""
 	# we have a chance to stop rebooting after boot in case there are some problems
 
-	cat /proc/cmdline | grep "lkp_grub=noreboot" > /dev/null
-	[ $? -eq 0 ] || reboot
+	grep -q "lkp_grub=noreboot" /proc/cmdline || reboot
 )&
 
 exit 0

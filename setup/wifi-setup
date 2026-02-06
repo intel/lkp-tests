@@ -12,8 +12,7 @@ do
 
        i=${i##*/}
 
-       cat /sys/class/net/$i/uevent | grep wlan
-       [ $? -ne 0 ] && continue
+       grep -q wlan /sys/class/net/$i/uevent || continue
        wifi_dev=$i
        break
 done

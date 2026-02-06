@@ -131,8 +131,7 @@ check_functions()
 	for func in "$@"; do
 		if ! grep -q -x -F "$func" "$FAVAIL_FUNCS"; then
 			echoe "Function: $func isn't available"
-			cs=$(grep -F "$func" "$FAVAIL_FUNCS")
-			if [ "$?" -eq 0 ]; then
+			if cs=$(grep -F "$func" "$FAVAIL_FUNCS"); then
 				echoe "Do you mean:"
 				echoe "$cs"
 			fi

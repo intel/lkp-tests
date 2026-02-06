@@ -46,15 +46,13 @@ start_bmc_watchdog()
 	stop_bmc_watchdog
 
 	[ -x /usr/sbin/dmidecode ] || return
-	dmidecode | grep "IPMI" 2>/dev/null
-	if [ $? -ne 0 ]; then
+	if ! dmidecode | grep "IPMI" 2>/dev/null; then
 		echo "IPMI BMC is not supported on this machine, skip bmc-watchdog setup!"
 		return
 	fi
 
 	[ -x /usr/local/bin/ipmi-setup ] || return
-	ipmi-setup 2> /dev/null | grep "BMC"
-	if [ $? -ne 0 ]; then
+	if ! ipmi-setup 2> /dev/null | grep "BMC"; then
 		echo "ipmi setup fail, skip bmc-watchdog setup!"
 		return
 	fi
