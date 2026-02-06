@@ -138,6 +138,7 @@ run_lmbench3_development()
 
 	local LMBENCH_PATH="$(find bin/ -maxdepth 2 -name lmbench)"
 
+	# shellcheck disable=SC2016
 	sed -i '/lat_pagefault -P $SYNC_MAX $FILE/i [ -f $FILE ] || dd if=/dev/zero of=$FILE count=1 bs=1G' $LMBENCH_PATH
 	log_eval "
 	(

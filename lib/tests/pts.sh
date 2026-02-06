@@ -42,9 +42,12 @@ fixup_startup_time()
 	[ -n "$environment_directory" ] || return
 	local test=$1
 	local target=${environment_directory}/pts/${test}/startuptime-run
+	# shellcheck disable=SC2016
 	sed -i 's,$6,$3,' "$target"
+	# shellcheck disable=SC2016
 	sed -i 's,BASE_DIR=$3,BASE_DIR=$3/workfiles,' "$target"
 	sed -i "33ased -i 's,120,600,' comm_startup_lat.sh" "$target"
+	# shellcheck disable=SC2016
 	sed -i '37arm -r $3/workfiles' "$target"
 }
 

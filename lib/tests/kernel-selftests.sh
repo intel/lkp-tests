@@ -532,6 +532,7 @@ fixup_mm()
 		[[ -z $iterations ]] && iterations=20
 		[[ -z $nr_threads ]] && nr_threads="\$NUM_CPUS"
 		[[ $iterations -le 0 || ($nr_threads != "\$NUM_CPUS" && $nr_threads -le 0) ]] && die "Paramters: iterations or nr_threads must > 0"
+		# shellcheck disable=SC2016
 		sed -i 's/^STRESS_PARAM="nr_threads=$NUM_CPUS test_repeat_count=20"/STRESS_PARAM="nr_threads='$nr_threads' test_repeat_count='$iterations'"/' mm/test_vmalloc.sh
 	fi
 }

@@ -47,4 +47,3 @@ disable=SC3044 # In POSIX sh, 'disown' is undefined.
 disable=SC3045 # In POSIX sh, ulimit -n is undefined.
 disable=SC3054 # In POSIX sh, array references are undefined.
 disable=SC3058 # In POSIX sh, string operations on $@/$* are undefined.
-

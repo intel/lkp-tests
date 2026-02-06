@@ -35,7 +35,9 @@ gnuplot_dirtied_written() {
 		test -s $file || break
 		echo $comma '\'
 		comma=","
+		# shellcheck disable=SC2016
 		echo \"$file\" 'using 1:($5/256) with linespoints pt 7 ps 0.8 lc rgbcolor "red"  title "dirtied '$bdi'", \'
+		# shellcheck disable=SC2016
 		echo \"$file\" 'using 1:($6/256) with      points pt 5 ps 0.6 lc rgbcolor "green" title "written '$bdi'" \'
 	done
 	echo

@@ -7,6 +7,7 @@ plot_lines() {
 	do
 		[[ -f task-bw-${dd[$i]}$suffix ]] || break
 		[[ $i != 0 ]] && echo -n ,
+		# shellcheck disable=SC2016
 		echo -n \"task-bw-${dd[$i]}$suffix\" using '1:($3/1048576)' with steps lw 2.0 lc rgbcolor \"${colors[$i]}\"      title \"task ${dd[$i]}\"
 	done
 }

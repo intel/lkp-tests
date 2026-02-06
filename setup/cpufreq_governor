@@ -11,6 +11,7 @@ is_docker && exit 0
 
 . $LKP_SRC/lib/reproduce-log.sh
 
+# shellcheck disable=SC2016
 log_echo '
 for cpu_dir in /sys/devices/system/cpu/cpu[0-9]*
 do

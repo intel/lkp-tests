@@ -3,5 +3,6 @@
 category=${1:-benchmark}
 jobs_dir=${2:-$LKP_SRC/jobs}
 
+# shellcheck disable=SC2016
 grep $category $jobs_dir/*.yaml -l |
 	xargs -P$(nproc) sed -ne '1,$s/^ *testcase: \+\(.*\)/\1/p' | sort -u
