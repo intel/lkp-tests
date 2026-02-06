@@ -75,7 +75,7 @@ end
 
 desc 'Run shellcheck'
 task :shellcheck do
-  executables = `find -type f -executable ! -path "./.git*"  ! -path "./vendor*" ! -size +100k | xargs -P$(nproc) grep -s -l -e '^#!/.*bash$' -e '^#!/bin/sh$'`.split("\n").join(' ')
+  executables = ENV['file'] || `find -type f -executable ! -path "./.git*"  ! -path "./vendor*" ! -size +100k | xargs -P$(nproc) grep -s -l -e '^#!/.*bash$' -e '^#!/bin/sh$'`.split("\n").join(' ')
 
   format = ENV['format'] || 'tty'
 
