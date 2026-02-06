@@ -13,9 +13,9 @@ day=$(date +%F)
 [[ $stdout =~ Working\ files\ in\ ([a-zA-Z0-9_/]+), ]] || exit
 
 dir="${BASH_REMATCH[1]}"
-rm -fr $dir/lib/modules/$(uname -r)
-rm -fr $dir/lib/firmware
-rm -fr initramfs-$day
-cp -a $dir initramfs-$day
+rm -fr "$dir/lib/modules/$(uname -r)"
+rm -fr "$dir/lib/firmware"
+rm -fr "initramfs-$day"
+cp -a "$dir" "initramfs-$day"
 
 ./create-cpio.sh initramfs-$day

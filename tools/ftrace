@@ -172,6 +172,7 @@ do_save_functions()
 {
 	local target=$1
 	sfuncs=$(ftrace_get "$target")
+	# shellcheck disable=SC2116
 	sfuncs=$(echo $sfuncs)
 	# Deal with #### all functions enabled ####, etc
 	if [ "${sfuncs####}" != "$sfuncs" ]; then
@@ -259,7 +260,7 @@ KPROBE_EVENTS="kprobe_events"
 
 save_kprobes()
 {
-	undo_ftrace_set "$KPROBE_EVENTS" $(ftrace_get "$KPROBE_EVENTS")
+	undo_ftrace_set "$KPROBE_EVENTS" "$(ftrace_get "$KPROBE_EVENTS")"
 }
 
 set_kprobes()

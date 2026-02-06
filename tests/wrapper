@@ -79,6 +79,7 @@ if [ -n "$nr_instances" ]; then
 		done
 	done
 	wait $to_wait
+	# shellcheck disable=SC2012
 	(cd $TMP_RESULT_ROOT/log-$program && ls | sort -h | xargs cat > $fifo)
 	rm -rf $TMP_RESULT_ROOT/log-$program
 else

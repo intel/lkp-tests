@@ -67,9 +67,10 @@ EOF
 	fi
 	./runmcetest -t $MCE_TMPDIR -s $MCE_SUMDIR -o $MCE_LOGDIR -b $MCE_TOOLDIR -l $MCE_CASELIST -r 1
 
+	# shellcheck disable=SC2206
 	file=($MCE_SUMDIR/*.log)
-	if [[ $file ]]; then
-		cat "$file"
+	if (( ${#file[@]} )); then
+		cat "${file[@]}"
 	else
 		echo "WARNING: mce-test test results is not exist."
 	fi
@@ -128,9 +129,10 @@ test_choice()
 
 	#upload_files -t results  $MCE_LOGDIR/*
 
+	# shellcheck disable=SC2206
 	file=($MCE_SUMDIR/*.log)
-	if [[ $file ]]; then
-		cat "$file"
+	if (( ${#file[@]} )); then
+		cat "${file[@]}"
 	else
 		echo "WARNING: mce-test test results is not exist."
 	fi

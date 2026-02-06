@@ -7,9 +7,9 @@
 # - msrmask
 # - msrval
 
-. $LKP_SRC/lib/reproduce-log.sh
-. $LKP_SRC/lib/common.sh
-. $LKP_SRC/lib/debug.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/common.sh
+. "$LKP_SRC"/lib/debug.sh
 
 : "${check_msr:=y}"
 : "${restore_msr:=y}"
@@ -95,5 +95,5 @@ sanity_check
 [ -n "$hw_prefetcher" ] && setup_hw_prefetcher "$hw_prefetcher"
 # For debug/test purpose, we also provide to use msr and msrval directly
 # to configure CPU msr
-[ -n "$msr" -a -n "$msrval" ] && setup_msr "$msr" "$msrmask" "$msrval"
+[ -n "$msr" ] && [ -n "$msrval" ] && setup_msr "$msr" "$msrmask" "$msrval"
 exit 0

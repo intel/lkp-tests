@@ -77,7 +77,7 @@ lkp_jobfile_append_var()
 {
 	local key_value=$1
 
-	local query_str=job_file=$(escape_cgi_param "$job")
+	local query_str=job_file="$(escape_cgi_param "$job")"
 	echo "$WGET_CMD -O /dev/null $LKP_SERVER/~lkp/cgi-bin/lkp-jobfile-append-var?$query_str&$key_value"
 	if [ "$job" != "" ]
 	then
@@ -88,7 +88,7 @@ lkp_jobfile_append_var()
 (
 	lkp_log()
 	{
-		echo $(date +%c): "$1"
+		echo "$(date +%c): $1"
 	}
 
 	lkp_log ""
@@ -151,10 +151,10 @@ lkp_jobfile_append_var()
 		get_config=true
 		while $get_config
 		do
-			rm -rf $LKP_JOB_DIR/*
+			rm -rf "${LKP_JOB_DIR:?}"/*
 
 			# reboot after 4 hours
-			[ $(date +%s) -ge $reboot_timeout ] && reboot
+			[ "$(date +%s)" -ge "$reboot_timeout" ] && reboot
 
 			# Get Job configuration
 			if ! $WGET_CMD --directory-prefix="$LKP_JOB_DIR/" $LKP_CONFIG_URL; then

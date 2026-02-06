@@ -24,7 +24,7 @@ fi
 #    50% of (RAM - 1 GB), or 256 MB.
 setup_cache_size()
 {
-	local memory_byte=$(to_byte $memory)
+	local memory_byte="$(to_byte "$memory")"
 	local nr_node=${nr_node:-1}
 
 	[ "$mongodb_mem_node_bind" ] && {

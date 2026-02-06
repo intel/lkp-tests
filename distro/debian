@@ -19,21 +19,21 @@ add_i386_package()
 
 download()
 {
-	echo apt-get download $*
-	apt-get download $* || apt-get download $*
+	echo apt-get download "$@"
+	apt-get download "$@" || apt-get download "$@"
 }
 
 hardlink_to_symlink()
 {
 	while read -r line
 	do
-		local hard_links=($line)
+		read -r -a hard_links <<< "$line"
 		for i in {1..9}
 		do
 			[[ ${hard_links[$i]} ]] || break
 			echo \
-			ln -sf ${hard_links[0]#.} ${hard_links[$i]}
-			ln -sf ${hard_links[0]#.} ${hard_links[$i]}
+			ln -sf "${hard_links[0]#.}" "${hard_links[$i]}"
+			ln -sf "${hard_links[0]#.}" "${hard_links[$i]}"
 		done
 	done < <(find . -type f -links +1 | while read i; do find . -samefile "$i" | awk '{printf "%s ", $1}'; printf "\n"; done | sort | uniq)
 }
@@ -92,7 +92,7 @@ fixup_lkp-eywa()
 fixup_perf()
 {
 	local real_perf=(usr/bin/perf_*)
-	[[ $real_perf ]] || return
+	[[ -n "${real_perf[*]}" ]] || return
 
 	# replace the perf wrapper script
 	ln -sf /$real_perf usr/bin/perf

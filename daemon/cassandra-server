@@ -29,7 +29,7 @@ new_log_dir="$path/cassandra/commitlog"
 sed -i "s@# commitlog_directory: ${def_log_dir}@commitlog_directory: ${new_log_dir}@" $cassandra_conf
 
 gc_log=$BENCHMARK_ROOT/cassandra/logs/gc.log
-mkdir -p $(dirname $gc_log)
+mkdir -p "$(dirname "$gc_log")"
 touch $gc_log
 
 cp $cassandra_conf $TMP_RESULT_ROOT/

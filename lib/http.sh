@@ -37,7 +37,7 @@ reset_broken_ipmi()
 #
 trigger_post_process()
 {
-	http_get_cgi "cgi-bin/lkp-post-run?job_file="$(escape_cgi_param "$job")
+	http_get_cgi "cgi-bin/lkp-post-run?job_file=$(escape_cgi_param "$job")"
 
 	reset_broken_ipmi
 }
@@ -49,7 +49,7 @@ jobfile_append_var()
 	# input example: "var1=value1" "var2=value2 value_with_space" ....
 	[ -z "$*" ] && LOG_ERROR "no paramter specified at $FUNCTION" && return
 
-	local query_str=job_file=$(escape_cgi_param "$job")
+	local query_str="job_file=$(escape_cgi_param "$job")"
 	for assignment in "$@"; do
 		query_str="${query_str}&$(escape_cgi_param "$assignment")"
 	done
@@ -88,7 +88,7 @@ http_do_request()
 	local path="$1"
 	shift
 
-	[ -n "$NO_NETWORK$VM_VIRTFS" -o -z "$LKP_SERVER$HTTP_PREFIX" ] && {
+	{ [ -n "$NO_NETWORK$VM_VIRTFS" ] || [ -z "$LKP_SERVER$HTTP_PREFIX" ]; } && {
 		echo skip http request: $path "$@"
 		return
 	}

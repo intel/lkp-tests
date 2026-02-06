@@ -1,5 +1,5 @@
 #!/bin/sh
 
-. $LKP_SRC/lib/env.sh
+. "$LKP_SRC"/lib/env.sh
 
 /etc/init.d/ssh stop

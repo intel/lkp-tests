@@ -2,7 +2,7 @@
 
 dbg_log()
 {
-	echo $(date +%H:%M:%S) $@ >> $TMP_RESULT_ROOT/lkp.log
+	echo "$(date +%H:%M:%S) $*" >> "$TMP_RESULT_ROOT/lkp.log"
 }
 
 die()

@@ -41,15 +41,17 @@ sed -r -i \
 	$files
 
 
+# shellcheck disable=SC2016
 sed -r -i \
 	-e 's/\$\(<\s*/$(cat /' \
-	$files
+	"$files"
 
 
+# shellcheck disable=SC2016
 sed -r -i \
 	-e 's/\[\[ \$([^ ]+) =\~ '\''([^ ]+)'\''\s+\]\]/[ "${\1#*\2}" != "$\1" ]/g' \
 	-e 's/\[\[ \$([^ ]+) =\~ ([^ ]+)\s+\]\]/[ "${\1#*\2}" != "$\1" ]/g' \
-	$files
+	"$files"
 
 
 sed -r -i \
@@ -68,4 +70,4 @@ sed -r -i \
 	$files
 
 checkbashisms $files
-echo "$files" | xargs -P$(nproc) -n1 bash -n
+echo "$files" | xargs -P"$(nproc)" -n1 bash -n

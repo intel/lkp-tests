@@ -1,9 +1,9 @@
 #!/bin/sh
 
 . "$LKP_SRC"/lib/reproduce-log.sh
-. $LKP_SRC/lib/debug.sh
-. $LKP_SRC/lib/env.sh
+. "$LKP_SRC"/lib/debug.sh
+. "$LKP_SRC"/lib/env.sh
 
 export PATH=$PATH:/lkp/benchmarks/pepc/bin/
 
-[ $# -ge 1 ] && log_cmd eval "pepc $@" 2>&1
+[ $# -ge 1 ] && log_cmd eval "pepc $*" 2>&1

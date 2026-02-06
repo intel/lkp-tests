@@ -10,15 +10,26 @@
 # - hard code    xxx_partitions; leave nr_xxx_partitions empty
 # - hard code nr_xxx_partitions; make     xxx_partitions a shell glob to be expanded in test box
 
-. $LKP_SRC/lib/unit.sh
-. $LKP_SRC/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/unit.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
 [ -n "$wait_disks_timeout" ] || wait_disks_timeout=300
 
 check_nr_partitions()
 {
-	max_ssd=$(ls $ssd_partitions | wc -l)
-	max_hdd=$(ls $hdd_partitions | wc -l)
+	if [ -n "$ssd_partitions" ]; then
+		# shellcheck disable=SC2012
+		max_ssd=$(ls $ssd_partitions 2>/dev/null | wc -l)
+	else
+		max_ssd=0
+	fi
+
+	if [ -n "$hdd_partitions" ]; then
+		# shellcheck disable=SC2012
+		max_hdd=$(ls $hdd_partitions 2>/dev/null | wc -l)
+	else
+		max_hdd=0
+	fi
 
 	nr_ssd_partitions=${nr_ssd_partitions:-$(echo $ssd_partitions | wc -w)}
 	nr_hdd_partitions=${nr_hdd_partitions:-$(echo $hdd_partitions | wc -w)}
@@ -48,7 +59,7 @@ check_nr_partitions()
 
 wait_disks()
 {
-	for i in $(seq $wait_disks_timeout)
+	for _ in $(seq $wait_disks_timeout)
 	do
 		check_nr_partitions 2>/dev/null && return
 		sleep 1
@@ -60,7 +71,13 @@ wait_disks()
 
 check_nr_pmem()
 {
-	max_pmem=$(ls /sys/block/pmem* | wc -w)
+	set -- /sys/block/pmem*
+	if [ -e "$1" ]; then
+		max_pmem=$#
+	else
+		max_pmem=0
+	fi
+
 	[ $max_pmem -eq 0 ] && {
 		echo "No pmem device" >&2
 		exit 1
@@ -99,33 +116,33 @@ partition2disk()
 	[ "$nr_hdd" -gt "$max_hdd" ] && nr_hdd=$max_hdd
 }
 
-if [ -n "$nr_hdd" -a "$nr_hdd" != 0 ]; then
+if [ -n "$nr_hdd" ] && [ "$nr_hdd" != 0 ]; then
 	nr_partitions=$nr_hdd
 	partitions="$hdd_partitions"
 	disk_description=${nr_hdd}hdd
-elif [ -n "$nr_ssd" -a "$nr_ssd" != 0 ]; then
+elif [ -n "$nr_ssd" ] && [ "$nr_ssd" != 0 ]; then
 	nr_partitions=$nr_ssd
 	partitions="$ssd_partitions"
 	disk_description=${nr_ssd}ssd
-elif [ -n "$nr_brd" -a "$nr_brd" != 0 ]; then
+elif [ -n "$nr_brd" ] && [ "$nr_brd" != 0 ]; then
 	[ -n "$ramdisk_size" ] || ramdisk_size="1G"
 	log_cmd modprobe -r brd
-	log_cmd modprobe brd rd_nr=$nr_brd rd_size=$(to_kb $ramdisk_size)
+	log_cmd modprobe brd rd_nr=$nr_brd rd_size="$(to_kb $ramdisk_size)"
 	sleep 1
 	partitions=$(ls /dev/ram*)
 	nr_partitions=$nr_brd
 	disk_description=${nr_brd}brd
 	disks=$(echo $partitions | tr '\n' ' ')
-elif [ -n "$nr_srd" -a "$nr_srd" != 0 ]; then
+elif [ -n "$nr_srd" ] && [ "$nr_srd" != 0 ]; then
 	[ -n "$ramdisk_size" ] || ramdisk_size="1G"
 	log_cmd modprobe -r scsi_debug
-	log_cmd modprobe scsi_debug add_host=1 num_tgts=$nr_srd max_luns=1 dev_size_mb=$(to_mb $ramdisk_size)
+	log_cmd modprobe scsi_debug add_host=1 num_tgts=$nr_srd max_luns=1 dev_size_mb="$(to_mb $ramdisk_size)"
 	sleep 1
 	partitions=$(grep -l -e scsi_debug /sys/block/*/device/model | awk -F'/' '{print "/dev/"$4}')
 	nr_partitions=$nr_srd
 	disk_description=${nr_srd}srd
 	disks=$(echo $partitions | tr '\n' ' ')
-elif [ -n "$scsi_ram" -a "$scsi_ram" != 0 ]; then
+elif [ -n "$scsi_ram" ] && [ "$scsi_ram" != 0 ]; then
 	[ -n "$ramdisk_size" ] || ramdisk_size="1G"
 	log_cmd modprobe -r scsi_ram
 	log_cmd modprobe scsi_ram capacity=$(($(to_byte $ramdisk_size) / 512))
@@ -134,13 +151,13 @@ elif [ -n "$scsi_ram" -a "$scsi_ram" != 0 ]; then
 	nr_partitions=1
 	disk_description=1scsi_ram
 	disks=$(echo $partitions | tr '\n' ' ')
-elif [ -n "$nr_pmem" -a "$nr_pmem" != 0 ]; then
+elif [ -n "$nr_pmem" ] && [ "$nr_pmem" != 0 ]; then
 	log_cmd modprobe nd_e820
 	sleep 1
 	check_nr_pmem
 	nr_partitions=$nr_pmem
 	partitions=$(ls /dev/pmem*)
-	disk_descriptions=${nr_pmem}pmem
+	disk_description=${nr_pmem}pmem
 	disks="fake pmem disk, you shouldn't use it"
 else
 	echo "setup/disk: should not reach here" >&2
@@ -150,10 +167,10 @@ else
 	exit 1
 fi
 
-[ -z "$nr_partitions" -o "$nr_partitions" -lt 1 ] && {
+if [ -z "$nr_partitions" ] || [ "$nr_partitions" -lt 1 ]; then
 	echo "setup/disk: no disk partitions found, nr_partitions=$nr_partitions" >&2
 	exit 1
-}
+fi
 
 [ "${partitions#/dev/disk/by-}" != "$partitions" ] && partitions="$(readlink -e $partitions)"
 
@@ -162,7 +179,7 @@ partitions=$(echo $partitions | cut -f1-$nr_partitions -d' ')
 if [ -z "$disks" ]; then
 	for part in $partitions; do
 		ret_disk=$(partition2disk $part)
-		[ "${disks#*$ret_disk }" = "$disks" ] && disks="$disks $ret_disk "
+		[ "${disks#*"$ret_disk" }" = "$disks" ] && disks="$disks $ret_disk "
 	done
 fi
 

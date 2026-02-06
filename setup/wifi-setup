@@ -2,7 +2,7 @@
 # - ssid
 # - passwd
 
-. $LKP_SRC/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
 wifi_dev=
 

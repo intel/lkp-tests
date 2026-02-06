@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rc_file=$(mktemp -d /tmp/lkp-XXXXXX)
-trap "rm -rf $rc_file" EXIT
+trap 'rm -rf "$rc_file"' EXIT
 
 cat <<'EOF' > $rc_file
 source $HOME/.bashrc

@@ -1,14 +1,14 @@
 #!/bin/sh
 
-. $LKP_SRC/lib/detect-system.sh
-. $LKP_SRC/lib/env.sh
-. $LKP_SRC/lib/http.sh
-. $LKP_SRC/lib/kexec.sh
-. $LKP_SRC/lib/mount.sh
-. $LKP_SRC/lib/network.sh
-. $LKP_SRC/lib/reboot.sh
-. $LKP_SRC/lib/tbox.sh
-. $LKP_SRC/lib/ucode.sh
+. "$LKP_SRC/lib/detect-system.sh"
+. "$LKP_SRC/lib/env.sh"
+. "$LKP_SRC/lib/http.sh"
+. "$LKP_SRC/lib/kexec.sh"
+. "$LKP_SRC/lib/mount.sh"
+. "$LKP_SRC/lib/network.sh"
+. "$LKP_SRC/lib/reboot.sh"
+. "$LKP_SRC/lib/tbox.sh"
+. "$LKP_SRC/lib/ucode.sh"
 
 # borrowed from linux/tools/testing/selftests/rcutorture/doc/initrd.txt
 # Author: Paul E. McKenney <paulmck@linux.vnet.ibm.com>
@@ -84,7 +84,7 @@ setup_network()
 		return
 	}
 
-	local net_devices=$(get_net_devices)
+	local net_devices="$(get_net_devices)"
 	if [ -z "$net_devices" ]; then
 
 		warn_no_eth0
@@ -218,11 +218,11 @@ show_mac_addr()
 
 echo_to_tty()
 {
-	echo "LKP: stdout: $$: $@"
+	echo "LKP: stdout: $$: $*"
 
 	for ttys in ttyS0 ttyS1 ttyS2 ttyS3
 	do
-		echo "LKP: $ttys: $$: $@" > /dev/$ttys 2>/dev/null
+		echo "LKP: $ttys: $$: $*" > /dev/$ttys 2>/dev/null
 	done
 }
 
@@ -315,7 +315,7 @@ install_initrd()
 
 		dir="${dir%/}"
 		# rli9 FIXME /lkp/benchmarks/$(basename $dir) could exist
-		ln -svf $dir /lkp/benchmarks/$(basename $dir)
+		ln -svf "$dir" "/lkp/benchmarks/$(basename "$dir")"
 	done
 
 	return 0
@@ -386,7 +386,8 @@ try_get_and_set_distro()
 {
 	[ -n "$DISTRO" ] && return
 
-	local rootfs=$(grep "rootfs:" $job | cut -d: -f2 | sed 's/ //g')
+	local rootfs
+	rootfs=$(grep "rootfs:" "$job" | cut -d: -f2 | sed 's/ //g')
 	DISTRO=${rootfs%%-*}
 	DISTRO=${DISTRO##*/}
 }
@@ -430,9 +431,9 @@ mount_debugfs()
 cleanup_pkg_cache()
 {
 	local pkg_cache=$1
-	local cleanup_stamp=$pkg_cache/cleanup_stamp/$(date +%U)
+	local cleanup_stamp="$pkg_cache/cleanup_stamp/$(date +%U)"
 	[ -d "$cleanup_stamp" ] && return
-	mkdir $cleanup_stamp -p
+	mkdir "$cleanup_stamp" -p
 
 	for delday in $(seq 14 -1 0)
 	do
@@ -605,11 +606,11 @@ rsync_rootfs()
 	local append="$(grep -m1 '^APPEND ' $NEXT_JOB | sed 's/^APPEND //')"
 	for i in $append
 	do
-		[ "$i" != "${i#remote_rootfs=}" ] && export "$i"
-		[ "$i" != "${i#root=}" ] && export "$i"
+		[ "$i" != "${i#remote_rootfs=}" ] && export "${i?}"
+		[ "$i" != "${i#root=}" ] && export "${i?}"
 	done
 
-	if [ -n "$remote_rootfs" -a -n "$root" ]; then
+	if [ -n "$remote_rootfs" ] && [ -n "$root" ]; then
 		$LKP_DEBUG_PREFIX $LKP_SRC/bin/rsync-rootfs $remote_rootfs $root
 
 		# reboot only if rsynced rootfs is incomplete
@@ -628,7 +629,8 @@ rsync_rootfs()
 
 is_same_kernel_and_rootfs()
 {
-	local next_kernel=$(awk '/^kernel: /{print $2}' $job | tr -d '"')
+	local next_kernel
+	next_kernel=$(awk '/^kernel: /{print $2}' "$job" | tr -d '"')
 	[ -n "$next_kernel" ] || {
 		echo "ERROR: no kernel in the job file: $job"
 		return 1
@@ -637,7 +639,7 @@ is_same_kernel_and_rootfs()
 	if [ "$kernel" = "$next_kernel" ]; then
 		# check run_on_local_disk flag in current and next job files
 		# if run_on_local_disk setting is different, reboot is required
-		if grep -q "^run_on_local_disk: [a-zA-Z0-9_]*" $job; then
+		if grep -q "^run_on_local_disk: [a-zA-Z0-9_]*" "$job"; then
 			[ -n "$run_on_local_disk" ] || return 1
 		else
 			[ -n "$run_on_local_disk" ] && return 1
@@ -645,7 +647,8 @@ is_same_kernel_and_rootfs()
 
 		is_same_cmdline || return 1
 
-		local next_rootfs=$(awk '/^rootfs: /{print $2}' $job)
+		local next_rootfs
+		next_rootfs=$(awk '/^rootfs: /{print $2}' "$job")
 		[ -n "$next_rootfs" ] || {
 			echo "ERROR: no rootfs in the job file: $job"
 			return 1
@@ -660,17 +663,20 @@ is_same_kernel_and_rootfs()
 is_same_testcase()
 {
 	local current_testcase=$testcase
-	local next_testcase=$(awk '/^testcase: /{print $2}' $job | tr -d '"')
+	local next_testcase
+	next_testcase=$(awk '/^testcase: /{print $2}' "$job" | tr -d '"')
 
 	[ "$current_testcase" = "$next_testcase" ]
 }
 
 is_same_bp_memmap()
 {
-	local next_bp_memmap=$(awk '/bp_memmap:/{print $2}' $job)
+	local next_bp_memmap
+	next_bp_memmap=$(awk '/bp_memmap:/{print $2}' "$job")
 	# $ awk -F'memmap=' '{print $2}' /proc/cmdline | awk '{print $1}'
 	# 32G!4G
-	local current_memmap=$(awk -F'memmap=' '{print $2}' /proc/cmdline | awk '{print $1}')
+	local current_memmap
+	current_memmap=$(awk -F'memmap=' '{print $2}' /proc/cmdline | awk '{print $1}')
 
 	[ "$next_bp_memmap" = "$current_memmap" ]
 }
@@ -678,7 +684,8 @@ is_same_bp_memmap()
 is_same_cmdline()
 {
 	local current_kernel_cmdline=$kernel_cmdline
-	local next_kernel_cmdline=$(awk '/kernel_cmdline:/{print $2}' $job)
+	local next_kernel_cmdline
+	next_kernel_cmdline=$(awk '/kernel_cmdline:/{print $2}' "$job")
 
 	[ "$current_kernel_cmdline" = "$next_kernel_cmdline" ]
 }

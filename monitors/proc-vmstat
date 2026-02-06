@@ -42,7 +42,7 @@ fi
 
 while :
 do
-	echo time: $(date +%s)
+	echo time: "$(date +%s)"
 	cat $syspath
 	wait_timeout $interval
 done

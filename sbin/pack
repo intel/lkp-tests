@@ -1,6 +1,5 @@
 #!/bin/bash
-
-[[ $LKP_SRC ]] || export LKP_SRC="$(dirname $(dirname $(readlink -e -v $0)))"
+[[ $LKP_SRC ]] || export LKP_SRC="$(dirname "$(dirname "$(readlink -e -v "$0")")")"
 
 . $LKP_SRC/lib/detect-system.sh
 
@@ -89,6 +88,7 @@ check_shared_pack()
 BM_ROOT=/lkp/benchmarks/$BM_NAME
 
 source $LKP_SRC/lib/install.sh
+# shellcheck disable=SC2154
 [ "$quiet_run" = "false" ] || source $LKP_SRC/pack/quiet
 source $LKP_SRC/pack/default
 source $LKP_SRC/pack/$BM_NAME || exit

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[[ -n "$LKP_SRC" ]] || LKP_SRC=$(dirname $(dirname $(readlink -e -v $0)))
+[[ -n "$LKP_SRC" ]] || LKP_SRC=$(dirname "$(dirname "$(readlink -e -v "$0")")")
 
 source $LKP_SRC/lib/result.sh
 
@@ -33,10 +33,10 @@ remove()
 	while read -r path
 	do
 		remove_from_mrtts $path
-		stale_links="$stale_links $(find $(dirname "$path") -xtype l)"
+		stale_links="$stale_links $(find "$(dirname "$path")" -xtype l)"
 	done < $temp_file_sort
 
-	cat $temp_file_sort | xargs -P$(nproc) rm -rf
+	cat $temp_file_sort | xargs -P"$(nproc)" rm -rf
 
 	rm -vf $stale_links
 	rm -f $temp_file_unsort
@@ -60,7 +60,7 @@ script_name=$(basename $0)
 patterns="$*"
 
 temp_file=$(mktemp /tmp/lkp-rm-XXXXXXXXX)
-trap "rm -f $temp_file" EXIT
+trap 'rm -f "$temp_file"' EXIT
 
 lkp _rt $patterns > $temp_file
 [[ -s "$temp_file" ]] || {

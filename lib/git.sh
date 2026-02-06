@@ -9,7 +9,7 @@ git_clone_update()
 	local branch=master
 	shift
 
-	if [ -n "$1" -a "$1" = "${1#-}" ]; then
+	if [ -n "$1" ] && [ "$1" = "${1#-}" ]; then
 		dir="$1"
 		shift
 	else

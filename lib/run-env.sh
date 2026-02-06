@@ -16,7 +16,7 @@ __local_run()
 local_run()
 {
 	if ! [ "$LKP_LOCAL_RUN" = 1 ] && ! [ "$LKP_LOCAL_RUN" = 0 ]; then
-		export LKP_LOCAL_RUN=$(__local_run)
+		export LKP_LOCAL_RUN="$(__local_run)"
 	fi
 	[ "$LKP_LOCAL_RUN" = 1 ]
 }

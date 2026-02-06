@@ -26,7 +26,7 @@ options=""
 
 options="-m $mode $option -rtcwake $rtcwake -sync -info $multi"
 
-[ $(which xset) ] && options="$options -display on"
+[ "$(which xset)" ] && options="$options -display on"
 
 # use -gzip and -skiphtml to reduce the memory usage
 options="$options -gzip -skiphtml"
@@ -69,7 +69,7 @@ f_dmesg=./dmesg.log
 f_lkp_output=./analyze-suspend
 
 echo options: $options >> $f_log
-echo analyze_suspend test started at: $(date +%F) $(date +%T) >> $f_log
+echo analyze_suspend test started at: "$(date +%F)" "$(date +%T)" >> $f_log
 echo analyze_suspend test started
 
 sleep $idle_time
@@ -81,7 +81,7 @@ do
 	while true
 	do
 		ping -c 1 -W 1 internal-lkp-server > /dev/null && break
-		echo $(date +%T): network not ready >> $f_log
+		echo "$(date +%T)": network not ready >> $f_log
 		retry=$((retry - 1))
 		[ $retry -eq 0 ] && break
 	done
@@ -98,7 +98,7 @@ do
 		echo network recovered by $LKP_SRC/bin/run-ipconfig >> $f_log
 	fi
 
-	echo $(date +%T): suspending-$ite/$multi >> $f_log
+	echo "$(date +%T)": suspending-$ite/$multi >> $f_log
 	if [ -n "$debug" ]
 	then
 		set_job_state "suspending_debug-$ite/$multi" > /dev/null
@@ -116,22 +116,22 @@ do
 	upload_files $f_lkp_output
 
 	#upload and delete previous test results to save ramdisk space
-	f_result=$(ls ./ | grep "suspend-")
+	f_result=$(find ./ -maxdepth 1 -name "*suspend*" | grep "suspend-")
 	if [ -n "$f_result" ]
 	then
-		echo $(date +%T): uploading test result $f_result ... >> $f_log
+		echo "$(date +%T)": uploading test result $f_result ... >> $f_log
 		upload_files -t result $f_result
 		rm -rf $f_result
 		echo "$(date +%T): done ..." >> $f_log
 	fi
 
 	#commands to supend and resume
-	echo $(date +%T): $cmd $options
-	echo $(date +%T): $cmd $options >> $f_log
+	echo "$(date +%T)": $cmd $options
+	echo "$(date +%T)": $cmd $options >> $f_log
 	$cmd $options
 #	[ $? -ne 0 ] && exit 1
-	echo $(date +%T): resume back, return value $? !
-	echo $(date +%T): resume back, return value $? ! >> $f_log
+	echo "$(date +%T)": resume back, return value $? !
+	echo "$(date +%T)": resume back, return value $? ! >> $f_log
 
 	sleep $idle_time
 done

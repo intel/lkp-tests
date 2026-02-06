@@ -34,10 +34,10 @@
 # - blkio.throttle.read_iops_device
 # - blkio.throttle.write_iops_device
 
-. $LKP_SRC/lib/common.sh
-. $LKP_SRC/lib/reproduce-log.sh
-. $LKP_SRC/lib/debug.sh
-. $LKP_SRC/lib/cgroup.sh
+. "$LKP_SRC"/lib/common.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/debug.sh
+. "$LKP_SRC"/lib/cgroup.sh
 
 CGROUP_MNT=/cgroup
 
@@ -69,7 +69,7 @@ create_one_cgroup()
 		val=${line##*=}
 		[ -n "$val" ] || continue
 		param=$(echo "$key" | sed 's/_46_/./g')
-		if [ "${key%%_46_*}" = "cpu" -o "${key%%_46_*}" = "cpuacct" ]; then
+		if [ "${key%%_46_*}" = "cpu" ] || [ "${key%%_46_*}" = "cpuacct" ]; then
 			if [ -w "$CGROUP_MNT/cpu,cpuacct/$cgname/$param" ]; then
 				log_eval "echo '$val' > '$CGROUP_MNT/cpu,cpuacct/$cgname/$param'"
 			else
@@ -87,6 +87,7 @@ permission in $CGROUP_MNT/${key%%_46_*}/$cgname/ directory"
 }
 
 for i in $(seq 1 "$cg_count"); do
+	# shellcheck disable=SC2154
 	name="$testcase.$i"
 	create_one_cgroup "$name"
 	cgroup_names="$cgroup_names $name"

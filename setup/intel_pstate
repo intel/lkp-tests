@@ -6,7 +6,7 @@
 
 [ -d "/sys/devices/system/cpu/intel_pstate" ] || exit 0
 
-. $LKP_SRC/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
 [ -n "$max_perf_pct" ] && {
 	log_eval "echo $max_perf_pct > /sys/devices/system/cpu/intel_pstate/max_perf_pct"

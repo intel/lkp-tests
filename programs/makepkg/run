@@ -22,7 +22,7 @@ export GIT_SSL_NO_VERIFY=true
 . $LKP_SRC/distro/${DISTRO}
 . $LKP_SRC/lib/install.sh
 
-cd $(get_pkg_dir $benchmark) || die "pkg is empty"
+cd "$(get_pkg_dir "$benchmark")" || die "pkg is empty"
 
 pack_to=$(basename $rootfs)
 [[ -n "$PKG_MNT" ]] || PKG_MNT=/osimage/pkg
@@ -47,7 +47,7 @@ get_pkg_info()
 check_shared_pkg()
 {
 	if [ -L $LKP_SRC/programs/$benchmark/pkg ]; then
-		basename $(dirname $(readlink $LKP_SRC/programs/$benchmark/pkg))
+		basename "$(dirname "$(readlink $LKP_SRC/programs/$benchmark/pkg)")"
 	else
 		echo $benchmark
 	fi
@@ -68,8 +68,8 @@ update_softlink()
 {
 	[ -e "$sync_dest/$cgz_name" ] || return
 
-	ln -sf "$(basename $(realpath $sync_dest/$cgz_name))" "$sync_dest/${bm_name}-${arch}.cgz" || return
-	echo "create package: $sync_dest/${bm_name}-${arch}.cgz -> $(realpath $sync_dest/$cgz_name)"
+	ln -sf "$(basename "$(realpath "$sync_dest/$cgz_name")")" "$sync_dest/${bm_name}-${arch}.cgz" || return
+	echo "create package: $sync_dest/${bm_name}-${arch}.cgz -> $(realpath "$sync_dest/$cgz_name")"
 
 	update_shared_pkg "${bm_name}-${arch}.cgz"
 
@@ -88,7 +88,7 @@ distro_install_depends ${benchmark}-dev || die "failed to install ${benchmark}-d
 
 build_depends_pkg -i $benchmark $TMP
 
-echo $LKP_SRC/sbin/makepkg --config $(lkp_src)/etc/makepkg.conf
+echo $LKP_SRC/sbin/makepkg --config "$(lkp_src)"/etc/makepkg.conf
 sync_dest="$PKG_MNT/$pack_to"
 date=$(date +"%Y%m%d")
 pkgver=$(get_pkg_info pkgver)
@@ -97,6 +97,6 @@ bm_name=$(check_shared_pkg)
 cgz_name="${bm_name}-${arch}-${pkgver:-0}-${pkgrel:-0}_${date}.cgz"
 
 PACMAN=true BUILDDIR=$TMP CARCH=$arch PKGEXT=.cgz CGZDEST="$sync_dest/$cgz_name" \
-	$LKP_SRC/sbin/makepkg --config $(lkp_src)/etc/makepkg.conf || exit
+	$LKP_SRC/sbin/makepkg --config "$(lkp_src)/etc/makepkg.conf" || exit
 
 update_softlink && echo "Makepkg finished successfully"

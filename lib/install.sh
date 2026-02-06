@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. $LKP_SRC/lib/detect-system.sh
+. "$LKP_SRC/lib/detect-system.sh"
 
 sync_distro_sources()
 {
@@ -11,7 +11,7 @@ sync_distro_sources()
 	case $distro in
 	debian|ubuntu) apt-get update ;;
 	fedora|amazon_linux)
-		if [ $distro_version -ge 22 ]; then
+		if [ "$distro_version" -ge 22 ]; then
 			dnf update
 		else
 			yum update
@@ -31,7 +31,7 @@ adapt_package()
 	local distro_file=$2
 	[ -z "$distro_file" ] && return 1
 	[ -f "$distro_file" ] || return 1
-	grep "^$pkg_name:" $distro_file
+	grep "^$pkg_name:" "$distro_file"
 }
 
 # To adapt packages between distributions, use Debian as the default distribution.
@@ -94,7 +94,7 @@ remove_packages_repository()
 # also ARCH info itself for packages that match current system ARCH.
 parse_packages_arch()
 {
-	local arch=$(get_system_arch)
+	local arch="$(get_system_arch)"
 	#remove space between package name and ARCH info
 	#"liblsan0 (x86_64)" => "liblsan0(x86_64)"
 	generic_packages=$(echo $generic_packages | sed 's/ (/(/g')
@@ -169,7 +169,7 @@ get_dependency_packages()
 	local script=$2
 	local PKG_TYPE=$3
 
-	local base_file=$(get_dependency_file ${script})
+	local base_file="$(get_dependency_file "${script}")"
 	[ -n "$base_file" ] || return
 
 	local generic_packages="$(sed 's/#.*//' "$base_file")"
@@ -242,8 +242,8 @@ build_depends_pkg()
 	fi
 
 	# install the dependencies (including -dev ones) to build pkg
-	local debs=$(get_dependency_packages $DISTRO ${script})
-	local dev_debs=$(get_dependency_packages $DISTRO ${script}-dev)
+	local debs="$(get_dependency_packages "$DISTRO" "${script}")"
+	local dev_debs="$(get_dependency_packages "$DISTRO" "${script}-dev")"
 	debs="$(echo $debs $dev_debs | tr '\n' ' ')"
 	if [ -n "$debs" ] && [ "$debs" != " " ]; then
 		$LKP_SRC/distro/installer/$DISTRO $debs
@@ -265,7 +265,7 @@ build_depends_pkg()
 		# pack and install dependencies of pkg
 		build_depends_pkg -i $pkg "$dest"
 
-		local pkg_dir=$(get_pkg_dir $pkg)
+		local pkg_dir="$(get_pkg_dir "$pkg")"
 		if [ -n "$pkg_dir" ]; then
 			(
 				cd "$pkg_dir" && \

@@ -60,20 +60,16 @@ run_test()
 	local test_dir="$BENCHMARK_ROOT/blktests/tests"
 
 	local all_tests
-	local all_tests_cmd
 
 	if [ "${test%[a-z4]-[0-9][0-9][0-9]}" != "$test" ]; then # single test
-		all_tests_cmd="echo ${test%-*}/${test#*-}"
+		log_echo "echo ${test%-*}/${test#*-}"
+		all_tests=$(echo "${test%-*}/${test#*-}")
 	elif [ "${test#*-}" != "$test" ]; then # group tests
-		all_tests_cmd="sed \"s:^:${test%%-*}/:\" $test_dir/$test"
+		log_echo "sed \"s:^:${test%%-*}/:\" $test_dir/$test"
+		all_tests=$(sed "s:^:${test%%-*}/:" "$test_dir/$test")
 	else
 		all_tests="$test"
 	fi
-
-	[ -n "$all_tests_cmd" ] && {
-		log_echo $all_tests_cmd
-		all_tests=$(eval "$all_tests_cmd")
-	}
 
 	case "$test" in
 	nvme-*)

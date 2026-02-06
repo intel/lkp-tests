@@ -5,9 +5,9 @@
 
 cd_benchmark()
 {
-	local benchmark_path=$(get_benchmark_path $1)
+	local benchmark_path="$(get_benchmark_path "$1")"
 
-	log_cmd cd $benchmark_path || die "$benchmark_path does not exist"
+	log_cmd cd "$benchmark_path" || die "$benchmark_path does not exist"
 }
 
 get_benchmark_path()
@@ -21,7 +21,7 @@ get_benchmark_path()
 prepare_exec_path()
 {
 	local exec_name=${1:-$suite}
-	local benchmark_path=$(get_benchmark_path)
+	local benchmark_path="$(get_benchmark_path)"
 
 	local exec_path
 	for exec_path in $benchmark_path $benchmark_path/usr/local/bin $benchmark_path/bin

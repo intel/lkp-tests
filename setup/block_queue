@@ -3,7 +3,7 @@
 # - max_sectors_kb
 # - nr_requests
 
-. $LKP_SRC/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
 block_queue_dev=${block_queue_dev:-*}
 

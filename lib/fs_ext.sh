@@ -49,7 +49,7 @@ start_o2cb()
 	# Usage: /etc/init.d/o2cb {start|stop|status|restart|try-restart|force-reload}
 	o2cb remove-cluster ocfs2single >/dev/null 2>&1
 	o2cb add-cluster ocfs2single || return
-	o2cb add-node --ip 127.0.0.1 --port 7777 --number 1 ocfs2single $(hostname) || return
+	o2cb add-node --ip 127.0.0.1 --port 7777 --number 1 ocfs2single "$(hostname)" || return
 	o2cb register-cluster ocfs2single || return
 	o2cb start-heartbeat ocfs2single || return
 	service o2cb force-reload || return
@@ -101,7 +101,7 @@ start_smbd()
    read only = no
 EOF
 	# setup passwd
-	(echo "pass"; echo "pass") | smbpasswd -s -a $(whoami)
+	(echo "pass"; echo "pass") | smbpasswd -s -a "$(whoami)"
 	# restart service
 	systemctl restart smbd.service
 }
@@ -111,7 +111,7 @@ mount_local_cifs()
 	local dir
 	for dir
 	do
-		local mnt=/cifs/$(basename $dir)
+		local mnt=/cifs/"$(basename "$dir")"
 		local dev=//localhost$dir
 		log_cmd mkdir -p $mnt
 		log_cmd timeout 5m mount -t cifs $def_mount -o user=root,password=pass $dev $mnt
@@ -139,7 +139,7 @@ mount_local_nfs()
 	local dir
 	for dir
 	do
-		local mnt=/nfs/$(basename $dir)
+		local mnt=/nfs/"$(basename "$dir")"
 		local dev=localhost:$dir
 		log_cmd mkdir -p $mnt
 		log_cmd timeout 5m mount -t $fs ${mount:-$def_mount} $mount_option $dev $mnt
@@ -177,7 +177,7 @@ mount_tmpfs()
 is_null_blk()
 {
 	local dev=$1
-	[ $(echo "$dev" | grep -Fe "/null") ]
+	[ "$(echo "$dev" | grep -Fe "/null")" ]
 }
 
 is_mount_on_root()

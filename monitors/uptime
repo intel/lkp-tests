@@ -5,7 +5,7 @@ setup_wait
 
 snapshot()
 {
-	echo time: $(date +%s.%N)
+	echo time: "$(date +%s.%N)"
 	read -r boot idle < /proc/uptime
 	echo boot: $boot
 	echo idle: $idle

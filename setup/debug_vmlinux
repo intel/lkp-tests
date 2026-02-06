@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. $LKP_SRC/lib/http.sh
+. "$LKP_SRC"/lib/http.sh
 
 if [ -z "$vmlinux_file" ]; then
 	echo "No vmlinux_file in job file" 1>&2

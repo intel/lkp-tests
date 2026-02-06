@@ -7,7 +7,7 @@
 . $LKP_SRC/lib/lkp_path.sh
 . $LKP_SRC/lib/host.sh
 
-if ! [ $(id -u) = 0 ]; then
+if ! [ "$(id -u)" = 0 ]; then
 	echo "This script must be run as root" 1>&2
 	exit 1
 fi
@@ -15,7 +15,7 @@ fi
 script_name=$(basename $0)
 
 [ -n "$HOSTNAME" ] || HOSTNAME=$(hostname)		#?chomp
-[ -n "$LKP_SRC" ] || export LKP_SRC=$(dirname $(dirname $(readlink -e -v $0)))
+[ -n "$LKP_SRC" ] || export LKP_SRC=$(dirname "$(dirname "$(readlink -e -v "$0")")")
 TMP="$LKP_SRC/tmp"
 
 usage() {
@@ -116,7 +116,7 @@ create_lkp_dirs() {
 
 bundle_install_china() {
 	local tmpdir=$(mktemp -d /tmp/lkp-install-china-XXXXXX)
-	trap "rm -rf $tmpdir" EXIT
+	trap 'rm -rf "$tmpdir"' EXIT
 	cp $LKP_SRC/Gemfile $tmpdir/Gemfile
 	cp $LKP_SRC/Gemfile.lock $tmpdir/Gemfile.lock
 	(cd $tmpdir || exit; bundle config --local mirror.https://rubygems.org https://gems.ruby-china.com; bundle install)
@@ -154,7 +154,7 @@ verify_install() {
 	#
 	# Here also use -f /.dockerenv as a hack to only do this inside docker to reduce
 	# unnecessary re-installation that requires clone the linux repo.
-	[ -f /.dockerenv -a $DISTRO = debian ] && {
+	[ -f /.dockerenv ] && [ "$DISTRO" = debian ] && {
 		[ "$pkg" = perf ] && pkg=linux-perf
 	}
 
@@ -212,13 +212,13 @@ install_packages() {
 	local packages="$(get_dependency_packages ${distro} ${script})"
 	local dev_packages="$(get_dependency_packages ${distro} ${script}-dev)"
 	local generic_packages="$(echo $packages $dev_packages | tr '\n' ' ')"
-	[ -n "$generic_packages" -a "$generic_packages" != " " ] || return
+	[ -n "$generic_packages" ] && [ "$generic_packages" != " " ] || return
 
 	[ "$distro" = "debian" ] && remove_packages_repository
 	echo "Use: $LKP_SRC/distro/installer/$distro install $generic_packages"
 	[ -n "$DRY_RUN" ] && return
 
-	if [ "$distro" = "centos" -o "$distro" = "aliyun" ]; then
+	if [ "$distro" = "centos" ] || [ "$distro" = "aliyun" ]; then
 		local ocfs2_tools_name=$(echo "$generic_packages" | grep 'ocfs2-tools')
 		if [ -n "$ocfs2_tools_name" ]; then
 			. $LKP_SRC/distro/$distro
@@ -316,7 +316,7 @@ install_base_support()
 {
 	install_packages "lkp" "$distro"
 
-	if [ "$distro" = "amazon_linux" -a "$_system_version" = "2" ]; then
+	if [ "$distro" = "amazon_linux" ] && [ "$_system_version" = "2" ]; then
 		install_ruby
 		install_fakeroot
 	fi
@@ -402,7 +402,7 @@ export DISTRO
 
 export LKP_LOCAL_RUN=1
 
-validate_parameters $@ || exit 1
+validate_parameters "$@" || exit 1
 
 [ -n "$SKIP_BASE" ] || install_base_support
 

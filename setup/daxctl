@@ -2,7 +2,7 @@
 
 . "$LKP_SRC"/lib/reproduce-log.sh
 . "$LKP_SRC"/lib/nvdimm.sh
-. $LKP_SRC/lib/debug.sh
+. "$LKP_SRC"/lib/debug.sh
 
 export PATH=$PATH:/lkp/benchmarks/bin/
 

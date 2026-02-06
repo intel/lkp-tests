@@ -2,8 +2,8 @@
 # - clear
 # - schemata
 
-. $LKP_SRC/lib/reproduce-log.sh
-. $LKP_SRC/lib/resctrl.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/resctrl.sh
 
 RESCTRL_MNT=/resctrl
 

@@ -31,14 +31,14 @@ read_kernel_cmdline_vars()
 {
 	[ -f /proc/cmdline ] || return 1
 
-	# shellcheck disable=SC2013
+	# shellcheck disable=SC2013,SC2163
 	for i in $(cat /proc/cmdline)
 	do
-		[ "${i#user=}" != "$i" ] && export $i
-		[ "${i#job=}" != "$i" ] && export $i
-		[ "${i#ip=}" != "$i" ] && export $i
-		[ "${i#NO_NETWORK=}" != "$i" ] && export $i
-		[ "${i#result_service}" != "$i" ] && export $i
+		[ "${i#user=}" != "$i" ] && export "$i"
+		[ "${i#job=}" != "$i" ] && export "$i"
+		[ "${i#ip=}" != "$i" ] && export "$i"
+		[ "${i#NO_NETWORK=}" != "$i" ] && export "$i"
+		[ "${i#result_service}" != "$i" ] && export "$i"
 	done
 	return 0
 }

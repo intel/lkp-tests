@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[[ -n "$LKP_SRC" ]] || LKP_SRC=$(dirname $(dirname $(readlink -e -v $0)))
+[[ -n "$LKP_SRC" ]] || LKP_SRC=$(dirname "$(dirname "$(readlink -e -v "$0")")")
 
 set -e
 
@@ -64,6 +64,10 @@ while getopts "d:i:j:g:t:-:" opt; do
 					;;
 			esac
 			;;
+		*)
+			echo "Unknown option -$opt"
+			exit 1
+			;;
 	esac
 done
 
@@ -102,7 +106,7 @@ test()
 	mkdir -p $job_dir
 	lkp split-job "$job_yaml" $opt_any -o $job_dir || return
 
-	local jobs=($job_dir/*$pattern*.yaml)
+	local jobs=("$job_dir"/*"$pattern"*.yaml)
 
 	local proxy_env
 	[[ $proxy ]] && proxy_env="http_proxy=$proxy https_proxy=$proxy"

@@ -116,7 +116,7 @@ set_affinity()
 #
 parse_range ()
 {
-	RANGE=${@//,/ }
+	RANGE=${*//,/ }
 	RANGE=${RANGE//-/..}
 	LIST=""
 	for r in $RANGE; do

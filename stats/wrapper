@@ -10,9 +10,9 @@ check_incomplete_run()
 	local file=$1
 
 	[[ -s $file ]] && return
-	[[ -f $LKP_SRC/programs/$program/run ]] || return
+	[[ -f "$LKP_SRC/programs/$program/run" ]] || return
 
-	echo -e "# missing $program $file\nis_incomplete_run: 1" >> $RESULT_ROOT/last_state
+	echo -e "# missing $program $file\nis_incomplete_run: 1" >> "$RESULT_ROOT/last_state"
 }
 
 check_soft_timeout()
@@ -20,16 +20,16 @@ check_soft_timeout()
 	local file=$RESULT_ROOT/soft_timeout
 	[[ -f $file ]] || return
 
-	grep -xq "soft_timeout: 1" $RESULT_ROOT/last_state ||
-	echo -e "soft_timeout: 1" >> $RESULT_ROOT/last_state
+	grep -xq "soft_timeout: 1" "$RESULT_ROOT/last_state" ||
+	echo -e "soft_timeout: 1" >> "$RESULT_ROOT/last_state"
 }
 
 check_die()
 {
 	# test.locktorture.exit_code.99: 1
-	[[ -f $RESULT_ROOT/last_state ]] || return 0
+	[[ -f "$RESULT_ROOT/last_state" ]] || return 0
 
-	grep -q "exit_code.99: 1" $RESULT_ROOT/last_state && {
+	grep -q "exit_code.99: 1" "$RESULT_ROOT/last_state" && {
 		echo "job exited due to die: $RESULT_ROOT" 1>&2
 		return 1
 	}
@@ -41,9 +41,9 @@ check_env_issue()
 {
 	# wget_initrd_fail is mostly caused by env issue not kernel, we
 	# better mv rt to bad.
-	[[ -f $RESULT_ROOT/last_state ]] || return 0
+	[[ -f "$RESULT_ROOT/last_state" ]] || return 0
 
-	grep -q "wget_initrd_fail: 1" $RESULT_ROOT/last_state && {
+	grep -q "wget_initrd_fail: 1" "$RESULT_ROOT/last_state" && {
 		echo "job exited due to wget_initrd_fail: $RESULT_ROOT" 1>&2
 		return 1
 	}
@@ -57,10 +57,10 @@ check_empty_output()
 
 	[[ $program = 'kernel-size' ]] && return
 	[[ $program = 'perf-profile' ]] && return
-	[[ $program = 'dmesg' && -s $RESULT_ROOT/kmsg ]] && return
-	[[ $program = 'kmsg' && -s $RESULT_ROOT/dmesg ]] && return
+	[[ $program = 'dmesg' && -s "$RESULT_ROOT/kmsg" ]] && return
+	[[ $program = 'kmsg' && -s "$RESULT_ROOT/dmesg" ]] && return
 
-	rm -f $log $log.gz
+	rm -f "$log" "$log.gz"
 	exit 0
 }
 
@@ -75,7 +75,7 @@ check_binary_output()
 	# refer to the exception cases in check_empty_output()
 	[[ -e $log ]] || return
 
-	grep -Paq '\x0' $log || return
+	grep -Paq '\x0' "$log" || return
 
 	log_warn "$program: skip binary file" "$log"
 	exit 0
@@ -191,6 +191,7 @@ parser_path=$program_dir/$program
 stats_group=${2:-$1}
 log=$RESULT_ROOT/$stats_group
 
+# shellcheck disable=SC2119
 LKP_SRC_ETC=$(lkp_src)/etc
 # exit processing the stats if the program is not in the program_list.
 # program_list is a file that records all the programs(setups, monitors, tests,
@@ -245,10 +246,11 @@ check_die || exit 1
 check_env_issue || exit 1
 
 tmpfile=$(mktemp --tmpdir=/tmp lkp-stats.XXXXXXXX)
-if [[ -f $log ]]; then
-	$parser_path $log < $log > $tmpfile || { log_error "failed to stat $program" "$parser_path $log < $log\nerrno: $?\ntmpfile: $tmpfile"; is_bad_rt_candidate && exit 1; }
+if [[ -f "$log" ]]; then
+	# shellcheck disable=SC2094
+	"$parser_path" "$log" < "$log" > "$tmpfile" || { log_error "failed to stat $program" "$parser_path $log < $log\nerrno: $?\ntmpfile: $tmpfile"; is_bad_rt_candidate && exit 1; }
 else
-	$parser_path < /dev/null > $tmpfile || { log_error "failed to stat $program" "$parser_path < /dev/null\nerrno: $?\ntmpfile: $tmpfile"; is_bad_rt_candidate && exit 1; }
+	"$parser_path" < /dev/null > "$tmpfile" || { log_error "failed to stat $program" "$parser_path < /dev/null\nerrno: $?\ntmpfile: $tmpfile"; is_bad_rt_candidate && exit 1; }
 fi
 
 grep -q "^$program\." <(cat $LKP_SRC_ETC/failure $LKP_SRC_ETC/pass) ||

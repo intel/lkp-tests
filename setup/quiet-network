@@ -1,12 +1,12 @@
 #!/bin/sh
 
-. $LKP_SRC/lib/common.sh
-. $LKP_SRC/lib/network.sh
+. "$LKP_SRC"/lib/common.sh
+. "$LKP_SRC"/lib/network.sh
 
 cat >> "$TMP_RESULT_ROOT/post-run.quiet-network" <<EOF
 #!/bin/sh
 
-. $LKP_SRC/lib/network.sh
+. "$LKP_SRC"/lib/network.sh
 network_up
 EOF
 

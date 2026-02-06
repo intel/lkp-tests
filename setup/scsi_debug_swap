@@ -5,7 +5,7 @@ setup_swap_size()
 {
 	if [ "${swap_size#*%}" != "$swap_size" ]; then
 		swap_size=${swap_size%%%*}
-		totalmem=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
+		totalmem=$(grep MemTotal /proc/meminfo | awk '{print $2}')
 		swap_size=$(((totalmem >> 10) * swap_size / 100))
 	else
 		case $swap_size in
@@ -25,7 +25,7 @@ setup_swap_size()
 
 sysctl -w kernel.softlockup_panic=0
 modprobe -r scsi_debug 2>/dev/null
-freemem=$(cat /proc/meminfo | grep MemFree | awk '{print $2}')
+freemem=$(grep MemFree /proc/meminfo | awk '{print $2}')
 setup_swap_size
 [ -n "$swap_size" ] || swap_size=$(((freemem >> 10 ) * 4 / 5 ))
 modprobe scsi_debug dev_size_mb=$swap_size

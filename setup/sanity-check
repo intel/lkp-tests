@@ -1,7 +1,7 @@
 #!/bin/sh
 
-. $LKP_SRC/lib/debug.sh
-. $LKP_SRC/lib/env.sh
+. "$LKP_SRC"/lib/debug.sh
+. "$LKP_SRC"/lib/env.sh
 
 # nr_cpu: 36
 check_nr_cpu()
@@ -35,7 +35,7 @@ check_nr_cpu()
 	echo check_nr_cpu
 	lscpu | grep -e CPU\(s\) -e Thread -e Core -e Socket -e NUMA
 
-	local lscpu_nr_cpu=$(lscpu --parse=cpu | grep "^[0-9]" | wc -l)
+	local lscpu_nr_cpu="$(lscpu --parse=cpu | grep -c "^[0-9]")"
 	[ "$nr_cpu" = "$lscpu_nr_cpu" ] && return 0
 
 	echo "check_nr_cpu: lscpu_nr_cpu $lscpu_nr_cpu mismatchs with nr_cpu $nr_cpu" >&2

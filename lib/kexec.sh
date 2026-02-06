@@ -16,6 +16,8 @@ read_kernel_cmdline_vars_from_append()
 
 	for i in $1
 	do
+		# shellcheck disable=SC2163
+		{
 		[ "$i" != "${i#job=}" ]			&& export "$i"
 		[ "$i" != "${i#RESULT_ROOT=}" ]		&& export "$i"
 		[ "$i" != "${i#initrd=}" ]		&& export "$i"
@@ -29,6 +31,7 @@ read_kernel_cmdline_vars_from_append()
 		[ "$i" != "${i#linux_selftests_initrd=}" ]	&& export "$i"
 		[ "$i" != "${i#linux_perf_initrd=}" ]	&& export "$i"
 		[ "$i" != "${i#ucode_initrd=}" ]   && export "$i"
+		}
 	done
 }
 
@@ -65,7 +68,7 @@ initrd_is_modified()
 	new_md5sum="$(md5sum $file)"
 
 	[ -f $md5sumfile ] || return 0
-	[ -n "$new_md5sum" -a "$(cat $md5sumfile)" = "$new_md5sum" ] && {
+	[ -n "$new_md5sum" ] && [ "$(cat $md5sumfile)" = "$new_md5sum" ] && {
 		echo "$file isn't modified"
 		return 1
 	}
@@ -94,7 +97,7 @@ use_local_modules_initrds()
 		# lkp qemu will create a link to modules.cgz under $CACHE_DIR
 		# ls -al /root/.lkp/cache/modules.cgz
 		# lrwxrwxrwx 1 root root 21 Jun 19 08:13 /root/.lkp/cache/modules.cgz -> /lkp-qemu/modules.cgz
-		local local_modules=$CACHE_DIR/$(basename $modules_initrd)
+		local local_modules="$CACHE_DIR/$(basename "$modules_initrd")"
 		[ -e $local_modules ] || return
 		echo "use local modules: $local_modules"
 		unset modules_initrd
@@ -171,7 +174,7 @@ detect_acpi_rsdp_mismatch()
 	local append="$1"
 	local acpi_rsdp="$2"
 
-	local job_acpi_rsdp=$(echo "$append" | grep -o -E "acpi_rsdp=0x[0-9a-fA-F]+" | cut -d= -f2)
+	local job_acpi_rsdp="$(echo "$append" | grep -o -E "acpi_rsdp=0x[0-9a-fA-F]+" | cut -d= -f2)"
 	[ -n "$job_acpi_rsdp" ] || echo "acpi_rsdp is not set in bootloader_append param of the next job"
 
 	[ -n "$job_acpi_rsdp" ] && [ -n "$acpi_rsdp" ] && [ "$job_acpi_rsdp" != "$acpi_rsdp" ] && {

@@ -6,20 +6,20 @@ check_shared_package()
 {
 	local bm_name="$1"
 
-	local depends_link=$(get_dependency_file "$bm_name")
+	local depends_link="$(get_dependency_file "$bm_name")"
 
 	# check both the depends file and the pkg dir
 	local target
 	if [[ -L "$depends_link" ]]; then
 		# $LKP_SRC/distro/depends/${pkg}
 		# $LKP_SRC/programs/${pkg}/pkg/{depends|depends-dev}
-		target=$(readlink $depends_link)
+		target=$(readlink "$depends_link")
 		target=${target%/pkg/depends*}
-		target=$(basename $target)
-	elif [[ -L "$(dirname $depends_link)" ]]; then
+		target=$(basename "$target")
+	elif [[ -L "$(dirname "$depends_link")" ]]; then
 		# $LKP_SRC/programs/${pkg}/pkg
-		target=$(readlink $(dirname $depends_link))
-		target=$(basename $(dirname $target))
+		target=$(readlink "$(dirname "$depends_link")")
+		target=$(basename "$(dirname "$target")")
 	else
 		return 1
 	fi

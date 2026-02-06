@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[[ -n "$LKP_SRC" ]] || LKP_SRC=$(dirname $(dirname $(readlink -e -v $0)))
+[[ -n "$LKP_SRC" ]] || LKP_SRC=$(dirname "$(dirname "$(readlink -e -v "$0")")")
 
 source "$LKP_SRC/lib/common.sh"
 source "$LKP_SRC/lib/result.sh"
@@ -50,9 +50,9 @@ remove_stale_links()
 	for path; do
 		path=$(abs_path "$path")
 		if is_rt "$path"; then
-			stale_links=$(find $(dirname $(dirname "$path")) -xtype l)
+			stale_links=$(find "$(dirname "$(dirname "$path")")" -xtype l)
 		elif is_mrt "$path"; then
-			stale_links=$(find $(dirname "$path") -xtype l)
+			stale_links=$(find "$(dirname "$path")" -xtype l)
 		fi
 
 		rm -vf "$stale_links"

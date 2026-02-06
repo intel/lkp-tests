@@ -178,7 +178,7 @@ run_lmbench3_development()
 
 show_result()
 {
-	local LMBENCH_RESULT_PATH=$(find results/ -maxdepth 2 -name ${testbox}.0)
+	local LMBENCH_RESULT_PATH="$(find results/ -maxdepth 2 -name "${testbox}.0")"
 	cat $LMBENCH_RESULT_PATH|| die "no test result found"
 }
 
@@ -220,8 +220,7 @@ make 2>&1 || die "failed to build lmbench3"
 ln -sf /usr/bin/gnuplot-qt /usr/bin/gnuplot
 
 if [ "${standalone}" != "1" ]; then
-
-	os=$(echo -e $(/lkp/benchmarks/lmbench3/scripts/gnu-os) | sed s/unknown-//)
+	os=$(echo -e "$(/lkp/benchmarks/lmbench3/scripts/gnu-os)" | sed 's/unknown-//')
 	[ -n "$os" ] && rm -rf $BENCHMARK_ROOT/lmbench3/results/$os/
 
 	case "$mode" in

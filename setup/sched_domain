@@ -4,10 +4,10 @@
 
 [ -n "$domain_idx" ] || exit 0
 
-. $LKP_SRC/lib/env.sh
-. $LKP_SRC/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/env.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
-for domain_dir in /sys/kernel/debug/sched/domains/cpu[0-9]*/domain$domain_idx
+for domain_dir in /sys/kernel/debug/sched/domains/cpu[0-9]*/domain"$domain_idx"
 do
 	if [ -n "$imb_pct" ]; then
 		log_eval "echo $imb_pct > $domain_dir/imbalance_pct"

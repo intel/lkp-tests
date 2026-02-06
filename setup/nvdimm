@@ -20,6 +20,7 @@ __probe_devs()
 {
 	case "$mode" in
 		raw|fsdax)
+			# shellcheck disable=SC2010
 			rdevs=$(ls /dev/pmem* | grep '/dev/pmem[0-9]\+$')
 			;;
 		dax)
@@ -63,6 +64,7 @@ probe_parts()
 {
 	rparts=
 	for dev in $devs; do
+		# shellcheck disable=SC2010
 		rparts_d=$(ls "$dev"* | grep "$dev.\+")
 		rparts="$rparts $rparts_d"
 	done
@@ -85,6 +87,7 @@ probe_parts()
 	fi
 
 	# normalize whitespace
+	# shellcheck disable=SC2116
 	parts=$(echo $rparts)
 }
 

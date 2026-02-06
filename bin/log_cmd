@@ -1,7 +1,7 @@
 #!/bin/sh
 
 date=$(date +'%F %T')
-echo "$date $@"
+echo "$date $*"
 
 args=''
 for i in "$@"; do

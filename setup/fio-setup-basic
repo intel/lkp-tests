@@ -36,11 +36,11 @@
 # - ramp_time
 # - stonewall
 
-. $LKP_SRC/lib/reproduce-log.sh
-. $LKP_SRC/lib/common.sh
-. $LKP_SRC/lib/unit.sh
-. $LKP_SRC/lib/debug.sh
-. $LKP_SRC/lib/fs_ext.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/common.sh
+. "$LKP_SRC"/lib/unit.sh
+. "$LKP_SRC"/lib/debug.sh
+. "$LKP_SRC"/lib/fs_ext.sh
 
 [ -n "$test_size" ] || die "test_size must be specified for fio"
 
@@ -79,10 +79,11 @@ do
 	if [ "$raw_disk" = 1 ]; then
 		# for raw disk, using lsblk to get disk capacity in bytes instead of reading filesystem stats
 		# because raw disk will not mount filesystem
-		available_storage_size=$(lsblk -b | grep $(basename $storage) | awk '{print $4}')
+		# shellcheck disable=SC2046
+		available_storage_size=$(lsblk -b | grep $(basename "$storage") | awk '{print $4}')
 		[ -n "$available_storage_size" ] || die "device $storage doesn't exist"
 	else
-		mnt_point=$(stat -c %m $(readlink -f $storage))
+		mnt_point=$(stat -c %m "$(readlink -f "$storage")")
 		available_storage_size=$(df -k | awk '{print $4" "$NF}' | grep $mnt_point$ | awk '{print $1}')
 		[ -n "$available_storage_size" ] || die "storage $storage doesn't mounted"
 		available_storage_size=$(to_byte ${available_storage_size}k)
@@ -302,9 +303,9 @@ no=0
 for storage in $storages; do
 	if [ "$raw_disk" = 1 ]; then
 		storage_setup="filename=$storage"
-	elif is_null_blk /dev/$(basename $storage); then
+	elif is_null_blk "/dev/$(basename "$storage")"; then
 		storage_setup="filename=/dev/nullb0"
-	elif is_mount_on_root /dev/$(basename $storage); then
+	elif is_mount_on_root "/dev/$(basename "$storage")"; then
 		[ -d "/lkp/benchmarks/fio" ] || mkdir /lkp/benchmarks/fio
 		if [ "$testfile" = 'y' ]; then
 			storage_setup="\

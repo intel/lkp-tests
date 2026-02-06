@@ -23,7 +23,7 @@ check_mount()
 
 	is_mount_point $2 && return
 	mkdir -p $2
-	mount $* && return
+	mount "$@" && return
 
 	# debug mount failure
 	local exit_code=$?

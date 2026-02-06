@@ -11,7 +11,7 @@ echo "arg0=$0"
 echo "arg1=$1"
 echo "arg2=$2"
 echo "arg3=$3"
-echo "argv=$@"
+echo "argv=$*"
 
 echo "param_a=$param_a"
 echo "param_b=$param_b"

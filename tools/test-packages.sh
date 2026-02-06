@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[[ -n "$LKP_SRC" ]] || LKP_SRC=$(dirname $(dirname $(readlink -e -v $0)))
+[[ -n "$LKP_SRC" ]] || LKP_SRC="$(dirname "$(dirname "$(readlink -e -v "$0")")")"
 
 . $LKP_SRC/lib/install.sh
 . $LKP_SRC/lib/detect-system.sh
@@ -23,6 +23,7 @@ map_packages()
 	adapt_packages | sort | uniq
 }
 
+# shellcheck disable=SC2119
 detect_system
 distro=$_system_name_lowercase
 arch=$(get_system_arch)

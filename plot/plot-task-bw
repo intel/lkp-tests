@@ -37,7 +37,7 @@ zcat ftrace.gz | grep -F task_io | awk '/(dd|cp|tar|fio)-[0-9]+/{print $1}'| sed
 }
 
 declare -a dd
-dd=($(cat pid dd-pid 2>/dev/null))
+mapfile -t dd < <(cat pid dd-pid 2>/dev/null)
 
 
 [[ ${#dd[*]} -lt 1 ]] && exit

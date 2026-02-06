@@ -91,13 +91,13 @@ replace_script_partition_val()
 
 	if ((VDISK_NUM)); then
 		local index=0
-		local vdisk_hdd_val="${disk_names[@]:$index:$nr_hdd_partitions}"
+		local vdisk_hdd_val="${disk_names[*]:$index:$nr_hdd_partitions}"
 		index=$((index+nr_hdd_partitions))
-		local vdisk_ssd_val="${disk_names[@]:$index:$nr_ssd_partitions}"
+		local vdisk_ssd_val="${disk_names[*]:$index:$nr_ssd_partitions}"
 		index=$((index+nr_ssd_partitions))
-		local vdisk_rootfs_val="${disk_names[@]:$index:$nr_rootfs_vdisk}"
+		local vdisk_rootfs_val="${disk_names[*]:$index:$nr_rootfs_vdisk}"
 		index=$((index+nr_rootfs_vdisk))
-		local vdisk_swap_val="${disk_names[@]:$index:$nr_swap_vdisk}"
+		local vdisk_swap_val="${disk_names[*]:$index:$nr_swap_vdisk}"
 
 		# First remove lines between two export, or it will be left
 		# export ssd_partitions='/dev/disk/by-id/nvme-INTEL_SSDPE2KX040T7_PHLF7414019F4P0IGN-part2
@@ -218,7 +218,7 @@ replace_script_partition_val $job_script
 
 if [[ $opt_modules ]]; then
 	modules_initrd=$opt_modules
-	ln -sf "$(realpath $opt_modules)" $CACHE_DIR/$(basename $opt_modules)
+	ln -sf "$(realpath "$opt_modules")" "$CACHE_DIR/$(basename "$opt_modules")"
 else
 	unset modules_initrd # modules_initrd has existed in job.sh, need to flush it
 fi
@@ -245,7 +245,7 @@ create_lkp_src_initrd()
 		# shellcheck disable=SC2164
 		pushd "$LKP_SRC/programs/lkp-src/pkg"
 		LKP_USER="$user" PACMAN=true BUILDDIR=/tmp/$USER CARCH=$arch PKGEXT=.cgz CGZDEST="$CACHE_DIR/lkp-$arch.cgz" \
-		$LKP_SRC/sbin/makepkg --config $(lkp_src)/etc/makepkg.conf -e
+		$LKP_SRC/sbin/makepkg --config "$(lkp_src)/etc/makepkg.conf" -e
 		[[ -f $CACHE_DIR/lkp-$arch.cgz ]] || {
 			echo "Failed to pack: $CACHE_DIR/lkp-$arch.cgz"
 			exit 1
@@ -324,6 +324,7 @@ run_kvm()
 	}
 	netdev_option="-device e1000,netdev=net0 "
 	netdev_option+="-netdev user,id=net0"
+	# shellcheck disable=SC2206
 	KVM_COMMAND=(
 		$QEMU_MODEL
 		-fsdev "local,id=test_dev,path=$vm_result_path,security_model=none" -device "virtio-9p-pci,fsdev=test_dev,mount_tag=$mount_tag"
@@ -339,7 +340,7 @@ run_kvm()
 		$qemu_console_option
 		$QEMU_DRIVE_OPTION
 	)
-	echo "exec command: ${KVM_COMMAND[@]}"
+	echo "exec command: ${KVM_COMMAND[*]}"
 	"${KVM_COMMAND[@]}"
 }
 

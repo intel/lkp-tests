@@ -8,7 +8,7 @@ usage()
 
 hashsum()
 {
-	echo $* | cksum | cut -f1 -d' '
+	echo "$*" | cksum | cut -f1 -d' '
 }
 
 [[ $# -eq 3 ]] || usage

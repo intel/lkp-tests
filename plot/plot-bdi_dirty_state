@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#	dd-3853  [004]   159.775867: bdi_dirty_state: bdi 8:64: reclaimable=27052 writeback=4100 thresh=74 dirtied=31200 written=80 
+#	dd-3853  [004]   159.775867: bdi_dirty_state: bdi 8:64: reclaimable=27052 writeback=4100 thresh=74 dirtied=31200 written=80
 
 plot() {
 data=$1

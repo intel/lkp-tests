@@ -36,8 +36,8 @@ run_kunit_tests()
 {
 	local kernel_version=$(get_kernel_version)
 
-	for i in ${test_array[@]}; do
-		echo "$FUNCNAME: test $i"
+	for i in "${test_array[@]}"; do
+		echo "${FUNCNAME[0]}: test $i"
 
 		# skip x86 only modules
 		[[ $arch = "i386" ]] && {

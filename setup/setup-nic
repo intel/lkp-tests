@@ -12,11 +12,11 @@
 # - tx_tso
 # - maxconn
 
-. $LKP_SRC/lib/env.sh
-. $LKP_SRC/lib/reproduce-log.sh
-. $LKP_SRC/lib/common.sh
-. $LKP_SRC/lib/unit.sh
-. $LKP_SRC/lib/debug.sh
+. "$LKP_SRC"/lib/env.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/common.sh
+. "$LKP_SRC"/lib/unit.sh
+. "$LKP_SRC"/lib/debug.sh
 
 #default:
 #rx_usec=16
@@ -37,13 +37,13 @@ if [ -n "$int_coalescence" ]; then
   ethtool -C $dev adaptive-tx off
 fi
 
-[ -n "$rx_usec" -a "$rx_usec" != 0 ] && ethtool -C $dev rx-usecs $rx_usec
+[ -n "$rx_usec" ] && [ "$rx_usec" != 0 ] && ethtool -C $dev rx-usecs $rx_usec
 
-[ -n "$tx_usec" -a "$tx_usec" != 0 ] && ethtool -C $dev tx-usecs $tx_usec
+[ -n "$tx_usec" ] && [ "$tx_usec" != 0 ] && ethtool -C $dev tx-usecs $tx_usec
 
-[ -n "$rx_framesz" -a "$rx_framesz" != 0 ] && ethtool -C $dev rx-framesz $rx_framesz
+[ -n "$rx_framesz" ] && [ "$rx_framesz" != 0 ] && ethtool -C $dev rx-framesz $rx_framesz
 
-[ -n "$tx_framesz" -a "$tx_framesz" != 0 ] && ethtool -C $dev tx-framesz $tx_framesz
+[ -n "$tx_framesz" ] && [ "$tx_framesz" != 0 ] && ethtool -C $dev tx-framesz $tx_framesz
 
 if [ -n "$int_coalescence" ]; then
   ethtool -C $dev adaptive-rx on
@@ -55,12 +55,12 @@ if [ -n "$flow_control" ]; then
   ethtool -A $dev tx on
 fi
 
-if [ -n "$rx_backlog" -a "$rx_backlog" != 0 ]; then
+if [ -n "$rx_backlog" ] && [ "$rx_backlog" != 0 ]; then
   echo $rx_backlog > /proc/sys/net/core/netdev_max_backlog
 fi
 
-if [ -n "$rx_ringbuf" -a "$rx_ringbuf" != 0 ] &&
-   [ -n "$tx_ringbuf" -a "$tx_ringbuf" != 0 ]; then
+if [ -n "$rx_ringbuf" ] && [ "$rx_ringbuf" != 0 ] &&
+   [ -n "$tx_ringbuf" ] && [ "$tx_ringbuf" != 0 ]; then
     ethtool -G $dev rx $rx_ringbuf tx $tx_ringbuf
 fi
 
@@ -68,6 +68,6 @@ if [ -n "$tso" ]; then
   ethtool -K $dev tso on
 fi
 
-if [ -n "$maxconn" -a "$maxconn" != 0 ]; then
+if [ -n "$maxconn" ] && [ "$maxconn" != 0 ]; then
   echo $maxconn > /proc/sys/net/core/somaxconn
 fi

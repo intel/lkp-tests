@@ -13,9 +13,9 @@ test_file=$BENCHMARK_ROOT/igt/$group
 
 exclude_tests()
 {
-	local excluded_tests=$(cat "$exclude" | grep -v "#")
+	mapfile -t excluded_tests < <(grep -v "#" "$exclude")
 	local test
-	for test in ${excluded_tests[@]}
+	for test in "${excluded_tests[@]}"
 	do
 		sed -i "/$test/d" $test_file
 	done
@@ -24,19 +24,19 @@ exclude_tests()
 exclude_tests
 
 denylist=$BENCHMARK_ROOT/igt/tests/intel-ci/blacklist.txt
-cat $denylist | grep -v -e ^# -e ^$ > $(dirname $denylist)/denylist
-denylist=$(dirname $denylist)/denylist
+grep -v -e ^# -e ^$ "$denylist" > "$(dirname "$denylist")/denylist"
+denylist=$(dirname "$denylist")/denylist
 
 while read -r testcase
 do
 	if [[ $test ]]; then
 		# get subtests from test
-		subtests=$test
+		read -r -a subtests <<< "$test"
 	else
 		# "sort -u" is to rm duplicate subtest "interruptible"
-		subtests=$(build/tests/$testcase --list-subtest | sort -u)
+		mapfile -t subtests < <(build/tests/"$testcase" --list-subtest | sort -u)
 	fi
-	for subtest in ${subtests[@]}
+	for subtest in "${subtests[@]}"
 	do
 		full_test_name=igt@$testcase@$subtest
 
@@ -47,7 +47,7 @@ do
 			continue
 		}
 
-		echo $full_test_name | grep -q -E -f $denylist && {
+		echo $full_test_name | grep -q -E -f "$denylist" && {
 			echo "LKP SKIP $full_test_name"
 			continue
 		}

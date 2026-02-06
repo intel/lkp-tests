@@ -50,7 +50,7 @@ EOF"
 
 run_aim()
 {
-	export PATH=$(pwd):$PATH
+	export PATH="$(pwd):$PATH"
 
 	aim7_setup
 

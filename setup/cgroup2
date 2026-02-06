@@ -12,10 +12,10 @@
 # - rdma.max
 # - pids.max
 
-. $LKP_SRC/lib/common.sh
-. $LKP_SRC/lib/reproduce-log.sh
-. $LKP_SRC/lib/debug.sh
-. $LKP_SRC/lib/cgroup.sh
+. "$LKP_SRC"/lib/common.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/debug.sh
+. "$LKP_SRC"/lib/cgroup.sh
 
 CGROUP2_MNT=/cgroup2
 

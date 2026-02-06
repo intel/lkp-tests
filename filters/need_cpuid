@@ -1,13 +1,13 @@
 #!/bin/bash
 
-source $LKP_SRC/lib/lkp_path.sh
+source "$LKP_SRC/lib/lkp_path.sh"
 
 # check if testbox's brand is match to run the job
 # model is converted to cpuid
 
-source $(lkp_src etc/cpuid)
+source "$(lkp_src etc/cpuid)"
 
-model_key=$(echo $model | sed -e 's/[[:blank:]]/_/g' -e 's/-/_/g')
+model_key=$(echo "$model" | sed -e 's/[[:blank:]]/_/g' -e 's/-/_/g')
 cpuid=${!model_key}
 
 if (( need_cpuid > cpuid )); then

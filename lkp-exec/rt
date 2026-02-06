@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[[ -n "$LKP_SRC" ]] || LKP_SRC=$(dirname $(dirname $(readlink -e -v $0)))
+[[ -n "$LKP_SRC" ]] || LKP_SRC=$(dirname "$(dirname "$(readlink -e -v "$0")")")
 
 source $LKP_SRC/lib/result.sh
 source $LKP_SRC/lib/constant.sh
@@ -56,20 +56,24 @@ if [[ $opt_date ]]; then
 	do
 		day=$(date +%F -d "$d days ago")
 		if [[ $script_name =~ ^_ ]]; then
+			# shellcheck disable=SC2206
 			files+=($KTEST_PATHS_DIR/$day/$day-$opt_queue $KTEST_PATHS_DIR/$day/.$day-$opt_queue)
 		else
+			# shellcheck disable=SC2206
 			files+=($KTEST_PATHS_DIR/$day/$day-$opt_queue)
 		fi
 	done
 else
 	if [[ $script_name =~ ^_ ]]; then
+		# shellcheck disable=SC2206
 		files=($KTEST_PATHS_DIR/*/????-??-??-$opt_queue $KTEST_PATHS_DIR/*/.????-??-??-$opt_queue)
 	else
+		# shellcheck disable=SC2206
 		files=($KTEST_PATHS_DIR/*/????-??-??-$opt_queue)
 	fi
 fi
 
-[[ $files ]] || exit 0
+(( ${#files[@]} )) || exit 0
 
 case $opt_project in
 	all | ALL  ) projects=$(ls $LKP_SRC/repo/); ;;
@@ -82,6 +86,7 @@ patterns="$*"
 temp_file_unsort=$(mktemp /tmp/lkp-rt-unsort-XXXXXX)
 temp_file_sort=$(mktemp /tmp/lkp-rt-sort-XXXXXX)
 
+# shellcheck disable=SC2064
 trap "rm -f $temp_file_unsort $temp_file_sort" EXIT
 
 [[ $patterns ]] ||
@@ -98,7 +103,7 @@ cat "${files[@]}" >> $temp_file_unsort
 		done
 
 		if [[ "$flag_pattern" = "0" ]]; then
-			cmd="grep -h -E $pattern ${files[@]}"
+			cmd="grep -h -E $pattern ${files[*]}"
 			flag_pattern=1
 		else
 			cmd="$cmd | grep -E $pattern"

@@ -8,9 +8,9 @@ is_mrt()
 	local dir=$1
 	local -a jobs
 	local -a matrix
-	matrix=( $dir/matrix.json* )
+	matrix=( "$dir"/matrix.json* )
 	[ ${#matrix} -eq 0 ] && return 1
-	jobs=( $dir/[0-9]*/job.yaml )
+	jobs=( "$dir"/[0-9]*/job.yaml )
 	[ ${#jobs} -ge 1 ]
 }
 
@@ -27,7 +27,7 @@ expand_tag_to_commit()
 
 	[[ "$param" =~ (^v[0-9].[0-9]+[-rc0-9_]*$) ]] &&
 	{
-		git_tag=$BASH_REMATCH
+		git_tag=${BASH_REMATCH[0]}
 		git_tag="${git_tag%/*}"
 
 		# shellcheck disable=SC2098 # This expansion will not see the mentioned assignment

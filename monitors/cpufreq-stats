@@ -8,7 +8,7 @@ setup_wait
 
 while :
 do
-	echo time: $(date +%s.%N)
+	echo time: "$(date +%s.%N)"
 
 	for cpu in $(cd /sys/devices/system/cpu && echo cpu[0-9]*)
 	do

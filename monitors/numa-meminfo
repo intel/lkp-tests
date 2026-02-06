@@ -18,7 +18,7 @@ fi
 NODES=$(grep ^Node /proc/zoneinfo | awk '{print $2}' | sed -e 's/,//' | sort | uniq)
 while :
 do
-	echo time: $(date +%s.%N)
+	echo time: "$(date +%s.%N)"
 	for NODE in $NODES
 	do
 		echo node: $NODE

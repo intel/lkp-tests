@@ -12,10 +12,10 @@
 # - quota_sz
 # - quota_reset_interval_ms
 
-. $LKP_SRC/lib/reproduce-log.sh
-. $LKP_SRC/lib/common.sh
-. $LKP_SRC/lib/unit.sh
-. $LKP_SRC/lib/debug.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/common.sh
+. "$LKP_SRC"/lib/unit.sh
+. "$LKP_SRC"/lib/debug.sh
 
 
 #[ -d "/sys/module/damon_reclaim" ] || die "No damon_reclaim module in system"

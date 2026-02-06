@@ -2,7 +2,7 @@
 # SC2174: When used with -p, -m only applies to the deepest directory
 # shellcheck disable=SC2174
 
-[ -n "$LKP_SRC" ] || export LKP_SRC=$(dirname $(dirname $(readlink -e -v $0)))
+[ -n "$LKP_SRC" ] || export LKP_SRC=$(dirname "$(dirname "$(readlink -e -v "$0")")")
 export TMP=/tmp/lkp
 export PATH=$PATH:$LKP_SRC/bin
 export BENCHMARK_ROOT=/lkp/benchmarks
@@ -57,7 +57,7 @@ job_script=$1
 job_script=$(readlink -e -v $job_script) || exit 1
 
 shift
-mytest_cmdline="${@}"
+mytest_cmdline="$*"
 mytest_cmdline=${mytest_cmdline##*-- }
 
 . $job_script export_top_env

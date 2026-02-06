@@ -20,9 +20,10 @@ ln -s $BENCHMARK_ROOT/mce-log/mcelog /usr/sbin/mcelog
 
 make test
 
+# shellcheck disable=SC2206
 files=($BENCHMARK_ROOT/mce-log/tests/*/results)
-if [[ $files ]]; then
-    for file in ${files[@]}
+if (( ${#files[@]} )); then
+    for file in "${files[@]}"
     do
         item=$(dirname $file)
         echo "mce-log-item:${item##*/}"

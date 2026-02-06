@@ -18,8 +18,8 @@ upload_files_rsync()
 {
 	[ -n "$target_directory" ] && {
 
-		local current_dir=$(pwd)
-		local tmpdir=$(mktemp -d)
+		local current_dir="$(pwd)"
+		local tmpdir="$(mktemp -d)"
 		cd "$tmpdir" || return
 		mkdir -p ${target_directory}
 
@@ -75,7 +75,7 @@ upload_one_curl()
 
 	if [ -d "$src" ]; then
 		(
-			cd $(dirname "$1") || exit
+			cd "$(dirname "$1")" || exit
 			dir=$(basename "$1")
 			find "$dir" -type d -exec curl -sSf -X MKCOL "http://$LKP_SERVER$dest/{}" \;
 			find "$dir" -type f -size +0 -exec curl -sSf -T '{}' "http://$LKP_SERVER$dest/{}" \;
@@ -93,10 +93,11 @@ upload_files_curl()
 
 	# "%" character as special character not be allowed in the URL when use curl command to transfer files, details can refer to below:
 	# https://www.werockyourweb.com/url-escape-characters/
-	local job_result_root=$(echo $JOB_RESULT_ROOT | sed 's/%/%25/g')
+	local job_result_root="$(echo "$JOB_RESULT_ROOT" | sed 's/%/%25/g')"
 
 	[ -n "$target_directory" ] && {
 		local dir
+		# shellcheck disable=SC2046
 		for dir in $(echo $target_directory | tr '/' ' ')
 		do
 			job_result_root=$job_result_root/$dir
@@ -159,7 +160,7 @@ upload_files()
 	# NO_NETWORK is empty: means network is avaliable
 	# VM_VIRTFS is empty: means it's not a 9p fs(used by lkp-qemu)
 	if [ -z "$NO_NETWORK$VM_VIRTFS" ]; then
-		[ -z "$JOB_RESULT_ROOT" -a "$LKP_LOCAL_RUN" = "1" ] && { # bin/run-local.sh
+		[ -z "$JOB_RESULT_ROOT" ] && [ "$LKP_LOCAL_RUN" = "1" ] && { # bin/run-local.sh
 			upload_files_copy "$@"
 			return
 		}

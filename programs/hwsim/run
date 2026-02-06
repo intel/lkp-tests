@@ -15,7 +15,7 @@ test_file=$BENCHMARK_ROOT/hwsim/hwsim-$test
 if [ -f "$test_file" ]; then
 	group="$test"
 elif grep -q "$test" $BENCHMARK_ROOT/hwsim/hwsim-*; then
-	group=$(basename $(grep -l "$test" $BENCHMARK_ROOT/hwsim/hwsim-*) | sed "s/^hwsim-//")
+	group=$(basename "$(grep -l "$test" "$BENCHMARK_ROOT"/hwsim/hwsim-*)" | sed "s/^hwsim-//")
 	grep -h "$test" $BENCHMARK_ROOT/hwsim/hwsim-* > $test_file
 else
 	die "can not find $test under $BENCHMARK_ROOT/hwsim"

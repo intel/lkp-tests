@@ -13,7 +13,7 @@ kselftests_make()
 
 build_selftests()
 {
-	cd tools/testing/selftests	|| return
+	cd tools/testing/selftests || return
 
 	# temporarily workaround compile error on gcc-6
 	[[ "$LKP_LOCAL_RUN" = "1" ]] && {
@@ -23,7 +23,7 @@ build_selftests()
 		[[ "$CC" = "gcc-6" ]] && has_cmd gcc-5 && sed -i -e '/^include ..\/lib.mk/a CC=gcc-5' x86/Makefile
 	}
 
-	make				|| return
+	make || return
 	cd ../../..
 }
 

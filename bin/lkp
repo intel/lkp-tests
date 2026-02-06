@@ -1,7 +1,7 @@
 #!/bin/sh
 
 [ -n "$LKP_SRC" ] ||
-export LKP_SRC=$(dirname $(dirname $(readlink -e -v $0)))
+export LKP_SRC="$(dirname "$(dirname "$(readlink -e -v "$0")")")"
 
 show_help()
 {
@@ -13,10 +13,10 @@ More commands can be found in ${LKP_SRC}/{bin,sbin,tools}/
 EOF
 }
 
-[ $# = 0 -o "$*" = 'help' ] && {
+if [ $# = 0 ] || [ "$*" = 'help' ]; then
 	show_help
 	exit
-}
+fi
 
 lkp_command="$1"
 lkp_args=
@@ -55,7 +55,7 @@ try_run()
 try_run2()
 {
 	local subdir="$1"
-	local path=$(find "$LKP_SRC/$subdir" -name "$lkp_command" -type f)
+	local path="$(find "$LKP_SRC/$subdir" -name "$lkp_command" -type f)"
 	shift
 
 	[ -x "$path" ] && exec "$path" $lkp_args "$@"

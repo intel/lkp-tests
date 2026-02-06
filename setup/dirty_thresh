@@ -4,7 +4,7 @@
 # - dirty_background_ratio
 # - dirty_background_bytes
 
-. $LKP_SRC/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
 if [ -n "$dirty_ratio" ]; then
 	log_eval "echo $dirty_ratio > /proc/sys/vm/dirty_ratio"

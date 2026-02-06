@@ -24,11 +24,11 @@ set -e
 
 lkp_src_kbuild=$(dirname "$(realpath "$0")")
 
-source $lkp_src_kbuild/kbuild.sh
+source "$lkp_src_kbuild/kbuild.sh"
 
 check_install_path()
 {
-	if [[ $COMPILER_INSTALL_PATH ]]; then
+	if [[ "$COMPILER_INSTALL_PATH" ]]; then
 		echo "Compiler will be installed in $COMPILER_INSTALL_PATH"
 	else
 		return 1
@@ -76,7 +76,7 @@ download_extract()
 {
 	local URL="$1"
 	local file="$(basename $URL)"
-	local dir="$COMPILER_INSTALL_PATH/$(basename $(dirname $URL))"
+	local dir="$COMPILER_INSTALL_PATH/$(basename "$(dirname "$URL")")"
 
 	mkdir -p $COMPILER_INSTALL_PATH || {
 		echo "Can't use $COMPILER_INSTALL_PATH as compiler install path, please choose a different COMPILER_INSTALL_PATH"
@@ -120,6 +120,7 @@ get_toolchain_list()
 
 get_installed_cross_gcc()
 {
+	# shellcheck disable=SC2206
 	local cross_gcc_candidates=($COMPILER_INSTALL_PATH/${COMPILER}*/${crosstool}/bin/${crosstool}-gcc)
 	local cross_gcc=$(echo "${cross_gcc_candidates[@]}" | tr ' ' '\n' | sort -V | tail -1)
 	[[ -x $cross_gcc ]] && echo $cross_gcc
@@ -129,6 +130,7 @@ get_installed_cross_clang()
 {
 	local cross_clang
 	if [[ $URL =~ cdn.kernel.org ]]; then
+		# shellcheck disable=SC2206
 		local cross_clang_candidates=($COMPILER_INSTALL_PATH/${COMPILER//clang/llvm}*/bin/clang)
 		cross_clang=$(echo "${cross_clang_candidates[@]}" | tr ' ' '\n' | sort -V | tail -1)
 	else
@@ -248,9 +250,10 @@ setup_gcc_exec()
 	}
 
 	# load build-in depends libs
+	# shellcheck disable=SC2206
 	local deplibs_path=($COMPILER_INSTALL_PATH/${COMPILER}*/${crosstool}/libexec/gcc/${crosstool}/*)
-	deplibs_path=$(tr ' ' '\n' <<< ${deplibs_path[@]} | sort -V | tail -n1)
-	[[ -d $deplibs_path ]] && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$deplibs_path
+	local deplibs_dir=$(tr ' ' '\n' <<< "${deplibs_path[*]}" | sort -V | tail -n1)
+	[[ -d "$deplibs_dir" ]] && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$deplibs_dir
 
 	install_dependence "$gcc_exec"
 }
@@ -388,7 +391,7 @@ elif [[ ! $ARCH ]]; then
 	export ARCH=x86_64
 fi
 
-[[ "$*" =~ ARCH=([a-z0-9_]+) ]] && [[ $ARCH != ${BASH_REMATCH[1]} ]] && {
+[[ "$*" =~ ARCH=([a-z0-9_]+) ]] && [[ "$ARCH" != "${BASH_REMATCH[1]}" ]] && {
 	echo "Conflicting ARCH specified! $ARCH ${BASH_REMATCH[1]}"
 	exit 1
 }

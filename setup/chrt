@@ -12,7 +12,7 @@ else
 	default_priority=0
 fi
 
-: ${sched_priority:="$default_priority"}
+: "${sched_priority:="$default_priority"}"
 
 cat >> "$TMP"/env.yaml <<EOF
 

@@ -7,7 +7,7 @@ setup_wait
 
 while :
 do
-	echo time: $(date +%s.%N)
+	echo time: "$(date +%s.%N)"
 
 	grep . * | sed 's/:/: /'
 

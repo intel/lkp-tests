@@ -1,8 +1,8 @@
 #!/bin/bash
 
 if test -n "$BASH" ; then
-	checkpath () 
-	{ 
+	checkpath ()
+	{
 		error=0
 		newPATH=
 		local IFS=":"
@@ -11,7 +11,7 @@ if test -n "$BASH" ; then
 			if [ ! -d "$p" ]; then
 				echo "checkpath: $p is not a directory; removing it" >&2
 			else
-				case :$newPATH: in 
+				case :$newPATH: in
 					*:$p:*) echo "checkpath: $p already in path" >&2
 					;;
 					*)

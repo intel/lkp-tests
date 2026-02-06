@@ -45,7 +45,7 @@ setup_class()
 	exclude_opt="--exclude spawn,exec"
 
 	# Fix stress-ng: error: [36360] process [36390] (stress-ng-swap) aborted early, out of system resources
-	[ $(nproc) -gt 16 ] && exclude_opt="${exclude_opt},swap"
+	[ "$(nproc)" -gt 16 ] && exclude_opt="${exclude_opt},swap"
 
 	case "$class" in
 	"memory")

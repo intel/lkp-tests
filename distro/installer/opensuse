@@ -1,3 +1,3 @@
 #!/bin/bash
 
-zypper install -y $*
+zypper install -y "$@"

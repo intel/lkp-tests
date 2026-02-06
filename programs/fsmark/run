@@ -107,11 +107,11 @@ calc_nr_file
 
 nr_directories=${nr_directories%d}
 nr_files_per_directory=${nr_files_per_directory%fpd}
-if [ -z "$nr_directories" -a -n "$nr_files_per_directory" ]; then
+if [ -z "$nr_directories" ] && [ -n "$nr_files_per_directory" ]; then
 	nr_directories=$((nr_files / nr_files_per_directory))
 fi
 
-if [ "$nr_directories" -a "$nr_files_per_directory" ]; then
+if [ "$nr_directories" ] && [ "$nr_files_per_directory" ]; then
 	PARAM="${PARAM} -D $nr_directories -N $nr_files_per_directory"
 fi
 

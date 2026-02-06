@@ -2,7 +2,7 @@
 
 . $LKP_SRC/lib/debug.sh
 
-prog=$(basename $(dirname "$0"))
+prog=$(basename "$(dirname "$0")")
 
 [ -f $TMP_RESULT_ROOT/run.$prog ] || die "can not find $TMP_RESULT_ROOT/run.$prog"
 

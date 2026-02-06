@@ -143,6 +143,7 @@ wait_other_nodes()
 
 	while read -r line; do
 		[ "${line#\#}" != "$line" ] && continue
+		# shellcheck disable=SC2163
 		export "$line"
 	done <<EOF
 $(sync_cluster_state 'roles_ip')
@@ -204,7 +205,7 @@ run_program()
 	local program_type=$1
 	shift
 
-	local program=$(record_program "$@")
+	local program="$(record_program "$@")"
 
 	for i
 	do
@@ -225,7 +226,7 @@ run_program()
 
 run_program_in_background()
 {
-	local program=$(record_program "$@")
+	local program="$(record_program "$@")"
 
 	if [ "$1" != "${1#*=}" ]; then
 		env "$@" &

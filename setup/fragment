@@ -1,7 +1,7 @@
 #!/bin/bash
 
-. $LKP_SRC/lib/log.sh
-. $LKP_SRC/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/log.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
 # setup/disk and setup/fs have to be in job file to give us $mount_points
 [ -z "$mount_points" ] && {
@@ -11,14 +11,14 @@
 fs="$mount_points"
 
 # we are going to fragment the entire memory
-memtotal=`grep MemTotal /proc/meminfo |awk '{print $2}'`
+memtotal=$(grep MemTotal /proc/meminfo | awk '{print $2}')
 nr_task=$((((memtotal * 3 / 2) >> 20) / 10))
 
 log "fs=$fs, memtotal=$memtotal KB, nr_task=$nr_task, each task consumes 10G"
 
 log_eval "cat /proc/buddyinfo"
 
-for i in `seq $nr_task`; do
+for i in $(seq $nr_task); do
 	sparsefile=$fs/sparse_$i
 	log "dealing with $sparsefile"
 	fallocate -l 10G $sparsefile

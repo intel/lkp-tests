@@ -1,8 +1,8 @@
 #!/bin/sh
 # - test
 
-. $LKP_SRC/lib/reproduce-log.sh
-. $LKP_SRC/lib/debug.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/debug.sh
 
 [ "$nr_partitions" -lt 1 ] && die "$nr_partitions -lt 1"
 export PATH=$BENCHMARK_ROOT/filebench/bin:$PATH

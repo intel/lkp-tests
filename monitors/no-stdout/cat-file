@@ -11,7 +11,7 @@ if [ "$when" = "post_test" ]; then
 	wait_post_test
 fi
 
-for file in $* $files; do
+for file in "$@" $files; do
 	base=$(basename $file)
 	for prefix in / /proc /sys /sys/kernel/debug; do
 		path=$prefix/$file

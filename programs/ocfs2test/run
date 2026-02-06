@@ -91,7 +91,7 @@ single_node_test()
 		  -m /mnt/ocfs2 -l $OCFS2TEST_HOME/ocfs2log -t $test_name -d $partition"
 	done < $test_dir/$test
 
-	find $OCFS2TEST_HOME/ocfs2log -name single_run.log -type f | xargs cat
+	find "$OCFS2TEST_HOME/ocfs2log" -name single_run.log -type f -exec cat {} +
 }
 
 setup_test_env

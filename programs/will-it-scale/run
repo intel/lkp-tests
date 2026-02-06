@@ -21,7 +21,7 @@ cd_benchmark
 # $ gzip -dc will-it-scale-x86_64.cgz | cpio -it | grep "fallocate1_"
 # lkp/benchmarks/will-it-scale/fallocate1_processes
 # lkp/benchmarks/will-it-scale/fallocate1_threads
-ls | grep -q "${test}_" || die "test $test doesn't exist"
+ls *"${test}_"* >/dev/null 2>&1 || die "test $test doesn't exist"
 
 setup_params()
 {

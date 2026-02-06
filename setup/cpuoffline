@@ -5,7 +5,7 @@
 # - offline_cpus
 # - offline_package
 
-. $LKP_SRC/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
 cat >> "$TMP_RESULT_ROOT/post-run.cpuoffline" <<EOF
 #!/bin/bash

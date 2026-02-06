@@ -43,7 +43,7 @@ echo $((1<<30)) > /proc/sys/vm/max_map_count
 echo $((1<<20)) > /proc/sys/kernel/threads-max
 
 export CMD=log_test
-[ -n "$mount_points" ] && export SPARSE_ROOT=$(echo $mount_points | cut -d " " -f1)
+[ -n "$mount_points" ] && export SPARSE_ROOT="$(echo "$mount_points" | cut -d " " -f1)"
 . ./hw_vars
 
 if [ "$pre_setup" = "0" ]; then

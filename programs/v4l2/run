@@ -23,6 +23,7 @@ run()
 	case $test in
 	device)
 		test_option="-d"
+		# shellcheck disable=SC2012
 		test_dev="$(ls /dev/video[0-9]* 2>/dev/null | head -n 1)"
 		[ -n "$test_dev" ] || {
 			build_simulator || die "Faile to build simulator"

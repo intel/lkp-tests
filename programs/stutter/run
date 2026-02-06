@@ -10,7 +10,7 @@ cd_benchmark
 
 set_memtotal_bytes()
 {
-	local default_memory_bytes=$(to_byte "8G")
+	local default_memory_bytes="$(to_byte 8G)"
 
 	# get available memory(gb)
 	# root@lkp-ivb-d02 ~# free -g
@@ -18,8 +18,8 @@ set_memtotal_bytes()
 	#Mem:          7.7Gi       305Mi       6.4Gi       8.0Mi       991Mi       6.3Gi
 	#Swap:            0B          0B          0B
 
-	local available_memory_gb=$(free -g | sed -n "2, 1p" | awk '{print $7}')
-	local memory_bytes=$(to_byte ${available_memory_gb}G)
+	local available_memory_gb="$(free -g | sed -n "2, 1p" | awk '{print $7}')"
+	local memory_bytes="$(to_byte "${available_memory_gb}G")"
 	# limit the memory to speed up the test
 	if [ $memory_bytes -gt $default_memory_bytes ]; then
 		memory_bytes=$default_memory_bytes

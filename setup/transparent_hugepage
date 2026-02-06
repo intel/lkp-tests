@@ -6,7 +6,7 @@
 # - enabled_32kB
 # - enabled_16kB
 
-. $LKP_SRC/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
 if [ -n "$thp_enabled" ]; then
 	log_eval "echo '$thp_enabled' > /sys/kernel/mm/transparent_hugepage/enabled"

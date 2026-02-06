@@ -176,7 +176,7 @@ run()
 # Automatically detect and generate new groups for each fs-types
 build_generate_testgroup()
 {
-	cd $source_dir/src/test
+	cd "$source_dir/src/test" || return
 	rm -f group_none group_non-pmem group_pmem group_by_fs_type.yaml
 
 	# 1.find out the groups
@@ -193,38 +193,38 @@ build_generate_testgroup()
 	do
 		[ -f "$nvml_case/TEST0" ] || continue
 		[ -x "$nvml_case/TEST0" ] || continue
-		cd $nvml_case
-		scripts=`ls -1 TEST* | grep -v -i -e "\.ps1" | sort -V`
+		cd "$nvml_case" || continue
+		scripts=$(ls -1 TEST* | grep -v -i -e "\.ps1" | sort -V)
 
 		for run_script in $scripts
 		do
-			req_fs=`grep -w "require_fs_type" $run_script` || {
-				echo  $nvml_case >> ../group_pmem
-				echo  $nvml_case >> ../group_non-pmem
+			req_fs=$(grep -w "require_fs_type" "$run_script") || {
+				echo  "$nvml_case" >> ../group_pmem
+				echo  "$nvml_case" >> ../group_non-pmem
 				continue
 			}
-			fs_type=`echo ${req_fs:15}`
+			fs_type=${req_fs:15}
 			for type in $fs_type
 			do
 				case "$type"
 				in
 				any)
-					echo $nvml_case >> ../group_pmem
-					echo $nvml_case >> ../group_non-pmem
+					echo "$nvml_case" >> ../group_pmem
+					echo "$nvml_case" >> ../group_non-pmem
 					;;
 				non-pmem)
-					echo $nvml_case >>../group_non-pmem
+					echo "$nvml_case" >>../group_non-pmem
 					;;
 				pmem)
-					echo $nvml_case >>../group_pmem
+					echo "$nvml_case" >>../group_pmem
 					;;
 				none)
-					echo $nvml_case >>../group_none
+					echo "$nvml_case" >>../group_none
 					;;
 				esac
 			done
 		done
-		cd - >/dev/null
+		cd - >/dev/null || return
 	done
 	for type in pmem non-pmem none
 	do
@@ -238,6 +238,6 @@ build_generate_testgroup()
 # Auto generate user_filter to enable those tests which do not need run as superuser.
 build_user_filter_file()
 {
-	cd $source_dir || return
+	cd "$source_dir" || return
 	git grep "require_no_superuser" | awk -F '[:/]' '{if (!a[$3]++ && $3 != "unittest") {print $3} }' > user_filter
 }

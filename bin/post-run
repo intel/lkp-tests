@@ -33,7 +33,7 @@ wait_for_bg_procs()
 	local pidfile="$TMP/.pid-wait-bg-procs"
 	[ -s "$pidfile" ] || return 0
 
-	echo wait for background processes: $(cat $pidfile $TMP/.name-wait-bg-procs)
+	echo wait for background processes: "$(cat "$pidfile" "$TMP/.name-wait-bg-procs")"
 
 	for i in $(seq 15)
 	do
@@ -228,9 +228,9 @@ done
 upload_qemu_results()
 {
 	# result_root: /root/.lkp//result/kvm:stream/100%-10000000-true-performance/lkp-skl-4sp1/debian-x86_64-20180403.cgz/x86_64-rhel-7.2/gcc-7/84df9525b0c27f3ebc2ebb1864fa62a97fdedb7d/x86_64-softmmu/d3c2bbb166f8cd840a3f4efec31d55485f1360ed/84df9525b0c27f3ebc2ebb1864fa62a97fdedb7d/0
-	local guest_rt=$(grep 'result_root: ' $TMP/stdout | awk -F'result_root: ' '{print $2}')
+	local guest_rt="$(grep 'result_root: ' "$TMP/stdout" | awk -F'result_root: ' '{print $2}')"
 	[ -f "$guest_rt/output" ] || return
-	upload_files -t guest_result $guest_rt
+	upload_files -t guest_result "$guest_rt"
 
 	# backup host log to host_rt
 	# result_service: 9p/virtfs_mount, RESULT_MNT: //result, RESULT_ROOT: //result/kvm:kernel-selftests/x86/lkp-skl-d01/debian-12-x86_64-20240206.cgz/x86_64-rhel-8.3-kselftests/gcc-13/0c3836482481200ead7b416ca80c68a29cfdaabd/1, TMP_RESULT_ROOT: /tmp/lkp/result

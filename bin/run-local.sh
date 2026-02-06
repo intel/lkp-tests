@@ -2,7 +2,7 @@
 # SC2174: When used with -p, -m only applies to the deepest directory
 # shellcheck disable=SC2174
 
-[ -n "$LKP_SRC" ] || export LKP_SRC=$(dirname $(dirname $(readlink -e -v $0)))
+[ -n "$LKP_SRC" ] || export LKP_SRC="$(dirname "$(dirname "$(readlink -e -v "$0")")")"
 export TMP=/tmp/lkp
 export PATH=$PATH:$LKP_SRC/bin
 export BENCHMARK_ROOT=/lkp/benchmarks
@@ -41,7 +41,7 @@ if [ -z "$opt_result_root" ]; then
 	mkdir -p -m 02775 $RESULT_ROOT
 else
 	mkdir -p -m 02775 $opt_result_root
-	export RESULT_ROOT=$(readlink -e -v $opt_result_root)
+	export RESULT_ROOT="$(readlink -e -v "$opt_result_root")"
 fi
 
 export TMP_RESULT_ROOT=$RESULT_ROOT

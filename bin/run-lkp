@@ -72,7 +72,7 @@ end_time=$(date '+%s')
 set_job_state 'post_run'
 $LKP_SRC/bin/post-run
 
-[ "$result_fs" = 'cifs' -o "$result_fs" = 'virtfs' ] || {
+[ "$result_fs" = 'cifs' ] || [ "$result_fs" = 'virtfs' ] || {
 	chown -R .lkp $RESULT_ROOT 2>/dev/null
 	chmod -R g+rw $RESULT_ROOT 2>/dev/null
 }
@@ -93,7 +93,7 @@ elif [ -f "$TMP/soft_timeout" ]; then
 elif [ "$run_job_exit_code" != 0 ]; then
 		program_type=$(sed -ne "s/\(.*\)\..*\.exit_code\..*/\\1/p" "$last_state_file")
 		# "99" is a fixed number from lib/debug die() function
-		if [ "$run_job_exit_code" = "99" -o "$program_type" = "setup" -o "$program_type" = "daemon" ]; then
+		if [ "$run_job_exit_code" = "99" ] || [ "$program_type" = "setup" ] || [ "$program_type" = "daemon" ]; then
 			set_job_state 'incomplete'
 		else
 			set_job_state 'failed'

@@ -7,7 +7,7 @@ check_raid_disks()
 	local raid_level=$1
 	local raid_disks=$2
 
-	[[ "$md_raid_level" = $raid_level ]] &&
+	[[ "$md_raid_level" = "$raid_level" ]] &&
 	(( disk_nr_pmem < raid_disks )) &&
 	(( disk_nr_brd < raid_disks )) &&
 	(( disk_nr_srd < raid_disks )) &&

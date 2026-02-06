@@ -6,7 +6,7 @@
 file="/sys/kernel/debug/sched/features"
 [ -f $file ] || exit 0
 
-. $LKP_SRC/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
 for f in $feature
 do

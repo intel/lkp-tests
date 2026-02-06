@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## This script is to extract testcase from xfstests/*-new result output file or generate generic group_file.
-[[ -n "$LKP_SRC" ]] || LKP_SRC=$(dirname $(dirname $(readlink -e -v $0)))
+[[ -n "$LKP_SRC" ]] || LKP_SRC="$(dirname "$(dirname "$(readlink -e -v "$0")")")"
 
 . "$LKP_SRC/lib/log.sh"
 . "$LKP_SRC/lib/constant.sh"

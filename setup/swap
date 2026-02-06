@@ -18,7 +18,7 @@ for i in $partitions; do
 done
 
 [ -n "$vma_swap_readahead" ] &&
-	log_write_file /sys/kernel/mm/swap/vma_ra_enabled $(parse_bool "$vma_swap_readahead")
+	log_write_file /sys/kernel/mm/swap/vma_ra_enabled "$(parse_bool "$vma_swap_readahead")"
 
 # verify swap priority
 cat /proc/swaps

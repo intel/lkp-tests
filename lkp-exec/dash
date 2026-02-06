@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rc_file=$(mktemp -d /tmp/lkp-XXXXXX)
-trap "rm -rf $rc_file" EXIT
+trap 'rm -rf "$rc_file"' EXIT
 
 for lib in debug.sh common.sh misc.sh wget.sh job-init.sh bootstrap.sh job.sh env.sh; do
 	echo ". $LKP_SRC/lib/$lib" >> $rc_file

@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # wake those detached processes up to do read
+# shellcheck disable=SC2046
 kill -USR1 $(cat $TMP/pidfile)
 
 any_pid_alive()

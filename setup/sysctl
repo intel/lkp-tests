@@ -195,7 +195,7 @@
 # - sc_cold_threshold_mbytes
 # - sc_drop_threshold_mbytes
 
-. $LKP_SRC/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
 [ -n "$sc_vsyscall32" ] && log_eval "echo '$sc_vsyscall32' > '/proc/sys/abi/vsyscall32'"
 [ -n "$sc_exception_trace" ] && log_eval "echo '$sc_exception_trace' > '/proc/sys/debug/exception-trace'"

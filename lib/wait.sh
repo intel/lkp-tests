@@ -46,11 +46,11 @@ explain_kill()
 
 kill_one()
 {
-	explain_kill $*
+	explain_kill "$@"
 
-	kill    $* 2>/dev/null
+	kill    "$@" 2>/dev/null
 	wait_post_test --timeout 3 && return
-	kill -9 $* 2>/dev/null
+	kill -9 "$@" 2>/dev/null
 }
 
 kill_tests()

@@ -10,8 +10,8 @@
 # - checkpoint_timeout
 # - checkpoint_completion_target
 
-. $LKP_SRC/lib/reproduce-log.sh
-. $LKP_SRC/lib/env.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/env.sh
 
 postgres_run()
 {
@@ -32,7 +32,8 @@ init_postgresql()
 	mkdir -p "$data_dir"
 	chown postgres "$data_dir"
 
-	bin_dir=/usr/lib/postgresql/*/bin
+	set -- /usr/lib/postgresql/*/bin
+	bin_dir=$1
 
 	postgres_run $bin_dir/initdb  -D "$data_dir" 2>&1
 	postgresql_conf_file="$data_dir"/postgresql.conf

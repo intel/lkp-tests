@@ -1,9 +1,9 @@
 #!/bin/sh
 
-. $LKP_SRC/lib/tests/fixup.sh
-. $LKP_SRC/lib/reproduce-log.sh
-. $LKP_SRC/lib/env.sh
-. $LKP_SRC/lib/debug.sh
+. "$LKP_SRC"/lib/tests/fixup.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/env.sh
+. "$LKP_SRC"/lib/debug.sh
 
 check_mysql_server()
 {

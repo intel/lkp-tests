@@ -5,7 +5,7 @@
 # - pgrp2_pattern
 # - pgrp2_cpulist
 
-. $LKP_SRC/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
 if [ -n "$test_cpulist" ]; then
 	cat >> "$TMP"/env.yaml <<EOF

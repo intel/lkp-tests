@@ -2,7 +2,7 @@
 
 set -e
 
-[[ -n "$LKP_SRC" ]] || LKP_SRC=$(dirname $(dirname $(readlink -e -v $0)))
+[[ -n "$LKP_SRC" ]] || LKP_SRC=$(dirname "$(dirname "$(readlink -e -v "$0")")")
 
 . $LKP_SRC/lib/docker.sh
 
@@ -46,6 +46,10 @@ while getopts "d:i:t:-:" opt; do
 					exit 1
 					;;
 			esac
+			;;
+		*)
+			echo "Unknown option -$opt"
+			exit 1
 			;;
 	esac
 done

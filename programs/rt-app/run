@@ -14,4 +14,4 @@ log_cmd rt-app workloads/${workload}.json 2>&1
 
 log_cmd find . -print -name "*.log" -exec cat {} \;
 
-upload_files -t results $(get_benchmark_path)/*.log
+upload_files -t results "$(get_benchmark_path)"/*.log

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[[ $LKP_SRC ]] || export LKP_SRC="$(dirname $(dirname $(readlink -e -v $0)))"
+[[ $LKP_SRC ]] || export LKP_SRC="$(dirname "$(dirname "$(readlink -e -v "$0")")")"
 
 rootfs=$1
 BM_NAME=$2

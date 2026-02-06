@@ -2,8 +2,8 @@
 # - max
 # - fb_list
 
-. $LKP_SRC/lib/reproduce-log.sh
-. $LKP_SRC/lib/env.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/env.sh
 
 is_virt && exit 0
 is_docker && exit 0
@@ -48,7 +48,7 @@ do
 		echo 1 > $cpu_dir/cpuidle/state$cstate/disable
 	done
 
-	for state_dir in $cpu_dir/cpuidle/state[0-9]
+	for state_dir in "$cpu_dir"/cpuidle/state[0-9]
 	do
 		name=$(cat $state_dir/name)
 		desc=$(cat $state_dir/desc)
@@ -56,6 +56,6 @@ do
 		t=$(cat $state_dir/disable)
 		[ $t -eq 0 ] && status=enabled
 		default=$(cat $state_dir/default_status)
-		printf '\t %s %7s [%10s]: %8s [%8s]\n' $(basename $state_dir) $name "$desc" $status $default
+		printf '\t %s %7s [%10s]: %8s [%8s]\n' "$(basename "$state_dir")" "$name" "$desc" "$status" "$default"
 	done
 done

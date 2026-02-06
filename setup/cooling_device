@@ -2,7 +2,7 @@
 # - cur_state
 # - max_state
 
-. $LKP_SRC/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
 if [ "${0#*intel_powerclamp}" != "$0" ]; then
 	type='intel_powerclamp'

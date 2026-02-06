@@ -77,7 +77,7 @@ start_reboot_watchdog()
 
 downgrade_ucode()
 {
-	local next_version=$(awk '/^ucode: /{print $2}' $job | tr -d "'")
+	local next_version="$(awk '/^ucode: /{print $2}' $job | tr -d "'")"
 	ucode_less_than_current $next_version
 }
 

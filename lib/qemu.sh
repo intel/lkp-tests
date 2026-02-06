@@ -53,7 +53,7 @@ setup_qemu_drives()
 			[[ $qemu_img_option =~ ^/dev/.*$ ]]		&& disk=$qemu_img_option
 		}
 
-		QEMU_IMG_SIZES+=($size)
+		QEMU_IMG_SIZES+=("$size")
 
 		[[ -e $disk ]] ||
 		qemu-img create -f qcow2 $disk $size || {

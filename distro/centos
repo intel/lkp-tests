@@ -63,7 +63,7 @@ pack_benchmark()
 
 download()
 {
-	$LKP_SRC/distro/installer/$DISTRO --downloadonly $*
+	"$LKP_SRC/distro/installer/$DISTRO" --downloadonly "$@"
 }
 
 pack()

@@ -8,9 +8,9 @@
 # - blksize
 # - blkcount
 
-. $LKP_SRC/lib/debug.sh
-. $LKP_SRC/lib/reproduce-log.sh
-. $LKP_SRC/lib/run.sh
+. "$LKP_SRC/lib/debug.sh"
+. "$LKP_SRC/lib/reproduce-log.sh"
+. "$LKP_SRC/lib/run.sh"
 
 cd_benchmark
 
@@ -27,7 +27,7 @@ setup_test_block()
 	dev=$partition
 
 	echo "$fstype" | grep -q -e "^ext" || local mkfs_opts="-f"
-	umount $dev 2>/dev/null
+	umount "$dev" 2>/dev/null
 
 	# "$ mkfs -t f2fs -q -f /dev/sda2" will output "WDC WD30EZRX-00S0A80"
 	# and it will be shown as " WDC WD30EZRX-00S0A80^@^@" in rt/fxmark,
@@ -80,9 +80,9 @@ setup_config()
 	# testfile's size is determined by the host device, the default test
 	# device is hdd/ssd in lkp, testfiles's size will be too large.
 	# setup_test_block creates a small device to speed up tests.
-	[ "$test" = "MWUM" -o "$test" = "MWUL" -o "$test" = "DWTL" ] && {
+	if [ "$test" = "MWUM" ] || [ "$test" = "MWUL" ] || [ "$test" = "DWTL" ]; then
 		setup_test_block || return
-	}
+	fi
 
 	# install the filebench command
 	[[ "$test" == *"filebench"* ]] && {

@@ -24,7 +24,7 @@ args="\
 "
 
 cat > "$TMP_RESULT_ROOT"/run.oltp <<EOF
-. $LKP_SRC/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
 cd /usr/share/sysbench
 log_cmd sysbench $args prepare

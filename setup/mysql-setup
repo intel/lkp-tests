@@ -9,7 +9,7 @@ setup_mysql()
 	# could be looked up with '/usr/sbin/resolveip'"
 	# from mysql_install_db on Debian.
 	[ ! -x /usr/sbin/resolveip ] && \
-	ln -s $(which resolveip) /usr/sbin/resolveip
+	ln -s "$(which resolveip)" /usr/sbin/resolveip
 
 	mkdir -p $mnt_point/mysql
 	mysql_install_db --datadir="$mnt_point/mysql" --user=mysql

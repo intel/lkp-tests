@@ -13,4 +13,4 @@ cd_benchmark
 echo "Running openssl-speed benchmark..."
 export LD_LIBRARY_PATH=$BENCHMARK_ROOT/$suite/lib:$LD_LIBRARY_PATH
 
-log_cmd ./apps/openssl speed -multi $(nproc) -seconds $runtime $algorithm
+log_cmd ./apps/openssl speed -multi "$(nproc)" -seconds $runtime $algorithm
