@@ -14,7 +14,7 @@ check_test_param
 
 setup_compiler
 
-build_env
+build_env || die "build env failed"
 
 enable_remote_node
 
