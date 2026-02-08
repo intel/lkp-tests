@@ -171,7 +171,7 @@ fixup_dma()
 {
 	# need to bind a device to dma_map_benchmark driver
 	# for PCI devices
-	local name=$(ls /sys/bus/pci/devices/ | head -1)
+	local name=$(ls -U /sys/bus/pci/devices/ | head -1)
 	[[ $name ]] || return
 
 	echo dma_map_benchmark > /sys/bus/pci/devices/$name/driver_override || return
