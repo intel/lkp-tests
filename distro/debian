@@ -19,8 +19,8 @@ add_i386_package()
 
 download()
 {
-	echo apt-get download "$@"
-	apt-get download "$@" || apt-get download "$@"
+	echo apt-get download $*
+	apt-get download $* || apt-get download $*
 }
 
 hardlink_to_symlink()

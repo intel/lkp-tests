@@ -8,4 +8,4 @@ arch=$(get_system_arch)
 yes "" | DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" \
      -o Dpkg::Options::="--force-confold" \
      -o Dpkg::Options::="--force-overwrite" \
-     -y install "$@"
+     -y install $*
