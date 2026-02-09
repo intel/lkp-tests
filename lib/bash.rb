@@ -42,10 +42,7 @@ module Bash
     #   Bash.run("grep x", returns: [0,1]) # Custom success codes
     #   Bash.run("slow", stream: true) { |line| ... } # Stream lines
     def run(*args, **options, &block)
-      returns = options.delete(:returns) || [0]
-      verbose = options.delete(:verbose)
-      stream = options.delete(:stream)
-      unsetenv_others = options.delete(:unsetenv_others)
+      returns, verbose, stream, unsetenv_others = extract_options(options)
 
       # Default block meant for streaming output if none provided (stream mode only)
       block ||= ->(line) { puts line } if stream
@@ -65,6 +62,15 @@ module Bash
     end
 
     private
+
+    def extract_options(options)
+      [
+        options.delete(:returns) || [0],
+        options.delete(:verbose),
+        options.delete(:stream),
+        options.delete(:unsetenv_others)
+      ]
+    end
 
     def prepare_args(args, unsetenv_others)
       env = args.first.is_a?(Hash) ? args.shift : {}
