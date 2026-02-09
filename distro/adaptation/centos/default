@@ -344,6 +344,7 @@ libssh-dev: libssh-devel
 libssl-dev: openssl-devel
 libssl: openssl-devel
 libstdc++-dev: libstdc++-devel libstdc++-static
+libsystemd-dev: systemd-devel
 libtasn1-6:
 libteam-utils: teamd
 libthai-data: libthai
