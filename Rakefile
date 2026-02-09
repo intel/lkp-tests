@@ -67,9 +67,17 @@ desc 'Run syntax check'
 task :syntax do
   executables = `find -type f -executable ! -path "./.git*" ! -path "./vendor*" ! -size +100k`.split("\n").join(' ')
 
-  sh "grep -s -l '^#!/.*ruby$' #{executables} | xargs -P$(nproc) -n1 ruby -c >/dev/null", verbose: false
-  sh "grep -s -l '^#!/.*bash$' #{executables} | xargs -P$(nproc) -n1 bash -n", verbose: false
-  sh "grep -s -l '^#!/bin/sh$' #{executables} | xargs -P$(nproc) -n1 dash -n", verbose: false
+  sh "grep -s -l '^#!/.*ruby$' #{executables} | xargs -P$(nproc) -n1 ruby -c >/dev/null", verbose: false do |ok, res|
+    exit res.exitstatus unless ok
+  end
+
+  sh "grep -s -l '^#!/.*bash$' #{executables} | xargs -P$(nproc) -n1 bash -n", verbose: false do |ok, res|
+    exit res.exitstatus unless ok
+  end
+
+  sh "grep -s -l '^#!/bin/sh$' #{executables} | xargs -P$(nproc) -n1 dash -n", verbose: false do |ok, res|
+    exit res.exitstatus unless ok
+  end
 
   puts 'syntax OK'
 end
@@ -83,16 +91,24 @@ task :shellcheck do
   base_cmd = "shellcheck -S warning -f #{format}"
   base_cmd += " -i #{ENV['code']}" if ENV['code']
 
-  sh "#{base_cmd} #{executables}", verbose: false
-
-  puts 'shellcheck OK'
+  sh "#{base_cmd} #{executables}", verbose: false do |ok, res|
+    if ok
+      puts 'shellcheck OK'
+    else
+      exit res.exitstatus
+    end
+  end
 end
 
 desc 'Run yamllint'
 task :yamllint do
-  sh 'yamllint', '--strict', '--format=auto', '.'
-
-  puts 'yamllint OK'
+  sh 'yamllint', '--strict', '--format=auto', '.', verbose: false do |ok, res|
+    if ok
+      puts 'yamllint OK'
+    else
+      exit res.exitstatus
+    end
+  end
 end
 
 desc 'Run code check'
