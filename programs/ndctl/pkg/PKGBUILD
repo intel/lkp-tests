@@ -13,16 +13,10 @@ build()
 {
 	cd_src_pkg_dir
 
-	[[ -e '/usr/include/iniparser.h' ]] || cp /usr/include/iniparser/* /usr/include/
-
-	meson setup build
-	meson configure -Dtest=enabled -Ddocs=disabled build
-	meson compile -C build
+	meson_src_pkg -Drootprefix="${benchmark_path}" -Dtest=enabled -Ddocs=disabled -Diniparserdir=/usr/include/iniparser
 }
 
 package()
 {
-	cd_src_pkg_dir
-
-	DESTDIR="${pkgdir}" meson install -C build
+	meson_install_src_pkg
 }

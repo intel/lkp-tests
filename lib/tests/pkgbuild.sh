@@ -6,6 +6,9 @@
 
 get_benchmark_path()
 {
+	local pkgdir=${1:-$pkgdir}
+	local pkgname=${2:-$pkgname}
+
 	# pkgdir is like /tmp/lkp/dbench/pkg/dbench
 	echo "${pkgdir}/lkp/benchmarks/${pkgname}"
 }
@@ -18,9 +21,10 @@ prepare_benchmark_path()
 get_src_pkg_dir()
 {
 	local pkgname=${1:-$pkgname}
+	local srcdir=${2:-$srcdir}
 
 	# srcdir is like /tmp/lkp/dbench/src
-	echo "$srcdir/$pkgname"
+	echo "${srcdir}/${pkgname}"
 }
 
 cd_src_pkg_dir()
@@ -37,23 +41,50 @@ rename_versioned_src_pkg_dir()
 	log_cmd mv "$srcdir/$versioned_pkgname" "$srcdir/$pkgname"
 }
 
+split_args()
+{
+	local args_before_dash=$1
+	local args_after_dash=$2
+	shift 2
+
+	local target_args=$args_before_dash
+	local quoted_arg
+
+	for arg in "$@"; do
+		if [[ "$arg" == "--" ]]; then
+			target_args=$args_after_dash
+			continue
+		fi
+
+		printf -v quoted_arg %q "$arg"
+		eval "${target_args}+=($quoted_arg)"
+	done
+}
+
+generate_configure()
+{
+	[[ -x "configure" ]] && return
+	[[ -x "autogen.sh" ]] && return
+	[[ -f "configure.ac" ]] || return 0
+
+	log_cmd libtoolize --force --copy || true
+	log_cmd aclocal
+	log_cmd autoheader
+	log_cmd automake --add-missing --copy
+	log_cmd autoconf
+}
+
 # Args: everything before '--' goes to configure, everything after to make
 make_src_pkg()
 {
 	local configure_args=()
 	local make_args=()
-	local args_name="configure_args"
 
-	for arg in "$@"; do
-		if [[ "$arg" == "--" ]]; then
-			args_name="make_args"
-			continue
-		fi
-
-		eval "${args_name}+=(\"$arg\")"
-	done
+	split_args configure_args make_args "$@"
 
 	cd_src_pkg_dir
+
+	generate_configure
 
 	[[ -x "autogen.sh" ]] && ./autogen.sh
 	[[ -x "configure" ]] && ./configure "${configure_args[@]}"
@@ -65,7 +96,33 @@ make_install_src_pkg()
 {
 	cd_src_pkg_dir
 
-	make install $@
+	make install "$@"
+}
+
+meson_src_pkg()
+{
+	local setup_args=()
+	local configure_args=()
+
+	split_args setup_args configure_args "$@"
+
+	cd_src_pkg_dir
+
+	if [[ ! -d "build" ]]; then
+		log_cmd meson setup build --prefix="$benchmark_path" "${setup_args[@]}"
+	fi
+
+	if [[ ${#configure_args[@]} -gt 0 ]]; then
+		log_cmd meson configure "${configure_args[@]}" build
+	fi
+
+	log_cmd meson compile -C build
+}
+
+meson_install_src_pkg()
+{
+	cd_src_pkg_dir
+	log_cmd meson install -C build "$@"
 }
 
 pip3_install()
@@ -280,6 +337,76 @@ pack_to_cgz()
 	local output="$1"
 	shift
 	cpio -o -H newc --quiet "$@" | gzip -n -9 > "$output"
+}
+
+# Usage:
+#   build_install_valgrind_pmem [install_prefix]
+#
+build_install_valgrind_pmem()
+{
+	local prefix=${1:-/usr/local}
+
+	cd_src_pkg_dir valgrind
+
+	git submodule update --init --recursive
+
+	./autogen.sh
+	./configure --prefix=$prefix CFLAGS="-fno-stack-protector"
+	make -j$(nproc)
+	make install
+}
+
+# Usage:
+#   build_install_libcxx [install_path]
+#
+build_install_libcxx()
+{
+	local install_path=${1:-/usr/local/libcxx}
+
+	cd_src_pkg_dir libcxxabi
+	git checkout release_39
+
+	cd_src_pkg_dir llvm
+	git checkout release_39
+
+	cd_src_pkg_dir libcxx
+	git checkout release_39
+
+	export CC=clang
+	export CXX=clang++
+
+	local cmake_cmd=cmake
+	if [[ "$DISTRO" == "centos" || "$DISTRO" == "aliyun" ]]; then
+		cmake_cmd=cmake3
+	fi
+
+	cp -af "${srcdir}/libcxxabi" "${srcdir}/llvm/projects"
+	cp -af "${srcdir}/libcxx" "${srcdir}/llvm/projects"
+
+	mkdir -p "${srcdir}/build/abi"
+	mkdir -p "${srcdir}/build/lib"
+
+	cd_src_pkg_dir build/abi
+	$cmake_cmd -DLLVM_PATH="${srcdir}/llvm" \
+		-DCMAKE_INSTALL_PREFIX="${install_path}" \
+		"${srcdir}/llvm/projects/libcxxabi/"
+	make -j$(nproc)
+	make install
+
+	# xlocale.h was removed since libc6-dev 2.26
+	if [ ! -f /usr/include/xlocale.h ]; then
+		touch "${srcdir}/llvm/projects/libcxx/include/xlocale.h"
+	fi
+
+	cd_src_pkg_dir build/lib
+	$cmake_cmd -DLLVM_PATH="${srcdir}/llvm" \
+		-DLIBCXX_CXX_ABI=libcxxabi \
+		-DLIBCXX_CXX_ABI_INCLUDE_PATHS="${srcdir}/llvm/projects/libcxxabi/include" \
+		-DCMAKE_INSTALL_PREFIX="${install_path}" \
+		-DLIBCXX_CXX_ABI_LIBRARY_PATH="${install_path}/lib" \
+		"${srcdir}/llvm/projects/libcxx"
+	make -j$(nproc)
+	make install
 }
 
 prepare()

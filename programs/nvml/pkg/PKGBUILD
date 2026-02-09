@@ -15,64 +15,12 @@ md5sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 . $LKP_SRC/lib/env.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-build_install_valgrind_pmem()
-{
-	cd_src_pkg_dir valgrind
-
-	git submodule update --init --recursive
-
-	./autogen.sh
-	./configure --prefix=/usr/local CFLAGS="-fno-stack-protector"
-	make
-	make install
-}
 
 build_install_libfabric()
 {
 	cd_src_pkg_dir libfabric
 	./autogen.sh
 	./configure --prefix=/usr/local --with-valgrind=/usr/local
-	make
-	make install
-}
-
-# The c++ subtest needs a custom version of the standard library -- libc++.
-# please visit https://github.com/pmem/nvml/blob/master/utils/docker/images/install-libcxx.sh
-# to get more detail info.
-build_install_libcxx()
-{
-	cd_src_pkg_dir libcxxabi
-	git checkout release_39
-
-	cd_src_pkg_dir llvm"
-	git checkout release_39
-
-	cd_src_pkg_dir libcxx"
-	git checkout release_39
-
-	export CC=clang
-	export CXX=clang++
-	local install_path=/usr/local/libcxx
-
-	CMAKE=cmake
-	[ "$DISTRO" = "centos" -o "$DISTRO" = "aliyun" ] && CMAKE=cmake3
-
-	cp -af "${srcdir}/libcxxabi" "${srcdir}/llvm/projects"
-	cp -af "${srcdir}/libcxx" "${srcdir}/llvm/projects"
-
-	mkdir -p "${srcdir}/build/abi"
-	mkdir -p "${srcdir}/build/lib"
-
-	cd_src_pkg_dir build/abi
-	$CMAKE -DLLVM_PATH="${srcdir}/llvm" -DCMAKE_INSTALL_PREFIX="${install_path}" "${srcdir}/llvm/projects/libcxxabi/"
-	make
-	make install
-
-	# xlocale.h was removed since libc6-de 2.26: https://sourceware.org/glibc/wiki/Release/2.26#Removal_of_.27xlocale.h.27
-	# here touch a fake header to avoid compiling error.
-	[ -f /usr/include/xlocale.h ] || touch "${srcdir}/llvm/projects/libcxx/include/xlocale.h"
-	cd_src_pkg_dir build/lib
-	$CMAKE -DLLVM_PATH="${srcdir}/llvm" -DLIBCXX_CXX_ABI=libcxxabi -DLIBCXX_CXX_ABI_INCLUDE_PATHS="${srcdir}/llvm/projects/libcxxabi/include" -DCMAKE_INSTALL_PREFIX="${install_path}" -DLIBCXX_CXX_ABI_LIBRARY_PATH="${install_path}/lib" "${srcdir}/llvm/projects/libcxx"
 	make
 	make install
 }

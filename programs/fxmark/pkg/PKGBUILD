@@ -15,17 +15,13 @@ build()
 
 	cd_src_pkg_dir filebench
 	git checkout 1.4.9.1
-	libtoolize
-	aclocal
-	autoheader
-	automake --add-missing
-	autoconf
-	./configure --prefix ${benchmark_path}/filebench
-	make
+
+	pkgname=filebench make_src_pkg --prefix ${benchmark_path}/filebench
 }
 
 package()
 {
-	make_install_src_pkg
+	pkgname=filebench make_install_src_pkg
+
 	pack_src_pkg_contents
 }
