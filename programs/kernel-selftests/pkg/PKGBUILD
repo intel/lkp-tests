@@ -17,11 +17,6 @@ md5sums=('SKIP' 'SKIP')
 . $LKP_SRC/lib/debug.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-prepare()
-{
-	prepare_benchmark_path
-}
-
 get_kernel_version()
 {
 	# format: X.Y.Z-...

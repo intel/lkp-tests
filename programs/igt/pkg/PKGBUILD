@@ -10,11 +10,6 @@ sha256sums=('SKIP' 'SKIP')
 . $LKP_SRC/lib/install.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-prepare()
-{
-	prepare_benchmark_path
-}
-
 build()
 {
 	python3 -m venv $srcdir

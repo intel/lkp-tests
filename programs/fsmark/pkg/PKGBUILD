@@ -9,17 +9,8 @@ md5sums=('SKIP')
 
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-prepare()
-{
-	prepare_benchmark_path
-}
-
 build()
 {
 	make_src_pkg -- fs_mark
 }
 
-package()
-{
-	pack_src_pkg_contents
-}

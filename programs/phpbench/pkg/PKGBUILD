@@ -9,11 +9,6 @@ md5sums=('3e5fa1ad60261ff052bb38f505c8c4e5')
 
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-prepare()
-{
-	prepare_benchmark_path
-}
-
 build()
 {
 	mkdir -p "$srcdir/$pkgname"

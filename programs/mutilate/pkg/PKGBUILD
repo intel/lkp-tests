@@ -12,11 +12,6 @@ md5sums=('SKIP' 'SKIP')
 . $LKP_SRC/lib/install.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-prepare()
-{
-	prepare_benchmark_path
-}
-
 patch_source()
 {
 	# if scons isn't python3 version, no need apply patch

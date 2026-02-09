@@ -10,17 +10,8 @@ sha256sums=('SKIP')
 
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-prepare()
-{
-	prepare_benchmark_path
-}
-
 build()
 {
 	make_src_pkg -- all
 }
 
-package()
-{
-	pack_src_pkg_contents
-}

@@ -16,11 +16,6 @@ md5sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 . $LKP_SRC/lib/env.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-prepare()
-{
-	prepare_benchmark_path
-}
-
 valgrind()
 {
 	cd_src_pkg_dir valgrind

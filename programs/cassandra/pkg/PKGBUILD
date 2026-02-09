@@ -18,7 +18,3 @@ prepare()
     rename_versioned_src_pkg_dir apache-$pkgname-$pkgver
 }
 
-package()
-{
-	pack_src_pkg_contents
-}

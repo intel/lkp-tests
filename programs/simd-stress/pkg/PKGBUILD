@@ -9,18 +9,9 @@ md5sums=('SKIP')
 
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-prepare()
-{
-	prepare_benchmark_path
-}
-
 build()
 {
 	cd_src_pkg_dir
 	gcc -O3 -Wall -W -static -march=skylake-avx512 simd-stress.c -o simd-stress -lpthread
 }
 
-package()
-{
-	pack_src_pkg_contents
-}

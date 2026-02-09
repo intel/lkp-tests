@@ -281,3 +281,18 @@ pack_to_cgz()
 	shift
 	cpio -o -H newc --quiet "$@" | gzip -n -9 > "$output"
 }
+
+prepare()
+{
+	prepare_benchmark_path
+}
+
+build()
+{
+	make_src_pkg
+}
+
+package()
+{
+	pack_src_pkg_contents
+}

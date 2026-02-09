@@ -16,11 +16,6 @@ md5sums=('SKIP' 'SKIP' 'SKIP' 'SKIP')
 . $LKP_SRC/lib/tests/pkgbuild.sh
 . $LKP_SRC/lib/detect-system.sh
 
-prepare()
-{
-	prepare_benchmark_path
-}
-
 build_install_xfstests()
 {
 	cd_src_pkg_dir xfstests-dev

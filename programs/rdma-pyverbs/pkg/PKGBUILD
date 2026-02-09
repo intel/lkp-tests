@@ -9,11 +9,6 @@ md5sums=('SKIP')
 
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-prepare()
-{
-	prepare_benchmark_path
-}
-
 build()
 {
 	cd_src_pkg_dir
@@ -21,7 +16,3 @@ build()
 	./build.sh
 }
 
-package()
-{
-	pack_src_pkg_contents
-}

@@ -12,11 +12,6 @@ md5sums=('SKIP' 'SKIP')
 . $LKP_SRC/lib/install.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-prepare()
-{
-	prepare_benchmark_path
-}
-
 patch_source()
 {
 	[ "$DISTRO" = "centos" ] || return 0
@@ -24,7 +19,3 @@ patch_source()
 	_patch_source
 }
 
-package()
-{
-	pack_src_pkg_contents
-}

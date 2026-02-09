@@ -12,11 +12,6 @@ md5sums=('SKIP' 'SKIP' 'SKIP')
 . $LKP_SRC/lib/install.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-prepare()
-{
-	prepare_benchmark_path
-}
-
 patch_source()
 {
 	# PWD=/tmp/lkp/ku-latency/src, srcdir=/tmp/lkp/ku-latency/src

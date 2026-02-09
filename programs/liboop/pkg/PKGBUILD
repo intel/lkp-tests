@@ -17,11 +17,6 @@ prepare()
   rename_versioned_src_pkg_dir
 }
 
-build()
-{
-	make_src_pkg
-}
-
 package()
 {
 	make_install_src_pkg DESTDIR="${pkgdir}"

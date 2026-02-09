@@ -15,7 +15,3 @@ prepare()
 	rename_versioned_src_pkg_dir pybench-2018-02-16
 }
 
-package()
-{
-	pack_src_pkg_contents
-}

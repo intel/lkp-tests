@@ -20,11 +20,6 @@ prepare()
 	rename_versioned_src_pkg_dir
 }
 
-build()
-{
-	make_src_pkg
-}
-
 package()
 {
 	cd_src_pkg_dir

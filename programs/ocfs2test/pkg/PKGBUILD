@@ -14,11 +14,6 @@ md5sums=('SKIP' '0437b586145b9179837377a979c78364' '33afc8610e3e68fc2575987a751f
 . $LKP_SRC/lib/install.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-prepare()
-{
-	prepare_benchmark_path
-}
-
 build()
 {
 	export PATH=/usr/lib64/openmpi/bin:$PATH

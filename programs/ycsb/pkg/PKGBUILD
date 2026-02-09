@@ -23,7 +23,3 @@ build()
 	cd_src_pkg_dir
 }
 
-package()
-{
-	pack_src_pkg_contents
-}

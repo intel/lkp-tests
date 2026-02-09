@@ -10,11 +10,6 @@ md5sums=('SKIP' 'SKIP')
 . $LKP_SRC/lib/install.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-prepare()
-{
-	prepare_benchmark_path
-}
-
 build_util_linux()
 {
 	cd_src_pkg_dir util-linux
