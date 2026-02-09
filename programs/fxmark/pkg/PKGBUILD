@@ -4,7 +4,7 @@ pkgrel=1
 url='https://github.com/sslab-gatech/fxmark'
 arch=('i386' 'x86_64' 'aarch64')
 license=('GPL')
-source=('https://github.com/sslab-gatech/fxmark.git' 'https://github.com/filebench/filebench.git')
+source=('https://github.com/rli9/fxmark.git' 'https://github.com/filebench/filebench.git')
 md5sums=('SKIP' 'SKIP')
 
 . $LKP_SRC/lib/tests/pkgbuild.sh
