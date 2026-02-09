@@ -96,11 +96,6 @@ describe Bash do
         expect(out).to be_empty
       end
 
-      it 'clears environment when unsetenv_others: true (legacy alias)' do
-        out = described_class.run('echo $LKP_TEST_ENV_VAR', unsetenv_others: true)
-        expect(out).to be_empty
-      end
-
       it 'passes specific env vars even with unsetenv_others: true' do
         out = described_class.run({ 'PRESERVED' => 'yes' }, 'echo $PRESERVED', unsetenv_others: true)
         expect(out).to eq('yes')

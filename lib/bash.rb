@@ -52,30 +52,47 @@ module Bash
 
       cmd = TTY::Command.new(printer: verbose ? :pretty : :null, uuid: false, **options)
 
+      args = prepare_args(args, unsetenv_others)
+
+      result = cmd.run!(*args) do |out, err|
+        # TTY::Command yields chunks, split them to match line-based expectation.
+        (out || err).each_line { |line| block.call(line.chomp) } if stream
+      end
+
+      handle_result(result, args, returns, options, stream, block)
+    rescue TTY::Command::TimeoutExceeded
+      raise TimeoutError, args.join(' ')
+    end
+
+    private
+
+    def prepare_args(args, unsetenv_others)
       env = args.first.is_a?(Hash) ? args.shift : {}
 
       if unsetenv_others
-        # Manually construct `env -i` command because TTY::Command unsetenv_others is unreliable
-        env_vars = env.map { |k, v| "#{k}=#{v}" }
-        args = if args.size == 1
-                 ['env', '-i'] + env_vars + ['bash', '-c', args.first]
-               else
-                 ['env', '-i'] + env_vars + args
-               end
+        construct_env_i_args(args, env)
       else
-        # Normalize args to force bash for single strings (legacy support)
-        args = ['bash', '-c', args.first] if args.size == 1
-        args.unshift(env) unless env.empty?
+        construct_bash_args(args, env)
       end
+    end
 
-      result = cmd.run!(*args) do |out, err|
-        next unless stream
-
-        # Streaming mode: yield lines to block
-        # TTY::Command yields chunks, split them to match line-based expectation.
-        (out || err).each_line { |line| block.call(line.chomp) }
+    def construct_env_i_args(args, env)
+      env_vars = env.map { |k, v| "#{k}=#{v}" }
+      base = ['env', '-i'] + env_vars
+      if args.size == 1
+        base + ['bash', '-c', args.first]
+      else
+        base + args
       end
+    end
 
+    def construct_bash_args(args, env)
+      args = ['bash', '-c', args.first] if args.size == 1
+      args.unshift(env) unless env.empty?
+      args
+    end
+
+    def handle_result(result, args, returns, options, stream, block)
       # Legacy Bash.run behavior (Post-run yield) if NOT streaming
       # Note: legacy behavior requires yielding (stdout, stderr, exit_status)
       if block && !stream
@@ -86,8 +103,6 @@ module Bash
       end
 
       result.out.chomp
-    rescue TTY::Command::TimeoutExceeded
-      raise TimeoutError.new(args.join(' '))
     end
   end
 end

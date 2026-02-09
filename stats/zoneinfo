@@ -6,9 +6,9 @@ tag = ''
 def puts_vals(tag, node, zone, line)
   vals = line.split
   if tag == 'pages' && vals.size >= 2
-    puts "node#{node}.#{zone}.pages.#{vals[vals.size - 2]}: #{vals[vals.size - 1]}"
+    puts "node#{node}.#{zone}.pages.#{vals[-2]}: #{vals[-1]}"
   elsif tag == 'node' && vals.size >= 2
-    puts "node#{node}.#{vals[vals.size - 2]}: #{vals[vals.size - 1]}"
+    puts "node#{node}.#{vals[-2]}: #{vals[-1]}"
   elsif line =~ /\s*([a-zA-Z].*):\s*([0-9]+)/
     puts "node#{node}.#{zone}.#{$1.tr(' ', '_')}: #{$2}"
   end
