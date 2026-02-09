@@ -1,7 +1,7 @@
 apache2: httpd
 apt-file:
 arping: iputils
-autopoint: gettext
+autopoint: gettext-devel
 autotools-dev: autoconf
 binutils-dev: binutils-devel
 bsdextrautils:
