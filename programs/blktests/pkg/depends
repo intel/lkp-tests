@@ -15,6 +15,7 @@ init-system-helpers
 iproute
 kpartx
 libc-bin
+libcap-ng0
 libgfapi0
 libgfrpc0
 libgfxdr0
@@ -27,6 +28,7 @@ libnl-idiag-3-200
 libnl-nf-3-200
 libnl-utils
 libp11-kit0
+libpam0g
 librdmacm1
 libsqlite3-0
 libssl-dev
@@ -38,5 +40,6 @@ nbd-server
 nvme-cli
 parted
 pciutils
+python
 virt-what
 xfsprogs

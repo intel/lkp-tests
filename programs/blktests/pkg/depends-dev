@@ -1,6 +1,9 @@
 autopoint
 gettext
+libcap-ng-dev
 libncurses-dev
+libpam0g-dev
 libsqlite3-dev
 linux-libc-dev
+python-dev
 uuid-runtime
