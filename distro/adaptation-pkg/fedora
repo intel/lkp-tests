@@ -16,6 +16,7 @@ dbench:
 device-dax: ndctl
 eatmem: vm-scalability
 ebizzy::
+edk2::
 energy: perf
 filebench::
 fsmark::
@@ -91,7 +92,6 @@ redis-server::
 rocksdb::
 rt-app::
 rt-tests::
-edk2::
 schbench::
 simd-stress::
 sockperf::

@@ -19,6 +19,7 @@ dbench:
 device-dax: ndctl
 eatmem: vm-scalability
 ebizzy::
+edk2::
 energy: perf
 filebench::
 fio::
@@ -94,7 +95,6 @@ qat::
 qemu-next::
 qperf::
 reaim::
-edk2::
 redis-server::
 rocksdb::
 rt-app::

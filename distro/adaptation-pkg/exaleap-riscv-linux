@@ -16,6 +16,7 @@ dbench:
 device-dax: ndctl
 eatmem: vm-scalability
 ebizzy::
+edk2::
 energy::
 filebench::
 fsmark::
@@ -82,7 +83,6 @@ qemu-next::
 qperf::
 reaim::
 redis-server::
-edk2::
 rocksdb::
 schbench::
 simd-stress::
