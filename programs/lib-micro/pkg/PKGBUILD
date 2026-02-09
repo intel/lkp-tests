@@ -16,6 +16,6 @@ build()
 
 	# increase the size of optstr array to avoid buffer overflow error
 	sed -i 's/optstr\[256\]/optstr\[2048\]/g' src/libmicro.c
-	CFLAGS="" make
+	CFLAGS="-Wno-error=stringop-overflow" make
 }
 
