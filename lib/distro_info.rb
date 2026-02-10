@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
 
+require "#{LKP_SRC}/lib/bash"
+
 module LKP
   require 'singleton'
 
@@ -24,14 +26,14 @@ module LKP
     def initialize(rootfs = '/')
       path_to_script = "#{LKP_SRC}/lib/detect-system.sh"
 
-      @systemname, @systemnamel, @systemversion, @systemarch = `
+      @systemname, @systemnamel, @systemversion, @systemarch = Bash.run(<<~SCRIPT).split
         . #{path_to_script}
         detect_system #{rootfs}
         echo $_system_name
         echo $_system_name_lowercase
         echo $_system_version
         echo $_system_arch
-      `.split
+      SCRIPT
     end
   end
 end

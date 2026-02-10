@@ -1,4 +1,5 @@
 require 'spec_helper'
+require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/programs"
 require_relative '../lib/stats'
 
@@ -14,11 +15,11 @@ describe 'stats' do
         stat_script = LKP::Programs.find_parser(script)
         new_stat = case script
                    when /^(kmsg)$/
-                     `RESULT_ROOT=/boot/1/vm- #{stat_script} #{file}`
+                     Bash.run("RESULT_ROOT=/boot/1/vm- #{stat_script} #{file}")
                    when /^(dmesg|mpstat|fio)$/
-                     `#{stat_script} #{file}`
+                     Bash.run("#{stat_script} #{file}")
                    else
-                     `#{stat_script} < #{file}`
+                     Bash.run("#{stat_script} < #{file}")
                    end
         raise "stats script exitstatus #{$CHILD_STATUS.exitstatus}" unless $CHILD_STATUS.success?
 

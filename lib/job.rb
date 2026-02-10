@@ -434,7 +434,7 @@ class Job
   end
 
   def read_single_program(key, file)
-    options = `#{LKP_SRC}/bin/program-options #{file}`.split("\n")
+    options = Bash.run("#{LKP_SRC}/bin/program-options #{file}").split("\n")
     @referenced_programs[key] = {}
 
     options.each do |line|

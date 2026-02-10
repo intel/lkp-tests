@@ -1,22 +1,25 @@
 #!/usr/bin/env ruby
 
-HOSTNAME = ENV['HOSTNAME'] || `hostname`.chomp
 ENV['LKP_SRC'] ||= File.dirname(File.realpath($PROGRAM_NAME, 2))
 LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 2)
 
 require 'English'
+require 'etc'
 require 'fileutils'
 require 'optparse'
 require 'ostruct'
+require 'socket'
+require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/constant"
 require "#{LKP_SRC}/lib/distro_info"
 require "#{LKP_SRC}/lib/install"
 require "#{LKP_SRC}/lib/job"
 require "#{LKP_SRC}/lib/yaml"
 
+HOSTNAME = ENV['HOSTNAME'] || Socket.gethostname
 TMP = "#{LKP_SRC}/tmp".freeze
 
-if `whoami`.chomp != 'root'
+if Process.euid != 0
   puts 'Please run as root to install packages'
   exit 1
 end
@@ -86,7 +89,7 @@ def create_host_config
     mem_kb = File.open('/proc/meminfo').gets.split[1].to_i
     mem_gb = mem_kb >> 20
     mem_gb = (mem_gb + 3) & 0xfffffffc
-    nr_cpu = `getconf _NPROCESSORS_CONF`
+    nr_cpu = Etc.nprocessors
     File.open(host_config, 'w') do |file|
       file.puts "memory: #{mem_gb}G"
       file.puts "hdd_partitions: #{$opt_hdd.join ' '}"
@@ -114,8 +117,12 @@ def install_benchmarks(script, distro)
   return unless File.file? "#{LKP_SRC}/pack/#{script}"
 
   if File.basename(File.realpath("#{LKP_SRC}/pack/#{script}")) == 'perf'
-    `perf -v 2>/dev/null`
-    return if $CHILD_STATUS.success?
+    begin
+      Bash.run('perf -v')
+      return
+    rescue Bash::BashCallError
+      # continue to install
+    end
   end
 
   pkg_name = "#{script.tr('_', '-')}-LKP"

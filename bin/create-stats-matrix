@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
 LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 2)
-LKP_USER = ENV['USER'] || `whoami`.chomp
 
+require 'etc'
 require 'fileutils'
 require 'optparse'
 require 'ostruct'
@@ -10,5 +10,7 @@ require "#{LKP_SRC}/lib/job"
 require "#{LKP_SRC}/lib/matrix"
 require "#{LKP_SRC}/lib/stats"
 require "#{LKP_SRC}/lib/yaml"
+
+LKP_USER = ENV['USER'] || Etc.getpwuid(Process.uid).name
 
 create_stats_matrix ARGV[0]

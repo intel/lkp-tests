@@ -1,8 +1,11 @@
 #!/usr/bin/env ruby
-LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
-LKP_USER ||= ENV['LKP_USER'] || ENV['USER'] || `whoami`.chomp
 
+LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
+
+require 'etc'
 require "#{LKP_SRC}/lib/run_env"
+
+LKP_USER ||= ENV['LKP_USER'] || ENV['USER'] || Etc.getpwuid(Process.uid).name
 
 DEVEL_HOURLY_KCONFIGS = %w(x86_64-rhel-7.6).freeze
 LKP_DEFAULT_COMPILER = 'gcc-7'.freeze

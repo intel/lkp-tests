@@ -1,11 +1,8 @@
 #!/usr/bin/env ruby
 
 LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 2)
-LKP_USER = ENV['USER'] || `whoami`.chomp
 
-TMP = "/tmp/lkp-#{LKP_USER}".freeze
-ENV['TMP'] = TMP
-
+require 'etc'
 require 'fileutils'
 require 'optparse'
 require 'ostruct'
@@ -19,6 +16,11 @@ require "#{LKP_SRC}/lib/run_env"
 set_local_run
 require "#{LKP_SRC}/lib/stats"
 require "#{LKP_SRC}/lib/yaml"
+
+LKP_USER = ENV['USER'] || Etc.getpwuid(Process.uid).name
+
+TMP = "/tmp/lkp-#{LKP_USER}".freeze
+ENV['TMP'] = TMP
 
 ENV['PATH'] = ENV.fetch('PATH', nil) + ":#{LKP_SRC}/bin"
 ENV['BENCHMARK_ROOT'] = '/lkp/benchmarks'

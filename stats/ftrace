@@ -86,7 +86,7 @@ end
 # - normlize data generated at above step
 #
 def parse_event(event_fmt, records)
-  `cat #{event_fmt}` =~ /print fmt: "([^"]*)".*$/
+  File.read(event_fmt) =~ /print fmt: "([^"]*)".*$/
   fmt = $1
   return if fmt.nil?
 

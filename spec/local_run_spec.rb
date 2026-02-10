@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'fileutils'
+require 'socket'
 require 'spec_helper'
 require 'tmpdir'
 require "#{LKP_SRC}/lib/bash"
@@ -20,7 +21,7 @@ describe 'local run' do
     File.write(@tmp_file, s)
 
     require @tmp_file
-    @hostname = `hostname`.chomp
+    @hostname = Socket.gethostname
     @hostfile = @tmp_dir.path(@hostname)
   end
 

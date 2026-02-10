@@ -3,9 +3,10 @@ LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
 LOCAL_RUN_ENV ||= 'LKP_LOCAL_RUN'.freeze
 
 require 'yaml'
+require "#{LKP_SRC}/lib/bash"
 
 def __local_run?
-  hostname = `hostname`.chomp
+  hostname = Bash.run('hostname').chomp
   return false unless File.exist?("#{LKP_SRC}/hosts/#{hostname}")
 
   host_file = YAML.load_file("#{LKP_SRC}/hosts/#{hostname}")

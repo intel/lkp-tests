@@ -9,6 +9,7 @@ require 'pathname'
 require 'stringio'
 require 'timeout'
 require "#{LKP_SRC}/lib/array"
+require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/log"
 require "#{LKP_SRC}/lib/string"
 
@@ -253,16 +254,16 @@ def copy_and_decompress(src_fullpath, dst)
   end
 
   if File.exist?(src_fullpath)
-    `cp #{src_file} #{dst}`
+    FileUtils.cp(src_fullpath, dst)
   elsif File.exist?("#{src_fullpath}.gz")
     src_fullpath += '.gz'
-    `gzip -cd #{src_fullpath} > #{dst}`
+    Bash.run("gzip -cd #{src_fullpath} > #{dst}")
   elsif File.exist?("#{src_fullpath}.bz2")
     src_fullpath += '.bz2'
-    `bzip2 -cd #{src_fullpath} > #{dst}`
+    Bash.run("bzip2 -cd #{src_fullpath} > #{dst}")
   elsif File.exist?("#{src_fullpath}.xz")
     src_fullpath += '.xz'
-    `xz -cd #{src_fullpath} > #{dst}`
+    Bash.run("xz -cd #{src_fullpath} > #{dst}")
   else
     log_warn "File doesn't exist: #{src_fullpath}"
     return false

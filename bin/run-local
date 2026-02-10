@@ -1,17 +1,14 @@
 #!/usr/bin/env ruby
-# SC2174: When used with -p, -m only applies to the deepest directory
-# shellcheck disable=SC2174
 
 LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 2)
-LKP_USER = ENV['USER'] || `whoami`.chomp
 
-TMP = "/tmp/lkp-#{LKP_USER}".freeze
-ENV['TMP'] = TMP
-
+require 'etc'
 require 'fileutils'
 require 'optparse'
 require 'ostruct'
 require 'shellwords'
+require 'socket'
+require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/common"
 require "#{LKP_SRC}/lib/distro_info"
 require "#{LKP_SRC}/lib/job"
@@ -23,6 +20,11 @@ require "#{LKP_SRC}/lib/run_env"
 set_local_run
 require "#{LKP_SRC}/lib/stats"
 require "#{LKP_SRC}/lib/yaml"
+
+LKP_USER = ENV['USER'] || Etc.getpwuid(Process.uid).name
+
+TMP = "/tmp/lkp-#{LKP_USER}".freeze
+ENV['TMP'] = TMP
 
 ENV['PATH'] = ENV.fetch('PATH', nil) + ":#{LKP_SRC}/bin"
 ENV['BENCHMARK_ROOT'] = '/lkp/benchmarks'
@@ -103,18 +105,18 @@ end
 distroinfo = LKP::DistroInfo.instance
 distro = distroinfo.systemnamel
 
-HOSTNAME ||= ENV['HOSTNAME'] || `hostname`.chomp
+HOSTNAME ||= ENV['HOSTNAME'] || Socket.gethostname
 job['testbox'] = HOSTNAME
 job['tbox_group'] = tbox_group(HOSTNAME)
 job['kconfig'] ||= 'defconfig'
-job['commit'] ||= `uname -r`.chomp!
+job['commit'] ||= Bash.run('uname -r')
 job['rootfs'] ||= if File.exist? '/etc/os-release'
-                    `grep -m1 ^ID= /etc/os-release`.split('=')[1].chomp
+                    Bash.run('grep -m1 ^ID= /etc/os-release').split('=')[1].chomp
                   else
                     distro
                   end
-job['nr_cpu'] ||= `nproc`.to_i
-job['memory'] ||= `grep -w '^memory:' #{LKP_SRC}/hosts/#{HOSTNAME}`.split[1].chomp
+job['nr_cpu'] ||= Etc.nprocessors
+job['memory'] ||= Bash.run("grep -w '^memory:' #{LKP_SRC}/hosts/#{HOSTNAME}").split[1].chomp
 job['compiler'] ||= File.realpath('/usr/bin/gcc').match(/gcc.*/).to_s
 job['compiler'] = 'gcc' if job['compiler'].empty?
 job['NO_NETWORK'] = 1

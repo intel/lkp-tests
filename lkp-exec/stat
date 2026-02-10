@@ -4,6 +4,7 @@ LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 2)
 
 require 'optparse'
 require 'ostruct'
+require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/lkp_git"
 require "#{LKP_SRC}/lib/log"
 require "#{LKP_SRC}/lib/result"
@@ -67,7 +68,7 @@ unless $opt_kernel.empty?
   $opt_pattern << " #{$opt_kernel}"
 end
 
-_result_roots = `#{LKP_SRC}/lkp-exec/_rt #{$opt_pattern}`.split
+_result_roots = Bash.run("#{LKP_SRC}/lkp-exec/_rt #{$opt_pattern}").split
 groups = {}
 _result_roots.each do |_rt|
   __rt = File.dirname _rt

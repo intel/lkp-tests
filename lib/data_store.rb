@@ -2,6 +2,7 @@ LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
 
 require 'digest/sha1'
 require 'fileutils'
+require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/common"
 require "#{LKP_SRC}/lib/property"
 require "#{LKP_SRC}/lib/yaml"
@@ -342,7 +343,7 @@ module DataStore
       end
 
       files.each do |ifn|
-        `strings #{ifn} | sed 's#$#/#' | #{grep_cmdline} #{ext_grep_cmdline}`.lines.reverse!.each do |line|
+        Bash.run("strings #{ifn} | sed 's#$#/#' | #{grep_cmdline} #{ext_grep_cmdline}").lines.reverse!.each do |line|
           line = line.strip.sub(/\/$/, '')
           yield line unless line.empty?
         end

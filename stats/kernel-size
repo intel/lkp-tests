@@ -3,6 +3,7 @@
 LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 2)
 
 require 'yaml'
+require "#{LKP_SRC}/lib/bash"
 
 RESULT_ROOT = ENV.fetch('RESULT_ROOT', nil)
 
@@ -12,7 +13,7 @@ exit unless job
 kernel_size_file = "#{File.dirname job['kernel']}/kernel_size"
 exit unless File.exist? kernel_size_file
 
-text, data, bss = `tail -n 1 #{kernel_size_file}`.split
+text, data, bss = Bash.run("tail -n 1 #{kernel_size_file}").split
 
 puts "text: #{text}"
 puts "data: #{data}"

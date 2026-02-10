@@ -7,6 +7,7 @@ require 'fileutils'
 require 'json'
 require 'yaml'
 require "#{LKP_SRC}/lib/assert"
+require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/common"
 require "#{LKP_SRC}/lib/erb"
 require "#{LKP_SRC}/lib/log"
@@ -61,7 +62,10 @@ end
 
 def load_yaml_tail(file)
   begin
-    return YAML.load `tail -n 100 #{file}`
+    stdout = Bash.run('tail', '-n', '100', file)
+    return YAML.unsafe_load(stdout)
+  rescue Bash::BashCallError
+    nil
   rescue Psych::SyntaxError => e
     log_warn "#{file}: " + e.message
   end
@@ -148,7 +152,7 @@ def load_json(file, cache: false)
         obj = if file =~ /\.json$/
                 JSON.parse File.read(file, encoding: 'UTF-8')
               else
-                JSON.parse `zcat #{file}`
+                JSON.parse Bash.run("zcat #{file}")
               end
         return obj unless cache
 

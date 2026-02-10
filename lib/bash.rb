@@ -1,7 +1,6 @@
 LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
 
 require 'English'
-require 'open3'
 require 'shellwords'
 require 'tty-command'
 

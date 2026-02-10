@@ -4,6 +4,7 @@ LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
 
 require 'fileutils'
 require 'tempfile'
+require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/constant"
 require "#{LKP_SRC}/lib/lkp_path"
 require "#{LKP_SRC}/lib/lkp_pattern"
@@ -94,7 +95,7 @@ end
 def concat_context_from_dmesg(dmesg_file, line)
   line = line.resolve_invalid_bytes
   if line =~ /(possible recursive locking detected|possible circular locking dependency detected)/
-    lines = `#{grep_cmd(dmesg_file)} -A30 -Fx "#{line.chomp}" #{dmesg_file} | grep -m4 -e "trying to acquire lock" -e "already holding lock" -e "at: .*" | sed 's/^.* at:/at:/'`.chomp.split("\n")
+    lines = Bash.run("#{grep_cmd(dmesg_file)} -A30 -Fx \"#{line.chomp}\" #{dmesg_file} | grep -m4 -e \"trying to acquire lock\" -e \"already holding lock\" -e \"at: .*\" | sed 's/^.* at:/at:/'").chomp.split("\n")
     unless lines.empty?
       new_line = "#{line.chomp} #{lines.map { |l| l.sub(/^\[.*\] /, '') }.join(' ')}"
       return [line, new_line]
@@ -104,7 +105,7 @@ def concat_context_from_dmesg(dmesg_file, line)
 end
 
 def grep_crash_head(dmesg_file)
-  raw_oops = `#{grep_cmd(dmesg_file)} -a -E -e \\\\+0x -f #{LKP_SRC_ETC}/oops-pattern #{dmesg_file} | grep -v -E -f #{LKP_SRC_ETC}/oops-pattern-ignore`
+  raw_oops = Bash.run("#{grep_cmd(dmesg_file)} -a -E -e \\\\+0x -f #{LKP_SRC_ETC}/oops-pattern #{dmesg_file} | grep -v -E -f #{LKP_SRC_ETC}/oops-pattern-ignore")
 
   return {} if raw_oops.empty?
 
@@ -158,26 +159,26 @@ def grep_printk_errors(kmsg_file, kmsg)
 
   if kmsg_file =~ /\bkmsg\b/
     # the kmsg file is dumped inside the running kernel
-    oops = `#{grep} -a -E -e 'segfault at' -e '^<[0123]>' -e '^kern  :(err   |crit  |alert |emerg ): ' #{kmsg_file} |
+    oops = Bash.run("#{grep} -a -E -e 'segfault at' -e '^<[0123]>' -e '^kern  :(err   |crit  |alert |emerg ): ' #{kmsg_file} |
       sed -r 's/\\x1b\\[([0-9;]+m|[mK])//g' |
       grep -a -v -E -f #{LKP_SRC_ETC}/oops-pattern |
       grep -a -v -F -f #{LKP_SRC_ETC}/kmsg-denylist.raw;
-      grep "Kernel tests: Boot OK" #{kmsg_file};
-      grep -Eo "[^ ]* runtime error:.*" #{kmsg_file} | sed 's/^/sanitizer./g';
-      grep -Eo -e "Direct leak of .*allocated from:" -e "Indirect leak of .*allocated from:" -e "#[0-5] 0x[0-9a-z]{12} in .*" #{kmsg_file} |
+      grep \"Kernel tests: Boot OK\" #{kmsg_file};
+      grep -Eo \"[^ ]* runtime error:.*\" #{kmsg_file} | sed 's/^/sanitizer./g';
+      grep -Eo -e \"Direct leak of .*allocated from:\" -e \"Indirect leak of .*allocated from:\" -e \"#[0-5] 0x[0-9a-z]{12} in .*\" #{kmsg_file} |
       sed 's/^Indirect leak.*/|sanitizer.indirect_leak/g' | sed 's/^Direct leak.*/|sanitizer.direct_leak/g' |
-      sed "s/#[0-5] 0x[0-9a-z]\\{12\\} in //g" | awk '{print $1}' | tr '\n' '/' | tr '|' '\n' | sed 's|/$||'`
+      sed \"s/#[0-5] 0x[0-9a-z]\\{12\\} in //g\" | awk '{print $1}' | tr '\\n' '/' | tr '|' '\\n' | sed 's|/$||'")
   else
     return '' unless File.exist?("#{KTEST_USER_GENERATED_DIR}/printk-error-messages")
 
     # the dmesg file is from serial console
-    oops = `#{grep} -a -F -f #{KTEST_USER_GENERATED_DIR}/printk-error-messages #{kmsg_file} |
+    oops = Bash.run("#{grep} -a -F -f #{KTEST_USER_GENERATED_DIR}/printk-error-messages #{kmsg_file} |
       grep -a -v -E -f #{LKP_SRC_ETC}/oops-pattern |
       grep -a -v -F -f #{LKP_SRC_ETC}/kmsg-denylist.raw;
-      grep "Kernel tests: Boot OK" #{kmsg_file};`
-    oops += `grep -a -E -f #{LKP_SRC_ETC}/ext4-crit-pattern #{kmsg_file}` if kmsg.index 'EXT4-fs ('
-    oops += `grep -a -E -f #{LKP_SRC_ETC}/xfs-alert-pattern #{kmsg_file}` if kmsg.index 'XFS ('
-    oops += `grep -a -E -f #{LKP_SRC_ETC}/btrfs-crit-pattern #{kmsg_file}` if kmsg.index 'btrfs: '
+      grep \"Kernel tests: Boot OK\" #{kmsg_file};")
+    oops += Bash.run("grep -a -E -f #{LKP_SRC_ETC}/ext4-crit-pattern #{kmsg_file}") if kmsg.index 'EXT4-fs ('
+    oops += Bash.run("grep -a -E -f #{LKP_SRC_ETC}/xfs-alert-pattern #{kmsg_file}") if kmsg.index 'XFS ('
+    oops += Bash.run("grep -a -E -f #{LKP_SRC_ETC}/btrfs-crit-pattern #{kmsg_file}") if kmsg.index 'btrfs: '
   end
   oops
 end
@@ -420,12 +421,12 @@ end
 
 def get_crash_stats(dmesg_file)
   if dmesg_file =~ /\.xz$/
-    `xz -d -k #{dmesg_file}`
+    Bash.run("xz -d -k #{dmesg_file}")
     uncompressed_dmesg = dmesg_file.remove(/\.xz$/)
     dmesg_file = uncompressed_dmesg
   end
 
-  boot_error_ids = `#{LKP::Programs.find_parser('dmesg')} #{dmesg_file}`
+  boot_error_ids = Bash.run("#{LKP::Programs.find_parser('dmesg')} #{dmesg_file}")
 
   oops_map = {}
   id = ''
@@ -458,7 +459,7 @@ end
 
 def get_content(dmesg_file)
   if dmesg_file =~ /\.xz$/
-    `xz -d -k #{dmesg_file} --stdout`
+    Bash.run("xz -d -k #{dmesg_file} --stdout")
   else
     File.read(dmesg_file)
   end

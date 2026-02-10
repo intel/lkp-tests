@@ -4,6 +4,7 @@ LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 2)
 
 require 'optparse'
 require 'ostruct'
+require 'socket'
 require "#{LKP_SRC}/lib/distro_info"
 require "#{LKP_SRC}/lib/job"
 require "#{LKP_SRC}/lib/log"
@@ -71,7 +72,7 @@ if ARGV.empty?
   exit
 end
 
-@opt_testbox ||= ENV['HOSTNAME'] || `hostname`.chomp
+@opt_testbox ||= ENV['HOSTNAME'] || Socket.gethostname
 unless File.exist?(File.join(LKP_SRC, 'hosts', @opt_testbox))
   puts "hosts/#{@opt_testbox} doesn't exist, please rerun \"lkp install\""
   exit

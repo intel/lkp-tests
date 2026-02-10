@@ -3,6 +3,7 @@
 LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
 
 require 'set'
+require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/constant"
 require "#{LKP_SRC}/lib/lkp_git"
 require "#{LKP_SRC}/lib/lkp_path"
@@ -151,7 +152,7 @@ class ResultPath < Hash
       pattern = [RESULT_ROOT_DIR, test_case, PATH_SCHEME[test_case].map { |key| options[key] || '.*' }].flatten.join('/')
 
       cmdline = "grep -he '#{pattern}' #{KTEST_PATHS_DIR}/*/????-??-??-* | sed -e 's#[0-9]\\+/$##' | sort | uniq"
-      `#{cmdline}`
+      Bash.run(cmdline)
     end
   end
 end

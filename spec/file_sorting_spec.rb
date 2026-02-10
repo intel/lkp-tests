@@ -1,9 +1,10 @@
 require 'spec_helper'
+require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/string"
 
 def sorted_file_content(file_path)
   # remove empty line and line starting with #
-  `LC_ALL=C sort -f #{file_path} | grep -hv '^\\s*#\\|^\\s*$' | uniq`
+  Bash.run("LC_ALL=C sort -f #{file_path} | grep -hv '^\\s*#\\|^\\s*$' | uniq")
 end
 
 def with_shebang?(file)
@@ -51,7 +52,7 @@ describe 'Directory File Sorting' do
                        .reject { |line| line.blank? || line.start_with?('#') }
                        .join
 
-          expect(actual).to eq(sorted_file_content(file))
+          expect(actual.chomp).to eq(sorted_file_content(file))
         end
       end
     end
