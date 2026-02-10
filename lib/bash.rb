@@ -41,19 +41,32 @@ module Bash
     #   Bash.run("grep x", returns: [0,1]) # Custom success codes
     #   Bash.run("slow", stream: true) { |line| ... } # Stream lines
     def run(*args, **options, &block)
-      returns, verbose, stream, unsetenv_others = extract_options(options)
+      returns = options.delete(:returns) || [0]
+      verbose = options.delete(:verbose)
+      stream = options.delete(:stream)
+      unsetenv_others = options.delete(:unsetenv_others)
 
       # Default block meant for streaming output if none provided (stream mode only)
       block ||= ->(line) { puts line } if stream
 
-      cmd = TTY::Command.new(printer: verbose ? :pretty : :null, uuid: false, **options)
+      cmd = if options.empty? && !verbose
+              # Cache the TTY::Command instance for performance.
+              # This is a class instance variable on the Bash module.
+              (@default_cmd ||= TTY::Command.new(printer: :null, uuid: false))
+            else
+              TTY::Command.new(printer: verbose ? :pretty : :null, uuid: false, **options)
+            end
 
       args = prepare_args(args, unsetenv_others)
 
-      result = cmd.run!(*args) do |out, err|
-        # TTY::Command yields chunks, split them to match line-based expectation.
-        (out || err).each_line { |line| block.call(line.chomp) } if stream
-      end
+      result = if stream
+                 cmd.run!(*args) do |out, err|
+                   # TTY::Command yields chunks, split them to match line-based expectation.
+                   (out || err).each_line { |line| block.call(line.chomp) }
+                 end
+               else
+                 cmd.run!(*args)
+               end
 
       handle_result(result, args, returns, options, stream, block)
     rescue TTY::Command::TimeoutExceeded
@@ -61,15 +74,6 @@ module Bash
     end
 
     private
-
-    def extract_options(options)
-      [
-        options.delete(:returns) || [0],
-        options.delete(:verbose),
-        options.delete(:stream),
-        options.delete(:unsetenv_others)
-      ]
-    end
 
     def prepare_args(args, unsetenv_others)
       env = args.first.is_a?(Hash) ? args.shift : {}
