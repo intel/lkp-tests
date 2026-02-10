@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # - test
 # - nvme_trtype
 # - use_siw

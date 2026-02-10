@@ -158,9 +158,9 @@ setup_fs_config()
 	# Then copy the udf_test binary to /lkp/benchmarks/xfstests/src/.
 	# If you do not wish to run udf_test then set environment variable DISABLE_UDF_TEST
 	# to 1.
-	[ "$fs" = udf ] && log_eval export DISABLE_UDF_TEST=1
+	[[ "$fs" == "udf" ]] && log_eval export DISABLE_UDF_TEST=1
 
-	if [ "$fs" = btrfs ] && [ "$nr_partitions" -ge 4 ]; then
+	if [[ "$fs" == "btrfs" ]] && [[ "$nr_partitions" -ge 4 ]]; then
 		log_eval export SCRATCH_DEV_POOL=\"${partitions#* }\"
 	else
 		log_eval export SCRATCH_DEV=${partitions##* }
@@ -176,22 +176,22 @@ setup_fs_config()
 	## so we need to adjust the "PATH" search order.
 	export PATH="/bin/":$PATH
 
-	if [ "$fs" = xfs ] && [ "$nr_partitions" -ge 3 ]; then
+	if [[ "$fs" == "xfs" ]] && [[ "$nr_partitions" -ge 3 ]]; then
 		SCRATCH_LOGDEV=${partitions#* }
 		SCRATCH_LOGDEV=${SCRATCH_LOGDEV%% *}
 		log_eval export SCRATCH_LOGDEV="$SCRATCH_LOGDEV"
 	fi
 
-	[ "${test%%-*}" = "xfs" ] && {
+	[[ "${test%%-*}" == "xfs" ]] && {
 		log_eval export SCRATCH_XFS_LIST_METADATA_FIELDS=u3.sfdir3.hdr.parent.i4
 		log_eval export SCRATCH_XFS_LIST_FUZZ_VERBS=random
 	}
 
 	is_test_in_group "$test" "generic-no-xfs-bug-on-assert" "xfs-no-xfs-bug-on-assert" && {
-		[ -f /sys/fs/xfs/debug/bug_on_assert ] && echo 0 > /sys/fs/xfs/debug/bug_on_assert
+		[[ -f /sys/fs/xfs/debug/bug_on_assert ]] && echo 0 > /sys/fs/xfs/debug/bug_on_assert
 	}
 
-	[ "$test" = "xfs-083" -o "$test" = "xfs-275" ] && {
+	[[ "$test" == "xfs-083" || "$test" == "xfs-275" ]] && {
 		log_eval export USE_EXTERNAL=yes
 		# create a 100M partition for log, avoid
 		# log size 67108864 blocks too large, maximum size is 1048576 blocks
@@ -209,7 +209,7 @@ setup_fs_config()
 		fi
 	}
 
-	[ "$test" = "xfs-437" ] && {
+	[[ "$test" == "xfs-437" ]] && {
 		echo "LC_ALL=en_US.UTF-8" >> /etc/environment
 		echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 		echo "LANG=en_US.UTF-8" > /etc/locale.conf
@@ -226,13 +226,13 @@ setup_fs_config()
 
 	setup_mkfs_options
 
-	if [ "$fs" = xfs ] && is_test_in_group "$test" "generic-group-[0-9]*"; then
+	if [[ "$fs" == "xfs" ]] && is_test_in_group "$test" "generic-group-[0-9]*"; then
 		mkfs.xfs -f -mreflink=1 $TEST_DEV || die "mkfs.xfs $TEST_DEV failed"
 		log_eval export MKFS_OPTIONS="-mreflink=1"
 	fi
 
-	[ "$test" = "generic-387" ] && {
-		[ -n "$SCRATCH_DEV_POOL" ] && {
+	[[ "$test" == "generic-387" ]] && {
+		[[ -n "$SCRATCH_DEV_POOL" ]] && {
 			SCRATCH_DEV=${SCRATCH_DEV_POOL##* }
 			log_eval unset SCRATCH_DEV_POOL
 		}
@@ -250,22 +250,22 @@ setup_fs_config()
 	}
 
 	# need at least 3 partitions for TEST_DEV, SCRATCH_DEV and LOGWRITES_DEV
-	if is_test_in_group "$test" "btrfs-log-writes" "generic-log-writes" && [ "$nr_partitions" -ge 3 ]; then
+	if is_test_in_group "$test" "btrfs-log-writes" "generic-log-writes" && [[ "$nr_partitions" -ge 3 ]]; then
 		LOGWRITES_DEV=${partitions#* }
 		LOGWRITES_DEV=${LOGWRITES_DEV%% *}
 		log_eval export LOGWRITES_DEV="$LOGWRITES_DEV"
-		[ "$fs" = "xfs" ] && log_eval export MKFS_OPTIONS="-mreflink=1"
-		[ "$fs" = "btrfs" ] && [ -n "$SCRATCH_DEV_POOL" ] && {
+		[[ "$fs" == "xfs" ]] && log_eval export MKFS_OPTIONS="-mreflink=1"
+		[[ "$fs" == "btrfs" ]] && [[ -n "$SCRATCH_DEV_POOL" ]] && {
 			log_eval export SCRATCH_DEV=${SCRATCH_DEV_POOL##* }
 			log_eval unset SCRATCH_DEV_POOL
 		}
 	fi
 
-	if [ "$test" = "generic-470" ] && [ "$nr_partitions" -ge 3 ]; then
+	if [[ "$test" == "generic-470" ]] && [[ "$nr_partitions" -ge 3 ]]; then
 		LOGWRITES_DEV=${partitions#* }
 		LOGWRITES_DEV=${LOGWRITES_DEV%% *}
 		log_eval export LOGWRITES_DEV="$LOGWRITES_DEV"
-		[ "$fs" = "xfs" ] && unset MKFS_OPTIONS
+		[[ "$fs" == "xfs" ]] && unset MKFS_OPTIONS
 	fi
 
 	is_test_in_group "$test" "ext4-logdev" "generic-logdev" "xfs-logdev" && {
@@ -335,7 +335,7 @@ run_smbv3_tests()
 
 run_fs_tests()
 {
-	[ -s tests/exclude/$fs ] && exclude_file="-E tests/exclude/$fs"
+	[[ -s tests/exclude/$fs ]] && exclude_file="-E tests/exclude/$fs"
 	log_cmd ./check $exclude_file $all_tests
 }
 
@@ -362,15 +362,15 @@ run_test()
 	local all_tests
 	local all_tests_cmd
 
-	if [ "${test#*-}" = "all" ]; then
+	if [[ "${test#*-}" == "all" ]]; then
 		all_tests_cmd="cd tests && ls ${test%-*}/[0-9][0-9][0-9]"
-	elif [ "${test#*-}" = "new" ]; then
+	elif [[ "${test#*-}" == "new" ]]; then
 		all_tests_cmd="cd tests && sed \"s:^:${test%-*}/:\" $test"
-	elif [ "${test%[a-z4]-[0-9][0-9][0-9]}" != "$test" ]; then
+	elif [[ "${test%[a-z4]-[0-9][0-9][0-9]}" != "$test" ]]; then
 		all_tests_cmd="echo ${test%-*}/${test#*-}"
-	elif [ "${test%-*}" = "$fs" ]; then
+	elif [[ "${test%-*}" == "$fs" ]]; then
 		all_tests_cmd="sed \"s:^:${test%%-*}/:\" $test_dir/$test"
-	elif [ "${test#*-}" != "$test" ]; then
+	elif [[ "${test#*-}" != "$test" ]]; then
 		all_tests_cmd="sed \"s:^:${test%%-*}/:\" $test_dir/$test"
 	else
 		# Now rename $test-broken to $test-ignore wihch is easier to understand.
@@ -380,7 +380,7 @@ run_test()
 	log_echo $all_tests_cmd
 	all_tests=$(eval "$all_tests_cmd")
 
-	[ "${test#*-}" = "all" ] || [ -n "$all_tests" ] || {
+	[[ "${test#*-}" == "all" ]] || [[ -n "$all_tests" ]] || {
 		echo "no test found"
 		return 1
 	}

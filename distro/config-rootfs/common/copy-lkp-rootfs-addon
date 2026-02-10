@@ -1,12 +1,12 @@
 #!/bin/bash
 
 ROOTFS=$1
-[ -d "$ROOTFS" ] || {
+[[ -d "$ROOTFS" ]] || {
 	echo "Cannot find rootfs directory: $ROOTFS" 1>&2
 	exit 1
 }
 
-[ -n "$LKP_SRC" ] || {
+[[ -n "$LKP_SRC" ]] || {
 	full_path=$(readlink -e -v $0)
 	export LKP_SRC=${full_path%distro*}
 }

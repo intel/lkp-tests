@@ -31,12 +31,12 @@ distro_install_depends()
 
 	packages=$(get_dependency_packages $DISTRO $bm)
 
-	[ -z "$packages" ] && return
+	[[ -z "$packages" ]] && return
 
 	echo install packages for $bm: $packages
 
 	local ocfs2_tools_name=$(echo "$packages" | grep 'ocfs2-tools')
-	[ -n "$ocfs2_tools_name" ] && install_ocfs2_tools "$ocfs2_tools_name"
+	[[ -n "$ocfs2_tools_name" ]] && install_ocfs2_tools "$ocfs2_tools_name"
 
 	for pkg in $packages
 	do
@@ -80,7 +80,7 @@ pack()
 	# Dependencies resolved.
 	# Nothing to do.
 	# Complete!
-	[ "$downloaded_rpms" ] || return 0
+	[[ "$downloaded_rpms" ]] || return 0
 
 	mkdir -p $target_dir
 
@@ -115,7 +115,7 @@ pack_benchmark_deps()
 		packages=$(get_dependency_packages $DISTRO $BM_NAME)
 
 		local ocfs2_tools_name=$(echo "$packages" | grep 'ocfs2-tools')
-		[ -n "$ocfs2_tools_name" ] && download_ocfs2_tools "$ocfs2_tools_name"
+		[[ -n "$ocfs2_tools_name" ]] && download_ocfs2_tools "$ocfs2_tools_name"
 
 		if download "$packages"; then
 			pack
@@ -127,7 +127,7 @@ pack_benchmark_deps()
 
 install_gcc7()
 {
-	if [ $DISTRO = "aliyun" ]; then
+	if [[ $DISTRO == "aliyun" ]]; then
 		wget -O /tmp/centos-release-scl-rh-2-3.el7.centos.noarch.rpm https://rpmfind.net/linux/centos/7/extras/x86_64/Packages/centos-release-scl-rh-2-3.el7.centos.noarch.rpm
 		rpm -ivh --ignoresize /tmp/centos-release-scl-rh-2-3.el7.centos.noarch.rpm
 	else

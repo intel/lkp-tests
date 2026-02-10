@@ -47,7 +47,7 @@ usage()
 	exit 1
 }
 
-if [ "$1" = "-x" ]; then
+if [[ "$1" == "-x" ]]; then
 	XPS_ENA=1
 	shift
 fi
@@ -70,13 +70,13 @@ case "$AFF" in
 esac
 
 # append the interfaces listed to the string with spaces
-while [ "$#" -ne "0" ] ; do
+while [[ "$#" -ne "0" ]] ; do
 	IFACES+=" $1"
 	shift
 done
 
 # for now the user must specify interfaces
-if [ -z "$IFACES" ]; then
+if [[ -z "$IFACES" ]]; then
 	usage
 	exit 1
 fi
@@ -86,7 +86,7 @@ fi
 set_affinity()
 {
 	VEC=$core
-	if [ $VEC -ge 32 ]
+	if [[ $VEC -ge 32 ]]
 	then
 		MASK_FILL=""
 		MASK_ZERO="00000000"
@@ -106,7 +106,7 @@ set_affinity()
 
 	printf "%s" $MASK > /proc/irq/$IRQ/smp_affinity
 	printf "%s %d %s -> /proc/irq/$IRQ/smp_affinity\n" $IFACE $core $MASK
-	if ! [ -z "$XPS_ENA" ]; then
+	if [[ -n "$XPS_ENA" ]]; then
 		printf "%s %d %s -> /sys/class/net/%s/queues/tx-%d/xps_cpus\n" $IFACE $core $MASK $IFACE $((n-1))
 		printf "%s" $MASK > /sys/class/net/$IFACE/queues/tx-$((n-1))/xps_cpus
 	fi
@@ -143,24 +143,24 @@ setaff()
 	queues="${IFACE}-.*TxRx"
 
 	irqs=$(grep "$queues" /proc/interrupts | cut -f1 -d:)
-	[ -z "$irqs" ] && irqs=$(grep $IFACE /proc/interrupts | cut -f1 -d:)
-	[ -z "$irqs" ] && irqs=$(for i in /sys/class/net/"$IFACE"/device/msi_irqs/* ;\
+	[[ -z "$irqs" ]] && irqs=$(grep $IFACE /proc/interrupts | cut -f1 -d:)
+	[[ -z "$irqs" ]] && irqs=$(for i in /sys/class/net/"$IFACE"/device/msi_irqs/* ;\
 	                         do
-	                             [ -e "$i" ] || continue
+	                             [[ -e "$i" ]] || continue
 
 	                             i=${i##*/}
 	                             grep "$i:.*TxRx" /proc/interrupts | grep -v fdir | cut -f 1 -d : ;\
 	                         done)
-	[ -z "$irqs" ] && echo "Error: Could not find interrupts for $IFACE"
+	[[ -z "$irqs" ]] && echo "Error: Could not find interrupts for $IFACE"
 
 	echo "IFACE CORE MASK -> FILE"
 	echo "======================="
 	for IRQ in $irqs; do
-		[ "$n" -gt "$ncores" ] && n=1
+		[[ "$n" -gt "$ncores" ]] && n=1
 		j=1
 		# much faster than calling cut for each
 		for i in $CORES; do
-			[ $((j++)) -ge $n ] && break
+			[[ $((j++)) -ge $n ]] && break
 		done
 		core=$i
 		set_affinity
@@ -177,12 +177,12 @@ setaff()
 # echo IFACES is $IFACES
 
 CORES=$(</sys/devices/system/cpu/online)
-[ "$CORES" ] || CORES=$(grep ^proc /proc/cpuinfo | cut -f2 -d:)
+[[ "$CORES" ]] || CORES=$(grep ^proc /proc/cpuinfo | cut -f2 -d:)
 
 # Core list for each node from sysfs
 node_dir=/sys/devices/system/node
 for i in "$node_dir"/node*; do
-	[ -e "$i" ] || continue
+	[[ -e "$i" ]] || continue
 
 	i=${i/*node/}
 	corelist[$i]=$(<$node_dir/node${i}/cpulist)
@@ -192,19 +192,19 @@ for IFACE in $IFACES; do
 	# echo $IFACE being modified
 
 	dev_dir=/sys/class/net/$IFACE/device
-	[ -e $dev_dir/numa_node ] && node=$(<$dev_dir/numa_node)
-	[ "$node" ] && [ "$node" -gt 0 ] || node=0
+	[[ -e $dev_dir/numa_node ]] && node=$(<$dev_dir/numa_node)
+	[[ "$node" ]] && [[ "$node" -gt 0 ]] || node=0
 
 	case "$AFF" in
 	local)
 		CORES=${corelist[$node]}
 	;;
 	remote)
-		[ "$rnode" ] || { [ $node -eq 0 ] && rnode=1 || rnode=0; }
+		[[ "$rnode" ]] || { [[ $node -eq 0 ]] && rnode=1 || rnode=0; }
 		CORES=${corelist[$rnode]}
 	;;
 	one)
-		[ -n "$cnt" ] || cnt=0
+		[[ -n "$cnt" ]] || cnt=0
 		CORES=$cnt
 	;;
 	all)
@@ -229,7 +229,7 @@ done
 
 # check for irqbalance running
 IRQBALANCE_ON=$(ps ax | grep -v grep | grep -q irqbalance; echo $?)
-if [ "$IRQBALANCE_ON" = "0" ] ; then
+if [[ "$IRQBALANCE_ON" == "0" ]] ; then
 	echo " WARNING: irqbalance is running and will"
 	echo "          likely override this script's affinitization."
 	echo "          Please stop the irqbalance service and/or execute"

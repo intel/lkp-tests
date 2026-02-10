@@ -67,9 +67,9 @@ check_empty_output()
 check_binary_output()
 {
 	[[ $program = dmesg ]] && return
-	[[ $program = kmsg  ]] && return
-	[[ $program = mpstat  ]] && return
-	[[ $program = iostat  ]] && return
+	[[ $program = kmsg ]] && return
+	[[ $program = mpstat ]] && return
+	[[ $program = iostat ]] && return
 
 	# kmsg may actually read the dmesg file
 	# refer to the exception cases in check_empty_output()

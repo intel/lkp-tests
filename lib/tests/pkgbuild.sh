@@ -394,7 +394,7 @@ build_install_libcxx()
 	make install
 
 	# xlocale.h was removed since libc6-dev 2.26
-	if [ ! -f /usr/include/xlocale.h ]; then
+	if [[ ! -f /usr/include/xlocale.h ]]; then
 		touch "${srcdir}/llvm/projects/libcxx/include/xlocale.h"
 	fi
 

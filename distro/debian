@@ -48,13 +48,13 @@ install()
 	#   libreadline7
 	#   libssl1.1
 	#   gawk
-	[ -s "opt/deb/sequence-deb.$BM_NAME" ] && {
+	[[ -s "opt/deb/sequence-deb.$BM_NAME" ]] && {
 		deb_files=$(find ./ -name "*.deb" -type f)
 		while read -r deb_pkgname
 		do
 			# deb package naming specification, the file name must contain '_'
 			deb_filename=$(echo "$deb_files" | grep "^\./${deb_pkgname}_")
-			if [ -n "${deb_filename}" ]; then
+			if [[ -n "${deb_filename}" ]]; then
 				mv "$deb_filename"  opt/deb
 
 				# keep-deb content looks like:
@@ -128,11 +128,9 @@ pack()
 		[[ -d $pkg_dir && -f $pkg_dir/allowlist ]] && cat $pkg_dir/allowlist
 	} | pack_to_cgz "$pack_to/${BM_NAME}_$date.cgz" --owner=root.root || return
 
-	ln -sf			 ${BM_NAME}_$date.cgz \
-			$pack_to/${BM_NAME}.cgz		|| return
+	ln -sf ${BM_NAME}_$date.cgz $pack_to/${BM_NAME}.cgz || return
 
-	chown .lkp	$pack_to/${BM_NAME}_$date.cgz \
-			$pack_to/${BM_NAME}.cgz		|| return
+	chown .lkp $pack_to/${BM_NAME}_$date.cgz $pack_to/${BM_NAME}.cgz || return
 
 	echo package installed to $pack_to/${BM_NAME}.cgz
 }
@@ -169,9 +167,9 @@ save_package_deps_info()
 	#   libreadline7
 	#   libssl1.1
 	#   gawk
-	[ -n "$PACKAGE_LIST" ] && \
+	[[ -n "$PACKAGE_LIST" ]] && \
 		echo "$PACKAGE_LIST" | grep -F -f "$LKP_SRC/distro/keep-deb" > "opt/deb/sequence-deb.$benchmark"
-	[ -n "$PACKAGE_VERSION_LIST" ] && \
+	[[ -n "$PACKAGE_VERSION_LIST" ]] && \
 		echo "$PACKAGE_VERSION_LIST" > "opt/deb/${benchmark}-deps.packages"
 }
 
@@ -198,13 +196,13 @@ distro_install_depends()
 	local arch=$(get_system_arch)
 
 	export DEBIAN_FRONTEND=noninteractive
-	[ "$arch" = "x86_64" ] && add_i386_package
+	[[ "$arch" == "x86_64" ]] && add_i386_package
 	update
 
 	apt-get install -yf
 	packages=$(get_dependency_packages $DISTRO $bm)
 
-	[ -z "$packages" ] && return
+	[[ -z "$packages" ]] && return
 
 	echo install packages for $bm: $packages
 
@@ -238,11 +236,11 @@ fixup_distro_mirror()
 
 	# add extra apt source into sources.list
 	# use (echo) to append new line at last
-	[ -f "$LKP_SRC/distro/apt-sources-list" ] &&
+	[[ -f "$LKP_SRC/distro/apt-sources-list" ]] &&
 	($LKP_SRC/distro/apt-sources-list; echo) >> /etc/apt/sources.list
 
 	# remove testing and unstable source
-	[ -f /etc/apt/sources.list ] && sed -i -e '/testing/d' -e '/unstable/d' /etc/apt/sources.list
+	[[ -f /etc/apt/sources.list ]] && sed -i -e '/testing/d' -e '/unstable/d' /etc/apt/sources.list
 }
 
 fixup_preinstall()
@@ -253,7 +251,7 @@ fixup_preinstall()
 fixup_arch_install()
 {
 	local pack_arch=$1
-	[ "$pack_arch" = "i386" ] || return
+	[[ "$pack_arch" == "i386" ]] || return
 
 	dpkg --add-architecture i386
 	update

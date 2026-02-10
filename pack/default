@@ -17,8 +17,8 @@ download()
 		wget -t 3 -T 10 --no-clobber $url && break
 	done
 	[[ $source_package ]] || source_package=$(basename $url)
-	[[ $source_dir     ]] || source_dir=${source_package%%.tar.*}
-	[[ $source_dir     ]] || source_dir=${source_package%%.tgz}
+	[[ $source_dir  ]] || source_dir=${source_package%%.tar.*}
+	[[ $source_dir  ]] || source_dir=${source_package%%.tgz}
 	[[ -d $source_dir ]] ||
 	tar xf "$source_package"
 }
@@ -152,7 +152,7 @@ cleanup()
 	[[ $source_package ]] && {
 		rm -f  "${BUILD_DIR:?}/${source_package}" || return
 	}
-	[[ $source_dir     ]] && {
+	[[ $source_dir  ]] && {
 		rm -fr "${BUILD_DIR:?}/${source_dir}" || return
 	}
 	post_cleanup
