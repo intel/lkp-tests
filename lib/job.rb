@@ -94,7 +94,7 @@ def __create_programs_hash(glob, lkp_src)
       next
     end
 
-    file = glob =~ /^programs\// ? path.split('/')[-2] : File.basename(path)
+    file = glob =~ /^programs\// || glob =~ /^\*\/(setup|daemon)$/ ? path.split('/')[-2] : File.basename(path)
     next if file == 'wrapper'
 
     if programs.include? file
@@ -426,9 +426,14 @@ class Job
       else
         programs = create_programs_hash("#{type}/**/*", lkp_src)
 
-        programs = programs.merge create_programs_hash('programs/*/run', lkp_src) if type == :tests
-        programs = programs.merge create_programs_hash('programs/*/parse', lkp_src) if type == :stats
+        script_name = {
+          tests: 'run',
+          stats: 'parse',
+          setup: 'setup',
+          daemon: 'daemon'
+        }[type]
 
+        programs = programs.merge create_programs_hash("programs/*/#{script_name}", lkp_src) if script_name
         programs
       end
   end

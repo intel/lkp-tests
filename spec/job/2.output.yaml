@@ -1,0 +1,11 @@
+---
+
+#! spec/job/2.yaml
+suite: ebizzy
+testcase: ebizzy
+category: benchmark
+nr_threads: 200%
+iterations: 100x
+ebizzy:
+  duration: 10s
+job_origin: spec/job/2.yaml

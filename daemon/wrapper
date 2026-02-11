@@ -11,6 +11,9 @@
 program=$1
 program_dir=$(dirname $0)
 
+runner_path=$program_dir/$program
+[ -x $runner_path ] || runner_path=$LKP_SRC/programs/$program/daemon
+
 shift
 
 setup_cgroup()
@@ -41,7 +44,7 @@ if [ -n "$nr_instances" ]; then
 			export instance_cgroup=$cg
 			setup_cgroup "$cg"
 			numa_bind=$(numa_node_binding "$i")
-			$numa_bind $program_dir/$program "$@" &
+			$numa_bind $runner_path "$@" &
 			to_wait="$to_wait $!"
 			i=$((i+1))
 			[ "$i" -gt "$nr_instances" ] && break
@@ -49,5 +52,5 @@ if [ -n "$nr_instances" ]; then
 	done
 	wait $to_wait
 else
-	exec $program_dir/$program "$@"
+	exec $runner_path "$@"
 fi

@@ -4,8 +4,7 @@ require "#{LKP_SRC}/lib/job2sh"
 describe Job2sh do
   describe '#to_shell' do
     artifacts_dir = File.join(LKP_SRC, 'spec', 'job2sh')
-
-    yaml_files = Dir.glob File.join(artifacts_dir, '*.yaml')
+    yaml_files = Dir.glob(File.join(artifacts_dir, '*.yaml')).reject { |f| f.include?('mock') }
 
     yaml_files.each do |yaml_file|
       it "convert #{yaml_file}" do
@@ -17,10 +16,52 @@ describe Job2sh do
         # The output can be different than join("\n") regarding the empty line. Thus
         # we need slightly change expected sh to add extra empty line and remove final
         # new line.
-        actual = job2sh.to_shell
-                       .join("\n")
+        actual = job2sh.to_shell.join("\n")
 
-        expect(actual).to eq File.read(yaml_file.sub(/\.yaml$/, '.sh'))
+        expected_sh = File.read(yaml_file.sub(/\.yaml$/, '.sh'))
+
+        # The job_origin is expanded to absolute path in job.rb, but the expected sh
+        # may have different path (e.g. relative path or different absolute path).
+        # We replace the actual job_origin with the one in expected sh to match it.
+        if expected_sh =~ /export job_origin='(.*)'/
+          actual.sub!(/export job_origin='.*'/, "export job_origin='#{$1}'")
+        end
+
+        expect(actual).to eq expected_sh
+      end
+    end
+  end
+
+  describe '#to_shell with mock environment' do
+    include_context 'mocked filesystem'
+
+    before do
+      allow_any_instance_of(Job).to receive(:lkp_src).and_return(tmp_lkp_src)
+
+      # Stub Bash.run for program-options
+      allow(Bash).to receive(:run).and_call_original
+      allow(Bash).to receive(:run).with(/program-options.*mock_setup\/setup/).and_return("setup\tmock_setup")
+      allow(Bash).to receive(:run).with(/program-options.*program_setup\/setup/).and_return("setup\tprogram_setup")
+      allow(Bash).to receive(:run).with(/program-options.*wrapper/).and_return('')
+    end
+
+    artifacts_dir = File.join(LKP_SRC, 'spec', 'job2sh')
+    yaml_files = Dir.glob File.join(artifacts_dir, '*.mock.yaml')
+
+    yaml_files.each do |yaml_file|
+      it "convert #{yaml_file}" do
+        job2sh = described_class.new
+        job2sh.load(yaml_file)
+        job2sh.expand_params
+
+        actual = job2sh.to_shell.join("\n")
+        expected_sh = File.read(yaml_file.sub(/\.yaml$/, '.sh'))
+
+        if expected_sh =~ /export job_origin='(.*)'/
+          actual.sub!(/export job_origin='.*'/, "export job_origin='#{$1}'")
+        end
+
+        expect(actual).to eq expected_sh
       end
     end
   end

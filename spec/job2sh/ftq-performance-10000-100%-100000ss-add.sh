@@ -100,9 +100,9 @@ run_job()
 
 	export_top_env
 
-	run_setup $LKP_SRC/setup/cpufreq_governor 'performance'
+	run_setup $LKP_SRC/setup/wrapper cpufreq_governor 'performance'
 
-	run_setup $LKP_SRC/setup/sanity-check
+	run_setup $LKP_SRC/setup/wrapper sanity-check
 
 	run_monitor $LKP_SRC/monitors/wrapper oom-killer
 	run_monitor $LKP_SRC/monitors/plain/watchdog

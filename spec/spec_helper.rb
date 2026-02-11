@@ -12,4 +12,5 @@ if ENV['GENERATE_COVERAGE'] == 'true'
   SimpleCov.start
 end
 
+Dir[File.join(LKP_SRC, 'spec', 'support', '**', '*.rb')].each { |f| require f }
 Dir[File.join(LKP_SRC, 'lib', 'spec', 'support', '**', '*.rb')].each { |f| require f }

@@ -109,6 +109,12 @@ class Job2sh < Job
     when /programs\/.+\/parse$/
       program_dir = File.join(File.dirname(program_path), 'stats')
       wrapper = File.join(lkp_src, 'stats', 'wrapper')
+    when /\/daemon$/
+      program_dir = File.join(File.dirname(program_path), 'daemon')
+      wrapper = File.join(lkp_src, 'daemon', 'wrapper')
+    when /\/setup$/
+      program_dir = File.join(File.dirname(program_path), 'setup')
+      wrapper = File.join(lkp_src, 'setup', 'wrapper')
     else
       program_dir = File.dirname(program_path)
       wrapper = "#{program_dir}/wrapper"

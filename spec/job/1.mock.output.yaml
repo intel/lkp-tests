@@ -1,0 +1,19 @@
+---
+
+#! spec/job/1.mock.yaml
+suite: mock-suite
+testcase: mock-testcase
+category: mock-category
+mock_setup:
+program_setup:
+legacy_setup:
+myprog:
+test_script:
+setup_script:
+legacy_daemon:
+job_origin: "/tmp/mock_lkp_src/spec/job/1.mock.yaml"
+
+#! include/category/mock-category
+kmsg:
+heartbeat:
+meminfo:

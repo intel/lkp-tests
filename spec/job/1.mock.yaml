@@ -1,0 +1,11 @@
+suite: mock-suite
+testcase: mock-testcase
+category: mock-category
+
+mock_setup:
+program_setup:
+legacy_setup:
+myprog:
+legacy_test:
+legacy_daemon:
+daemon:
