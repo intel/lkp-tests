@@ -7,13 +7,10 @@ shared_context 'mocked filesystem' do
   before do
     # Create executables
     [
-      'tests/wrapper',
+      'bin/program-options',
+      'bin/run-test',
       'stats/wrapper',
-      'stats/legacy_setup2',
       'setup/wrapper',
-      'setup/legacy_setup',
-      'setup/legacy_setup2',
-      'daemon/legacy_daemon',
       'daemon/wrapper',
       'programs/mysetup/setup',
       'programs/mysetup2/setup',

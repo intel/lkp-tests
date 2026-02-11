@@ -6,11 +6,8 @@ testcase: mock-testcase
 category: mock-category
 mock_setup:
 program_setup:
-legacy_setup:
 myprog:
-test_script:
-setup_script:
-legacy_daemon:
+daemon:
 job_origin: "/tmp/mock_lkp_src/spec/job/1.mock.yaml"
 
 #! include/category/mock-category

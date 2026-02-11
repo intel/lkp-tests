@@ -9,7 +9,7 @@ require "#{LKP_SRC}/lib/enumerator"
 require "#{LKP_SRC}/lib/log"
 require "#{LKP_SRC}/lib/result_root"
 require "#{LKP_SRC}/lib/stats"
-require "#{LKP_SRC}/lib/tests"
+require "#{LKP_SRC}/lib/programs"
 
 # How many components in the stat sort key
 $stat_sort_key_number = {
@@ -461,7 +461,7 @@ module Compare
     def do_filter_testcase_stat_keys(stats)
       stats.select do |k|
         base, _, remainder = k.partition('.')
-        all_tests_set.include?(base) && !remainder.start_with?('time.')
+        LKP::Programs.all_tests_set.include?(base) && !remainder.start_with?('time.')
       end
     end
 
@@ -826,7 +826,7 @@ module Compare
       stat_base_map[base] ||= stat[FAILURE] ? -10_000 : 0
       stat_base_map[base] += 1
     end
-    all_tests_set.each do |test|
+    LKP::Programs.all_tests_set.each do |test|
       c = stat_base_map[test]
       stat_base_map[test] = 0 if c&.positive?
     end

@@ -17,21 +17,18 @@ describe Job do
 
     it 'returns tests programs' do
       programs = job.available_programs(:tests)
-      expect(programs).to include('test_script')
       expect(programs).to include('myprog')
       expect(programs['myprog']).to include('programs/myprog/run')
     end
 
     it 'returns stats programs' do
       programs = job.available_programs(:stats)
-      expect(programs).to include('stat_script')
       expect(programs).to include('myprog')
       expect(programs['myprog']).to include('programs/myprog/parse')
     end
 
     it 'returns setup programs' do
       programs = job.available_programs(:setup)
-      expect(programs).to include('setup_script')
       # After implementation, this should include myprog
       expect(programs).to include('myprog')
       expect(programs['myprog']).to include('programs/myprog/setup')
@@ -39,7 +36,6 @@ describe Job do
 
     it 'returns daemon programs' do
       programs = job.available_programs(:daemon)
-      expect(programs).to include('legacy_daemon')
       # After implementation, this should include myprog
       expect(programs).to include('myprog')
       expect(programs['myprog']).to include('programs/myprog/daemon')
@@ -48,9 +44,6 @@ describe Job do
     it 'aggregates programs for :workload_elements' do
       # :workload_elements includes :setup, :tests, :daemon
       programs = job.available_programs(:workload_elements)
-      expect(programs).to include('test_script')
-      expect(programs).to include('setup_script')
-      expect(programs).to include('legacy_daemon')
       # NOTE: 'myprog' from tests is included because tests support programs/*/run
       expect(programs).to include('myprog')
       # 'daemon' overrides 'tests' and 'setup' due to merge order

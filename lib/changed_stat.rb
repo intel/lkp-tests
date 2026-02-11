@@ -9,7 +9,6 @@ require "#{LKP_SRC}/lib/lkp_git"
 require "#{LKP_SRC}/lib/log"
 require "#{LKP_SRC}/lib/result"
 require "#{LKP_SRC}/lib/statistics"
-require "#{LKP_SRC}/lib/tests"
 require "#{LKP_SRC}/lib/yaml"
 
 module LKP

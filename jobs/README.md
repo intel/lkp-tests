@@ -91,10 +91,14 @@ These top level keys are accumulative everywhere:
 If the key matches some script file in the below paths, it is treated as an
 executable script.
 
-  - $LKP_SRC/setup
   - $LKP_SRC/monitors
-  - $LKP_SRC/daemon
-  - $LKP_SRC/tests
+  - $LKP_SRC/programs
+
+The mapping rules for scripts in `programs/` are:
+
+  - `programs/<name>/setup`  => `setup` script
+  - `programs/<name>/daemon` => `daemon` script
+  - `programs/<name>/run`    => `test` script
 
 
 ## Variables
@@ -121,9 +125,9 @@ into an executable shell script. Here is a conceptual demo.
 	  test_param1: ...                         export  test_param1=...
 	  test_param2: ...                         export  test_param2=...
 	  ...                                      ...
-	  setup_script1:                           $LKP_SRC/setup/setup_script1
-	  setup_script2:                           $LKP_SRC/setup/setup_script2
-	  test_script:                             $LKP_SRC/tests/test_script
+	  setup_script1:                           $LKP_SRC/programs/setup_script1/setup
+	  setup_script2:                           $LKP_SRC/programs/setup_script2/setup
+	  test_script:                             $LKP_SRC/programs/test_script/run
 ```
 ## job allocation
 [This page](README-job-allocation.html) talks about job allocation.

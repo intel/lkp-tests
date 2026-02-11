@@ -19,6 +19,8 @@
 
 [ -n "$mount_option" ] && mount_option="-o $mount_option"
 
+program_name=$(basename "$(dirname "$0")")
+
 def_mount=
 def_mkfs=
 fs_options()
@@ -155,12 +157,12 @@ case $fs in
 	nfs)
 		start_nfsd $mount_points
 		mount_local_nfs $mount_points
-		[ "${0#*fs1}" != "$0" ] && mount_points=
+		[ "$program_name" = "fs1" ] && mount_points=
 		;;
 	cifs|smb*)
 		start_smbd $mount_points
 		mount_local_cifs $mount_points
-		[ "${0#*fs1}" != "$0" ] && mount_points=
+		[ "$program_name" = "fs1" ] && mount_points=
 		;;
 
 
@@ -196,7 +198,7 @@ umount_fs() {
 umount_fs
 EOF
 
-if [ "${0#*fs2}" != "$0" ]; then
+if [ "$program_name" = "fs2" ]; then
 	fs_key=fs2
 else
 	fs_key=fs

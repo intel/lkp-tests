@@ -26,15 +26,9 @@ run_job()
 
 	run_setup $LKP_SRC/setup/wrapper mysetup2
 
-	run_setup $LKP_SRC/setup/wrapper legacy_setup
-
-	run_setup $LKP_SRC/setup/wrapper legacy_setup2
-
 	run_test mode='thread' test='writeseek3' $LKP_SRC/tests/wrapper myprog
 
 	start_daemon $LKP_SRC/daemon/wrapper mydaemon
-
-	start_daemon $LKP_SRC/daemon/wrapper legacy_daemon
 }
 
 
@@ -44,7 +38,6 @@ extract_stats()
 	export stats_part_end=
 
 	$LKP_SRC/stats/wrapper mysetup2
-	$LKP_SRC/stats/wrapper legacy_setup2
 	env mode='thread' test='writeseek3' $LKP_SRC/stats/wrapper myprog
 
 	$LKP_SRC/stats/wrapper time myprog.time

@@ -4,7 +4,9 @@
 
 . "$LKP_SRC"/lib/reproduce-log.sh
 
-if [ "${0#*intel_powerclamp}" != "$0" ]; then
+program_name=$(basename "$(dirname "$0")")
+
+if [ "$program_name" = "intel_powerclamp" ]; then
 	type='intel_powerclamp'
 else
 	type='Processor'
@@ -23,3 +25,5 @@ do
 		log_eval "echo ${max_state%mp} > $i/max_state"
 	}
 done
+
+exit 0

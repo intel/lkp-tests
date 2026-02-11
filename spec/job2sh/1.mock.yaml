@@ -4,12 +4,9 @@ category: mock-category
 
 mysetup: 'mock_arg'
 mysetup2:
-legacy_setup:
-legacy_setup2:
 
 myprog:
   mode: thread
   test: writeseek3
 
 mydaemon:
-legacy_daemon:

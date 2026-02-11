@@ -178,7 +178,7 @@ check_exit_code()
 	exit "$exit_code"
 }
 
-record_program()
+get_program_name()
 {
 	local i
 	local program
@@ -189,12 +189,23 @@ record_program()
 		[ "$i" != "${i%/wrapper}" ] && continue  # skip $LKP_SRC/**/wrapper
 
 		program=${i##*/}
-		echo "${program}" >> $TMP/program_list
+		if [ "$program" = "run" ] || [ "$program" = "daemon" ] || [ "$program" = "setup" ]; then
+			program=${i%/*}
+			program=${program##*/}
+		fi
 		echo "${program}"
 		return 0
 	done
 
 	return 1
+}
+
+record_program()
+{
+	local program
+	program=$(get_program_name "$@") || return 1
+	echo "${program}" >> $TMP/program_list
+	echo "${program}"
 }
 
 run_program()
@@ -273,8 +284,7 @@ start_daemon()
 		# pattern removal operation is applied to each member of the array
 		# in turn, and the expansion is the resultant list.
 		# above is not expected in our usage case.
-		local daemon="$*"
-		daemon=${daemon##*/}
+		local daemon="$(get_program_name "$@")"
 		run_program_in_background "$@"
 		echo $! >> $TMP/pid-bg-proc-$daemon
 	else

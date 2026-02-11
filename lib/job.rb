@@ -459,8 +459,8 @@ class Job
       read_single_program(k, programs[k])
     end
 
-    read_single_program('wrapper', "#{LKP_SRC}/tests/wrapper")
-    read_single_program('dwrapper', "#{LKP_SRC}/daemon/wrapper")
+    read_single_program('wrapper', "#{LKP_SRC}/bin/run-test")
+    read_single_program('dwrapper', "#{LKP_SRC}/bin/run-daemon")
   end
 
   def each_job_init

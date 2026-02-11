@@ -40,10 +40,9 @@ show_deps_list()
 show_pack_list()
 {
 	local tmp_input="$(mktemp /tmp/lkp-tmpinput-XXXXXXXXX)"
-	for i in monitors setup tests daemon
-	do
-		find $LKP_SRC/$i -type f -or -type l | sed 's:.*/::' >> $tmp_input
-	done
+	find $LKP_SRC/monitors -type f -or -type l | sed 's:.*/::' >> $tmp_input
+	find $LKP_SRC/programs/ -mindepth 1 -maxdepth 1 -type d -printf "%f\n" >> $tmp_input
+
 	find  $LKP_SRC/pack -type f | sed 's:.*/::' |
 	grep -x -F -f $tmp_input |
 	grep -v -e '^0day-'

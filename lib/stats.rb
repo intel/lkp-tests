@@ -15,7 +15,6 @@ require "#{LKP_SRC}/lib/perf_metrics"
 require "#{LKP_SRC}/lib/programs"
 require "#{LKP_SRC}/lib/result"
 require "#{LKP_SRC}/lib/statistics"
-require "#{LKP_SRC}/lib/tests"
 require "#{LKP_SRC}/lib/yaml"
 
 MARGIN_SHIFT = 5
@@ -846,7 +845,7 @@ def kpi_stat?(stat, _axes, _values = nil)
   return false if $kpi_stat_denylist.include?(stat)
 
   base, _, remainder = stat.partition('.')
-  all_tests_set.include?(base) && !remainder.start_with?('time.')
+  LKP::Programs.all_tests_set.include?(base) && !remainder.start_with?('time.')
 end
 
 def sort_bisect_stats(stats)

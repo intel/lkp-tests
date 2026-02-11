@@ -2,11 +2,13 @@
 
 LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
 
+require 'set'
+
 module LKP
   class Programs
-    class << self
-      PROGRAMS_ROOT = File.join(LKP_SRC, 'programs').freeze
+    PROGRAMS_ROOT = File.join(LKP_SRC, 'programs').freeze
 
+    class << self
       def all_stats
         Dir["#{LKP_SRC}/stats/**/*"].map { |path| File.basename path } +
           Dir["#{PROGRAMS_ROOT}/*/parse"].map { |path| path.split('/')[-2] }
@@ -22,7 +24,12 @@ module LKP
       alias all_runner_names all_tests
 
       def all_tests_and_daemons
-        all_tests + Dir["#{LKP_SRC}/daemon/**/*"].map { |path| File.basename path }
+        all_tests + Dir["#{LKP_SRC}/daemon/**/*"].map { |path| File.basename path } +
+          Dir["#{PROGRAMS_ROOT}/*/daemon"].map { |path| path.split('/')[-2] }
+      end
+
+      def all_tests_set
+        @all_tests_set ||= Set.new(all_tests_and_daemons).freeze
       end
 
       def all_metas
