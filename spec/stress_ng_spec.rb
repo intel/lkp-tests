@@ -1,5 +1,4 @@
 require 'spec_helper'
-require "#{LKP_SRC}/lib/spec/test_helper"
 
 describe 'stress-ng' do
   Dir[LKP::Path.src('jobs', 'stress-ng*.yaml')].each do |job_yaml|

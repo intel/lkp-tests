@@ -1,4 +1,4 @@
-LKP_SRC ||= ENV.fetch('LKP_SRC', nil)
+LKP_SRC ||= ENV['LKP_SRC'] || File.expand_path('..', __dir__)
 
 require 'rspec'
 require "#{LKP_SRC}/lib/lkp_tmpdir"
@@ -13,4 +13,3 @@ if ENV['GENERATE_COVERAGE'] == 'true'
 end
 
 Dir[File.join(LKP_SRC, 'spec', 'support', '**', '*.rb')].each { |f| require f }
-Dir[File.join(LKP_SRC, 'lib', 'spec', 'support', '**', '*.rb')].each { |f| require f }
