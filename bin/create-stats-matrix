@@ -6,11 +6,10 @@ require 'etc'
 require 'fileutils'
 require 'optparse'
 require 'ostruct'
+require "#{LKP_SRC}/lib/constant"
 require "#{LKP_SRC}/lib/job"
 require "#{LKP_SRC}/lib/matrix"
 require "#{LKP_SRC}/lib/stats"
 require "#{LKP_SRC}/lib/yaml"
-
-LKP_USER = ENV['USER'] || Etc.getpwuid(Process.uid).name
 
 create_stats_matrix ARGV[0]
