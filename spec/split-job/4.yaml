@@ -1,0 +1,8 @@
+suite: split-job
+testcase: split-job
+
+fs2:
+ - ext4
+ - nfsv3
+
+split-job:

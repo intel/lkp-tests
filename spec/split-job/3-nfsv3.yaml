@@ -10,7 +10,7 @@ testbox: lkp-tbox
 arch: x86_64
 tbox_group: lkp-tbox
 
-#! include/fs/nfsv3
+#! programs/fs/include/nfsv3
 need_kconfig: NFS_V3
 
 #! include/split-job

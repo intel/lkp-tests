@@ -1,21 +1,23 @@
 ---
 
-#! spec/split-job/3.yaml
+#! spec/split-job/4.yaml
 suite: split-job
 testcase: split-job
-fs: ext4
+fs2: nfsv3
 split-job:
-job_origin: spec/split-job/3.yaml
+job_origin: spec/split-job/4.yaml
 testbox: lkp-tbox
 arch: x86_64
 tbox_group: lkp-tbox
 
-#! programs/fs/include/OTHERS
-need_kconfig: EXT4_FS
+#! programs/fs2/include/nfsv3
+need_kconfig: NFS_V3
 
 #! include/split-job
 including:
 - CONFIG_ALWAYS
 - CONFIG_TEST_ELSE
 - CONFIG_GROUP_ELSE
-- CONFIG_EXT4
+- CONFIG_FS_ELSE
+
+model: Haswell

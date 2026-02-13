@@ -36,6 +36,20 @@ shared_context 'mocked filesystem' do
     # Create other directories
     FileUtils.mkdir_p("#{tmp_lkp_src}/programs/mock_setup")
     FileUtils.mkdir_p("#{tmp_lkp_src}/programs/program_setup")
+
+    # Create directory-based includes
+    FileUtils.mkdir_p("#{tmp_lkp_src}/programs/myfs/include")
+    FileUtils.touch("#{tmp_lkp_src}/programs/myfs/include/subconf1")
+
+    # Create directory-based includes with symlink to parent
+    FileUtils.mkdir_p("#{tmp_lkp_src}/programs/myfs_link")
+    File.symlink("#{tmp_lkp_src}/programs/myfs", "#{tmp_lkp_src}/programs/myfs_link/symlink")
+    # Actually create a symlink for the whole program directory
+    File.symlink('myfs', "#{tmp_lkp_src}/programs/myfs_symlink")
+
+    # Create file-based includes
+    FileUtils.mkdir_p("#{tmp_lkp_src}/programs/mytask")
+    FileUtils.touch("#{tmp_lkp_src}/programs/mytask/include")
   end
 
   after do

@@ -65,6 +65,36 @@ describe Job do
       end
     end
   end
+
+  describe '#include_files' do
+    include_context 'mocked filesystem'
+
+    before do
+      allow(job).to receive(:lkp_src).and_return(tmp_lkp_src)
+    end
+
+    it 'detects single-file includes in programs' do
+      includes = job.include_files
+      expect(includes).to include('mytask')
+      expect(includes['mytask']['mytask']).to eq("#{tmp_lkp_src}/programs/mytask/include")
+    end
+
+    it 'detects directory-based includes in programs' do
+      includes = job.include_files
+      expect(includes).to include('myfs')
+      expect(includes['myfs']).to include('subconf1')
+      expect(includes['myfs']['subconf1']).to eq("#{tmp_lkp_src}/programs/myfs/include/subconf1")
+    end
+
+    it 'detects includes in symlinked programs' do
+      includes = job.include_files
+      # myfs_symlink -> myfs
+      expect(includes).to include('myfs_symlink')
+      # It should resolve subconf1 inside the linked directory but use 'myfs_symlink' as key
+      expect(includes['myfs_symlink']).to include('subconf1')
+      expect(includes['myfs_symlink']['subconf1']).to eq("#{tmp_lkp_src}/programs/myfs_symlink/include/subconf1")
+    end
+  end
 end
 
 describe 'job.rb global methods' do

@@ -23,9 +23,7 @@ describe Job2sh do
         # The job_origin is expanded to absolute path in job.rb, but the expected sh
         # may have different path (e.g. relative path or different absolute path).
         # We replace the actual job_origin with the one in expected sh to match it.
-        if expected_sh =~ /export job_origin='(.*)'/
-          actual.sub!(/export job_origin='.*'/, "export job_origin='#{$1}'")
-        end
+        actual.sub!(/export job_origin='.*'/, "export job_origin='#{$1}'") if expected_sh =~ /export job_origin='(.*)'/
 
         expect(actual).to eq expected_sh
       end
@@ -57,9 +55,7 @@ describe Job2sh do
         actual = job2sh.to_shell.join("\n")
         expected_sh = File.read(yaml_file.sub(/\.yaml$/, '.sh'))
 
-        if expected_sh =~ /export job_origin='(.*)'/
-          actual.sub!(/export job_origin='.*'/, "export job_origin='#{$1}'")
-        end
+        actual.sub!(/export job_origin='.*'/, "export job_origin='#{$1}'") if expected_sh =~ /export job_origin='(.*)'/
 
         expect(actual).to eq expected_sh
       end

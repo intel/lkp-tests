@@ -10,7 +10,7 @@ testbox: lkp-tbox
 arch: x86_64
 tbox_group: lkp-tbox
 
-#! include/fs/OTHERS
+#! programs/fs/include/OTHERS
 need_kconfig: XFS_FS
 
 #! include/split-job

@@ -31,6 +31,7 @@ SIZE_UNITS = {
   M: 20,
   K: 10
 }.freeze
+
 def to_byte(size_spec)
   return size_spec unless size_spec.is_a?(String)
 

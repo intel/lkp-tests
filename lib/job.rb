@@ -267,22 +267,27 @@ class Job
     return @include_files if @include_files
 
     @include_files = {}
-    Dir["#{lkp_src}/include/*"].map do |d|
+    Dir["#{lkp_src}/include/*"].each do |d|
       key = File.basename d
       @include_files[key] = {}
 
-      Dir["#{lkp_src}/include/#{key}",
-          "#{lkp_src}/include/#{key}/*"].each do |f|
+      Dir[d, "#{d}/*"].each do |f|
         next if File.directory? f
 
         @include_files[key][File.basename(f)] = f
       end
     end
 
-    Dir["#{lkp_src}/programs/*/include"].map do |f|
-      key = File.basename(File.dirname(f))
+    Dir["#{lkp_src}/programs/*/include"].each do |d|
+      key = File.basename(File.dirname(d))
       @include_files[key] = {}
-      @include_files[key][key] = f
+
+      Dir[d, "#{d}/*"].each do |f|
+        next if File.directory? f
+
+        name = File.basename(f) == 'include' ? key : File.basename(f)
+        @include_files[key][name] = f
+      end
     end
 
     @include_files
