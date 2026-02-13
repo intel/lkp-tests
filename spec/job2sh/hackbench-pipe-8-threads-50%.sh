@@ -60,7 +60,7 @@ run_job()
 	run_monitor $LKP_SRC/monitors/wrapper mpstat
 	run_monitor debug_mode=0 $LKP_SRC/monitors/no-stdout/wrapper perf-profile
 
-	run_test mode='threads' ipc='pipe' $LKP_SRC/tests/wrapper hackbench
+	run_test mode='threads' ipc='pipe' $LKP_SRC/bin/run-test hackbench
 }
 
 

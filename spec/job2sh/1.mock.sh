@@ -22,13 +22,13 @@ run_job()
 
 	export_top_env
 
-	run_setup $LKP_SRC/setup/wrapper mysetup 'mock_arg'
+	run_setup $LKP_SRC/bin/run-setup mysetup 'mock_arg'
 
-	run_setup $LKP_SRC/setup/wrapper mysetup2
+	run_setup $LKP_SRC/bin/run-setup mysetup2
 
-	run_test mode='thread' test='writeseek3' $LKP_SRC/tests/wrapper myprog
+	run_test mode='thread' test='writeseek3' $LKP_SRC/bin/run-test myprog
 
-	start_daemon $LKP_SRC/daemon/wrapper mydaemon
+	start_daemon $LKP_SRC/bin/run-daemon mydaemon
 }
 
 

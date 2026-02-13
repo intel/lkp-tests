@@ -106,9 +106,9 @@ run_job()
 
 	export_top_env
 
-	run_setup $LKP_SRC/setup/wrapper cpufreq_governor 'performance'
+	run_setup $LKP_SRC/bin/run-setup cpufreq_governor 'performance'
 
-	run_setup $LKP_SRC/setup/wrapper sanity-check
+	run_setup $LKP_SRC/bin/run-setup sanity-check
 
 	run_monitor $LKP_SRC/monitors/wrapper kmsg
 	run_monitor $LKP_SRC/monitors/no-stdout/wrapper boot-time
@@ -143,12 +143,12 @@ run_job()
 
 	if role server
 	then
-		start_daemon $LKP_SRC/daemon/wrapper sockperf-server
+		start_daemon $LKP_SRC/bin/run-daemon sockperf-server
 	fi
 
 	if role client
 	then
-		run_test msg_size='1472b' $LKP_SRC/tests/wrapper sockperf
+		run_test msg_size='1472b' $LKP_SRC/bin/run-test sockperf
 	fi
 }
 

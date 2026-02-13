@@ -105,16 +105,16 @@ class Job2sh < Job
     when /programs\/.+\/run$/
       # fake the program_dir to be used by later program_dir comparison
       program_dir = File.join(File.dirname(program_path), 'tests')
-      wrapper = File.join(lkp_src, 'tests', 'wrapper')
+      wrapper = File.join(lkp_src, 'bin', 'run-test')
     when /programs\/.+\/parse$/
       program_dir = File.join(File.dirname(program_path), 'stats')
       wrapper = File.join(lkp_src, 'stats', 'wrapper')
     when /\/daemon$/
       program_dir = File.join(File.dirname(program_path), 'daemon')
-      wrapper = File.join(lkp_src, 'daemon', 'wrapper')
+      wrapper = File.join(lkp_src, 'bin', 'run-daemon')
     when /\/setup$/
       program_dir = File.join(File.dirname(program_path), 'setup')
-      wrapper = File.join(lkp_src, 'setup', 'wrapper')
+      wrapper = File.join(lkp_src, 'bin', 'run-setup')
     else
       program_dir = File.dirname(program_path)
       wrapper = "#{program_dir}/wrapper"
