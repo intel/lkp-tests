@@ -139,6 +139,9 @@ RSpec/NoExpectationExample:
     - ^expect_
     - ^verify_
 
+RSpec/SpecFilePathFormat:
+  Enabled: false
+
 Security/Eval:
   Enabled: false
 
