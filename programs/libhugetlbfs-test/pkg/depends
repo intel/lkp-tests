@@ -2,6 +2,7 @@ autoconf
 automake
 gcc-multilib
 git
+libc6-dev-i386
 make
 python
 python-pkg-resources
