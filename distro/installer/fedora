@@ -1,3 +1,4 @@
 #!/bin/sh
 
+# shellcheck disable=SC2048
 dnf -y install $*

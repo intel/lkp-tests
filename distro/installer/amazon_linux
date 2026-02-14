@@ -15,4 +15,5 @@ elif [[ "$_system_version" = "2023" ]]; then
 	extra_option="--allowerasing"
 fi
 
+# shellcheck disable=SC2048
 ${package_manager} install -y "$extra_option" $*

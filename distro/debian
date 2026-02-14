@@ -19,7 +19,9 @@ add_i386_package()
 
 download()
 {
+	# shellcheck disable=SC2048
 	echo apt-get download $*
+	# shellcheck disable=SC2048
 	apt-get download $* || apt-get download $*
 }
 
