@@ -26,6 +26,7 @@ need_kconfig:
 - DM_DUST
 % elsif job['fs'] == "bcachefs"
 - BCACHEFS_FS: m
+- BCACHEFS_QUOTA: y
 % end
 
 - FS_ENCRYPTION: y
