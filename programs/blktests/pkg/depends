@@ -1,6 +1,5 @@
 blktrace
 bsdextrautils
-build-essential
 cryptsetup
 dosfstools
 e2fsprogs
@@ -34,6 +33,7 @@ libsqlite3-0
 libssl-dev
 libtasn1-6
 libtirpc
+liburing
 multipath-tools
 nbd-client
 nbd-server

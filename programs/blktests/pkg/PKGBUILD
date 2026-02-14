@@ -21,6 +21,7 @@ build_util_linux()
 build_blktests()
 {
 	make_src_pkg
+	make -C src miniublk
 }
 
 build()

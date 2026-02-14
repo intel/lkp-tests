@@ -25,31 +25,45 @@ set_env()
 	nbd-*|loop-*)
 		partition=""
 		;;
-	scsi-*)
+	scsi-*|block-*)
 		partition=${partitions%% *}
-		is_virt && partition=$(echo "$partition" | sed 's/[0-9]*$//g')
+		# block/019 and block/011 need a whole disk to test PCI hotplug
+		if [[ "$test" == "block-019" ]] || [[ "$test" == "block-011" ]] || is_virt; then
+			if [[ "$partition" =~ nvme ]]; then
+				# strip 'p1' from 'nvme0n1p1'
+				partition=${partition%p[0-9]*}
+			else
+				# strip '1' from 'sda1'
+				partition=${partition%%[0-9]*}
+			fi
+		fi
+		[[ "$test" == "block-004" ]] && log_eval export TIMEOUT=300
 		;;
 	srp-*)
 		log_cmd systemctl stop multipathd
-		;;
-	block-004)
-		log_eval export TIMEOUT=300
 		;;
 	*)
 		partition=${partitions%% *}
 		;;
 	esac
 
-	if [ -n "$partition" ]; then
+	if [[ -n "$partition" ]]; then
 		echo "TEST_DEVS=$partition" > config
-		[ "${test%%-*}" = "nvme" ] && log_cmd mkdir -p /mnt/$test && log_cmd mount $partition /mnt/$test
+		if [[ "${test%%-*}" == "nvme" ]]; then
+			log_cmd mkdir -p /mnt/$test && log_cmd mount $partition /mnt/$test
+		else
+			umount "${partition}"* 2>/dev/null || true
+		fi
 	fi
 
-	[ "$nvme_trtype" ] && echo "nvme_trtype=$nvme_trtype" >> config
-	[ "$use_siw" = "true" ] && echo "use_siw=1" >> config
+	[[ "$nvme_trtype" ]] && echo "nvme_trtype=$nvme_trtype" >> config
+	[[ "$use_siw" == "true" ]] && echo "use_siw=1" >> config
 
 	# fix the issue: losetup: cannot find an unused loop device
 	lsmod | grep -q loop || modprobe loop
+
+	# # fix the issue: module scsi_debug is not available
+	# lsmod | grep -q scsi_debug || modprobe scsi_debug
 
 	# fix blkzone is not available
 	ln -sf $BENCHMARK_ROOT/blktests/util-linux/blkzone /usr/bin/blkzone
@@ -58,34 +72,36 @@ set_env()
 run_test()
 {
 	local test_dir="$BENCHMARK_ROOT/blktests/tests"
-
 	local all_tests
 
-	if [ "${test%[a-z4]-[0-9][0-9][0-9]}" != "$test" ]; then # single test
-		log_echo "echo ${test%-*}/${test#*-}"
-		all_tests=$(echo "${test%-*}/${test#*-}")
-	elif [ "${test#*-}" != "$test" ]; then # group tests
-		log_echo "sed \"s:^:${test%%-*}/:\" $test_dir/$test"
-		all_tests=$(sed "s:^:${test%%-*}/:" "$test_dir/$test")
+	if [[ "$test" =~ -[0-9]{3}$ ]]; then # single test
+		all_tests="${test%-*}/${test##*-}"
+		log_echo "echo $all_tests"
+	elif [[ "$test" == *-* ]]; then # group tests
+		local group="${test%%-*}"
+		log_echo "sed \"s:^:${group}/:\" $test_dir/$test"
+		all_tests=$(sed "s:^:${group}/:" "$test_dir/$test")
 	else
 		all_tests="$test"
 	fi
 
-	case "$test" in
-	nvme-*)
-		log_cmd ./check -o /mnt/$test $all_tests
-		;;
-	*)
-		log_cmd ./check $all_tests
-		;;
-	esac
+	[[ -z "$all_tests" ]] && die "no tests found for $test"
+
+	local args=()
+	[[ "$test" == nvme-* ]] && args+=(-o "/mnt/$test")
+
+	local tests_array=()
+	mapfile -t tests_array <<< "$all_tests"
+	args+=("${tests_array[@]}")
+
+	log_cmd ./check "${args[@]}"
 }
 
 read_env_vars
 set_env
 run_test
 
-[ -d "$BENCHMARK_ROOT/blktests/results" ] && upload_files -t results $BENCHMARK_ROOT/blktests/results/*
-[ -d "/mnt/$test/nodev" ] && upload_files -t results /mnt/$test/nodev/*
+[[ -d "$BENCHMARK_ROOT/blktests/results" ]] && upload_files -t results $BENCHMARK_ROOT/blktests/results/*
+[[ -d "/mnt/$test/nodev" ]] && upload_files -t results /mnt/$test/nodev/*
 
 exit 0

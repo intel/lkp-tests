@@ -1,9 +1,12 @@
 autopoint
+build-essential
 gettext
 libcap-ng-dev
 libncurses-dev
 libpam0g-dev
+libreadline-dev
 libsqlite3-dev
+liburing-dev
 linux-libc-dev
 python-dev
 uuid-runtime
