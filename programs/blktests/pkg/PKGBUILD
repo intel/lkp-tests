@@ -10,14 +10,6 @@ md5sums=('SKIP' 'SKIP')
 . $LKP_SRC/lib/install.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
-build_util_linux()
-{
-	cd_src_pkg_dir util-linux
-	./autogen.sh
-	./configure
-	make
-}
-
 build_blktests()
 {
 	make_src_pkg

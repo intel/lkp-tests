@@ -7,14 +7,14 @@ license=('GPL')
 source=('https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git'
 	'https://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git'
 	'https://git.kernel.org/pub/scm/linux/kernel/git/djwong/e2fsprogs.git'
-	'https://github.com/koverstreet/bcachefs-tools.git#tag=v1.25.3')
-md5sums=('SKIP' 'SKIP' 'SKIP' 'SKIP')
+	'https://github.com/koverstreet/bcachefs-tools.git#tag=v1.25.3'
+	'https://github.com/karelzak/util-linux.git')
+md5sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
+. $LKP_SRC/lib/detect-system.sh
+. $LKP_SRC/lib/install.sh
 . $LKP_SRC/lib/tests/common.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
-. $LKP_SRC/lib/install.sh
-. $LKP_SRC/lib/tests/pkgbuild.sh
-. $LKP_SRC/lib/detect-system.sh
 
 build_install_xfstests()
 {
@@ -162,6 +162,7 @@ build()
 	mkdir -p ${benchmark_path}/tests
 
 	build_install_xfstests
+	build_util_linux
 	build_install_f2fs_tools
 
 	build_install_e2fuzz
@@ -176,6 +177,7 @@ build()
 package()
 {
 	pack_contents "$srcdir/xfstests-dev/*" $benchmark_path
+	pack_contents "$srcdir/util-linux" "$benchmark_path"
 
 	[ -d "$CARGO_HOME" ] && pack_contents $CARGO_HOME
 

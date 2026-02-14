@@ -423,3 +423,12 @@ package()
 {
 	pack_src_pkg_contents
 }
+
+build_util_linux()
+{
+	cd_src_pkg_dir util-linux
+
+	./autogen.sh
+	./configure
+	make
+}

@@ -40,6 +40,5 @@ sed
 thin-provisioning-tools
 udev
 udftools
-uuid-runtime
 xfsdump
 zlib1g

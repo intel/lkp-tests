@@ -13,7 +13,10 @@ libicu-dev
 libiscsi-dev
 libkeyutils-dev
 liblz4-dev
+libncurses-dev
+libreadline-dev
 libsodium-dev
+libsqlite3-dev
 libtool-bin
 libudev-dev
 liburcu-dev
