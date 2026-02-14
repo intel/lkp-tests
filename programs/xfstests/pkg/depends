@@ -2,8 +2,6 @@ acct
 acl
 attr
 bc
-btrfs-progs
-btrfs-tools
 build-essential
 dbench
 devscripts

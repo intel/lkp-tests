@@ -8,8 +8,9 @@ source=('https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git'
 	'https://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git'
 	'https://git.kernel.org/pub/scm/linux/kernel/git/djwong/e2fsprogs.git'
 	'https://github.com/koverstreet/bcachefs-tools.git#tag=v1.25.3'
+	'https://github.com/kdave/btrfs-progs.git'
 	'https://github.com/karelzak/util-linux.git')
-md5sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+md5sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 . $LKP_SRC/lib/detect-system.sh
 . $LKP_SRC/lib/install.sh
@@ -27,6 +28,19 @@ build_install_xfstests()
 	## Currently, ./configure file can't work with "--prefix" option correctly,
 	## so we just use the "make" command to generate the execuable file.
 	make
+}
+
+build_install_btrfs_progs()
+{
+	cd_src_pkg_dir btrfs-progs
+
+	# fix the build issue
+	sed -i 's/sphinx-build-3/sphinx-build/g' Makefile
+
+	./autogen.sh
+	./configure
+	make
+	make install DESTDIR="${pkgdir}"
 }
 
 build_install_bcachefs_tools()
@@ -164,6 +178,7 @@ build()
 	build_install_xfstests
 	build_util_linux
 	build_install_f2fs_tools
+	build_install_btrfs_progs
 
 	build_install_e2fuzz
 
