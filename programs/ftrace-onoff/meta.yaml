@@ -1,8 +1,13 @@
 short_description: >
+  Ftrace is an internal tracer designed to help out developers and designers
+  of systems to find what is going on inside the kernel.
 
 description: >
+  It can be used for debugging or analyzing latencies and performance issues
+  that take place outside of user-space.
+  This test iterates over available tracers, enabling and disabling them.
 
-homepage:
+homepage: https://www.kernel.org/doc/html/latest/trace/ftrace.html
 
 parameters:
   runtime:
