@@ -101,3 +101,94 @@ EOF
     end
   end
 end
+
+describe 'yaml_merge_included_files with ignore' do
+  let(:include_content) do
+    <<~YAML
+      key1: value1
+      key2: value2
+      key3: value3
+      disk: some_disk
+      d: some_d
+      key_spaced : value_spaced
+      nested_parent:
+        nested_child: value_child
+    YAML
+  end
+  let(:include_filename) { '/tmp/temp_include_ignore.yaml' }
+  # Ensure clean absolute path for verify
+  let(:absolute_path) { include_filename }
+
+  before do
+    File.write(include_filename, include_content)
+  end
+
+  after do
+    FileUtils.rm_f(include_filename)
+  end
+
+  it 'ignores keys with unquoted filename' do
+    yaml_input = "<<: #{absolute_path}, ignore: :key1"
+    merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
+    result = YAML.unsafe_load(merged_yaml)
+
+    expect(result).not_to have_key('key1')
+    expect(result['key2']).to eq 'value2'
+  end
+
+  it 'overrides keys directly in include line' do
+    yaml_input = "<<: '#{absolute_path}', ignore: :key1, key2: 'value_new'"
+    merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
+    result = YAML.unsafe_load(merged_yaml)
+
+    expect(result).not_to have_key('key1')
+    expect(result['key2']).to eq 'value_new'
+  end
+
+  it 'overrides keys using unquoted filename syntax' do
+    yaml_input = "<<: #{absolute_path}, key2: 'value_override'"
+    merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
+    result = YAML.unsafe_load(merged_yaml)
+
+    expect(result['key2']).to eq 'value_override'
+  end
+
+  it 'ignores a single key' do
+    yaml_input = "<<: '#{absolute_path}', ignore: :key1"
+    # Use dirname matching the file location or absolute path
+    merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
+    result = YAML.unsafe_load(merged_yaml)
+
+    expect(result).not_to have_key('key1')
+    expect(result['key2']).to eq 'value2'
+  end
+
+  it 'ignores multiple keys' do
+    yaml_input = "<<: '#{absolute_path}', ignore: [:key1, :key3]"
+    merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
+    result = YAML.unsafe_load(merged_yaml)
+
+    expect(result).not_to have_key('key1')
+    expect(result).not_to have_key('key3')
+    expect(result['key2']).to eq 'value2'
+  end
+
+  it 'does not ignore partial matches' do
+    # Should ignore 'd' but keep 'disk'
+    yaml_input = "<<: '#{absolute_path}', ignore: :d"
+    merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
+    result = YAML.unsafe_load(merged_yaml)
+
+    expect(result).not_to have_key('d')
+    expect(result['disk']).to eq 'some_disk'
+  end
+
+  it 'supports IRB style array of ignore symbols' do
+    yaml_input = "<<: '#{absolute_path}', ignore: [:key1, :key3]"
+    merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
+    result = YAML.unsafe_load(merged_yaml)
+
+    expect(result).not_to have_key('key1')
+    expect(result).not_to have_key('key3')
+  end
+end

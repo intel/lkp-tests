@@ -98,14 +98,64 @@ def search_file_in_paths(file, relative_to = nil, search_paths = nil)
   nil
 end
 
+def parse_include_content(content)
+  begin
+    args = eval("[#{content}]")
+  rescue SyntaxError, NameError
+    # Support unquoted filenames (e.g. "file.yaml, ignore: keys")
+    # by quoting the part before the first comma.
+    begin
+      if (comma_index = content.index(','))
+        file_part = content[0...comma_index].strip
+        rest_part = content[comma_index..]
+        args = eval("['#{file_part}'#{rest_part}]")
+      else
+        args = [content.strip]
+      end
+    rescue SyntaxError, NameError
+      return [content, []]
+    end
+  end
+
+  return [content, {}] unless args.is_a?(Array) && args.first.is_a?(String)
+
+  file = args[0]
+  options = args[1]
+  options = {} unless options.is_a?(Hash)
+  [file, options]
+end
+
 def yaml_merge_included_files(yaml, relative_to, search_paths = nil)
   yaml.gsub(/(.*)<< *: +([^*\[].*)/) do |_match|
     prefix = $1
-    file = $2.chomp
+    content = $2.chomp
+
+    file, options = parse_include_content(content)
+    ignore_keys = options[:ignore] ? Array(options[:ignore]).map(&:to_s) : []
+    # Any option other than :ignore is treated as a key override to be appended
+    overrides = options.except(:ignore)
+
     path = search_file_in_paths file, relative_to, search_paths
     raise "included yaml file not found | file: #{file}, relative_to: #{relative_to}, search_paths: #{search_paths}" unless path
 
     to_merge = File.read path
+
+    to_merge = to_merge.lines.grep_v(/^(#{ignore_keys.join('|')})\s*:/).join if ignore_keys.any?
+
+    overrides.each do |key, value|
+      # Append overrides at the correct indentation level
+      # Dump the value to YAML to handle quoting/types.
+      # YAML.dump(val) returns "---\nval\n", so we strip "--- " prefix or "---\n" prefix and the trailing newline.
+      yaml_val = YAML.dump(value).sub(/\A---\s*\n?/, '').chomp
+      pattern = /^(#{Regexp.escape(key)})\s*:\s+.*$/
+
+      if to_merge.match?(pattern)
+        to_merge = to_merge.gsub(pattern, "#{key}: #{yaml_val}")
+      else
+        to_merge += "\n#{key}: #{yaml_val}"
+      end
+    end
+
     indent = prefix.tr '^ ', ' '
     indented = [prefix]
     to_merge.split("\n").each do |line|
@@ -115,6 +165,7 @@ def yaml_merge_included_files(yaml, relative_to, search_paths = nil)
                     indent + line
                   end
     end
+
     indented.join("\n")
   end
 end
