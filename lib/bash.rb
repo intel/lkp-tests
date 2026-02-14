@@ -67,6 +67,11 @@ module Bash
       raise TimeoutError, args.join(' ')
     end
 
+    def safe_grep(*args, **options, &)
+      options[:returns] = [0, 1]
+      run(*args, **options, &)
+    end
+
     private
 
     def prepare_args(args, unsetenv_others)

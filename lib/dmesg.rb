@@ -95,7 +95,7 @@ end
 def concat_context_from_dmesg(dmesg_file, line)
   line = line.resolve_invalid_bytes
   if line =~ /(possible recursive locking detected|possible circular locking dependency detected)/
-    lines = Bash.run("#{grep_cmd(dmesg_file)} -A30 -Fx \"#{line.chomp}\" #{dmesg_file} | grep -m4 -e \"trying to acquire lock\" -e \"already holding lock\" -e \"at: .*\" | sed 's/^.* at:/at:/'").chomp.split("\n")
+    lines = Bash.safe_grep("#{grep_cmd(dmesg_file)} -A30 -Fx \"#{line.chomp}\" #{dmesg_file} | grep -m4 -e \"trying to acquire lock\" -e \"already holding lock\" -e \"at: .*\" | sed 's/^.* at:/at:/'").chomp.split("\n")
     unless lines.empty?
       new_line = "#{line.chomp} #{lines.map { |l| l.sub(/^\[.*\] /, '') }.join(' ')}"
       return [line, new_line]
@@ -105,7 +105,7 @@ def concat_context_from_dmesg(dmesg_file, line)
 end
 
 def grep_crash_head(dmesg_file)
-  raw_oops = Bash.run("#{grep_cmd(dmesg_file)} -a -E -e \\\\+0x -f #{LKP_SRC_ETC}/oops-pattern #{dmesg_file} | grep -v -E -f #{LKP_SRC_ETC}/oops-pattern-ignore")
+  raw_oops = Bash.safe_grep("#{grep_cmd(dmesg_file)} -a -E -e \\\\+0x -f #{LKP_SRC_ETC}/oops-pattern #{dmesg_file} | grep -v -E -f #{LKP_SRC_ETC}/oops-pattern-ignore")
 
   return {} if raw_oops.empty?
 
@@ -159,7 +159,7 @@ def grep_printk_errors(kmsg_file, kmsg)
 
   if kmsg_file =~ /\bkmsg\b/
     # the kmsg file is dumped inside the running kernel
-    oops = Bash.run("#{grep} -a -E -e 'segfault at' -e '^<[0123]>' -e '^kern  :(err   |crit  |alert |emerg ): ' #{kmsg_file} |
+    oops = Bash.safe_grep("#{grep} -a -E -e 'segfault at' -e '^<[0123]>' -e '^kern  :(err   |crit  |alert |emerg ): ' #{kmsg_file} |
       sed -r 's/\\x1b\\[([0-9;]+m|[mK])//g' |
       grep -a -v -E -f #{LKP_SRC_ETC}/oops-pattern |
       grep -a -v -F -f #{LKP_SRC_ETC}/kmsg-denylist.raw;
@@ -172,13 +172,13 @@ def grep_printk_errors(kmsg_file, kmsg)
     return '' unless File.exist?("#{KTEST_USER_GENERATED_DIR}/printk-error-messages")
 
     # the dmesg file is from serial console
-    oops = Bash.run("#{grep} -a -F -f #{KTEST_USER_GENERATED_DIR}/printk-error-messages #{kmsg_file} |
+    oops = Bash.safe_grep("#{grep} -a -F -f #{KTEST_USER_GENERATED_DIR}/printk-error-messages #{kmsg_file} |
       grep -a -v -E -f #{LKP_SRC_ETC}/oops-pattern |
       grep -a -v -F -f #{LKP_SRC_ETC}/kmsg-denylist.raw;
       grep \"Kernel tests: Boot OK\" #{kmsg_file};")
-    oops += Bash.run("grep -a -E -f #{LKP_SRC_ETC}/ext4-crit-pattern #{kmsg_file}") if kmsg.index 'EXT4-fs ('
-    oops += Bash.run("grep -a -E -f #{LKP_SRC_ETC}/xfs-alert-pattern #{kmsg_file}") if kmsg.index 'XFS ('
-    oops += Bash.run("grep -a -E -f #{LKP_SRC_ETC}/btrfs-crit-pattern #{kmsg_file}") if kmsg.index 'btrfs: '
+    oops += Bash.safe_grep("#{grep} -a -E -f #{LKP_SRC_ETC}/ext4-crit-pattern #{kmsg_file}") if kmsg.index 'EXT4-fs ('
+    oops += Bash.safe_grep("#{grep} -a -E -f #{LKP_SRC_ETC}/xfs-alert-pattern #{kmsg_file}") if kmsg.index 'XFS ('
+    oops += Bash.safe_grep("#{grep} -a -E -f #{LKP_SRC_ETC}/btrfs-crit-pattern #{kmsg_file}") if kmsg.index 'btrfs: '
   end
   oops
 end

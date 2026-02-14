@@ -111,12 +111,12 @@ job['tbox_group'] = tbox_group(HOSTNAME)
 job['kconfig'] ||= 'defconfig'
 job['commit'] ||= Bash.run('uname -r')
 job['rootfs'] ||= if File.exist? '/etc/os-release'
-                    Bash.run('grep -m1 ^ID= /etc/os-release').split('=')[1].chomp
+                    (Bash.safe_grep('grep -m1 ^ID= /etc/os-release').split('=')[1] || '').chomp
                   else
                     distro
                   end
 job['nr_cpu'] ||= Etc.nprocessors
-job['memory'] ||= Bash.run("grep -w '^memory:' #{LKP_SRC}/hosts/#{HOSTNAME}").split[1].chomp
+job['memory'] ||= (Bash.safe_grep("grep -w '^memory:' #{LKP_SRC}/hosts/#{HOSTNAME}").split[1] || '').chomp
 job['compiler'] ||= File.realpath('/usr/bin/gcc').match(/gcc.*/).to_s
 job['compiler'] = 'gcc' if job['compiler'].empty?
 job['NO_NETWORK'] = 1

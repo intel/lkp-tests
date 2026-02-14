@@ -343,7 +343,7 @@ module DataStore
       end
 
       files.each do |ifn|
-        Bash.run("strings #{ifn} | sed 's#$#/#' | #{grep_cmdline} #{ext_grep_cmdline}").lines.reverse!.each do |line|
+        Bash.safe_grep("strings #{ifn} | sed 's#$#/#' | #{grep_cmdline} #{ext_grep_cmdline}").lines.reverse!.each do |line|
           line = line.strip.sub(/\/$/, '')
           yield line unless line.empty?
         end

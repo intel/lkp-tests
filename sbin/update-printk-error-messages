@@ -142,7 +142,7 @@ nr_line_short = 0
 
 kmsg_denylist = File.read(LKP::Path.src('etc', 'kmsg-denylist.raw')).split "\n"
 
-Bash.run("git grep -A1 -E '(#{PRINTK_PATTERNS})' #{options[:kernel]} -- #{DIRS_TO_GREP} | grep -o '\".*\"'").each_line do |line|
+Bash.safe_grep("git grep -A1 -E '(#{PRINTK_PATTERNS})' #{options[:kernel]} -- #{DIRS_TO_GREP} | grep -o '\".*\"'").each_line do |line|
   line = line[1..-3]
   next if line =~ /"/
 
