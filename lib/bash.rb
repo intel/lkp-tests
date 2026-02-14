@@ -15,13 +15,7 @@ module Bash
       @stderr = stderr
       @exitstatus = exitstatus
 
-      super("Command failed with exit #{exitstatus}: #{truncate(command)}")
-    end
-
-    private
-
-    def truncate(str, limit = 100)
-      str.length > limit ? "#{str[0...limit]}..." : str
+      super("Command failed with exit #{exitstatus}: #{command}")
     end
   end
 
