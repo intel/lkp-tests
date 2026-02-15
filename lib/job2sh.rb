@@ -108,13 +108,25 @@ class Job2sh < Job
       wrapper = File.join(lkp_src, 'bin', 'run-test')
     when /programs\/.+\/parse$/
       program_dir = File.join(File.dirname(program_path), 'stats')
-      wrapper = File.join(lkp_src, 'stats', 'wrapper')
+      wrapper = File.join(lkp_src, 'bin', 'run-stats')
     when /\/daemon$/
       program_dir = File.join(File.dirname(program_path), 'daemon')
       wrapper = File.join(lkp_src, 'bin', 'run-daemon')
+    when /\/monitor$/
+      program_dir = File.join(File.dirname(program_path), 'monitors')
+      wrapper = File.join(lkp_src, 'bin', 'run-monitor')
+    when /\/no-stdout-monitor$/
+      program_dir = File.join(File.dirname(program_path), 'monitors')
+      wrapper = File.join(lkp_src, 'bin', 'run-no-stdout-monitor')
+    when /\/one-shot-monitor$/
+      program_dir = File.join(File.dirname(program_path), 'monitors')
+      wrapper = File.join(lkp_src, 'bin', 'run-one-shot-monitor')
     when /\/setup$/
       program_dir = File.join(File.dirname(program_path), 'setup')
       wrapper = File.join(lkp_src, 'bin', 'run-setup')
+    when /\/stats\//
+      program_dir = File.dirname(program_path)
+      wrapper = File.join(lkp_src, 'bin', 'run-stats')
     else
       program_dir = File.dirname(program_path)
       wrapper = "#{program_dir}/wrapper"
@@ -145,7 +157,7 @@ class Job2sh < Job
       command << 'start_daemon'
     when %r{/tests$}
       command << 'run_test'
-      @stats_lines << "\t$LKP_SRC/stats/wrapper time #{program}.time"
+      @stats_lines << "\t$LKP_SRC/bin/run-stats time #{program}.time"
     else
       command << 'env' unless program_env.empty?
     end

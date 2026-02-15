@@ -9,4 +9,8 @@ myprog:
   mode: thread
   test: writeseek3
 
+mymonitor:
+mymonitor2:
+mymonitor3:
+
 mydaemon:

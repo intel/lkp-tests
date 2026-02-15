@@ -95,7 +95,6 @@ def __create_programs_hash(glob, lkp_src)
     end
 
     file = glob =~ /^programs\// || glob =~ /^\*\/(setup|daemon)$/ ? path.split('/')[-2] : File.basename(path)
-    next if file == 'wrapper'
 
     if programs.include? file
       log_error "Conflict names #{programs[file]} and #{path}"
@@ -435,10 +434,15 @@ class Job
           tests: 'run',
           stats: 'parse',
           setup: 'setup',
-          daemon: 'daemon'
+          daemon: 'daemon',
+          monitors: 'monitor'
         }[type]
 
         programs = programs.merge create_programs_hash("programs/*/#{script_name}", lkp_src) if script_name
+        if type == :monitors
+          programs = programs.merge create_programs_hash("programs/*/no-stdout-monitor", lkp_src)
+          programs = programs.merge create_programs_hash("programs/*/one-shot-monitor", lkp_src)
+        end
         programs
       end
   end

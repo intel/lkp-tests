@@ -5,9 +5,9 @@
 program=$1
 program_dir=$(dirname "$0")
 
-runner_path=$program_dir/$program
-[ -x "$runner_path" ] || runner_path=$LKP_SRC/programs/$program/setup
+program_path=$program_dir/$program
+[ -x "$program_path" ] || program_path=$LKP_SRC/programs/$program/setup
 
 shift
 
-[ -x "$runner_path" ] && exec "$runner_path" "$@"
+[ -x "$program_path" ] && exec "$program_path" "$@"

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+program=$1
+program_dir=$(dirname $0)
+shift
+
+program_path=$program_dir/$program
+[ -x "$program_path" ] || program_path=$LKP_SRC/monitors/$program
+[ -x "$program_path" ] || program_path=$LKP_SRC/programs/$program/monitor
+
+$program_path "$@" > $TMP_RESULT_ROOT/$program

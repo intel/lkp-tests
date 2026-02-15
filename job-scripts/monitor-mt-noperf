@@ -31,16 +31,16 @@ run_job()
 	. $LKP_SRC/lib/job.sh
 	. $LKP_SRC/lib/env.sh
 
-	run_monitor $LKP_SRC/monitors/wrapper numa-meminfo
-	run_monitor $LKP_SRC/monitors/wrapper numa-vmstat
-	run_monitor $LKP_SRC/monitors/wrapper slabinfo
-	run_monitor $LKP_SRC/monitors/wrapper zoneinfo
-	run_monitor $LKP_SRC/monitors/wrapper buddyinfo
-	run_monitor $LKP_SRC/monitors/wrapper vmstat
-	run_monitor $LKP_SRC/monitors/wrapper proc-vmstat
-	run_monitor $LKP_SRC/monitors/wrapper meminfo
+	run_monitor $LKP_SRC/bin/run-monitor numa-meminfo
+	run_monitor $LKP_SRC/bin/run-monitor numa-vmstat
+	run_monitor $LKP_SRC/bin/run-monitor slabinfo
+	run_monitor $LKP_SRC/bin/run-monitor zoneinfo
+	run_monitor $LKP_SRC/bin/run-monitor buddyinfo
+	run_monitor $LKP_SRC/bin/run-monitor vmstat
+	run_monitor $LKP_SRC/bin/run-monitor proc-vmstat
+	run_monitor $LKP_SRC/bin/run-monitor meminfo
 
-	run_test $LKP_SRC/tests/wrapper mytest
+	run_test $LKP_SRC/bin/run-test mytest
 }
 
 extract_stats()
@@ -48,21 +48,21 @@ extract_stats()
 	export stats_part_begin=
 	export stats_part_end=
 
-	$LKP_SRC/stats/wrapper numa-meminfo
-	$LKP_SRC/stats/wrapper numa-vmstat
-	$LKP_SRC/stats/wrapper slabinfo
-	$LKP_SRC/stats/wrapper zoneinfo
-	$LKP_SRC/stats/wrapper buddyinfo
-	$LKP_SRC/stats/wrapper vmstat
-	$LKP_SRC/stats/wrapper proc-vmstat
-	$LKP_SRC/stats/wrapper meminfo
+	$LKP_SRC/bin/run-stats numa-meminfo
+	$LKP_SRC/bin/run-stats numa-vmstat
+	$LKP_SRC/bin/run-stats slabinfo
+	$LKP_SRC/bin/run-stats zoneinfo
+	$LKP_SRC/bin/run-stats buddyinfo
+	$LKP_SRC/bin/run-stats vmstat
+	$LKP_SRC/bin/run-stats proc-vmstat
+	$LKP_SRC/bin/run-stats meminfo
 
-	$LKP_SRC/stats/wrapper time mytest.time
-	$LKP_SRC/stats/wrapper dmesg
-	$LKP_SRC/stats/wrapper kmsg
-	$LKP_SRC/stats/wrapper last_state
-	$LKP_SRC/stats/wrapper stderr
-	$LKP_SRC/stats/wrapper time
+	$LKP_SRC/bin/run-stats time mytest.time
+	$LKP_SRC/bin/run-stats dmesg
+	$LKP_SRC/bin/run-stats kmsg
+	$LKP_SRC/bin/run-stats last_state
+	$LKP_SRC/bin/run-stats stderr
+	$LKP_SRC/bin/run-stats time
 }
 
 "$@"

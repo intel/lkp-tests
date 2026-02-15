@@ -11,8 +11,8 @@
 program=$1
 program_dir=$(dirname $0)
 
-runner_path=$program_dir/$program
-[ -x $runner_path ] || runner_path=$LKP_SRC/programs/$program/run
+program_path=$program_dir/$program
+[ -x $program_path ] || program_path=$LKP_SRC/programs/$program/run
 
 # Prefer to OOM kill job runner first.
 # This prevents some server/client test cases from blocking on OOM.
@@ -72,7 +72,7 @@ if [ -n "$nr_instances" ]; then
 			setup_cgroup "$cg"
 			numa_bind=$(numa_node_binding "$i")
 			[ -n "$numa_bind" ] && exec_prefix="$oexec_prefix $numa_bind"
-			$time_prefix $exec_prefix $runner_path "$@" > "$TMP_RESULT_ROOT/log-$program/$i" &
+			$time_prefix $exec_prefix $program_path "$@" > "$TMP_RESULT_ROOT/log-$program/$i" &
 			to_wait="$to_wait $!"
 			i=$((i+1))
 			[ "$i" -gt "$nr_instances" ] && break
@@ -85,5 +85,5 @@ if [ -n "$nr_instances" ]; then
 else
 	export nr_instances=1
 	export instance_id=1
-	exec $time_prefix $exec_prefix $runner_path "$@" > $fifo
+	exec $time_prefix $exec_prefix $program_path "$@" > $fifo
 fi

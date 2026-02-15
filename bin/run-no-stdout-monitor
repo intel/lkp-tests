@@ -1,0 +1,15 @@
+#!/bin/sh
+
+program=$1
+program_dir=$(dirname $0)
+shift
+
+echo $$ >> $TMP/pid-bg-proc-$program
+
+$LKP_SRC/bin/event/wait 'activate-monitor'
+
+program_path=$program_dir/$program
+[ -x "$program_path" ] || program_path=$LKP_SRC/monitors/$program
+[ -x "$program_path" ] || program_path=$LKP_SRC/programs/$program/monitor
+
+exec $program_path "$@"

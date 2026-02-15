@@ -26,6 +26,10 @@ run_job()
 
 	run_setup $LKP_SRC/bin/run-setup mysetup2
 
+	run_monitor $LKP_SRC/bin/run-monitor mymonitor
+	run_monitor $LKP_SRC/bin/run-no-stdout-monitor mymonitor2
+	run_monitor $LKP_SRC/bin/run-one-shot-monitor mymonitor3
+
 	run_test mode='thread' test='writeseek3' $LKP_SRC/bin/run-test myprog
 
 	start_daemon $LKP_SRC/bin/run-daemon mydaemon
@@ -37,10 +41,13 @@ extract_stats()
 	export stats_part_begin=
 	export stats_part_end=
 
-	$LKP_SRC/stats/wrapper mysetup2
-	env mode='thread' test='writeseek3' $LKP_SRC/stats/wrapper myprog
+	$LKP_SRC/bin/run-stats mysetup2
+	env mode='thread' test='writeseek3' $LKP_SRC/bin/run-stats myprog
+	$LKP_SRC/bin/run-stats mymonitor
+	$LKP_SRC/bin/run-stats mymonitor2
+	$LKP_SRC/bin/run-stats mymonitor3
 
-	$LKP_SRC/stats/wrapper time myprog.time
+	$LKP_SRC/bin/run-stats time myprog.time
 }
 
 

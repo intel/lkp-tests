@@ -104,8 +104,8 @@ run_job()
 
 	run_setup $LKP_SRC/bin/run-setup sanity-check
 
-	run_monitor $LKP_SRC/monitors/wrapper oom-killer
-	run_monitor $LKP_SRC/monitors/plain/watchdog
+	run_monitor $LKP_SRC/bin/run-monitor oom-killer
+	run_monitor $LKP_SRC/bin/run-monitor watchdog
 
 	run_test test='add' freq=10000 $LKP_SRC/bin/run-test ftq
 }
@@ -116,14 +116,14 @@ extract_stats()
 	export stats_part_begin=
 	export stats_part_end=
 
-	env test='add' freq=10000 $LKP_SRC/stats/wrapper ftq
+	env test='add' freq=10000 $LKP_SRC/bin/run-stats ftq
 
-	$LKP_SRC/stats/wrapper time ftq.time
-	$LKP_SRC/stats/wrapper dmesg
-	$LKP_SRC/stats/wrapper kmsg
-	$LKP_SRC/stats/wrapper last_state
-	$LKP_SRC/stats/wrapper stderr
-	$LKP_SRC/stats/wrapper time
+	$LKP_SRC/bin/run-stats time ftq.time
+	$LKP_SRC/bin/run-stats dmesg
+	$LKP_SRC/bin/run-stats kmsg
+	$LKP_SRC/bin/run-stats last_state
+	$LKP_SRC/bin/run-stats stderr
+	$LKP_SRC/bin/run-stats time
 }
 
 

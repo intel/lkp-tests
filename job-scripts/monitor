@@ -27,29 +27,29 @@ run_job()
 	. $LKP_SRC/lib/job.sh
 	. $LKP_SRC/lib/env.sh
 
-	run_monitor $LKP_SRC/monitors/wrapper iostat
-	run_monitor $LKP_SRC/monitors/wrapper vmstat
-	run_monitor $LKP_SRC/monitors/wrapper numa-numastat
-	run_monitor $LKP_SRC/monitors/wrapper numa-vmstat
-	run_monitor $LKP_SRC/monitors/wrapper numa-meminfo
-	run_monitor $LKP_SRC/monitors/wrapper proc-vmstat
-	run_monitor $LKP_SRC/monitors/wrapper proc-stat
-	run_monitor $LKP_SRC/monitors/wrapper meminfo
-	run_monitor $LKP_SRC/monitors/wrapper slabinfo
-	run_monitor $LKP_SRC/monitors/wrapper interrupts
-	run_monitor $LKP_SRC/monitors/wrapper lock_stat
-	run_monitor lite_mode=1 $LKP_SRC/monitors/wrapper perf-sched
-	run_monitor $LKP_SRC/monitors/wrapper softirqs
-	run_monitor $LKP_SRC/monitors/wrapper diskstats
-	run_monitor $LKP_SRC/monitors/wrapper cpuidle
-	run_monitor $LKP_SRC/monitors/wrapper cpufreq-stats
-	run_monitor $LKP_SRC/monitors/wrapper turbostat
-	run_monitor $LKP_SRC/monitors/wrapper sched_debug
-	run_monitor $LKP_SRC/monitors/wrapper perf-stat
-	run_monitor $LKP_SRC/monitors/wrapper mpstat
-	run_monitor debug_mode=1 $LKP_SRC/monitors/no-stdout/wrapper perf-profile
+	run_monitor $LKP_SRC/bin/run-monitor iostat
+	run_monitor $LKP_SRC/bin/run-monitor vmstat
+	run_monitor $LKP_SRC/bin/run-monitor numa-numastat
+	run_monitor $LKP_SRC/bin/run-monitor numa-vmstat
+	run_monitor $LKP_SRC/bin/run-monitor numa-meminfo
+	run_monitor $LKP_SRC/bin/run-monitor proc-vmstat
+	run_monitor $LKP_SRC/bin/run-monitor proc-stat
+	run_monitor $LKP_SRC/bin/run-monitor meminfo
+	run_monitor $LKP_SRC/bin/run-monitor slabinfo
+	run_monitor $LKP_SRC/bin/run-monitor interrupts
+	run_monitor $LKP_SRC/bin/run-monitor lock_stat
+	run_monitor lite_mode=1 $LKP_SRC/bin/run-monitor perf-sched
+	run_monitor $LKP_SRC/bin/run-monitor softirqs
+	run_monitor $LKP_SRC/bin/run-monitor diskstats
+	run_monitor $LKP_SRC/bin/run-monitor cpuidle
+	run_monitor $LKP_SRC/bin/run-monitor cpufreq-stats
+	run_monitor $LKP_SRC/bin/run-monitor turbostat
+	run_monitor $LKP_SRC/bin/run-monitor sched_debug
+	run_monitor $LKP_SRC/bin/run-monitor perf-stat
+	run_monitor $LKP_SRC/bin/run-monitor mpstat
+	run_monitor debug_mode=1 $LKP_SRC/bin/run-no-stdout-monitor perf-profile
 
-	run_test $LKP_SRC/tests/wrapper mytest
+	run_test $LKP_SRC/bin/run-test mytest
 }
 
 extract_stats()
@@ -57,32 +57,32 @@ extract_stats()
 	export stats_part_begin=
 	export stats_part_end=
 
-	$LKP_SRC/stats/wrapper iostat
-	$LKP_SRC/stats/wrapper vmstat
-	$LKP_SRC/stats/wrapper numa-numastat
-	$LKP_SRC/stats/wrapper numa-vmstat
-	$LKP_SRC/stats/wrapper numa-meminfo
-	$LKP_SRC/stats/wrapper proc-vmstat
-	$LKP_SRC/stats/wrapper meminfo
-	$LKP_SRC/stats/wrapper slabinfo
-	$LKP_SRC/stats/wrapper interrupts
-	$LKP_SRC/stats/wrapper lock_stat
-	env lite_mode=1 $LKP_SRC/stats/wrapper perf-sched
-	$LKP_SRC/stats/wrapper softirqs
-	$LKP_SRC/stats/wrapper diskstats
-	$LKP_SRC/stats/wrapper cpuidle
-	$LKP_SRC/stats/wrapper turbostat
-	$LKP_SRC/stats/wrapper sched_debug
-	$LKP_SRC/stats/wrapper perf-stat
-	$LKP_SRC/stats/wrapper mpstat
-	env debug_mode=1 $LKP_SRC/stats/wrapper perf-profile
+	$LKP_SRC/bin/run-stats iostat
+	$LKP_SRC/bin/run-stats vmstat
+	$LKP_SRC/bin/run-stats numa-numastat
+	$LKP_SRC/bin/run-stats numa-vmstat
+	$LKP_SRC/bin/run-stats numa-meminfo
+	$LKP_SRC/bin/run-stats proc-vmstat
+	$LKP_SRC/bin/run-stats meminfo
+	$LKP_SRC/bin/run-stats slabinfo
+	$LKP_SRC/bin/run-stats interrupts
+	$LKP_SRC/bin/run-stats lock_stat
+	env lite_mode=1 $LKP_SRC/bin/run-stats perf-sched
+	$LKP_SRC/bin/run-stats softirqs
+	$LKP_SRC/bin/run-stats diskstats
+	$LKP_SRC/bin/run-stats cpuidle
+	$LKP_SRC/bin/run-stats turbostat
+	$LKP_SRC/bin/run-stats sched_debug
+	$LKP_SRC/bin/run-stats perf-stat
+	$LKP_SRC/bin/run-stats mpstat
+	env debug_mode=1 $LKP_SRC/bin/run-stats perf-profile
 
-	$LKP_SRC/stats/wrapper time mytest.time
-	$LKP_SRC/stats/wrapper dmesg
-	$LKP_SRC/stats/wrapper kmsg
-	$LKP_SRC/stats/wrapper last_state
-	$LKP_SRC/stats/wrapper stderr
-	$LKP_SRC/stats/wrapper time
+	$LKP_SRC/bin/run-stats time mytest.time
+	$LKP_SRC/bin/run-stats dmesg
+	$LKP_SRC/bin/run-stats kmsg
+	$LKP_SRC/bin/run-stats last_state
+	$LKP_SRC/bin/run-stats stderr
+	$LKP_SRC/bin/run-stats time
 }
 
 "$@"

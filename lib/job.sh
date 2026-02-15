@@ -186,14 +186,14 @@ get_program_name()
 	for i
 	do
 		[ "$i" != "${i#*=}" ] && continue # skip env NAME=VALUE
-		[ "$i" != "${i%/wrapper}" ] && continue  # skip $LKP_SRC/**/wrapper
+
+		case $i in
+		*/bin/run-test|*/bin/run-setup|*/bin/run-daemon|*/bin/run-monitor|*/bin/run-no-stdout-monitor|*/bin/run-one-shot-monitor) continue ;;
+		esac
 
 		program=${i##*/}
-		if [ "$program" = "run" ] || [ "$program" = "daemon" ] || [ "$program" = "setup" ]; then
-			program=${i%/*}
-			program=${program##*/}
-		fi
 		echo "${program}"
+
 		return 0
 	done
 

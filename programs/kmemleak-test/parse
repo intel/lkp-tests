@@ -1,1 +1,1 @@
-../../stats/kmemleak
+../kmemleak/parse

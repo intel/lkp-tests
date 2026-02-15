@@ -9,15 +9,24 @@ shared_context 'mocked filesystem' do
     [
       'bin/program-options',
       'bin/run-test',
-      'stats/wrapper',
+      'bin/run-stats',
       'bin/run-setup',
       'bin/run-daemon',
+      'bin/run-monitor',
+      'bin/run-no-stdout-monitor',
+      'bin/run-one-shot-monitor',
       'programs/mysetup/setup',
       'programs/mysetup2/setup',
       'programs/mysetup2/parse',
       'programs/mydaemon/daemon',
       'programs/myprog/run',
-      'programs/myprog/parse'
+      'programs/myprog/parse',
+      'programs/mymonitor/monitor',
+      'programs/mymonitor/parse',
+      'programs/mymonitor2/no-stdout-monitor',
+      'programs/mymonitor2/parse',
+      'programs/mymonitor3/one-shot-monitor',
+      'programs/mymonitor3/parse'
     ].each do |f|
       path = "#{tmp_lkp_src}/#{f}"
       FileUtils.mkdir_p(File.dirname(path))
