@@ -112,7 +112,7 @@ cat "${files[@]}" >> $temp_file_unsort
 	eval "$cmd" >> $temp_file_unsort
 }
 
-[[ -s "$temp_file_unsort" ]] || exit 1
+[[ -s "$temp_file_unsort" ]] || exit 0
 
 sed -i -e 's#/$##' $temp_file_unsort
 
