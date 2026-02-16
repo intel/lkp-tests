@@ -38,5 +38,6 @@ sed
 thin-provisioning-tools
 udev
 udftools
+uidmap
 xfsdump
 zlib1g
