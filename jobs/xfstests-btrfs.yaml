@@ -47,4 +47,5 @@ xfstests:
     - btrfs-group-31
     - btrfs-group-32
     - btrfs-group-33
+    - btrfs-group-34
     # - btrfs-scratch-verity
