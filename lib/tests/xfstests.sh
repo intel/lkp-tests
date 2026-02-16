@@ -71,6 +71,14 @@ setup_cifs_config()
 	log_eval export FSTYP=cifs
 	log_eval export TEST_DEV=$cifs_server_path
 	log_eval export TEST_DIR=/$fs2/$FS_TEST_DIR
+
+	# There's no separate scratch dev for CIFS, so we use the same server path
+	# for SCRATCH_DEV and SCRATCH_MNT, similar to how TEST_DEV/TEST_DIR are set.
+	# The xfstests suite will typically use a different subdirectory or share for scratch.
+	log_eval export SCRATCH_DEV_POOL=$cifs_server_path
+	log_eval export SCRATCH_MNT=/fs/scratch
+	log_cmd mkdir -p $SCRATCH_MNT
+
 	log_eval export CIFS_MOUNT_OPTIONS="-ousername=root,password=pass,noperm,vers=$(cifs_version),mfsymlinks,actimeo=0"
 }
 
