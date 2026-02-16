@@ -5,12 +5,13 @@ url='https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git'
 arch=('i386' 'x86_64' 'aarch64')
 license=('GPL')
 source=('https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git'
+	'https://git.kernel.org/pub/scm/fs/xfs/xfsprogs-dev.git'
 	'https://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git'
 	'https://git.kernel.org/pub/scm/linux/kernel/git/djwong/e2fsprogs.git'
 	'https://github.com/koverstreet/bcachefs-tools.git#tag=v1.25.3'
 	'https://github.com/kdave/btrfs-progs.git'
 	'https://github.com/karelzak/util-linux.git')
-md5sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+md5sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 . $LKP_SRC/lib/detect-system.sh
 . $LKP_SRC/lib/install.sh
@@ -193,10 +194,10 @@ package()
 {
 	pack_contents "$srcdir/xfstests-dev/*" $benchmark_path
 	pack_contents "$srcdir/util-linux" "$benchmark_path"
+	# xfsprogs-dev source is required by xfs/437
+	pack_contents "$srcdir/xfsprogs-dev" "$benchmark_path/src"
 
 	[ -d "$CARGO_HOME" ] && pack_contents $CARGO_HOME
-
-	wget --no-check-certificate -O $benchmark_path/tools/find-api-violations.sh https://git.kernel.org/pub/scm/fs/xfs/xfsprogs-dev.git/plain/tools/find-api-violations.sh
 
 	generate_exclude_files
 
