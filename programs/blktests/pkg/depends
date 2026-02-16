@@ -34,6 +34,7 @@ libssl-dev
 libtasn1-6
 libtirpc
 liburing
+lsof
 multipath-tools
 nbd-client
 nbd-server

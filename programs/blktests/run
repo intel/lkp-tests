@@ -42,6 +42,13 @@ set_env()
 	srp-*)
 		log_cmd systemctl stop multipathd
 		;;
+	zbd-*)
+		partition=${partitions%% *}
+		# fix the issue: /etc/fscrypt.conf is missing
+		if [[ ! -f /etc/fscrypt.conf ]] && has_cmd fscrypt; then
+			fscrypt setup --force # --quiet
+		fi
+		;;
 	*)
 		partition=${partitions%% *}
 		;;
@@ -51,6 +58,8 @@ set_env()
 		echo "TEST_DEVS=$partition" > config
 		if [[ "${test%%-*}" == "nvme" ]]; then
 			log_cmd mkdir -p /mnt/$test && log_cmd mount $partition /mnt/$test
+			# fix nvme-fabrics does not support dhchap_ctrl_secret issue
+			modprobe nvme-auth 2>/dev/null || true
 		else
 			umount "${partition}"* 2>/dev/null || true
 		fi
