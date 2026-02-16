@@ -15,7 +15,7 @@ module Bash
       @stderr = stderr
       @exitstatus = exitstatus
 
-      super("Command failed with exit #{exitstatus}: #{command}")
+      super("Command failed with exit #{exitstatus}: #{command}: #{stderr}")
     end
   end
 
