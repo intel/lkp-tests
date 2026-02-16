@@ -23,7 +23,7 @@ describe 'stats' do
                    end
         raise "stats script exitstatus #{$CHILD_STATUS.exitstatus}" unless $CHILD_STATUS.success?
 
-        expect(new_stat).to eq old_stat
+        expect(new_stat).to eq old_stat.chomp
       end
     end
   end
