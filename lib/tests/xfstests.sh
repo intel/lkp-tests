@@ -108,7 +108,9 @@ _is_test_in_group()
 	local test=$1
 	local group=$2
 
-	# if it is running a group but not a single test, directly return true if the name matches
+	# Check for an exact match. This handles cases where:
+	# 1. The 'test' is actually a full group name (e.g. test="generic-dax" matches group="generic-dax")
+	# 2. The 'group' argument is a specific test name (e.g. test="generic-470" matches group="generic-470")
 	[[ "$test" =~ ^$group$ ]] && return
 
 	# test_prefix: xfs | ext4
@@ -119,12 +121,12 @@ _is_test_in_group()
 	# group_prefix: xfs | ext4
 	local group_prefix=${group%%-*}
 
-	[[ "$test_prefix" = "$group_prefix" ]] && {
-		local group_files=$(find $BENCHMARK_ROOT/xfstests/tests/ -mindepth 1 -maxdepth 1 -type f -regex "^.+/$group$")
-		[[ $group_files ]] || return
+	[[ "$test_prefix" != "$group_prefix" ]] && return 1
 
-		grep -q -E "^$test_number$" $group_files
-	}
+	local group_files=$(find $BENCHMARK_ROOT/xfstests/tests/ -mindepth 1 -maxdepth 1 -type f -regex "^.+/$group$")
+	[[ $group_files ]] || return
+
+	grep -q -E "^$test_number$" $group_files
 }
 
 setup_mkfs_options()
