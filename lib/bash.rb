@@ -39,6 +39,8 @@ module Bash
       verbose = options.delete(:verbose)
       stream = options.delete(:stream)
       unsetenv_others = options.delete(:unsetenv_others)
+      input = options.delete(:input)
+      run_opts = input ? { input: input } : {}
 
       # Default block meant for streaming output if none provided (stream mode only)
       block ||= ->(line) { puts line } if stream
@@ -54,12 +56,12 @@ module Bash
       args = prepare_args(args, unsetenv_others)
 
       result = if stream
-                 cmd.run!(*args) do |out, err|
+                 cmd.run!(*args, **run_opts) do |out, err|
                    # TTY::Command yields chunks, split them to match line-based expectation.
                    (out || err).each_line { |line| block.call(line.chomp) }
                  end
                else
-                 cmd.run!(*args)
+                 cmd.run!(*args, **run_opts)
                end
 
       handle_result(result, args, returns, options, stream, block)
