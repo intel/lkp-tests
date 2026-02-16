@@ -96,8 +96,16 @@ setup_test()
 	esac
 }
 
+setup_sysctl()
+{
+	# stress-ng: info: note: /proc/sys/kernel/sched_autogroup_enabled is 1 and this can impact scheduling throughput for processes not attached to a tty. Setting this to 0 may improve performance metrics
+	[ -w /proc/sys/kernel/sched_autogroup_enabled ] && \
+		log_cmd sysctl -w kernel.sched_autogroup_enabled=0
+}
+
 run_test()
 {
+	setup_sysctl
 	set_common_opts
 
 	if [ -n "$test" ]; then
