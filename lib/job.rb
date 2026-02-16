@@ -294,6 +294,7 @@ class Job
 
   def load_one_defaults(file, job)
     return unless File.exist? file
+    return if File.directory? file
 
     context_hash = deepcopy(@defaults)
     revise_hash(context_hash, job, overwrite_top_keys: true)
