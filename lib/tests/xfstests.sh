@@ -268,7 +268,7 @@ setup_fs_config()
 		[[ "$fs" == "xfs" ]] && unset MKFS_OPTIONS
 	fi
 
-	is_test_in_group "$test" "ext4-logdev" "generic-logdev" "xfs-logdev" && {
+	is_test_in_group "$test" "ext4-logdev" "generic-logdev" "xfs-logdev" "generic-scratch-shutdown-metadata-journaling" && {
 		log_eval export USE_EXTERNAL=yes
 
 		# create a 100M partition for log, avoid test cost too much time
