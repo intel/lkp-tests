@@ -7,12 +7,14 @@ libaio-dev
 libattr1-dev
 libblkid-dev
 libclang-dev
+libext2fs-dev
 libfuse3-dev
 libgdbm-dev
 libicu-dev
 libiscsi-dev
 libkeyutils-dev
 liblz4-dev
+liblzo2-dev
 libncurses-dev
 libreadline-dev
 libsodium-dev
@@ -23,6 +25,8 @@ liburcu-dev
 liburing-dev
 libuuid1
 libzstd-dev
+python-dev
+python-setuptools
 uuid-dev
 valgrind
 xfslibs-dev

@@ -16,11 +16,13 @@ indent
 libaio
 libcap2-bin
 libclang1
+libext2fs2t64
 libfuse3
 libgdbm-compat4
 libgdbm6
 libicu
 libiscsi
+liblzo2-2
 libreadline5
 libsodium
 libssl

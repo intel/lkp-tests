@@ -35,11 +35,8 @@ build_install_btrfs_progs()
 {
 	cd_src_pkg_dir btrfs-progs
 
-	# fix the build issue
-	sed -i 's/sphinx-build-3/sphinx-build/g' Makefile
-
 	./autogen.sh
-	./configure
+	./configure --disable-documentation
 	make
 	make install DESTDIR="${pkgdir}"
 }
