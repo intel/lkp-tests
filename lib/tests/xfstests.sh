@@ -269,11 +269,15 @@ setup_fs_config()
 		}
 	fi
 
-	if [[ "$test" == "generic-470" ]] && [[ "$nr_partitions" -ge 3 ]]; then
-		LOGWRITES_DEV=${partitions#* }
-		LOGWRITES_DEV=${LOGWRITES_DEV%% *}
-		log_eval export LOGWRITES_DEV="$LOGWRITES_DEV"
-		[[ "$fs" == "xfs" ]] && unset MKFS_OPTIONS
+	if is_test_in_group "$test" "generic-dax" "generic-470" && [[ "$nr_partitions" -ge 3 ]]; then
+		log_eval export MOUNT_OPTIONS="-o dax"
+
+		if [[ "$test" == "generic-470" ]]; then
+			LOGWRITES_DEV=${partitions#* }
+			LOGWRITES_DEV=${LOGWRITES_DEV%% *}
+			log_eval export LOGWRITES_DEV="$LOGWRITES_DEV"
+			[[ "$fs" == "xfs" ]] && unset MKFS_OPTIONS
+		fi
 	fi
 
 	is_test_in_group "$test" "ext4-logdev" "generic-logdev" "xfs-logdev" "generic-scratch-shutdown-metadata-journaling" && {
