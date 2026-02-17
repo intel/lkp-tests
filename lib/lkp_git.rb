@@ -35,6 +35,8 @@ end
 
 def __git_parents(commit)
   Bash.run("#{GIT} rev-list --parents -n1 \"#{commit}\"").chomp.split[1..]
+rescue Bash::BashCallError
+  nil
 end
 
 def git_parents(commit)
@@ -251,10 +253,14 @@ end
 
 def relative_commit_date(commit)
   Bash.run("#{GIT} log -n1 --format=format:\"%cr\" \"#{commit}\"").chomp
+rescue Bash::BashCallError
+  ''
 end
 
 def git_commit_subject(commit)
   Bash.run("#{GIT} log -1 --format=%s \"#{commit}\"").chomp
+rescue Bash::BashCallError
+  ''
 end
 
 def remote_exists?(remote)
