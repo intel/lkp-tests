@@ -301,7 +301,8 @@ setup_fs_config()
 
 	is_test_in_group "$test" "generic-scratch-shutdown-metadata-journaling" && {
 		log_eval export USE_EXTERNAL=yes
-		setup_external_log_device 100
+		# Filesystem must be larger than 300MB
+		setup_external_log_device 350
 	}
 
 	return 0
