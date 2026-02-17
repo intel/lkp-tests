@@ -29,16 +29,16 @@ describe Job do
 
     it 'returns setup programs' do
       programs = job.available_programs(:setup)
-      # After implementation, this should include myprog
-      expect(programs).to include('myprog')
-      expect(programs['myprog']).to include('programs/myprog/setup')
+      # After implementation, this should include mysetup3
+      expect(programs).to include('mysetup3')
+      expect(programs['mysetup3']).to include('programs/mysetup3/setup')
     end
 
     it 'returns daemon programs' do
       programs = job.available_programs(:daemon)
-      # After implementation, this should include myprog
-      expect(programs).to include('myprog')
-      expect(programs['myprog']).to include('programs/myprog/daemon')
+      # After implementation, this should include mydaemon2
+      expect(programs).to include('mydaemon2')
+      expect(programs['mydaemon2']).to include('programs/mydaemon2/daemon')
     end
 
     it 'aggregates programs for :workload_elements' do
@@ -47,7 +47,12 @@ describe Job do
       # NOTE: 'myprog' from tests is included because tests support programs/*/run
       expect(programs).to include('myprog')
       # 'daemon' overrides 'tests' and 'setup' due to merge order
-      expect(programs['myprog']).to include('programs/myprog/daemon')
+      # mydaemon2 is from daemon
+      expect(programs).to include('mydaemon2')
+      expect(programs['mydaemon2']).to include('programs/mydaemon2/daemon')
+
+      # myprog is from tests
+      expect(programs['myprog']).to include('programs/myprog/run')
     end
 
     context 'when moving a legacy setup script to programs' do
