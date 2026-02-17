@@ -422,6 +422,12 @@ do
 			script=$(basename "$real_script")
 		}
 
+		benchmark_package=$(get_adaptation_pkg $distro "$script")
+		if verify_install "$benchmark_package" && [ -z "$FORCE_MODE" ]; then
+			echo "package '$benchmark_package' installed."
+			continue
+		fi
+
 		pkg_dir=$(get_pkg_dir $script)
 		[ -z "$makepkg_once" ] && [ -n "$pkg_dir" ] && ! [ -x "$LKP_SRC/pack/$script" ] && {
 			install_packages "makepkg" $distro
@@ -431,7 +437,6 @@ do
 		install_packages "$script" $distro
 		makepkg_install_packages "$script" $distro || exit 1
 
-		benchmark_package=$(get_adaptation_pkg $distro "$script")
 		if [ -n "$FORCE_MODE" ] || ! verify_install "$benchmark_package"; then
 			makepkg_install_benchmark "$script" $distro || exit 1
 		fi
