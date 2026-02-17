@@ -9,6 +9,7 @@ libblkid-dev
 libclang-dev
 libext2fs-dev
 libfuse3-dev
+libgdbm-compat-dev
 libgdbm-dev
 libicu-dev
 libiscsi-dev
