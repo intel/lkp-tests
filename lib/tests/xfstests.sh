@@ -152,6 +152,38 @@ setup_mkfs_options()
 	[[ $mkfs_options ]] && log_eval export MKFS_OPTIONS="\"$mkfs_options\""
 }
 
+setup_external_log_device()
+{
+	local size=$1
+	local dev_var=${2:-SCRATCH_LOGDEV}
+	local target_dev
+
+	if is_disc_partitioned; then
+		create_virtual_disk "$size" || {
+			echo "fail to create a virtual disk for log" 1>&2
+			return 1
+		}
+		log_eval export "$dev_var"="/dev/loop0"
+	else
+		# If variable is already set (like SCRATCH_LOGDEV in calling scope), use it
+		if [[ -n "${!dev_var}" ]]; then
+			target_dev="${!dev_var}"
+		elif [[ "$dev_var" == "SCRATCH_DEV" ]]; then
+			target_dev=$SCRATCH_DEV
+		else
+			# Default to getting the 2nd partition (partitions format: "sda1 sda2 ...")
+			target_dev=${partitions#* }
+			target_dev=${target_dev%% *}
+		fi
+
+		local fdisk_size="+$size"
+		[[ "$size" =~ ^[0-9]+$ ]] && fdisk_size="+${size}M"
+
+		printf "n\np\n1\n\n%s\nw\n" "$fdisk_size" | fdisk "$target_dev"
+		log_eval export "$dev_var"="${target_dev}1"
+	fi
+}
+
 setup_fs_config()
 {
 	log_eval export TEST_DIR=${mount_points%% *}
@@ -206,17 +238,7 @@ setup_fs_config()
 		# create a 100M partition for log, avoid
 		# log size 67108864 blocks too large, maximum size is 1048576 blocks
 		# if had partition already, create a virtual disk for log
-		if is_disc_partitioned; then
-			create_virtual_disk 100 || {
-				echo "fail to create a virtual disk for log" 1>&2
-				return 1
-			}
-
-			log_eval export SCRATCH_LOGDEV="/dev/loop0"
-		else
-			printf "n\np\n1\n\n+100M\nw\n" | fdisk $SCRATCH_LOGDEV
-			log_eval export SCRATCH_LOGDEV="$SCRATCH_LOGDEV"1
-		fi
+		setup_external_log_device 100
 	}
 
 	[[ "$test" == "xfs-437" ]] && {
@@ -246,17 +268,7 @@ setup_fs_config()
 			SCRATCH_DEV=${SCRATCH_DEV_POOL##* }
 			log_eval unset SCRATCH_DEV_POOL
 		}
-		if is_disc_partitioned; then
-			create_virtual_disk 1k || {
-				echo "fail to create a virtual disk for log" 1>&2
-				return 1
-			}
-
-			log_eval export SCRATCH_DEV="/dev/loop0"
-		else
-			printf "n\np\n1\n\n+1G\nw\n" | fdisk $SCRATCH_DEV
-			log_eval export SCRATCH_DEV="$SCRATCH_DEV"1
-		fi
+		setup_external_log_device 1024 SCRATCH_DEV
 	}
 
 	# need at least 3 partitions for TEST_DEV, SCRATCH_DEV and LOGWRITES_DEV
@@ -282,24 +294,14 @@ setup_fs_config()
 		fi
 	fi
 
-	is_test_in_group "$test" "ext4-logdev" "generic-logdev" "xfs-logdev" "generic-scratch-shutdown-metadata-journaling" && {
+	is_test_in_group "$test" "ext4-logdev" "generic-logdev" "xfs-logdev" && {
 		log_eval export USE_EXTERNAL=yes
+		setup_external_log_device 100
+	}
 
-		# create a 100M partition for log, avoid test cost too much time
-		# if had partition already, create a virtual disk for log
-		if is_disc_partitioned; then
-			create_virtual_disk 100 || {
-				echo "fail to create a virtual disk for log" 1>&2
-				return 1
-			}
-
-			log_eval export SCRATCH_LOGDEV="/dev/loop0"
-		else
-			SCRATCH_LOGDEV=${partitions#* }
-			SCRATCH_LOGDEV=${SCRATCH_LOGDEV%% *}
-			printf "n\np\n1\n\n+100M\nw\n" | fdisk $SCRATCH_LOGDEV
-			log_eval export SCRATCH_LOGDEV="$SCRATCH_LOGDEV"1
-		fi
+	is_test_in_group "$test" "generic-scratch-shutdown-metadata-journaling" && {
+		log_eval export USE_EXTERNAL=yes
+		setup_external_log_device 100
 	}
 
 	return 0
