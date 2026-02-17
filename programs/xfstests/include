@@ -30,6 +30,8 @@ need_kconfig:
 % end
 
 - FS_ENCRYPTION: y
+- CRYPTO_HCTR2: y
+- CRYPTO_POLYVAL: y
 - DEBUG_KERNEL: y
 - FAULT_INJECTION: y
 - FAIL_MAKE_REQUEST: y

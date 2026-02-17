@@ -263,6 +263,11 @@ setup_fs_config()
 		log_eval export MKFS_OPTIONS="-mreflink=1"
 	fi
 
+	if [[ "$fs" == "ext4" ]] && is_test_in_group "generic-693" "$test"; then
+		mkfs.ext4 -F -O encrypt $TEST_DEV || die "mkfs.ext4 $TEST_DEV failed"
+		log_eval export MKFS_OPTIONS=\"-O encrypt\"
+	fi
+
 	[[ "$test" == "generic-387" ]] && {
 		[[ -n "$SCRATCH_DEV_POOL" ]] && {
 			SCRATCH_DEV=${SCRATCH_DEV_POOL##* }
