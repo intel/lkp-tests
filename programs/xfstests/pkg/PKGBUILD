@@ -91,6 +91,9 @@ generate_exclude_files()
 	# ext2 do not support -o dax=always, so ignore these test cases
 	cd $benchmark_path/tests
 	grep "dax=always" generic -R | cut -d':' -f1 | sort -u >> $benchmark_path/tests/exclude/ext2
+
+	# generic/470 requires MAP_SYNC which is not supported on ext2
+	echo "generic/470" >> $benchmark_path/tests/exclude/ext2
 	cd -
 
 	# # cifs exclude files, https://wiki.samba.org/index.php/Xfstesting-cifs
