@@ -25,12 +25,11 @@ module LKP
       return @regexp if @regexp
       return unless File.size?(file)
 
-      lines = self.class.lines(file)
-      @regexp = Regexp.new "(#{lines.join('|')})"
+      @regexp = Regexp.new "(#{patterns.join('|')})"
     end
 
     def patterns
-      File.read(file).split("\n")
+      @patterns ||= self.class.lines(file)
     end
 
     def pattern(content)
