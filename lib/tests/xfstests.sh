@@ -79,7 +79,7 @@ setup_cifs_config()
 	log_eval export SCRATCH_MNT=/fs/scratch
 	log_cmd mkdir -p $SCRATCH_MNT
 
-	log_eval export CIFS_MOUNT_OPTIONS="-ousername=root,password=pass,noperm,vers=$(cifs_version),mfsymlinks,actimeo=0"
+	log_eval export CIFS_MOUNT_OPTIONS=\"-ousername=root,password=pass,noperm,vers=$(cifs_version),mfsymlinks,actimeo=0\"
 }
 
 setup_fs2_config()
@@ -129,30 +129,66 @@ _is_test_in_group()
 	grep -q -E "^$test_number$" $group_files
 }
 
+setup_partition_dev()
+{
+	local dev=${partitions#* }
+	dev=${dev%% *}
+
+	log_eval export "$1"="$dev"
+}
+
+setup_logwrites_dev()
+{
+	setup_partition_dev LOGWRITES_DEV
+}
+
+setup_scratch_logdev()
+{
+	setup_partition_dev SCRATCH_LOGDEV
+}
+
 setup_mkfs_options()
 {
 	local mkfs_options=""
 
-	if [[ "$fs" = f2fs ]]; then
+	case "$fs" in
+	f2fs)
 		mkfs_options="-f"
-	elif is_test_in_group "$test" "xfs-projid16bit"; then
-		mkfs_options="-mcrc=0"
-	elif [[ "$fs" = "xfs" ]] && is_test_in_group "$test" "generic-dax"; then
-		# new version of mkfs.xfs set reflink=1 as default and conflict with DAX mount
-		# need to set reflink=0 manually
-		mkfs_options="-mreflink=0"
-	else
-		# this doesn't apply to xfs-realtime-scratch-reflink
-		#	reflink not supported with realtime devices
-		[[ "$fs" = "xfs" ]] && is_test_in_group "$test" "xfs-scratch-reflink.*" "generic-scratch-reflink.*" && mkfs_options+="-mreflink=1 "
+		;;
+	xfs)
+		if is_test_in_group "$test" "xfs-projid16bit"; then
+			mkfs_options="-mcrc=0"
+		elif is_test_in_group "$test" "generic-dax"; then
+			# new version of mkfs.xfs set reflink=1 as default and conflict with DAX mount
+			# need to set reflink=0 manually
+			mkfs_options="-mreflink=0"
+		elif is_test_in_group "$test" "generic-group-[0-9]*" || { [[ "$nr_partitions" -ge 3 ]] && is_test_in_group "$test" "btrfs-log-writes" "generic-log-writes"; }; then
+			mkfs_options="-mreflink=1"
+		else
+			# this doesn't apply to xfs-realtime-scratch-reflink
+			#	reflink not supported with realtime devices
+			is_test_in_group "$test" "xfs-scratch-reflink.*" "generic-scratch-reflink.*" && mkfs_options+="-mreflink=1 "
 
-		is_test_in_group "$test" "xfs-scratch-rmapbt" "xfs-scratch-reflink-scratch-rmapbt" && mkfs_options+="-mrmapbt=1 "
-	fi
+			is_test_in_group "$test" "xfs-scratch-rmapbt" "xfs-scratch-reflink-scratch-rmapbt" && mkfs_options+="-mrmapbt=1 "
+		fi
+		;;
+	ext4)
+		if is_test_in_group "generic-693" "$test"; then
+			mkfs_options="-O encrypt"
+		fi
+		;;
+	esac
 
-	[[ $mkfs_options ]] && log_eval export MKFS_OPTIONS="\"$mkfs_options\""
+	[[ $mkfs_options ]] || return 0
+
+	local force_flag="-f"
+	[[ "$fs" == "ext4" ]] && force_flag="-F"
+
+	mkfs.$fs $force_flag $mkfs_options $TEST_DEV || die "mkfs.$fs $TEST_DEV failed"
+	log_eval export MKFS_OPTIONS="\"$mkfs_options\""
 }
 
-setup_external_log_device()
+setup_external_log_dev()
 {
 	local size=$1
 	local dev_var=${2:-SCRATCH_LOGDEV}
@@ -181,6 +217,27 @@ setup_external_log_device()
 
 		printf "n\np\n1\n\n%s\nw\n" "$fdisk_size" | fdisk "$target_dev"
 		log_eval export "$dev_var"="${target_dev}1"
+	fi
+}
+
+setup_logdev_config()
+{
+	if is_test_in_group "xfs-083" "$test" || is_test_in_group "xfs-275" "$test"; then
+		# create a 100M partition for log, avoid
+		# log size 67108864 blocks too large, maximum size is 1048576 blocks
+		# if had partition already, create a virtual disk for log
+		setup_external_log_dev 100
+	elif is_test_in_group "$test" "ext4-logdev" "generic-logdev" "xfs-logdev"; then
+		setup_external_log_dev 100
+	elif is_test_in_group "$test" "generic-scratch-shutdown-metadata-journaling"; then
+		# Filesystem must be larger than 300MB
+		setup_external_log_dev 350
+	elif is_test_in_group "generic-387" "$test"; then
+		[[ -n "$SCRATCH_DEV_POOL" ]] && {
+			SCRATCH_DEV=${SCRATCH_DEV_POOL##* }
+			log_eval unset SCRATCH_DEV_POOL
+		}
+		setup_external_log_dev 1024 SCRATCH_DEV
 	fi
 }
 
@@ -219,9 +276,7 @@ setup_fs_config()
 	export PATH="/bin/":$PATH
 
 	if [[ "$fs" == "xfs" ]] && [[ "$nr_partitions" -ge 3 ]]; then
-		SCRATCH_LOGDEV=${partitions#* }
-		SCRATCH_LOGDEV=${SCRATCH_LOGDEV%% *}
-		log_eval export SCRATCH_LOGDEV="$SCRATCH_LOGDEV"
+		setup_scratch_logdev
 	fi
 
 	[[ "${test%%-*}" == "xfs" ]] && {
@@ -233,15 +288,7 @@ setup_fs_config()
 		[[ -f /sys/fs/xfs/debug/bug_on_assert ]] && echo 0 > /sys/fs/xfs/debug/bug_on_assert
 	}
 
-	[[ "$test" == "xfs-083" || "$test" == "xfs-275" ]] && {
-		log_eval export USE_EXTERNAL=yes
-		# create a 100M partition for log, avoid
-		# log size 67108864 blocks too large, maximum size is 1048576 blocks
-		# if had partition already, create a virtual disk for log
-		setup_external_log_device 100
-	}
-
-	[[ "$test" == "xfs-437" ]] && {
+	is_test_in_group "xfs-437" "$test" && {
 		echo "LC_ALL=en_US.UTF-8" >> /etc/environment
 		echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 		echo "LANG=en_US.UTF-8" > /etc/locale.conf
@@ -257,58 +304,27 @@ setup_fs_config()
 	}
 
 	setup_mkfs_options
-
-	if [[ "$fs" == "xfs" ]] && is_test_in_group "$test" "generic-group-[0-9]*"; then
-		mkfs.xfs -f -mreflink=1 $TEST_DEV || die "mkfs.xfs $TEST_DEV failed"
-		log_eval export MKFS_OPTIONS="-mreflink=1"
-	fi
-
-	if [[ "$fs" == "ext4" ]] && is_test_in_group "generic-693" "$test"; then
-		mkfs.ext4 -F -O encrypt $TEST_DEV || die "mkfs.ext4 $TEST_DEV failed"
-		log_eval export MKFS_OPTIONS=\"-O encrypt\"
-	fi
-
-	[[ "$test" == "generic-387" ]] && {
-		[[ -n "$SCRATCH_DEV_POOL" ]] && {
-			SCRATCH_DEV=${SCRATCH_DEV_POOL##* }
-			log_eval unset SCRATCH_DEV_POOL
-		}
-		setup_external_log_device 1024 SCRATCH_DEV
-	}
+	setup_logdev_config
 
 	# need at least 3 partitions for TEST_DEV, SCRATCH_DEV and LOGWRITES_DEV
 	if is_test_in_group "$test" "btrfs-log-writes" "generic-log-writes" && [[ "$nr_partitions" -ge 3 ]]; then
-		LOGWRITES_DEV=${partitions#* }
-		LOGWRITES_DEV=${LOGWRITES_DEV%% *}
-		log_eval export LOGWRITES_DEV="$LOGWRITES_DEV"
-		[[ "$fs" == "xfs" ]] && log_eval export MKFS_OPTIONS="-mreflink=1"
+		setup_logwrites_dev
+
 		[[ "$fs" == "btrfs" ]] && [[ -n "$SCRATCH_DEV_POOL" ]] && {
 			log_eval export SCRATCH_DEV=${SCRATCH_DEV_POOL##* }
 			log_eval unset SCRATCH_DEV_POOL
 		}
 	fi
 
-	if is_test_in_group "$test" "generic-dax" "generic-470" && [[ "$nr_partitions" -ge 3 ]]; then
-		log_eval export MOUNT_OPTIONS="-o dax"
+	if is_test_in_group "generic-470" "$test"; then
+		setup_logwrites_dev
 
-		if [[ "$test" == "generic-470" ]]; then
-			LOGWRITES_DEV=${partitions#* }
-			LOGWRITES_DEV=${LOGWRITES_DEV%% *}
-			log_eval export LOGWRITES_DEV="$LOGWRITES_DEV"
-			[[ "$fs" == "xfs" ]] && unset MKFS_OPTIONS
-		fi
+		[[ "$fs" == "xfs" ]] && unset MKFS_OPTIONS
 	fi
 
-	is_test_in_group "$test" "ext4-logdev" "generic-logdev" "xfs-logdev" && {
-		log_eval export USE_EXTERNAL=yes
-		setup_external_log_device 100
-	}
-
-	is_test_in_group "$test" "generic-scratch-shutdown-metadata-journaling" && {
-		log_eval export USE_EXTERNAL=yes
-		# Filesystem must be larger than 300MB
-		setup_external_log_device 350
-	}
+	if is_test_in_group "$test" "generic-dax" && [[ "$nr_partitions" -ge 3 ]]; then
+		log_eval export MOUNT_OPTIONS=\"-o dax\"
+	fi
 
 	return 0
 }
