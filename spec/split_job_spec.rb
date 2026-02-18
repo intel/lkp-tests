@@ -68,11 +68,11 @@ describe 'lkp-split-job' do
 
   it "split job['fs2'] with symlinked program" do
     Dir.chdir(@tmp_src_dir.to_s) do
-      Bash.run("ln -sf fs #{@tmp_src_dir}/programs/fs2")
       Bash.run("mkdir -p hosts; echo 'model: Haswell' > hosts/lkp-tbox")
       verify_split_job_output('4')
       Bash.run('rm hosts/lkp-tbox')
     end
+
     expect(Dir[@tmp_dir.path('4-*.yaml')]).not_to be_empty
   end
 end
