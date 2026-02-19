@@ -1,5 +1,5 @@
-require 'tmpdir'
 require 'fileutils'
+require 'tmpdir'
 
 shared_context 'mocked filesystem' do
   let(:tmp_lkp_src) { Dir.mktmpdir }

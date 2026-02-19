@@ -7,9 +7,9 @@ require "#{LKP_SRC}/lib/common"
 require "#{LKP_SRC}/lib/constant"
 require "#{LKP_SRC}/lib/enumerator"
 require "#{LKP_SRC}/lib/log"
+require "#{LKP_SRC}/lib/programs"
 require "#{LKP_SRC}/lib/result_root"
 require "#{LKP_SRC}/lib/stats"
-require "#{LKP_SRC}/lib/programs"
 
 # How many components in the stat sort key
 $stat_sort_key_number = {

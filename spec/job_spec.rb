@@ -1,8 +1,8 @@
+require 'fileutils'
+require 'pathname'
 require 'spec_helper'
 require 'tmpdir'
 require 'yaml'
-require 'fileutils'
-require 'pathname'
 require "#{LKP_SRC}/lib/job"
 
 describe Job do
