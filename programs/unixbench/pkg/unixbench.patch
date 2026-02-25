@@ -1,17 +1,18 @@
 diff --git a/UnixBench/Makefile b/UnixBench/Makefile
-index 50d8139..4184a57 100644
+index 3169c03064f0..59ccd5428573 100644
 --- a/UnixBench/Makefile
 +++ b/UnixBench/Makefile
-@@ -46,7 +46,7 @@ SHELL = /bin/sh
+@@ -45,8 +45,8 @@ SHELL = /bin/sh
+ # the building of the graphics benchmarks.  This will require the
  # X11 libraries on your system. (e.g. libX11-devel mesa-libGL-devel)
  #
- # Comment the line out to disable these tests.
--# GRAPHIC_TESTS = defined
+-# Comment the line out to disable these tests.
+ # GRAPHIC_TESTS = defined
 +GRAPHIC_TESTS = defined
  
  # Set "GL_LIBS" to the libraries needed to link a GL program.
  GL_LIBS = -lGL -lXext -lX11
-@@ -90,18 +90,18 @@ else
+@@ -90,18 +90,19 @@ else
    ## OS detection.  Comment out if gmake syntax not supported by other 'make'. 
    OSNAME:=$(shell uname -s)
    ARCH ?= $(shell uname -m)
@@ -27,6 +28,7 @@ index 50d8139..4184a57 100644
 -        OPTON += -march=native -mtune=native
 -    endif
 -  endif
++
 +#  ifeq ($(OSNAME),Linux)
 +#    # Not all CPU architectures support "-march" or "-march=native".
 +#    #   - Supported    : x86, x86_64, ARM, AARCH64, riscv64, etc..
@@ -43,10 +45,19 @@ index 50d8139..4184a57 100644
    ifeq ($(OSNAME),Darwin)
      # (adjust flags or comment out this section for older versions of XCode or OS X)
 diff --git a/UnixBench/Run b/UnixBench/Run
-index 4151248..123cbd3 100755
+index 41637bea160e..1b80c378dc1b 100755
 --- a/UnixBench/Run
 +++ b/UnixBench/Run
-@@ -999,7 +999,7 @@ sub getSystemInfo {
+@@ -443,7 +443,7 @@ my $testParams = {
+         "logmsg" => "C Compiler Throughput ($cCompiler)",
+         "cat"    => 'misc',
+         "prog" => "${BINDIR}/looper",
+-        "options" => "60 $cCompiler cctest.c",
++        "options" => "60 $cCompiler -Wno-error=implicit-int -Wno-error=implicit-function-declaration cctest.c",
+     },
+     "arithoh" => {
+         "logmsg" => "Arithoh",
+@@ -1003,7 +1003,7 @@ sub getSystemInfo {
      }
  
      # Get graphics hardware info.
@@ -55,7 +66,7 @@ index 4151248..123cbd3 100755
  
      # Get system run state, load and usage info.
      $info->{'runlevel'} = getCmdOutput("who -r | awk '{print \$3}'");
-@@ -2066,7 +2066,7 @@ sub main {
+@@ -2070,7 +2070,7 @@ sub main {
      my @creatingDirectories = ( ${TMPDIR}, ${RESULTDIR} );
      createDirrectoriesIfNotExists(@creatingDirectories);
  
