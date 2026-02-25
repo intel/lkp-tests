@@ -39,6 +39,7 @@ libntfs
 libopencryptoki0
 libtirpc
 lvm2
+mount
 net-tools
 nfs-kernel-server
 nftables
