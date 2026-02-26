@@ -33,7 +33,7 @@ unixbench:
     - float
     - double
     - arithoh
-    # - C # aborting
+    - C
     # - dc # Run: "Dc: sqrt(2) to 99 decimal places": Bad wait status: 0x100; aborting
     - hanoi
     - grep
