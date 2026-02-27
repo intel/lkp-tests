@@ -361,7 +361,15 @@ clean_firmware()
 
 clean_mm()
 {
-	local install_dir="$CACHE_DIR/kselftests"
+	local install_dir="$CACHE_DIR/kselftests/mm"
+	[[ -d $install_dir ]] && rm -rf $install_dir
+
+	return 0
+}
+
+clean_landlock()
+{
+	local install_dir="$CACHE_DIR/kselftests/landlock"
 	[[ -d $install_dir ]] && rm -rf $install_dir
 
 	return 0
@@ -671,11 +679,13 @@ make_run_tests()
 		kselftests_make TARGETS=$group install || return
 	fi
 
-	if [[ "$group" == "mm" ]]; then
-		# tests like guard_regions.file.hole_punch need create file on a physical disk (ext4/xfs/btrfs)
+	if [[ "$group" == "mm" || "$group" == "landlock" ]]; then
+		# mm tests like guard_regions.file.hole_punch need create file on a physical disk (ext4/xfs/btrfs)
 		# instead of a rootfs (RAM-based) filesystem (which is due to lkp tbox is boot from initramfs).
+		#
+		# landlock tests need create directory in current working directory, but the default execution directory is read-only.
 		# Here CACHE_DIR is usually a physical disk based filesystem if /opt/rootfs exists.
-		local install_dir="$CACHE_DIR/kselftests"
+		local install_dir="$CACHE_DIR/kselftests/$group"
 		kselftests_make install TARGETS=$group INSTALL_PATH=$install_dir || return
 
 		cd $install_dir || return
@@ -761,9 +771,8 @@ clean_test_group()
 {
 	local group=$1
 
-	if [[ "$group" = "firmware" ]]; then
-		clean_firmware
-	elif [[ "$group" = "mm" ]]; then
-		clean_mm
+	local clean_handler="clean_${group//[\/-]/_}"
+	if declare -f "$clean_handler" > /dev/null; then
+		$clean_handler || return
 	fi
 }
