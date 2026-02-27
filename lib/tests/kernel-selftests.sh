@@ -511,6 +511,18 @@ fixup_cpufreq()
 	echo 'timeout=600' > $group/settings
 }
 
+fixup_connector()
+{
+	# selftests: connector: proc_filter # TIMEOUT 300 seconds
+	echo 'timeout=1800' > $group/settings
+
+	# proc_filter is designed to run infinitely until interrupted, and wait for events.
+	# Inject alarm so that it interrupts after 15 seconds instead of 1800s.
+	[[ -f $group/proc_filter.c ]] && {
+		sed -i '/signal(SIGINT, sigint);/a \t\tsignal(SIGALRM, sigint);\n\t\talarm(15);' $group/proc_filter.c
+	}
+}
+
 fixup_mm()
 {
 	local run_vmtests="run_vmtests.sh"
