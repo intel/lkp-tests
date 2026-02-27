@@ -441,8 +441,8 @@ class Job
 
         programs = programs.merge create_programs_hash("programs/*/#{script_name}", lkp_src) if script_name
         if type == :monitors
-          programs = programs.merge create_programs_hash("programs/*/no-stdout-monitor", lkp_src)
-          programs = programs.merge create_programs_hash("programs/*/one-shot-monitor", lkp_src)
+          programs = programs.merge create_programs_hash('programs/*/no-stdout-monitor', lkp_src)
+          programs = programs.merge create_programs_hash('programs/*/one-shot-monitor', lkp_src)
         end
         programs
       end

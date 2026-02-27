@@ -86,7 +86,7 @@ def create_host_config
   if File.exist? host_config
     puts "reusing #{host_config}"
   else
-    mem_kb = File.open('/proc/meminfo').gets.split[1].to_i
+    mem_kb = File.open('/proc/meminfo') { |f| f.gets.split[1].to_i }
     mem_gb = mem_kb >> 20
     mem_gb = (mem_gb + 3) & 0xfffffffc
     nr_cpu = Etc.nprocessors

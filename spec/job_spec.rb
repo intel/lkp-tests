@@ -231,7 +231,7 @@ describe 'Job integration with mocked filesystem' do
 
   it 'loads 1.mock.yaml and produces 1.mock.output.yaml with setup discovery' do
     # Force Job instances to use the temp directory as LKP_SRC
-    allow_any_instance_of(Job).to receive(:lkp_src).and_return(tmp_lkp_src)
+    allow_any_instance_of(Job).to receive(:lkp_src).and_return(tmp_lkp_src) # rubocop:disable RSpec/AnyInstance
 
     # Stub Bash.run to simulate program-options output without invoking real binaries
     allow(Bash).to receive(:run).and_call_original

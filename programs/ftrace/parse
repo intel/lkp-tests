@@ -64,8 +64,7 @@ def normlize_event_data(event, event_data, records)
   end
 
   record = {}
-  file = File.open(event_data)
-  while (line = file.gets)
+  File.foreach(event_data) do |line|
     line = line.chomp
     if line == '' && !record['time'].nil?
       normlize_record event, record, key_prefix_items, records
@@ -75,7 +74,6 @@ def normlize_event_data(event, event_data, records)
     k, v = line.split(': ')
     record[k] = v
   end
-  file.close
   File.delete event_data
 end
 

@@ -34,7 +34,7 @@ describe Job2sh do
     include_context 'mocked filesystem'
 
     before do
-      allow_any_instance_of(Job).to receive(:lkp_src).and_return(tmp_lkp_src)
+      allow_any_instance_of(Job).to receive(:lkp_src).and_return(tmp_lkp_src) # rubocop:disable RSpec/AnyInstance
 
       # Stub Bash.run for program-options
       allow(Bash).to receive(:run).and_call_original

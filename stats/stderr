@@ -12,7 +12,7 @@ LKP_SRC_ETC ||= LKP::Path.src('etc')
 
 @ignore_patterns = []
 Dir["#{LKP_SRC_ETC}/ignore-stderr/*"].each do |f|
-  File.open(f).each_line do |line|
+  File.foreach(f) do |line|
     line = line.resolve_invalid_bytes
     @ignore_patterns << Regexp.new("^#{line.chomp}$")
   end

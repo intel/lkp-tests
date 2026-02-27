@@ -30,7 +30,7 @@ memleaks << memleak if memleak
 
 memleaks.uniq
         .each do |m|
-          stats.add "#{m[:comm]}.#{m[:type]}.#{m[:backtraces].reverse.join('.')}", 1
+  stats.add "#{m[:comm]}.#{m[:type]}.#{m[:backtraces].reverse.join('.')}", 1
 end
 
 stats.dump

@@ -58,32 +58,32 @@ describe 'Check need_kconfig from' do
   includes = Dir["#{LKP_SRC}/include/**/*", "#{LKP_SRC}/programs/*/include"]
   includes.select { |file| File.file?(file) }
           .each do |file|
-            yaml_data = load_yaml_with_conditionals(file)
-            # next if yaml_data.nil? || !yaml_data.is_a?(Hash) || erb_file?(file)
-            next unless yaml_data.is_a?(Hash) && !erb_file?(file)
+    yaml_data = load_yaml_with_conditionals(file)
+    # next if yaml_data.nil? || !yaml_data.is_a?(Hash) || erb_file?(file)
+    next unless yaml_data.is_a?(Hash) && !erb_file?(file)
 
-            kconfig_section = yaml_data['need_kconfig']
-            next if kconfig_section.nil?
+    kconfig_section = yaml_data['need_kconfig']
+    next if kconfig_section.nil?
 
-            it file do
-              case kconfig_section
-              when String
-                expect_valid_config_name(kconfig_section)
-              when Array
-                kconfig_section.each do |config|
-                  var_name, var_val = config.is_a?(String) ? config.split(':').map(&:strip) : [config.keys[0], config.values[0]]
-                  expect_valid_config_name(var_name)
+    it file do
+      case kconfig_section
+      when String
+        expect_valid_config_name(kconfig_section)
+      when Array
+        kconfig_section.each do |config|
+          var_name, var_val = config.is_a?(String) ? config.split(':').map(&:strip) : [config.keys[0], config.values[0]]
+          expect_valid_config_name(var_name)
 
-                  # If value is array
-                  if var_val.is_a?(Array)
-                    var_val.each do |val|
-                      expect_valid_config_value(val)
-                    end
-                  else
-                    expect_valid_config_value(var_val)
-                  end
-                end
-              end
+          # If value is array
+          if var_val.is_a?(Array)
+            var_val.each do |val|
+              expect_valid_config_value(val)
             end
+          else
+            expect_valid_config_value(var_val)
+          end
+        end
+      end
+    end
   end
 end

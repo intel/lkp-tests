@@ -87,5 +87,5 @@ end
 
 results.sort_by { |k, _v| k }
        .each do |record, percent|
-         puts "#{record}: #{format('%.2f', percent)}" if percent >= 0.05
+  puts "#{record}: #{format('%.2f', percent)}" if percent >= 0.05
 end

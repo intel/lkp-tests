@@ -11,7 +11,7 @@ def show_dmesg_times
   dhcp = false
   smp_start = false
 
-  File.open(dmesg).each do |line|
+  File.foreach(dmesg) do |line|
     line = line.resolve_invalid_bytes
     case line
     when /\[ *(\d+\.\d+)\] Sending DHCP requests/

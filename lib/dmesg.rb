@@ -125,24 +125,24 @@ def grep_crash_head(dmesg_file)
   raw_oops.each_line
           .flat_map { |l| concat_context_from_dmesg(dmesg_file, l) }
           .each do |line|
-            case line
-            when LKP::OopsPattern.instance.regexp
-              oops_map[$1] ||= line
+    case line
+    when LKP::OopsPattern.instance.regexp
+      oops_map[$1] ||= line
 
-              has_oom = true if line =~ OOM_PATTERN
-            when /\+0x/
-              next if line.index ' ? '
+      has_oom = true if line =~ OOM_PATTERN
+    when /\+0x/
+      next if line.index ' ? '
 
-              if line =~ CALLTRACE_PATTERN
-                add_one_calltrace[prev_line] unless line.index('SyS_')
-                add_one_calltrace[line]
-                prev_line = nil
-              else
-                prev_line = line
-              end
-            else
-              log_warn "oops pattern mismatch: #{line}"
-            end
+      if line =~ CALLTRACE_PATTERN
+        add_one_calltrace[prev_line] unless line.index('SyS_')
+        add_one_calltrace[line]
+        prev_line = nil
+      else
+        prev_line = line
+      end
+    else
+      log_warn "oops pattern mismatch: #{line}"
+    end
   end
 
   oops_map

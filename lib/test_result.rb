@@ -22,8 +22,7 @@ module LKP
       @results = case results
                  when Array
                    results.map(&:to_sym)
-                          .group_by { |result| result }
-                          .transform_values(&:size)
+                          .tally
                  when Hash
                    results.transform_keys(&:to_sym)
                  else
@@ -127,23 +126,23 @@ module LKP
       test_contents.reject { |test_stat, _values| LKP::StatDenylist.instance.contain?(test_stat) }
                    .select { |test_stat, _values| test_stat =~ /^#{self['testcase']}/ && self.class.test_result_definition.result?(test_stat) }
                    .to_h do |test_stat, values|
-                     result = self.class.test_result_definition.type(test_stat)
+        result = self.class.test_result_definition.type(test_stat)
 
-                     # "kmsg.XFS(pmem#):EXPERIMENTAL_online_scrub_feature_in_use.Use_at_your_own_risk": 1,
-                     #
-                     # "xfstests.generic.413.pass": 1,
-                     #
-                     # kernel-selftests.android.run.sh.fail: {
-                     #   0,
-                     #   1
-                     # }
-                     # "kernel-selftests.kvm.make.fail": [
-                     #   1
-                     # ]
-                     values = Array(values)
-                     log_warn "#{test_stat} value is unexpected | #{values}" unless values.any?(&:positive?)
+        # "kmsg.XFS(pmem#):EXPERIMENTAL_online_scrub_feature_in_use.Use_at_your_own_risk": 1,
+        #
+        # "xfstests.generic.413.pass": 1,
+        #
+        # kernel-selftests.android.run.sh.fail: {
+        #   0,
+        #   1
+        # }
+        # "kernel-selftests.kvm.make.fail": [
+        #   1
+        # ]
+        values = Array(values)
+        log_warn "#{test_stat} value is unexpected | #{values}" unless values.any?(&:positive?)
 
-                     [test_stat, FuncTestResult.new(test_stat.sub(/\.(pass|fail|skip)$/, ''), result => values.sum)]
+        [test_stat, FuncTestResult.new(test_stat.sub(/\.(pass|fail|skip)$/, ''), result => values.sum)]
       end
     end
 
@@ -160,10 +159,10 @@ module LKP
 
       test_results = test_contents.select { |test_stat, _values| test_stat =~ /^(#{allowed_stats.map { |s| Regexp.escape(s) }.join('|')})/ }
                                   .to_h do |test_stat, values|
-                                    result = self.class.test_result_definition.type(test_stat)
-                                    values = Array(values)
+        result = self.class.test_result_definition.type(test_stat)
+        values = Array(values)
 
-                                    [test_stat, BootTestResult.new(test_stat, result => values.sum)]
+        [test_stat, BootTestResult.new(test_stat, result => values.sum)]
       end
 
       if %w[boot fuzz].include?(rectified_category)
@@ -182,7 +181,7 @@ module LKP
       test_contents.reject { |test_stat, _values| LKP::StatDenylist.instance.contain?(test_stat) }
                    .select { |test_stat, _values| test_stat =~ /^#{self['testcase']}/ && bisect_kpi.match?(test_stat) }
                    .to_h do |test_stat, values|
-                     [test_stat, PerfTestResult.new(test_stat, values)]
+        [test_stat, PerfTestResult.new(test_stat, values)]
       end
     end
 

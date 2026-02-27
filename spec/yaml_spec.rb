@@ -20,11 +20,11 @@ describe 'load_yaml_with_flock' do
   end
 
   it 'raises Timeout Error due to flock by other process' do
-    f = File.open("#{TEST_YAML_FILE}.lock", File::RDWR | File::CREAT, 0o0664)
-    f.flock(File::LOCK_EX)
+    File.open("#{TEST_YAML_FILE}.lock", File::RDWR | File::CREAT, 0o0664) do |f|
+      f.flock(File::LOCK_EX)
 
-    expect { Timeout.timeout(0.001) { load_yaml_with_flock TEST_YAML_FILE } }.to raise_error(Timeout::Error)
-    f.close
+      expect { Timeout.timeout(0.001) { load_yaml_with_flock TEST_YAML_FILE } }.to raise_error(Timeout::Error)
+    end
   end
 end
 
@@ -43,10 +43,10 @@ describe 'save_yaml_with_flock' do
   end
 
   it 'raises Timeout Error due to flock by other process' do
-    f = File.open("#{TEST_YAML_FILE}.lock", File::RDWR | File::CREAT, 0o0664)
-    f.flock(File::LOCK_EX)
-    expect { Timeout.timeout(0.001) { save_yaml_with_flock test_yaml_obj, TEST_YAML_FILE } }.to raise_error(Timeout::Error)
-    f.close
+    File.open("#{TEST_YAML_FILE}.lock", File::RDWR | File::CREAT, 0o0664) do |f|
+      f.flock(File::LOCK_EX)
+      expect { Timeout.timeout(0.001) { save_yaml_with_flock test_yaml_obj, TEST_YAML_FILE } }.to raise_error(Timeout::Error)
+    end
   end
 end
 
