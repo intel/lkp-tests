@@ -25,9 +25,9 @@ log_cmd export LTP_RUNTIME_MUL=2
 log_cmd export LTPROOT="$(get_benchmark_path)" # used by kirk
 
 if [ -f "$BENCHMARK_ROOT/ltp/runtest/$test" ]; then
-    log_cmd kirk -U ltp -f $test $big_dev_opt $tmpdir_opt
+    log_cmd kirk -f $test $big_dev_opt $tmpdir_opt
 elif [ -f "$BENCHMARK_ROOT/ltp/runtest/temp_single_test" ]; then
-    log_cmd kirk -U ltp -f temp_single_test $big_dev_opt $tmpdir_opt
+    log_cmd kirk -f temp_single_test $big_dev_opt $tmpdir_opt
 else
     die "ltp test cmdfile is not found"
 fi
