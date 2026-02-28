@@ -35,6 +35,12 @@ case "$lkp_command" in
 	'merge')	lkp_command='merge-remote-result'		;;
 	'run-monitor')	lkp_command='run-local-monitor.sh'		;;
 	'stop-monitor')	TMP=/tmp/lkp $LKP_SRC/bin/event/wakeup default-monitors; exit $?	;;
+        'monitor'|'setup'|'test'|'daemon')
+                exec "$LKP_SRC/bin/lkp-programs" "$lkp_command" "$@"
+                ;;
+	'path'|'depends')
+		exec "$LKP_SRC/bin/lkp-programs" "$lkp_command" "$@"
+		;;
 	'run')
 		if echo "$*" | grep '\.sh$' >/dev/null; then
 			lkp_command='run-local.sh'
@@ -55,7 +61,7 @@ try_run()
 try_run2()
 {
 	local subdir="$1"
-	local path="$(find "$LKP_SRC/$subdir" -name "$lkp_command" -type f)"
+	local path="$(find "$LKP_SRC/$subdir" -name "$lkp_command" -print -quit | head -n 1)"
 	shift
 
 	[ -x "$path" ] && exec "$path" $lkp_args "$@"

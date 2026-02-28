@@ -21,10 +21,14 @@ describe LKP::Programs do
 
     # Regular daemon
     FileUtils.touch("#{@lkp_src}/daemon/olddaemon")
+    FileUtils.chmod(0o755, "#{@lkp_src}/daemon/olddaemon")
+    FileUtils.chmod(0o755, "#{@lkp_src}/daemon/olddaemon")
 
     # Program daemon (the bug reproduction case)
     FileUtils.mkdir_p("#{@lkp_src}/programs/newdaemon")
     FileUtils.touch("#{@lkp_src}/programs/newdaemon/daemon")
+    FileUtils.chmod(0o755, "#{@lkp_src}/programs/newdaemon/daemon")
+    FileUtils.chmod(0o755, "#{@lkp_src}/programs/newdaemon/daemon")
   end
 
   before do
@@ -53,6 +57,39 @@ describe LKP::Programs do
 
     it 'finds daemons in programs/*/daemon' do
       expect(described_class.all_tests_and_daemons).to include('newdaemon')
+    end
+  end
+
+  describe '.collect_programs' do
+    it 'returns mapped lkp_files and prog_files' do
+      res = described_class.collect_programs('tests/*', '*/run')
+      expect(res).to include('mytest', 'progtest')
+    end
+
+    it 'filters non-executable files if executable_only is true' do
+      FileUtils.mkdir_p("#{@lkp_src}/custom")
+      FileUtils.touch("#{@lkp_src}/custom/exe_file")
+      FileUtils.chmod(0o755, "#{@lkp_src}/custom/exe_file")
+      FileUtils.touch("#{@lkp_src}/custom/non_exe_file")
+
+      FileUtils.mkdir_p("#{@lkp_src}/programs/custom_prog")
+      FileUtils.touch("#{@lkp_src}/programs/custom_prog/custom_run")
+      FileUtils.chmod(0o755, "#{@lkp_src}/programs/custom_prog/custom_run")
+
+      FileUtils.mkdir_p("#{@lkp_src}/programs/bad_prog")
+      FileUtils.touch("#{@lkp_src}/programs/bad_prog/custom_run")
+
+      res = described_class.collect_programs('custom/*', '*/custom_run', executable_only: true)
+
+      expect(res).to include('exe_file', 'custom_prog')
+      expect(res).not_to include('non_exe_file', 'bad_prog')
+    end
+  end
+
+  describe '.find_executable' do
+    it 'finds an executable dynamically' do
+      path = described_class.find_executable('progtest', 'tests', 'run')
+      expect(path).to end_with('programs/progtest/run')
     end
   end
 end

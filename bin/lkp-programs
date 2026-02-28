@@ -1,0 +1,128 @@
+#!/usr/bin/env ruby
+
+LKP_SRC = ENV['LKP_SRC'] || File.expand_path('..', __dir__)
+
+require "#{LKP_SRC}/lib/programs"
+require 'yaml'
+
+command = ARGV.shift
+subcommand = ARGV.shift
+
+def list_programs(type, verbose)
+  programs = case type
+             when 'setup'
+               LKP::Programs.all_setups
+             when 'test'
+               LKP::Programs.all_tests
+             when 'monitor'
+               LKP::Programs.all_monitors
+             when 'daemon'
+               LKP::Programs.all_daemons
+             end.sort.uniq
+
+  if verbose
+    programs.each do |prog|
+      meta = LKP::Programs.find_meta(prog)
+      desc = ''
+      if meta
+        begin
+          yaml = YAML.load_file(meta)
+          desc = "  - #{yaml['short_description'].to_s.strip.split("\n").first}" if yaml && yaml['short_description']
+        rescue StandardError
+          nil
+        end
+      end
+      printf("%-20s %s\n", prog, desc)
+    end
+  else
+    puts programs
+  end
+end
+
+def find_program_path(type, program)
+  if type
+    case type
+    when 'setup'
+      LKP::Programs.find_setup(program)
+    when 'test'
+      LKP::Programs.find_runner(program)
+    when 'monitor'
+      LKP::Programs.find_monitor(program)
+    when 'daemon'
+      LKP::Programs.find_daemon(program)
+    end
+  else
+    LKP::Programs.find_runner(program) ||
+      LKP::Programs.find_setup(program) ||
+      LKP::Programs.find_monitor(program) ||
+      LKP::Programs.find_daemon(program)
+  end
+end
+
+if command == 'path'
+  target = subcommand
+  path = find_program_path(nil, target)
+  if path
+    puts path
+    exit 0
+  else
+    warn "lkp path #{target}: no executable path found"
+    exit 1
+  end
+elsif command == 'depends'
+  target = subcommand
+  depends_file = LKP::Programs.find_depends_file(target)
+  if depends_file
+    puts File.read(depends_file)
+    exit 0
+  else
+    warn "lkp depends #{target}: no dependencies documented"
+    exit 1
+  end
+elsif ['ls'].include?(subcommand)
+  verbose = ARGV.include?('-v') || ARGV.include?('--verbose')
+  list_programs(command, verbose)
+  exit 0
+elsif ['path'].include?(subcommand)
+  target = ARGV.shift
+  path = find_program_path(command, target)
+  if path
+    puts path
+    exit 0
+  else
+    warn "lkp #{command} path #{target}: no executable path found"
+    exit 1
+  end
+elsif ['depends'].include?(subcommand)
+  target = ARGV.shift
+  depends_file = LKP::Programs.find_depends_file(target)
+  if depends_file
+    puts File.read(depends_file)
+    exit 0
+  else
+    warn "lkp #{command} depends #{target}: no dependencies documented"
+    exit 1
+  end
+elsif [nil, 'help', '--help', '-h'].include?(subcommand)
+  puts "Usage: lkp #{command} <command> [options]"
+  puts ''
+  puts 'Commands:'
+  puts "  ls [-v|--verbose]   List all available #{command}s"
+  puts "  path <program>      Print the absolute path to the #{command} executable"
+  puts "  depends <program>   Print package dependencies required for #{command}"
+  puts '  <program> --help    Show meta.yaml for <program>'
+  exit 0
+elsif ARGV.include?('--help') || ARGV.include?('-h')
+  meta_file = LKP::Programs.find_meta(subcommand)
+  if meta_file
+    puts File.read(meta_file)
+    exit 0
+  else
+    warn "lkp #{command} #{subcommand}: no meta.yaml found"
+    exit 1
+  end
+else
+  warn "lkp #{command}: unknown command/program '#{subcommand}'"
+  warn "See 'lkp #{command} help' for usage."
+  exit 1
+end

@@ -9,23 +9,51 @@ module LKP
     PROGRAMS_ROOT = File.join(LKP_SRC, 'programs').freeze
 
     class << self
+      def collect_programs(lkp_src_pattern, programs_pattern, executable_only: false)
+        lkp_files = Dir["#{LKP_SRC}/#{lkp_src_pattern}"]
+        prog_files = Dir["#{PROGRAMS_ROOT}/#{programs_pattern}"]
+
+        if executable_only
+          lkp_files.select! { |p| File.file?(p) && File.executable?(p) }
+          prog_files.select! { |p| File.file?(p) && File.executable?(p) }
+        end
+
+        (lkp_files || []).map { |path| File.basename(path) } + (prog_files || []).map { |path| path.split('/')[-2] }
+      end
+
+      def find_executable(program, lkp_dir, *prog_names)
+        [
+          *prog_names.map { |n| "#{PROGRAMS_ROOT}/#{program}/#{n}" },
+          "#{LKP_SRC}/#{lkp_dir}/#{program}"
+        ].find { |file| File.exist?(file) }
+      end
+
       def all_stats
-        Dir["#{LKP_SRC}/stats/**/*"].map { |path| File.basename path } +
-          Dir["#{PROGRAMS_ROOT}/*/parse"].map { |path| path.split('/')[-2] }
+        collect_programs('stats/**/*', '*/parse')
       end
 
       alias all_parser_names all_stats
 
       def all_tests
-        Dir["#{LKP_SRC}/tests/**/*"].map { |path| File.basename path } +
-          Dir["#{PROGRAMS_ROOT}/*/run"].map { |path| path.split('/')[-2] }
+        collect_programs('tests/**/*', '*/run')
       end
 
       alias all_runner_names all_tests
 
+      def all_monitors
+        collect_programs('monitors/*', '*/{monitor,no-stdout-monitor,one-shot-monitor}', executable_only: true)
+      end
+
+      def all_setups
+        collect_programs('setup/**/*', '*/setup', executable_only: true)
+      end
+
+      def all_daemons
+        collect_programs('daemon/**/*', '*/daemon', executable_only: true)
+      end
+
       def all_tests_and_daemons
-        all_tests + Dir["#{LKP_SRC}/daemon/**/*"].map { |path| File.basename path } +
-          Dir["#{PROGRAMS_ROOT}/*/daemon"].map { |path| path.split('/')[-2] }
+        all_tests + all_daemons
       end
 
       def all_tests_set
@@ -36,18 +64,31 @@ module LKP
         Dir["#{LKP_SRC}/tests/*.yaml"] + Dir["#{PROGRAMS_ROOT}/*/meta.yaml"]
       end
 
-      def find_parser(program)
+      def find_meta(program)
         [
-          "#{PROGRAMS_ROOT}/#{program}/parse",
-          "#{LKP_SRC}/stats/#{program}"
-        ].find { |file| File.exist? file }
+          "#{PROGRAMS_ROOT}/#{program}/meta.yaml",
+          "#{LKP_SRC}/tests/#{program}.yaml"
+        ].find { |file| File.exist?(file) }
+      end
+
+      def find_parser(program)
+        find_executable(program, 'stats', 'parse')
+      end
+
+      def find_setup(program)
+        find_executable(program, 'setup', 'setup')
+      end
+
+      def find_monitor(program)
+        find_executable(program, 'monitors', 'monitor', 'no-stdout-monitor', 'one-shot-monitor')
+      end
+
+      def find_daemon(program)
+        find_executable(program, 'daemon', 'daemon')
       end
 
       def find_runner(program)
-        [
-          "#{PROGRAMS_ROOT}/#{program}/run",
-          "#{LKP_SRC}/tests/#{program}"
-        ].find { |file| File.exist? file }
+        find_executable(program, 'tests', 'run')
       end
 
       # program: turbostat, turbostat-dev
