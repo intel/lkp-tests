@@ -10,7 +10,7 @@ module LKP
 
     class << self
       def collect_programs(lkp_src_pattern, programs_pattern, executable_only: false)
-        lkp_files = Dir["#{LKP_SRC}/#{lkp_src_pattern}"]
+        lkp_files = lkp_src_pattern ? Dir["#{LKP_SRC}/#{lkp_src_pattern}"] : []
         prog_files = Dir["#{PROGRAMS_ROOT}/#{programs_pattern}"]
 
         if executable_only
@@ -22,10 +22,9 @@ module LKP
       end
 
       def find_executable(program, lkp_dir, *prog_names)
-        [
-          *prog_names.map { |n| "#{PROGRAMS_ROOT}/#{program}/#{n}" },
-          "#{LKP_SRC}/#{lkp_dir}/#{program}"
-        ].find { |file| File.exist?(file) }
+        candidates = prog_names.map { |n| "#{PROGRAMS_ROOT}/#{program}/#{n}" }
+        candidates << "#{LKP_SRC}/#{lkp_dir}/#{program}" if lkp_dir
+        candidates.find { |file| File.exist?(file) }
       end
 
       def all_stats
@@ -35,21 +34,21 @@ module LKP
       alias all_parser_names all_stats
 
       def all_tests
-        collect_programs('tests/**/*', '*/run')
+        collect_programs(nil, '*/run')
       end
 
       alias all_runner_names all_tests
 
       def all_monitors
-        collect_programs('monitors/*', '*/{monitor,no-stdout-monitor,one-shot-monitor}', executable_only: true)
+        collect_programs(nil, '*/{monitor,no-stdout-monitor,one-shot-monitor}', executable_only: true)
       end
 
       def all_setups
-        collect_programs('setup/**/*', '*/setup', executable_only: true)
+        collect_programs(nil, '*/setup', executable_only: true)
       end
 
       def all_daemons
-        collect_programs('daemon/**/*', '*/daemon', executable_only: true)
+        collect_programs(nil, '*/daemon', executable_only: true)
       end
 
       def all_tests_and_daemons
@@ -61,13 +60,12 @@ module LKP
       end
 
       def all_metas
-        Dir["#{LKP_SRC}/tests/*.yaml"] + Dir["#{PROGRAMS_ROOT}/*/meta.yaml"]
+        Dir["#{PROGRAMS_ROOT}/*/meta.yaml"]
       end
 
       def find_meta(program)
         [
-          "#{PROGRAMS_ROOT}/#{program}/meta.yaml",
-          "#{LKP_SRC}/tests/#{program}.yaml"
+          "#{PROGRAMS_ROOT}/#{program}/meta.yaml"
         ].find { |file| File.exist?(file) }
       end
 
@@ -76,19 +74,19 @@ module LKP
       end
 
       def find_setup(program)
-        find_executable(program, 'setup', 'setup')
+        find_executable(program, nil, 'setup')
       end
 
       def find_monitor(program)
-        find_executable(program, 'monitors', 'monitor', 'no-stdout-monitor', 'one-shot-monitor')
+        find_executable(program, nil, 'monitor', 'no-stdout-monitor', 'one-shot-monitor')
       end
 
       def find_daemon(program)
-        find_executable(program, 'daemon', 'daemon')
+        find_executable(program, nil, 'daemon')
       end
 
       def find_runner(program)
-        find_executable(program, 'tests', 'run')
+        find_executable(program, nil, 'run')
       end
 
       # program: turbostat, turbostat-dev

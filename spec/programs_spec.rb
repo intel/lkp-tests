@@ -41,18 +41,20 @@ describe LKP::Programs do
   end
 
   describe '.all_tests' do
-    it 'finds all tests from tests/ and programs/*/run' do
-      expect(described_class.all_tests).to include('mytest', 'progtest')
+    it 'finds all tests from programs/*/run' do
+      expect(described_class.all_tests).to include('progtest')
+      expect(described_class.all_tests).not_to include('mytest')
     end
   end
 
   describe '.all_tests_and_daemons' do
     it 'finds all tests' do
-      expect(described_class.all_tests_and_daemons).to include('mytest', 'progtest')
+      expect(described_class.all_tests_and_daemons).to include('progtest')
+      expect(described_class.all_tests_and_daemons).not_to include('mytest')
     end
 
-    it 'finds daemons in daemon/' do
-      expect(described_class.all_tests_and_daemons).to include('olddaemon')
+    it 'ignores daemons in legacy daemon/' do
+      expect(described_class.all_tests_and_daemons).not_to include('olddaemon')
     end
 
     it 'finds daemons in programs/*/daemon' do
