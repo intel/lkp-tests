@@ -18,7 +18,7 @@
 	ls lkp-tests/jobs
 
 	# install the common dependencies for lkp
-	# Note: lkp support ruby >= 3.1
+	# Note: lkp supports ruby >= 3.1
 	lkp install
 ```
 
@@ -40,7 +40,7 @@
 	# lkp-tests/jobs/hackbench.yaml => ./hackbench-pipe-8-threads-50%.yaml
 	# lkp-tests/jobs/hackbench.yaml => ./hackbench-socket-8-threads-50%.yaml
 
-	# install the remaining dependencies for the splited job
+	# install the remaining dependencies for the split job
 	lkp install ./hackbench-socket-8-threads-50%.yaml
 	# or add -f option to force to install all dependencies
 	lkp install -f ./hackbench-socket-8-threads-50%.yaml
