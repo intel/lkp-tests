@@ -338,7 +338,7 @@ Give an example to explain how to add one testcase, take hwsim as example:
 	# output is:
 	# lkp-tests/jobs/hwsim.yaml => ./hwsim-hwsim-00.yaml
 
-	# install the remaining dependencies for the splited job
+	# install the remaining dependencies for the split job
 	lkp install ./hwsim-hwsim-00.yaml
 	# when second time run the command, the pkg will not build again,
 	# to build the pkg again, you need add flag "-f", it may build
