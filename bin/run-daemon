@@ -44,7 +44,7 @@ if [ -n "$nr_instances" ]; then
 			export instance_cgroup=$cg
 			setup_cgroup "$cg"
 			numa_bind=$(numa_node_binding "$i")
-			$numa_bind $runner_path "$@" &
+			$numa_bind $program_path "$@" &
 			to_wait="$to_wait $!"
 			i=$((i+1))
 			[ "$i" -gt "$nr_instances" ] && break
@@ -52,5 +52,5 @@ if [ -n "$nr_instances" ]; then
 	done
 	wait $to_wait
 else
-	exec $runner_path "$@"
+	exec $program_path "$@"
 fi
