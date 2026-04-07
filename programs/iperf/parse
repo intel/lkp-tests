@@ -6,7 +6,7 @@ require 'json'
 require "#{LKP_SRC}/lib/log"
 
 begin
-  obj = JSON.parse $stdin
+  obj = JSON.parse $stdin.read
 rescue JSON::ParserError => e
   log_error 'error: malformed iperf result'
   log_error e.message[0..300]
