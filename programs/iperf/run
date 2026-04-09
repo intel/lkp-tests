@@ -1,6 +1,7 @@
 #!/bin/bash
 # - runtime
 # - protocol
+# - sessions
 ## iperf is a tool for active measurements of the maximum achievable
 ## bandwidth on IP networks. It supports tuning of various parameters
 ## related to timing, protocols, and buffers. For each test
@@ -8,12 +9,61 @@
 
 [[ -n "$runtime" ]] || runtime=300
 [[ "$protocol" = udp ]] && opt_udp=-u
+[[ -n "$port" ]] || port=5001
 
 [[ -n "$direct_server_ips" ]] && server=$direct_server_ips
 [[ -z "$server" ]] && server=127.0.0.1
 server=${server%% *}
 
-client_cmd="iperf3 -t $runtime -J -c $server $opt_udp"
+if [[ -n "$sessions" ]]; then
+	server_is_localhost=false
+	case "$server" in
+		127.0.0.1|::1|localhost)
+			server_is_localhost=true
+			;;
+	esac
 
-echo "$(date +'%F %T') ${client_cmd}" >> $RESULT_ROOT/reproduce.sh
-${client_cmd}
+	if [[ "$server_is_localhost" = true ]]; then
+		for i in $(seq 1 $sessions); do
+			iperf3 -s -B $server -p $(($port+i-1)) -1 > /dev/null &
+		done
+
+		for i in $(seq 1 $sessions); do
+			local_port=$(($port+i-1))
+			for _ in $(seq 1 10); do
+				ss -tln | grep -q ":${local_port} " && break
+				sleep 0.1
+			done
+		done
+	fi
+
+	client_output_dir="$TMP/iperf-client-output"
+	rm -rf "$client_output_dir"
+	mkdir -p "$client_output_dir"
+
+	for i in $(seq 1 $sessions); do
+		echo "$(date +'%F %T') iperf3 -c $server -p $(($port+i-1)) -i 10 -T $((0+i-1)) -J -t $runtime $opt_udp &" >> $RESULT_ROOT/reproduce.sh
+	done
+	echo "$(date +'%F %T') wait" >> $RESULT_ROOT/reproduce.sh
+
+	client_pids=()
+
+	for i in $(seq 1 $sessions); do
+		iperf3 -c $server -p $(($port+i-1)) -i 10 -T $((0+i-1)) -J -t $runtime $opt_udp > "$client_output_dir/client-$i.json" &
+		client_pids+=($!)
+	done
+
+	for pid in "${client_pids[@]}"; do
+		wait "$pid"
+	done
+
+	for i in $(seq 1 $sessions); do
+		cat "$client_output_dir/client-$i.json"
+	done
+
+	rm -rf "$client_output_dir"
+else
+	client_cmd="iperf3 -t $runtime -J -c $server $opt_udp"
+	echo "$(date +'%F %T') ${client_cmd}" >> $RESULT_ROOT/reproduce.sh
+	${client_cmd}
+fi
