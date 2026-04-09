@@ -5,17 +5,71 @@ LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 3)
 require 'json'
 require "#{LKP_SRC}/lib/log"
 
-begin
-  obj = JSON.parse $stdin.read
+raw = $stdin.read.strip
+
+# Split concatenated JSON objects
+chunks = raw.split(/\}\s*\{/)
+
+json_strings =
+  if chunks.size == 1
+    # Only one JSON object → use directly
+    [raw]
+  else
+    chunks.map.with_index do |chunk, idx|
+      if idx.zero?
+        "#{chunk}}"
+      elsif idx == chunks.size - 1
+        "{#{chunk}"
+      else
+        "{#{chunk}}"
+      end
+    end
+  end
+
+bps_tcp_sender_values = []
+bps_tcp_receiver_values = []
+bps_udp_values = []
+
+json_strings.each_with_index do |json_str, idx|
+  obj = JSON.parse(json_str)
+
+  bps_udp = obj.dig('end', 'sum', 'bits_per_second')
+
+  if bps_udp.nil?
+    bps_tcp_sender = obj.dig('end', 'sum_sent', 'bits_per_second')
+    bps_tcp_receiver = obj.dig('end', 'sum_received', 'bits_per_second')
+  end
+
+  if bps_tcp_sender.nil? && bps_tcp_receiver.nil? && bps_udp.nil?
+    log_error "warning: no bits_per_second in session #{idx + 1}"
+    next
+  end
+
+  bps_tcp_sender_values << bps_tcp_sender if bps_tcp_sender
+  bps_tcp_receiver_values << bps_tcp_receiver if bps_tcp_receiver
+  bps_udp_values << bps_udp if bps_udp
 rescue JSON::ParserError => e
-  log_error 'error: malformed iperf result'
+  log_error "error: malformed JSON in session #{idx + 1}"
   log_error e.message[0..300]
-  log_error e.backtrace.join('\n')
-  exit
+  next
 end
 
-exit if obj['end'].empty?
+if bps_tcp_sender_values.empty? && bps_tcp_receiver_values.empty? && bps_udp_values.empty?
+  log_error 'error: no valid iperf sessions parsed'
+  exit 1
+end
 
-puts "tcp.sender.bps: #{obj['end']['streams'][0]['sender']['bits_per_second']}" if obj['end']['streams'][0]['sender']
-puts "tcp.receiver.bps: #{obj['end']['streams'][0]['receiver']['bits_per_second']}" if obj['end']['streams'][0]['receiver']
-puts "udp.bps: #{obj['end']['streams'][0]['udp']['bits_per_second']}" if obj['end']['streams'][0]['udp']
+unless bps_tcp_sender_values.empty?
+  avg_bps_tcp_sender = bps_tcp_sender_values.sum / bps_tcp_sender_values.size
+  puts "tcp.sender.bps: #{avg_bps_tcp_sender}"
+end
+
+unless bps_tcp_receiver_values.empty?
+  avg_bps_tcp_receiver = bps_tcp_receiver_values.sum / bps_tcp_receiver_values.size
+  puts "tcp.receiver.bps: #{avg_bps_tcp_receiver}"
+end
+
+unless bps_udp_values.empty?
+  avg_bps_udp = bps_udp_values.sum / bps_udp_values.size
+  puts "udp.bps: #{avg_bps_udp}"
+end
