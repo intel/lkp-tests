@@ -1,6 +1,8 @@
 #!/bin/bash
 # - runtime
 # - protocol
+# - sessions
+# - port
 ## iperf is a tool for active measurements of the maximum achievable
 ## bandwidth on IP networks. It supports tuning of various parameters
 ## related to timing, protocols, and buffers. For each test
@@ -8,12 +10,23 @@
 
 [[ -n "$runtime" ]] || runtime=300
 [[ "$protocol" = udp ]] && opt_udp=-u
+[[ -n "$port" ]] || port=5001
 
 [[ -n "$direct_server_ips" ]] && server=$direct_server_ips
 [[ -z "$server" ]] && server=127.0.0.1
 server=${server%% *}
 
-client_cmd="iperf3 -t $runtime -J -c $server $opt_udp"
+if [[ -n "$sessions" ]];then
+	for i in `seq 1 $sessions`; do
+		iperf3 -s -B $server -p $(($port+i-1)) -1 > /dev/null &
+	done
+
+	for i in `seq 1 $sessions`; do
+		iperf3 -c $server -p $(($port+i-1)) -i 10 -T $((0+i-1)) -J -t $runtime $opt_udp
+	done
+else
+	client_cmd="iperf3 -t $runtime -J -c $server $opt_udp"
+	${client_cmd}
+fi
 
 echo "$(date +'%F %T') ${client_cmd}" >> $RESULT_ROOT/reproduce.sh
-${client_cmd}

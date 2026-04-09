@@ -13,6 +13,8 @@ homepage: https://iperf.fr/
 parameters:
   runtime:
   protocol:
+  sessions:
+  port:
 
 results:
   iperf.tcp.receiver.bps:
