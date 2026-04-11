@@ -1,0 +1,103 @@
+{
+	"start":	{
+		"connected":	[{
+				"socket":	5,
+				"local_host":	"127.0.0.1",
+				"local_port":	5001,
+				"remote_host":	"127.0.0.1",
+				"remote_port":	43211
+			}],
+		"version":	"iperf 3.16",
+		"system_info":	"Linux testhost 6.1.0 #1 SMP x86_64 GNU/Linux",
+		"timestamp":	{
+			"time":	"Fri, 10 Apr 2026 10:05:00 GMT",
+			"timesecs":	1775991900
+		},
+		"connecting_to":	{
+			"host":	"127.0.0.1",
+			"port":	5001
+		},
+		"cookie":	"def456",
+		"target_bitrate":	1048576,
+		"test_start":	{
+			"protocol":	"UDP",
+			"num_streams":	1,
+			"blksize":	1460,
+			"omit":	0,
+			"duration":	10,
+			"bytes":	0,
+			"blocks":	0,
+			"reverse":	0,
+			"tos":	0,
+			"target_bitrate":	1048576,
+			"bidir":	0,
+			"fqrate":	0
+		}
+	},
+	"intervals":	[{
+			"streams":	[{
+					"socket":	5,
+					"start":	0,
+					"end":	10.000089,
+					"seconds":	10.000089,
+					"bytes":	1312768,
+					"bits_per_second":	1050205.23,
+					"jitter_ms":	0.025,
+					"lost_packets":	2,
+					"packets":	903,
+					"lost_percent":	0.22148,
+					"omitted":	false,
+					"sender":	true
+				}],
+			"sum":	{
+				"start":	0,
+				"end":	10.000089,
+				"seconds":	10.000089,
+				"bytes":	1312768,
+				"bits_per_second":	1050205.23,
+				"jitter_ms":	0.025,
+				"lost_packets":	2,
+				"packets":	903,
+				"lost_percent":	0.22148,
+				"omitted":	false,
+				"sender":	true
+			}
+		}],
+	"end":	{
+		"streams":	[{
+				"udp":	{
+					"socket":	5,
+					"start":	0,
+					"end":	10.000089,
+					"seconds":	10.000089,
+					"bytes":	1312768,
+					"bits_per_second":	1050205.23,
+					"jitter_ms":	0.025,
+					"lost_packets":	2,
+					"packets":	903,
+					"lost_percent":	0.22148,
+					"sender":	true
+				}
+			}],
+		"sum":	{
+			"start":	0,
+			"end":	10.000089,
+			"seconds":	10.000089,
+			"bytes":	1312768,
+			"bits_per_second":	1050205.23,
+			"jitter_ms":	0.025,
+			"lost_packets":	2,
+			"packets":	903,
+			"lost_percent":	0.22148,
+			"sender":	true
+		},
+		"cpu_utilization_percent":	{
+			"host_total":	0.5,
+			"host_user":	0.1,
+			"host_system":	0.4,
+			"remote_total":	0.3,
+			"remote_user":	0.1,
+			"remote_system":	0.2
+		}
+	}
+}

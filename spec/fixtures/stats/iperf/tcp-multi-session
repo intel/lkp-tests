@@ -1,0 +1,132 @@
+{
+	"start":	{
+		"connected":	[{
+				"socket":	5,
+				"local_host":	"127.0.0.1",
+				"local_port":	5001,
+				"remote_host":	"127.0.0.1",
+				"remote_port":	43220
+			}],
+		"version":	"iperf 3.16",
+		"system_info":	"Linux testhost 6.1.0 #1 SMP x86_64 GNU/Linux",
+		"timestamp":	{
+			"time":	"Fri, 10 Apr 2026 10:10:00 GMT",
+			"timesecs":	1775992200
+		},
+		"connecting_to":	{
+			"host":	"127.0.0.1",
+			"port":	5001
+		},
+		"cookie":	"ghi789",
+		"tcp_mss_default":	32768,
+		"target_bitrate":	0,
+		"test_start":	{
+			"protocol":	"TCP",
+			"num_streams":	1,
+			"blksize":	131072,
+			"omit":	0,
+			"duration":	10,
+			"bytes":	0,
+			"blocks":	0,
+			"reverse":	0,
+			"tos":	0,
+			"target_bitrate":	0,
+			"bidir":	0,
+			"fqrate":	0
+		}
+	},
+	"intervals":	[],
+	"end":	{
+		"sum_sent":	{
+			"start":	0,
+			"end":	10.000098,
+			"seconds":	10.000098,
+			"bytes":	3124019200,
+			"bits_per_second":	2499213415.82,
+			"retransmits":	0,
+			"sender":	true
+		},
+		"sum_received":	{
+			"start":	0,
+			"end":	10.000201,
+			"seconds":	10.000201,
+			"bytes":	3123876864,
+			"bits_per_second":	2499079403.18,
+			"sender":	true
+		},
+		"cpu_utilization_percent":	{
+			"host_total":	3.1,
+			"host_user":	1.0,
+			"host_system":	2.1,
+			"remote_total":	1.5,
+			"remote_user":	0.4,
+			"remote_system":	1.1
+		}
+	}
+}
+{
+	"start":	{
+		"connected":	[{
+				"socket":	5,
+				"local_host":	"127.0.0.1",
+				"local_port":	5002,
+				"remote_host":	"127.0.0.1",
+				"remote_port":	43221
+			}],
+		"version":	"iperf 3.16",
+		"system_info":	"Linux testhost 6.1.0 #1 SMP x86_64 GNU/Linux",
+		"timestamp":	{
+			"time":	"Fri, 10 Apr 2026 10:10:00 GMT",
+			"timesecs":	1775992200
+		},
+		"connecting_to":	{
+			"host":	"127.0.0.1",
+			"port":	5002
+		},
+		"cookie":	"jkl012",
+		"tcp_mss_default":	32768,
+		"target_bitrate":	0,
+		"test_start":	{
+			"protocol":	"TCP",
+			"num_streams":	1,
+			"blksize":	131072,
+			"omit":	0,
+			"duration":	10,
+			"bytes":	0,
+			"blocks":	0,
+			"reverse":	0,
+			"tos":	0,
+			"target_bitrate":	0,
+			"bidir":	0,
+			"fqrate":	0
+		}
+	},
+	"intervals":	[],
+	"end":	{
+		"sum_sent":	{
+			"start":	0,
+			"end":	10.000112,
+			"seconds":	10.000112,
+			"bytes":	2748006400,
+			"bits_per_second":	2198402656.18,
+			"retransmits":	0,
+			"sender":	true
+		},
+		"sum_received":	{
+			"start":	0,
+			"end":	10.000245,
+			"seconds":	10.000245,
+			"bytes":	2747894272,
+			"bits_per_second":	2198291270.42,
+			"sender":	true
+		},
+		"cpu_utilization_percent":	{
+			"host_total":	2.8,
+			"host_user":	0.9,
+			"host_system":	1.9,
+			"remote_total":	1.4,
+			"remote_user":	0.3,
+			"remote_system":	1.1
+		}
+	}
+}
