@@ -75,3 +75,14 @@ index 41637bea160e..1b80c378dc1b 100755
      my $systemInfo = getSystemInfo($verbose);
  
      # If the number of copies to run was not set, set it to 1
+diff --git a/UnixBench/testdir/dc.dat b/UnixBench/testdir/dc.dat
+index dbb8f76d0e43..e7bdc3851c87 100644
+--- a/UnixBench/testdir/dc.dat
++++ b/UnixBench/testdir/dc.dat
+@@ -3,6 +3,5 @@ k
+ 2
+ v
+ p
+-q
+ [ calculate the sqrt(2) to 99 decimal places ... John Lions Test ]
+ [ $Header: dc.dat,v 1.1 87/06/22 14:28:28 kjmcdonell Beta $ ]
