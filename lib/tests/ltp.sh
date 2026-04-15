@@ -77,7 +77,7 @@ specify_tmpdir()
 	mount_point=/fs/$(basename $ltp_partition)
 
 	mkdir -p $mount_point/tmpdir || return
-	tmpdir_opt="--env TMPDIR=$mount_point/tmpdir"
+	tmpdir_opt="--tmp-dir $mount_point/tmpdir"
 
 	return 0
 }
