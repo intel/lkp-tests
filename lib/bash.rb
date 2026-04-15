@@ -70,7 +70,7 @@ module Bash
     end
 
     def safe_grep(*args, **options, &)
-      options[:returns] = [0, 1]
+      options[:returns] ||= [0, 1]
       run(*args, **options, &)
     end
 
