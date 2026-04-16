@@ -60,6 +60,8 @@ def shell_escape(v)
 end
 
 ARGV.each do |file|
+  next if file.nil? || file.empty? || !File.exist?(file)
+
   vars = YAML.unsafe_load_file file
   unless vars
     warn "fail to load file #{file} which results in #{vars.inspect}"
