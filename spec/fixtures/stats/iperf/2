@@ -1,0 +1,178 @@
+{
+  "start": {
+    "connected": [
+      {
+        "socket": 6,
+        "local_host": "127.0.0.1",
+        "local_port": 39820,
+        "remote_host": "127.0.0.1",
+        "remote_port": 25000
+      }
+    ],
+    "version": "iperf 3.20+",
+    "system_info": "Linux ethanolxb491host 7.0.0-rc2 #1 SMP PREEMPT_DYNAMIC Mon Mar 9 09:58:05 UTC 2026 x86_64",
+    "timestamp": {
+      "time": "Wed, 09 Apr 2026 10:00:00 GMT",
+      "timesecs": 1775721600
+    },
+    "connecting_to": {
+      "host": "127.0.0.1",
+      "port": 25000
+    },
+    "cookie": "session1cookie",
+    "tcp_mss_default": 32768,
+    "test_start": {
+      "protocol": "TCP",
+      "num_streams": 1,
+      "blksize": 131072,
+      "omit": 0,
+      "duration": 30,
+      "bytes": 0,
+      "blocks": 0,
+      "reverse": 0,
+      "tos": 0
+    }
+  },
+  "intervals": [],
+  "end": {
+    "streams": [
+      {
+        "sender": {
+          "socket": 6,
+          "start": 0,
+          "end": 30.000512,
+          "seconds": 30.000512,
+          "bytes": 75000000000,
+          "bits_per_second": 20000000000.0,
+          "retransmits": 0,
+          "sender": true
+        },
+        "receiver": {
+          "socket": 6,
+          "start": 0,
+          "end": 30.000612,
+          "seconds": 30.000512,
+          "bytes": 74625000000,
+          "bits_per_second": 19900000000.0,
+          "sender": true
+        }
+      }
+    ],
+    "sum_sent": {
+      "start": 0,
+      "end": 30.000512,
+      "seconds": 30.000512,
+      "bytes": 75000000000,
+      "bits_per_second": 20000000000.0,
+      "retransmits": 0,
+      "sender": true
+    },
+    "sum_received": {
+      "start": 0,
+      "end": 30.000612,
+      "seconds": 30.000612,
+      "bytes": 74625000000,
+      "bits_per_second": 19900000000.0,
+      "sender": true
+    },
+    "cpu_utilization_percent": {
+      "host_total": 85.5,
+      "host_user": 0.3,
+      "host_system": 85.2,
+      "remote_total": 42.1,
+      "remote_user": 0.7,
+      "remote_system": 41.4
+    },
+    "sender_tcp_congestion": "cubic",
+    "receiver_tcp_congestion": "cubic"
+  }
+}
+{
+  "start": {
+    "connected": [
+      {
+        "socket": 7,
+        "local_host": "127.0.0.1",
+        "local_port": 39821,
+        "remote_host": "127.0.0.1",
+        "remote_port": 25001
+      }
+    ],
+    "version": "iperf 3.20+",
+    "system_info": "Linux ethanolxb491host 7.0.0-rc2 #1 SMP PREEMPT_DYNAMIC Mon Mar 9 09:58:05 UTC 2026 x86_64",
+    "timestamp": {
+      "time": "Wed, 09 Apr 2026 10:00:00 GMT",
+      "timesecs": 1775721600
+    },
+    "connecting_to": {
+      "host": "127.0.0.1",
+      "port": 25001
+    },
+    "cookie": "session2cookie",
+    "tcp_mss_default": 32768,
+    "test_start": {
+      "protocol": "TCP",
+      "num_streams": 1,
+      "blksize": 131072,
+      "omit": 0,
+      "duration": 30,
+      "bytes": 0,
+      "blocks": 0,
+      "reverse": 0,
+      "tos": 0
+    }
+  },
+  "intervals": [],
+  "end": {
+    "streams": [
+      {
+        "sender": {
+          "socket": 7,
+          "start": 0,
+          "end": 30.000489,
+          "seconds": 30.000489,
+          "bytes": 82500000000,
+          "bits_per_second": 22000000000.0,
+          "retransmits": 0,
+          "sender": true
+        },
+        "receiver": {
+          "socket": 7,
+          "start": 0,
+          "end": 30.000589,
+          "seconds": 30.000489,
+          "bytes": 81750000000,
+          "bits_per_second": 21800000000.0,
+          "sender": true
+        }
+      }
+    ],
+    "sum_sent": {
+      "start": 0,
+      "end": 30.000489,
+      "seconds": 30.000489,
+      "bytes": 82500000000,
+      "bits_per_second": 22000000000.0,
+      "retransmits": 0,
+      "sender": true
+    },
+    "sum_received": {
+      "start": 0,
+      "end": 30.000589,
+      "seconds": 30.000589,
+      "bytes": 81750000000,
+      "bits_per_second": 21800000000.0,
+      "sender": true
+    },
+    "cpu_utilization_percent": {
+      "host_total": 90.2,
+      "host_user": 0.4,
+      "host_system": 89.8,
+      "remote_total": 45.3,
+      "remote_user": 0.8,
+      "remote_system": 44.5
+    },
+    "sender_tcp_congestion": "cubic",
+    "receiver_tcp_congestion": "cubic"
+  }
+}

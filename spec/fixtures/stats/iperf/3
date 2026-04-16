@@ -1,0 +1,152 @@
+{
+  "start": {
+    "connected": [
+      {
+        "socket": 6,
+        "local_host": "127.0.0.1",
+        "local_port": 48900,
+        "remote_host": "127.0.0.1",
+        "remote_port": 25000
+      }
+    ],
+    "version": "iperf 3.20+",
+    "system_info": "Linux ethanolxb491host 7.0.0-rc2 #1 SMP PREEMPT_DYNAMIC Mon Mar 9 09:58:05 UTC 2026 x86_64",
+    "timestamp": {
+      "time": "Wed, 09 Apr 2026 11:00:00 GMT",
+      "timesecs": 1775725200
+    },
+    "connecting_to": {
+      "host": "127.0.0.1",
+      "port": 25000
+    },
+    "cookie": "udpsession1cookie",
+    "test_start": {
+      "protocol": "UDP",
+      "num_streams": 1,
+      "blksize": 8192,
+      "omit": 0,
+      "duration": 30,
+      "bytes": 0,
+      "blocks": 0,
+      "reverse": 0,
+      "tos": 0
+    }
+  },
+  "intervals": [],
+  "end": {
+    "streams": [
+      {
+        "udp": {
+          "socket": 6,
+          "start": 0,
+          "end": 30.000345,
+          "seconds": 30.000345,
+          "bytes": 3562500000,
+          "bits_per_second": 950000000.0,
+          "jitter_ms": 0.015,
+          "lost_packets": 2,
+          "packets": 434570,
+          "lost_percent": 0.00046,
+          "out_of_order": 0,
+          "sender": true
+        }
+      }
+    ],
+    "sum": {
+      "start": 0,
+      "end": 30.000345,
+      "seconds": 30.000345,
+      "bytes": 3562500000,
+      "bits_per_second": 950000000.0,
+      "jitter_ms": 0.015,
+      "lost_packets": 2,
+      "packets": 434570,
+      "lost_percent": 0.00046,
+      "sender": true
+    },
+    "cpu_utilization_percent": {
+      "host_total": 12.4,
+      "host_user": 0.2,
+      "host_system": 12.2,
+      "remote_total": 6.8,
+      "remote_user": 0.1,
+      "remote_system": 6.7
+    }
+  }
+}
+{
+  "start": {
+    "connected": [
+      {
+        "socket": 7,
+        "local_host": "127.0.0.1",
+        "local_port": 48901,
+        "remote_host": "127.0.0.1",
+        "remote_port": 25001
+      }
+    ],
+    "version": "iperf 3.20+",
+    "system_info": "Linux ethanolxb491host 7.0.0-rc2 #1 SMP PREEMPT_DYNAMIC Mon Mar 9 09:58:05 UTC 2026 x86_64",
+    "timestamp": {
+      "time": "Wed, 09 Apr 2026 11:00:00 GMT",
+      "timesecs": 1775725200
+    },
+    "connecting_to": {
+      "host": "127.0.0.1",
+      "port": 25001
+    },
+    "cookie": "udpsession2cookie",
+    "test_start": {
+      "protocol": "UDP",
+      "num_streams": 1,
+      "blksize": 8192,
+      "omit": 0,
+      "duration": 30,
+      "bytes": 0,
+      "blocks": 0,
+      "reverse": 0,
+      "tos": 0
+    }
+  },
+  "intervals": [],
+  "end": {
+    "streams": [
+      {
+        "udp": {
+          "socket": 7,
+          "start": 0,
+          "end": 30.000298,
+          "seconds": 30.000298,
+          "bytes": 3675000000,
+          "bits_per_second": 980000000.0,
+          "jitter_ms": 0.012,
+          "lost_packets": 1,
+          "packets": 448608,
+          "lost_percent": 0.00022,
+          "out_of_order": 0,
+          "sender": true
+        }
+      }
+    ],
+    "sum": {
+      "start": 0,
+      "end": 30.000298,
+      "seconds": 30.000298,
+      "bytes": 3675000000,
+      "bits_per_second": 980000000.0,
+      "jitter_ms": 0.012,
+      "lost_packets": 1,
+      "packets": 448608,
+      "lost_percent": 0.00022,
+      "sender": true
+    },
+    "cpu_utilization_percent": {
+      "host_total": 13.1,
+      "host_user": 0.3,
+      "host_system": 12.8,
+      "remote_total": 7.2,
+      "remote_user": 0.2,
+      "remote_system": 7.0
+    }
+  }
+}
