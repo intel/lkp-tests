@@ -1,0 +1,22 @@
+url: https://git.kernel.org/pub/scm/linux/kernel/git/liveupdate/linux.git
+notify_build_success_branch: .*
+integration_testing_branches:
+- fixes
+- next
+- kexec-fixes
+- kexec-next
+owner:
+- Pasha Tatashin <pasha.tatashin@soleen.com>
+- Pratyush Yadav <pratyush@kernel.org>
+- Mike Rapoport <rppt@kernel.org>
+mail_cc:
+- Pasha Tatashin <pasha.tatashin@soleen.com>
+- Pratyush Yadav <pratyush@kernel.org>
+- Mike Rapoport <rppt@kernel.org>
+- kexec@lists.infradead.org
+subsystems:
+- liveupdate
+- kho
+- kexec
+- kdump
+belongs_to: liveupdate
