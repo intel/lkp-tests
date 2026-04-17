@@ -13,6 +13,9 @@ homepage: https://iperf.fr/
 parameters:
   runtime:
   protocol:
+  sessions:
+  numactl:
+  tune:
 
 results:
   iperf.tcp.receiver.bps:

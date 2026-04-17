@@ -30,6 +30,7 @@ fxmark::
 hackbench::
 hwsim::
 igt::
+iperf::
 iozone::
 kbuild::
 kernbench::
