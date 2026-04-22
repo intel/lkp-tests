@@ -63,6 +63,7 @@ tcpdump
 telnet
 telnetd-ssl
 tpm-tools
+tpm-udev
 traceroute
 trousers
 udisks2

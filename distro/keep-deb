@@ -45,6 +45,7 @@ rusersd
 sysstat
 tcpdump
 telnet
+tpm-udev
 traceroute
 trousers
 udisks2
