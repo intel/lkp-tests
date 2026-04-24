@@ -1,6 +1,6 @@
 #!/bin/sh
 
-file=$(basename $0)
+file=$(basename "$(dirname "$0")")
 file=${file#numa-}
 
 [ -f /sys/devices/system/node/node1/$file ] || exit 0

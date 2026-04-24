@@ -188,7 +188,7 @@ get_program_name()
 		[ "$i" != "${i#*=}" ] && continue # skip env NAME=VALUE
 
 		case $i in
-		*/bin/run-test|*/bin/run-setup|*/bin/run-daemon|*/bin/run-monitor|*/bin/run-no-stdout-monitor|*/bin/run-one-shot-monitor) continue ;;
+		*/bin/run-test|*/bin/run-setup|*/bin/run-daemon|*/bin/run-monitor|*/bin/run-plain-monitor|*/bin/run-no-stdout-monitor|*/bin/run-one-shot-monitor) continue ;;
 		esac
 
 		program=${i##*/}
@@ -248,9 +248,12 @@ run_program_in_background()
 
 run_monitor()
 {
+	local program
+	program=$(get_program_name "$@") || return 1
+
 	# w/a for watchdog to permit it always runs
-	[ "$need_monitors" = "false" ] && [ "${1%%watchdog/plain-monitor}" = "$1" ] && return
-	[ "$disable_monitor" = "$1" ] && return
+	[ "$need_monitors" = "false" ] && [ "$program" != "watchdog" ] && return
+	[ "$disable_monitor" = "$program" ] && return
 
 	run_program_in_background "$@"
 }

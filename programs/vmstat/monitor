@@ -1,6 +1,6 @@
 #!/bin/sh
 
-file=$(basename $0)
+file=$(basename "$(dirname "$0")")
 
 if vmstat --help | grep -q -F 'timestamp'; then
 	opt_timestamp='--timestamp'

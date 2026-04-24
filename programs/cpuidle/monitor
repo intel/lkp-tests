@@ -19,7 +19,7 @@ take_snapshot()
 	done
 }
 
-file=$(basename $0)
+file=$(basename "$(dirname "$0")")
 
 . $LKP_SRC/lib/wait.sh
 setup_wait
