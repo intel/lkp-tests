@@ -7,9 +7,14 @@ patch_based_on_branch:
   '\[.+ (-mm)( .+)?\]': mm-everything
 maintained_subsystems:
 - MEMORY HOT(UN)PLUG
+
 notify_build_success_branch: mm-new
 mail_to: David Hildenbrand <david@kernel.org>
-mail_cc: David Hildenbrand <david@kernel.org>
+mail_cc:
+- David Hildenbrand <david@kernel.org>
+- Andrew Morton <akpm@linux-foundation.org>
+- mm-commits@vger.kernel.org
+
 prioritized_branch: mm-new
 tests:
   - branch: mm-new
