@@ -3,8 +3,8 @@ mail_cc:
 - netfilter-devel@vger.kernel.org
 - coreteam@netfilter.org
 owner: Pablo Neira Ayuso <pablo@netfilter.org>
-git_am_branch: master
+git_am_branch: main
 subsystems:
 - netfilter
 patch_based_on_branch:
-  '\[(.+ )?nf-next( .+)?\]': master
+  '\[(.+ )?nf-next( .+)?\]': main
