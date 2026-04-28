@@ -1,0 +1,118 @@
+kern  :warn  : [    3.078160] [      T0] ------------[ cut here ]------------
+kern  :warn  : [    3.078160] [      T0] Cannot free reserved memory because of deferred initialization of the memory map
+kern  :warn  : [    3.078160] [      T0] WARNING: mm/memblock.c:904 at __free_reserved_area+0xd3/0xf0, CPU#0: swapper/0/0
+kern  :warn  : [    3.078160] [      T0] Modules linked in:
+kern  :warn  : [    3.078160] [      T0] CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 7.0.0-rc6-next-20260330 #1 PREEMPT(full)
+kern  :warn  : [    3.078160] [      T0] Hardware name: Intel Corporation CometLake Client Platform/CometLake S UDIMM (ERB/CRB), BIOS CMLSFWR1.R00.2212.D00.2104290922 04/29/2021
+kern  :warn  : [    3.078160] [      T0] RIP: 0010:__free_reserved_area+0xd3/0xf0
+kern  :warn  : [    3.078160] [      T0] Code: df 4c 89 e6 e8 ce fb ff ff 48 89 c3 4c 39 e0 72 83 5b 4c 89 e8 5d 41 5c 41 5d 41 5e 41 5f e9 04 7e 4c 01 48 8d 3d 8d ea 10 04 <67> 48 0f b9 3a 45 31 ed eb dd 0f 1f 00 66 66 2e 0f 1f 84 00 00 00
+kern  :warn  : [    3.078160] [      T0] RSP: 0000:ffffffff84607e78 EFLAGS: 00010202
+kern  :warn  : [    3.078160] [      T0] RAX: 00000004d5000001 RBX: 000000045bb1d000 RCX: ffffffff819ae685
+kern  :warn  : [    3.078160] [      T0] RDX: 00000000000000cc RSI: 000000045bb2a000 RDI: ffffffff85abcf70
+kern  :warn  : [    3.078160] [      T0] RBP: ffffffff86b2a000 R08: 0000000000000000 R09: fffffbfff08dee8c
+kern  :warn  : [    3.078160] [      T0] R10: ffffffff846f7463 R11: 0000000000001000 R12: 00000000000000cc
+kern  :warn  : [    3.078160] [      T0] R13: ffffffff8302f9a0 R14: 0000000000000000 R15: 000000045e7f1000
+kern  :warn  : [    3.078160] [      T0] FS:  0000000000000000(0000) GS:ffff8883fcf2c000(0000) knlGS:0000000000000000
+kern  :warn  : [    3.078160] [      T0] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+kern  :warn  : [    3.078160] [      T0] CR2: ffff88845da01000 CR3: 0000000459672001 CR4: 00000000003706f0
+kern  :warn  : [    3.078160] [      T0] Call Trace:
+kern  :warn  : [    3.078160] [      T0]  <TASK>
+kern  :warn  : [    3.078160] [      T0]  free_reserved_area+0xcc/0x170
+kern  :warn  : [    3.078160] [      T0]  alternative_instructions+0x134/0x150
+kern  :warn  : [    3.078160] [      T0]  arch_cpu_finalize_init+0x157/0x1e0
+kern  :warn  : [    3.078160] [      T0]  start_kernel+0x31c/0x3a0
+kern  :warn  : [    3.078160] [      T0]  x86_64_start_reservations+0x20/0x20
+kern  :warn  : [    3.078160] [      T0]  x86_64_start_kernel+0xd8/0xe0
+kern  :warn  : [    3.078160] [      T0]  common_startup_64+0x13e/0x141
+kern  :warn  : [    3.078160] [      T0]  </TASK>
+kern  :warn  : [    3.078160] [      T0] irq event stamp: 182603
+kern  :warn  : [    3.078160] [      T0] hardirqs last  enabled at (182613): [<ffffffff81527a22>] __up_console_sem+0x52/0x70
+kern  :warn  : [    3.078160] [      T0] hardirqs last disabled at (182622): [<ffffffff81527a07>] __up_console_sem+0x37/0x70
+kern  :warn  : [    3.078160] [      T0] softirqs last  enabled at (0): [<0000000000000000>] 0x0
+kern  :warn  : [    3.078160] [      T0] softirqs last disabled at (0): [<0000000000000000>] 0x0
+kern  :warn  : [    3.078160] [      T0] ---[ end trace 0000000000000000 ]---
+kern  :info  : [    3.078160] [      T0] pid_max: default: 32768 minimum: 301
+kern  :info  : [    3.078160] [      T0] Yama: becoming mindful.
+kern  :info  : [    3.078160] [      T0] LSM support for eBPF active
+...
+user  :notice: [  218.594644] [    T442]   6: Simple expression parser                                        : Running (1 active)
+user  :notice: [  218.683124] [    T442]   6: Simple expression parser                                        : Ok
+user  :notice: [  218.771402] [    T442] 2026-04-02 08:53:52 sudo ASAN_OPTIONS=fast_unwind_on_malloc=0 /usr/src/linux-perf-x86_64-rhel-9.4-bpf-cf7c3c02fdd0dfccf4d6611714273dcb538af2cb/tools/perf/perf test 7 -v
+user  :notice: [  219.005739] [    T442]   7: PERF_RECORD_* events & perf_sample fields                       : Running (1 active)
+user  :notice: [  221.224229] [    T442]   7: PERF_RECORD_* events & perf_sample fields                       : Ok
+user  :notice: [  221.311788] [    T442] 2026-04-02 08:53:55 sudo ASAN_OPTIONS=fast_unwind_on_malloc=0 /usr/src/linux-perf-x86_64-rhel-9.4-bpf-cf7c3c02fdd0dfccf4d6611714273dcb538af2cb/tools/perf/perf test 8 -v
+user  :notice: [  221.616778] [    T442]   8: Sysfs PMU tests                                                 :
+user  :notice: [  221.629801] [    T442]   8.1: Parsing with PMU format directory                             : Running (7 active)
+user  :notice: [  221.689824] [    T442]   8.1: Parsing with PMU format directory                             : Ok
+user  :notice: [  221.730857] [    T442]   8.2: Parsing with PMU event                                        : Ok
+user  :notice: [  221.742709] [    T442]   8.3: PMU event names                                               : Ok
+user  :notice: [  221.754903] [    T442]   8.4: PMU name combining                                            : Ok
+user  :notice: [  221.766720] [    T442]   8.5: PMU name comparison                                           : Ok
+user  :notice: [  221.778495] [    T442]   8.6: PMU cmdline match                                             : Ok
+user  :notice: [  221.801949] [    T442]   8.7: PMU user config changes                                       : Ok
+user  :notice: [  221.890977] [    T442] 2026-04-02 08:53:55 sudo ASAN_OPTIONS=fast_unwind_on_malloc=0 /usr/src/linux-perf-x86_64-rhel-9.4-bpf-cf7c3c02fdd0dfccf4d6611714273dcb538af2cb/tools/perf/perf test 9 -v
+user  :notice: [  222.172475] [    T442]   9: PMU JSON event tests                                            :
+user  :notice: [  222.184333] [    T442]   9.1: PMU event table sanity                                        : Running (5 active)
+user  :notice: [  222.197488] [    T442]   9.1: PMU event table sanity                                        : Ok
+user  :notice: [  222.285582] [    T442]   9.2: PMU event map aliases                                         : Ok
+kern  :err   : [  445.803550] [     C15] irq 26: nobody cared (try booting with the "irqpoll" option)
+kern  :warn  : [  445.811003] [     C15] CPU: 15 UID: 0 PID: 0 Comm: swapper/15 Tainted: G        W           7.0.0-rc6-next-20260330 #1 PREEMPT(full)
+kern  :warn  : [  445.811009] [     C15] Tainted: [W]=WARN
+kern  :warn  : [  445.811010] [     C15] Hardware name: Intel Corporation CometLake Client Platform/CometLake S UDIMM (ERB/CRB), BIOS CMLSFWR1.R00.2212.D00.2104290922 04/29/2021
+kern  :warn  : [  445.811013] [     C15] Call Trace:
+kern  :warn  : [  445.811015] [     C15]  <IRQ>
+kern  :warn  : [  445.811018] [     C15]  dump_stack_lvl+0x57/0x80
+kern  :warn  : [  445.811026] [     C15]  __report_bad_irq+0x40/0xe3
+kern  :warn  : [  445.811031] [     C15]  note_interrupt.cold+0xb/0x8c
+kern  :warn  : [  445.811037] [     C15]  handle_irq_event+0xaf/0xf0
+kern  :warn  : [  445.811043] [     C15]  handle_fasteoi_irq+0x167/0x3b0
+kern  :warn  : [  445.811051] [     C15]  __common_interrupt+0x53/0xf0
+kern  :warn  : [  445.811057] [     C15]  common_interrupt+0x7c/0xb0
+kern  :warn  : [  445.811061] [     C15]  </IRQ>
+kern  :warn  : [  445.811063] [     C15]  <TASK>
+kern  :warn  : [  445.811065] [     C15]  asm_common_interrupt+0x22/0x40
+kern  :warn  : [  445.811069] [     C15] RIP: 0010:cpuidle_enter_state+0xfb/0x2f0
+kern  :warn  : [  445.811074] [     C15] Code: ff 8b 73 04 bf ff ff ff ff 49 89 c6 e8 1e 22 94 ff 31 ff e8 d7 ef 65 fe 45 84 ff 0f 85 34 01 00 00 e8 09 eb 85 fe fb 45 85 e4 <0f> 88 0e 01 00 00 4d 63 fc 4c 89 f7 4b 8d 04 7f 49 8d 04 87 4c 8d
+kern  :warn  : [  445.811077] [     C15] RSP: 0018:ffff888101707d88 EFLAGS: 00000206
+kern  :warn  : [  445.811080] [     C15] RAX: 0000000000671b95 RBX: ffffe8ffffb818d8 RCX: 0000000000000000
+kern  :warn  : [  445.811083] [     C15] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff82e596c7
+kern  :warn  : [  445.811085] [     C15] RBP: ffffffff85571860 R08: 0000000000000001 R09: 0000000000000000
+kern  :warn  : [  445.811087] [     C15] R10: ffffffff85a953a7 R11: 0000000000000000 R12: 0000000000000003
+kern  :warn  : [  445.811089] [     C15] R13: 0000000000000003 R14: 00000067cbf61674 R15: 0000000000000000
+kern  :warn  : [  445.811096] [     C15]  ? cpuidle_enter_state+0xf7/0x2f0
+kern  :warn  : [  445.811103] [     C15]  ? cpuidle_enter_state+0xf7/0x2f0
+kern  :warn  : [  445.811109] [     C15]  cpuidle_enter+0x3c/0x70
+kern  :warn  : [  445.811116] [     C15]  cpuidle_idle_call+0x1bb/0x2f0
+kern  :warn  : [  445.811121] [     C15]  ? __pfx_cpuidle_idle_call+0x10/0x10
+kern  :warn  : [  445.811126] [     C15]  ? tick_nohz_idle_enter+0xa8/0xf0
+kern  :warn  : [  445.811131] [     C15]  ? tsc_verify_tsc_adjust+0x76/0x170
+kern  :warn  : [  445.811138] [     C15]  do_idle+0xc7/0x130
+kern  :warn  : [  445.811144] [     C15]  cpu_startup_entry+0x2f/0x70
+kern  :warn  : [  445.811147] [     C15]  start_secondary+0x1a3/0x1f0
+kern  :warn  : [  445.811152] [     C15]  ? __pfx_start_secondary+0x10/0x10
+kern  :warn  : [  445.811160] [     C15]  common_startup_64+0x13e/0x141
+kern  :warn  : [  445.811171] [     C15]  </TASK>
+kern  :err   : [  445.811173] [     C15] handlers:
+kern  :err   : [  446.023748] [     C15] [<0000000074b08020>] irq_default_primary_handler threaded [<000000003a5f22f8>] tps6598x_interrupt [tps6598x]
+kern  :emerg : [  446.035467] [     C15] Disabling IRQ #26
+user  :notice: [  664.341731] [    T442]   9.3: Parsing of PMU event table metrics                            : Ok
+user  :notice: [  684.943104] [    T442]   9.4: Parsing of PMU event table metrics with fake PMUs             : Ok
+user  :notice: [  688.656962] [    T442]   9.5: Parsing of metric thresholds with fake PMUs                   : Ok
+user  :notice: [  688.757286] [    T442] 2026-04-02 09:01:42 sudo ASAN_OPTIONS=fast_unwind_on_malloc=0 /usr/src/linux-perf-x86_64-rhel-9.4-bpf-cf7c3c02fdd0dfccf4d6611714273dcb538af2cb/tools/perf/perf test 10 -v
+user  :notice: [  689.010532] [    T442]  10: Hwmon PMU                                                       :
+user  :notice: [  689.022408] [    T442]  10.1: Basic parsing test                                            : Running (3 active)
+user  :notice: [  689.047252] [    T442]  10.1: Basic parsing test                                            : Ok
+user  :notice: [  689.189295] [    T442]  10.2: Parsing without PMU name                                      : Ok
+user  :notice: [  689.201204] [    T442]  10.3: Parsing with PMU name                                         : Ok
+user  :notice: [  689.269604] [    T442] 2026-04-02 09:01:43 sudo ASAN_OPTIONS=fast_unwind_on_malloc=0 /usr/src/linux-perf-x86_64-rhel-9.4-bpf-cf7c3c02fdd0dfccf4d6611714273dcb538af2cb/tools/perf/perf test 11 -v
+user  :notice: [  689.508967] [    T442]  11: Tool PMU                                                        :
+user  :notice: [  689.520888] [    T442]  11.1: Parsing without PMU name                                      : Running (2 active)
+user  :notice: [  689.709937] [    T442]  11.1: Parsing without PMU name                                      : Ok
+user  :notice: [  689.722012] [    T442]  11.2: Parsing with PMU name                                         : Ok
+user  :notice: [  689.790187] [    T442] 2026-04-02 09:01:43 sudo ASAN_OPTIONS=fast_unwind_on_malloc=0 /usr/src/linux-perf-x86_64-rhel-9.4-bpf-cf7c3c02fdd0dfccf4d6611714273dcb538af2cb/tools/perf/perf test 12 -v
+user  :notice: [  690.040616] [    T442]  12: DSO data tests                                                  :
+user  :notice: [  690.052546] [    T442]  12.1: read                                                          : Running (3 active)
+user  :notice: [  690.080492] [    T442]  12.1: read                                                          : Ok
+user  :notice: [  690.097346] [    T442]  12.2: cache                                                         : Ok
+user  :notice: [  690.109158] [    T442]  12.3: reopen                                                        : Ok
+user  :notice: [  690.186811] [    T442] 2026-04-02 09:01:44 sudo ASAN_OPTIONS=fast_unwind_on_malloc=0 /usr/src/linux-perf-x86_64-rhel-9.4-bpf-cf7c3c02fdd0dfccf4d6611714273dcb538af2cb/tools/perf/perf test 13 -v

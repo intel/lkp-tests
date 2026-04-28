@@ -1,0 +1,21 @@
+boot_failures: 1
+
+# RIP: __free_reserved_area+0x
+RIP:__free_reserved_area: 1
+message:RIP:__free_reserved_area: kern  :warn  : [    3.078160] [      T0] RIP: 0010:__free_reserved_area+0xd3/0xf0
+pattern:RIP:__free_reserved_area: RIP: __free_reserved_area+0x
+
+# irq .* nobody cared
+irq#:nobody_cared: 1
+message:irq#:nobody_cared: kern  :err   : [  445.803550] [     C15] irq 26: nobody cared (try booting with the "irqpoll" option)
+pattern:irq#:nobody_cared: irq .* nobody cared
+
+# RIP: cpuidle_enter_state+0x
+RIP:cpuidle_enter_state: 1
+message:RIP:cpuidle_enter_state: kern  :warn  : [  445.811069] [     C15] RIP: 0010:cpuidle_enter_state+0xfb/0x2f0
+pattern:RIP:cpuidle_enter_state: RIP: cpuidle_enter_state+0x
+
+timestamp:last: 446.035467
+timestamp:RIP:__free_reserved_area: 3.078160
+timestamp:irq#:nobody_cared: 445.803550
+timestamp:RIP:cpuidle_enter_state: 445.811069
