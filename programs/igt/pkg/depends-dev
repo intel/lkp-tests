@@ -14,6 +14,7 @@ libelf-dev
 libgsl-dev
 libjson-c-dev
 libkmod-dev
+libpci-dev
 libpciaccess-dev
 libpixman-1-dev
 libprocps-dev

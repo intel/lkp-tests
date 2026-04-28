@@ -12,6 +12,7 @@ libelf1
 libglib2.0-0
 libgsl
 libkmod2
+libpci3
 libpciaccess0
 libpixman-1-0
 libprocps
