@@ -20,7 +20,7 @@ build()
 
 	cd_src_pkg_dir
 
-	meson build && ninja -C build
+	meson setup build && ninja -C build
 
 	deactivate
 }
