@@ -2,30 +2,38 @@
 # - group
 # - test
 
-. $LKP_SRC/lib/debug.sh
-. $LKP_SRC/lib/upload.sh
-. $LKP_SRC/lib/reproduce-log.sh
+# shellcheck disable=SC1091
+. "$LKP_SRC"/lib/debug.sh
+. "$LKP_SRC"/lib/upload.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
 
 cd "$BENCHMARK_ROOT/igt" || exit
 
 exclude=$BENCHMARK_ROOT/igt/exclude
 test_file=$BENCHMARK_ROOT/igt/$group
 
+[[ -f "$test_file" ]] || die "igt group file not found: $test_file"
+
 exclude_tests()
 {
 	mapfile -t excluded_tests < <(grep -v "#" "$exclude")
+
 	local test
 	for test in "${excluded_tests[@]}"
 	do
-		sed -i "/$test/d" $test_file
+		sed -i "/$test/d" "$test_file"
 	done
 }
 
 exclude_tests
 
 denylist=$BENCHMARK_ROOT/igt/tests/intel-ci/blacklist.txt
-grep -v -e ^# -e ^$ "$denylist" > "$(dirname "$denylist")/denylist"
-denylist=$(dirname "$denylist")/denylist
+if [[ -f "$denylist" ]]; then
+	grep -v -e ^# -e ^$ "$denylist" > "$(dirname "$denylist")/denylist"
+	denylist=$(dirname "$denylist")/denylist
+else
+	denylist=
+fi
 
 while read -r testcase
 do
@@ -36,29 +44,30 @@ do
 		# "sort -u" is to rm duplicate subtest "interruptible"
 		mapfile -t subtests < <(build/tests/"$testcase" --list-subtest | sort -u)
 	fi
+
 	for subtest in "${subtests[@]}"
 	do
 		full_test_name=igt@$testcase@$subtest
 
-		echo $subtest | grep -q -e suspend -e hibernate -e S3 && {
+		echo "$subtest" | grep -q -e suspend -e hibernate -e S3 && {
 			# add "-e S3" to skip PM-related test
 			# [  133.586866] PM: suspend entry (deep)
 			echo "LKP SKIP $full_test_name"
 			continue
 		}
 
-		echo $full_test_name | grep -q -E -f "$denylist" && {
+		[[ -n "$denylist" ]] && echo "$full_test_name" | grep -q -E -f "$denylist" && {
 			echo "LKP SKIP $full_test_name"
 			continue
 		}
 
-		log_cmd build/tests/$testcase --run-subtest $subtest 2>&1
+		log_cmd build/tests/"$testcase" --run-subtest "$subtest" 2>&1
 
 		# #define IGT_EXIT_ABORT 112
 		# Exit status indicating a severe test/enviroment failure, any continued
 		# testing past this point can yeild unexpected reasults and is not recommended
-		[ $? -eq 112 ] && exit 112
+		[[ $? -eq 112 ]] && exit 112
 	done
-done < $test_file
+done < "$test_file"
 
 exit 0
