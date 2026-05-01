@@ -4,7 +4,7 @@ mail_cc:
 - linux-arm-kernel@lists.infradead.org
 owner:
 - Catalin Marinas <catalin.marinas@arm.com>
-- Will Deacon <will.deacon@arm.com>
+- Will Deacon <will@kernel.org>
 subsystems:
 - arm64
 - psci

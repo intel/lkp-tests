@@ -1,6 +1,6 @@
 url: https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git
 integration_testing_branches: for-next/perf
-owner: Will Deacon <will.deacon@arm.com>
+owner: Will Deacon <will@kernel.org>
 subsystems:
 - arm64
 - iommu
