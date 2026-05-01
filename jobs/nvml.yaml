@@ -22,7 +22,6 @@ nvml:
     - set
     - unicode
     - valgrind
-    - pmempool
     - util
 
 ---
@@ -37,3 +36,10 @@ nvml:
     - pmem
     - traces
     - util
+
+---
+need_memory: 10G
+nvml:
+  test: non-pmem
+  group:
+    - pmempool
