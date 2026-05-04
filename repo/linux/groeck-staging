@@ -1,14 +1,13 @@
 url: https://git.kernel.org/pub/scm/linux/kernel/git/groeck/linux-staging.git
-integration_testing_branches: hwmon-next
-mail_cc: linux-hwmon@vger.kernel.org
+integration_testing_branches:
+- hwmon
+- hwmon-next
+- watchdog
+- watchdog-next
+mail_cc: Guenter Roeck <linux@roeck-us.net>
 owner: Guenter Roeck <linux@roeck-us.net>
 subsystems:
-- dsa
 - hwmon
 - watchdog
-- mfd
-- reset
-- power
-- x86
 - pmbus
 notify_build_success_branch: .*
