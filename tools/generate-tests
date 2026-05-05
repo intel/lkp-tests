@@ -15,4 +15,4 @@
 }
 
 # shellcheck disable=SC2010
-ls $1/??? | grep -v -f <(cat $1-*) | cut -f2 -d/ > $1-all
+ls $1/??? | grep -v -f <(cat $1-* 2>/dev/null) | cut -f2 -d/ > $1-all

@@ -36,6 +36,7 @@ generate_new_tests()
 {
 	for tests in "$(get_pkg_dir "${pkgname}")"/addon/tests/*
 	do
+		[[ -f "$tests" ]] || continue
 		cat $tests | grep -v '^#' > $benchmark_path/tests/$(basename $tests)
 	done
 
@@ -67,6 +68,7 @@ split_standalone_tests()
 {
 	for file in $(get_pkg_dir blktests)/addon/tests/*-standalone
 	do
+		[[ -f "$file" ]] || continue
 		fields=(`basename $file | tr '-' ' '`)
 		fs=${fields[0]}
 
