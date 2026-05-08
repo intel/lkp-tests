@@ -96,7 +96,7 @@ kernel-selftests:
 
     - tc-testing
     - tdx
-    - thermal
+    # - thermal # requires DPTF capable SKU
     - timens
     - timers
     - tmpfs
