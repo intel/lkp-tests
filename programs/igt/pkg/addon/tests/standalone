@@ -8,3 +8,5 @@ gem_ctx_create
 gem_shrink
 # need mem > 15G
 gem_ctx_exec
+# need mem > 14G
+gem_mmap_gtt
