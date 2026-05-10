@@ -41,5 +41,6 @@ thin-provisioning-tools
 udev
 udftools
 uidmap
+uuid-runtime
 xfsdump
 zlib1g
