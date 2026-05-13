@@ -227,7 +227,10 @@ setup_logdev_config()
 		# log size 67108864 blocks too large, maximum size is 1048576 blocks
 		# if had partition already, create a virtual disk for log
 		setup_external_log_dev 100
-	elif is_test_in_group "$test" "ext4-logdev" "generic-logdev" "xfs-logdev"; then
+	elif is_test_in_group "$test" "ext4-logdev"; then
+		setup_external_log_dev 100
+		log_eval export USE_EXTERNAL="yes"
+	elif is_test_in_group "$test" "generic-logdev" "xfs-logdev"; then
 		setup_external_log_dev 100
 	elif is_test_in_group "$test" "generic-scratch-shutdown-metadata-journaling"; then
 		# Filesystem must be larger than 300MB
