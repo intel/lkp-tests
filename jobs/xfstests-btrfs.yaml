@@ -42,10 +42,14 @@ xfstests:
     - btrfs-group-26
     - btrfs-group-27
     - btrfs-group-28
-    - btrfs-group-29
     - btrfs-group-30
     - btrfs-group-31
     - btrfs-group-32
     - btrfs-group-33
     - btrfs-group-34
     # - btrfs-scratch-verity
+---
+disk: 9HDD
+xfstests:
+  test:
+    - btrfs-group-29
