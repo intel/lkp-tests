@@ -1,5 +1,6 @@
 acl
 apache2
+apache2-utils
 arping
 at
 automake
@@ -9,6 +10,7 @@ bsdmainutils
 build-essential
 bzip2
 cron
+curl
 dnsmasq
 dnsutils
 dosfstools
@@ -41,6 +43,7 @@ libtirpc
 lvm2
 mount
 net-tools
+netcat-openbsd
 nfs-kernel-server
 nftables
 ntfs-3g
