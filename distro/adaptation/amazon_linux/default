@@ -422,6 +422,7 @@ systemtap-sdt-dev: systemtap-sdt-devel
 telnetd-ssl:
 thin-provisioning-tools:
 tpm-tools: tpm2-tools
+tpm-udev:
 trinity:
 udftools:
 usbutils:

@@ -381,6 +381,7 @@ stress: stress-ng
 systemd-dev:
 systemtap-sdt-dev: systemtap-sdt-devel
 telnetd-ssl:
+tpm-udev:
 tshark: wireshark
 uidmap: shadow
 update-inetd:
