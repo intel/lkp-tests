@@ -441,6 +441,7 @@ systemd-dev: systemd-devel
 systemtap-sdt-dev: systemtap-sdt-devel
 telnetd-ssl:
 thin-provisioning-tools:
+tpm-udev:
 tshark: wireshark
 uidmap: shadow-utils
 update-inetd:

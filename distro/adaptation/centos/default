@@ -505,6 +505,7 @@ systemtap-sdt-dev: systemtap-sdt-devel
 telnetd-ssl:
 texinfo: texinfo-tex
 thin-provisioning-tools:
+tpm-udev:
 trinity:
 tshark: wireshark
 uidmap: shadow-utils
