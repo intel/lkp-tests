@@ -62,6 +62,7 @@ python-minimal: python2
 qemu-system-x86: qemu
 ruby-gnuplot:
 sg3-utils: sg3_utils
+tpm-udev: tpm2-tools
 uuid-dev: uuid
 xfslibs-dev: xfsprogs
 xinit: xorg-xinit
