@@ -40,6 +40,7 @@ need_kconfig:
 - USERFAULTFD: y
 
 % elsif ___.group == "mm"
+- DEBUG_KMEMLEAK: y
 - DEVICE_PRIVATE: y
 - GUP_BENCHMARK: y
 - GUP_TEST: y
