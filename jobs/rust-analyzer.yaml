@@ -1,0 +1,5 @@
+suite: rust-analyzer
+testcase: rust-analyzer
+category: functional
+
+rust-analyzer:
