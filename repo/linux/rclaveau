@@ -1,0 +1,10 @@
+url: https://github.com/rclaveau-tech/linux-khadas.git
+owner: Ronald Claveau <linux-kernel-dev@aliel.fr>
+mail_to:
+- Ronald Claveau <linux-kernel-dev@aliel.fr>
+branch_denylist: .*
+branch_allowlist: b4/.*
+fetch_tags: false
+notify_build_success_branch: .*
+private_report_branch: .*
+upstream: false
