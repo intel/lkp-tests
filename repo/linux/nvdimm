@@ -2,8 +2,12 @@ url: https://git.kernel.org/pub/scm/linux/kernel/git/nvdimm/nvdimm.git
 integration_testing_branches:
 - libnvdimm-for-next
 - dax-misc
-mail_cc: linux-nvdimm@lists.01.org
-owner: Dan Williams <dan.j.williams@intel.com>
+mail_cc:
+- Alison Schofield <alison.schofield@intel.com>
+- Dan Williams <djbw@kernel.org>
+- Dave Jiang <dave.jiang@intel.com>
+- linux-nvdimm@lists.01.org
+owner: Dan Williams <djbw@kernel.org>
 subsystems:
 - pmem
 - libnvdimm
