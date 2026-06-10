@@ -11,6 +11,14 @@ md5sums=('SKIP' 'SKIP')
 
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
+# kernbench has nothing to compile (the kernbench source is a single script and
+# the linux tarball is only packed), so override the default build() which would
+# otherwise run make_src_pkg and try to 'cd' into the non-directory src/kernbench.
+build()
+{
+	:
+}
+
 package()
 {
 	pack_contents "$srcdir/linux-${kernel_ver}/" "$benchmark_path/linux"

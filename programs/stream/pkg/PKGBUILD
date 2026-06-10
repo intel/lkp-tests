@@ -9,6 +9,13 @@ md5sums=('SKIP')
 
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
+# No compile step; override the default build() (make_src_pkg from pkgbuild.sh)
+# so install doesn't run make on the unbuilt source.
+build()
+{
+	:
+}
+
 package()
 {
 	pack_src_pkg_contents stream.c

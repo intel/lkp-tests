@@ -12,6 +12,13 @@ md5sums=('SKIP' 'SKIP')
 . $LKP_SRC/lib/install.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
+# No compile step; override the default build() (make_src_pkg from pkgbuild.sh)
+# so install doesn't run make on the unbuilt source.
+build()
+{
+	:
+}
+
 patch_source()
 {
 	[ "$DISTRO" = "centos" ] || return 0

@@ -12,6 +12,13 @@ md5sums=('SKIP' 'SKIP' 'SKIP')
 . $LKP_SRC/lib/install.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
+# Compilation happens in package() via gcc; override the default build()
+# (make_src_pkg from pkgbuild.sh) so install doesn't run make on the unbuilt source.
+build()
+{
+	:
+}
+
 patch_source()
 {
 	# PWD=/tmp/lkp/ku-latency/src, srcdir=/tmp/lkp/ku-latency/src

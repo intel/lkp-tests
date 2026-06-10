@@ -9,6 +9,13 @@ md5sums=('e3ca0e887e4310896d32dd1cbd258a94')
 
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
+# No compile step; override the default build() (make_src_pkg from pkgbuild.sh)
+# so install doesn't run make on the unbuilt source.
+build()
+{
+	:
+}
+
 prepare()
 {
 	prepare_benchmark_path
