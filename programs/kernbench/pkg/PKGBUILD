@@ -21,7 +21,7 @@ build()
 
 package()
 {
-	pack_contents "$srcdir/linux-${kernel_ver}/" "$benchmark_path/linux"
+	pack_contents "$srcdir/linux-${kernel_ver}/." "$benchmark_path/linux"
 
 	# copy the original file instead of link, so don't use -a option
 	# $ ls -lrt $srcdir
