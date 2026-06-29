@@ -41,6 +41,7 @@ xfstests:
     - generic-group-76
     - generic-group-77
     - generic-group-78
+    - generic-group-79
     - generic-no-xfs-bug-on-assert
 
 ---
