@@ -11,5 +11,5 @@ fs:
 
 xfstests:
   test:
-    - xfs-233 # execution time > 30mins
     - xfs-136 # execution time ~ 80mins
+    - xfs-233 # execution time > 30mins

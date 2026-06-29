@@ -7,19 +7,18 @@ need_memory: 2G
 disk: 4HDD
 
 fs:
+  - btrfs
   - ext2
   - ext4
-  - xfs
-  - btrfs
   - f2fs
   - udf
+  - xfs
   # - bcachefs
   # - ocfs2 # mount.ocfs2 known bug
 
 xfstests:
   test:
     - generic-464
-    - generic-log-writes
     - generic-exportfs # [not run] cifs does not support NFS export
     - generic-group-37
     - generic-group-39
@@ -38,3 +37,4 @@ xfstests:
     - generic-group-52
     - generic-group-53
     - generic-group-54
+    - generic-log-writes

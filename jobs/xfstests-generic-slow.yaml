@@ -7,12 +7,12 @@ need_memory: 1G
 disk: 4HDD
 
 fs:
+  - btrfs
   - ext2
   - ext4
-  - xfs
-  - btrfs
   - f2fs
   - udf
+  - xfs
   # - bcachefs
   # - ocfs2 # mount.ocfs2 known bug
 

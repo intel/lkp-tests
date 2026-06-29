@@ -7,12 +7,12 @@ need_memory: 2G
 disk: 4HDD
 
 fs:
+  - btrfs
   - ext2
   - ext4
-  - xfs
-  - btrfs
   - f2fs
   - udf
+  - xfs
   # - bcachefs
   # - ocfs2 # mount.ocfs2 known bug
 
@@ -45,11 +45,11 @@ xfstests:
 
 ---
 fs:
-  - ext4
-  - xfs
   - btrfs
+  - ext4
   - f2fs
   - udf
+  - xfs
   # - bcachefs
 
 xfstests:
@@ -58,9 +58,9 @@ xfstests:
 
 ---
 fs:
-  - xfs
   - btrfs
   - f2fs
+  - xfs
   # - bcachefs
 
 xfstests:
@@ -69,10 +69,10 @@ xfstests:
 
 ---
 fs:
-  - ext4
-  - xfs
   - btrfs
+  - ext4
   - udf
+  - xfs
   # - bcachefs
 
 xfstests:
@@ -81,9 +81,9 @@ xfstests:
 
 ---
 fs:
-  - xfs
   - btrfs
   - udf
+  - xfs
   # - bcachefs
 
 xfstests:
@@ -92,9 +92,9 @@ xfstests:
 
 ---
 fs:
+  - btrfs
   - ext2
   - xfs
-  - btrfs
   # - bcachefs
 
 xfstests:
@@ -103,15 +103,14 @@ xfstests:
 
 ---
 fs:
-  - ext4
-  - xfs
   - btrfs
+  - ext4
   - f2fs
+  - xfs
   # - bcachefs
 
 xfstests:
   test:
-    # [not run] ext2/udf does not support metadata journaling
     - generic-metadata-journaling-00
     - generic-metadata-journaling-01
     - generic-metadata-journaling-02
@@ -141,9 +140,9 @@ xfstests:
 ---
 fs:
   - ext4
-  - xfs
   - f2fs
   - udf
+  - xfs
   # - bcachefs
 
 xfstests:
@@ -153,8 +152,8 @@ xfstests:
 ---
 fs:
   - ext4
-  - xfs
   - f2fs
+  - xfs
   # - bcachefs
 
 xfstests:
@@ -174,27 +173,27 @@ xfstests:
 
 ---
 fs:
+  - btrfs
   - ext2
   - ext4
-  - xfs
-  - btrfs
   - f2fs
+  - xfs
   # - bcachefs
   # - ocfs2 # mount.ocfs2 known bug
 
 xfstests:
   test:
     - generic-525
-    - generic-freeze # [not run] udf does not support freezing
-    - generic-attrs # [not run] attr namespace user not supported by this filesystem type: udf
     - generic-acls # [not run] ACLs not supported by this filesystem type: cifs/udf
+    - generic-attrs # [not run] attr namespace user not supported by this filesystem type: udf
+    - generic-freeze # [not run] udf does not support freezing
 
 ---
 fs:
-  - ext4
-  - xfs
   - btrfs
+  - ext4
   - f2fs
+  - xfs
   # - bcachefs
   # - ocfs2 # mount.ocfs2 known bug
 
@@ -204,11 +203,11 @@ xfstests:
 
 ---
 fs:
+  - btrfs
   - ext2
   - ext4
-  - xfs
-  - btrfs
   - udf
+  - xfs
   # - bcachefs
   # - ocfs2 # mount.ocfs2 known bug
 
@@ -230,9 +229,9 @@ xfstests:
 fs:
   - ext2
   - ext4
-  - xfs
   - f2fs
   - udf
+  - xfs
   # - bcachefs
   # - ocfs2 # mount.ocfs2 known bug
 

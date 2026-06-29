@@ -7,17 +7,18 @@ need_memory: 3G
 disk: 4HDD
 
 fs:
+  - btrfs
   - ext2
   - ext4
-  - xfs
-  - btrfs
   - f2fs
   - udf
+  - xfs
   # - bcachefs
   # - ocfs2 # mount.ocfs2 known bug
 
 xfstests:
   test:
+    - generic-311
     - generic-group-19
     - generic-group-20
     - generic-group-21
@@ -36,15 +37,14 @@ xfstests:
     - generic-group-34
     - generic-group-35
     - generic-group-36
-    - generic-311
 
 ---
 fs:
+  - btrfs
   - ext2
   - ext4
-  - xfs
-  - btrfs
   - f2fs
+  - xfs
   # - bcachefs
 
 xfstests:
@@ -53,15 +53,13 @@ xfstests:
 
 ---
 fs:
-  - xfs
   - btrfs
+  - xfs
   # - bcachefs
 
 xfstests:
   test:
     - generic-281 # [not run] Reflink not supported by scratch filesystem type: ext2/ext4/f2fs/udf
-
-    # [not run] Reflink not supported by scratch filesystem type: ext2/ext4/f2fs/udf
     - generic-scratch-reflink-08
     - generic-scratch-reflink-09
     - generic-scratch-reflink-10

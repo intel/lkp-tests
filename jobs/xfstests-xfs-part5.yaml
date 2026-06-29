@@ -9,6 +9,6 @@ fs:
 
 xfstests:
   test:
+    - xfs-projid16bit
     - xfs-stress-online-repair
     - xfs-stress-scrub
-    - xfs-projid16bit

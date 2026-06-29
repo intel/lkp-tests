@@ -7,17 +7,18 @@ need_memory: 1G
 disk: 4HDD
 
 fs:
+  - btrfs
   - ext2
   - ext4
-  - xfs
-  - btrfs
   - f2fs
   - udf
+  - xfs
   # - bcachefs
   # - ocfs2 # mount.ocfs2 known bug
 
 xfstests:
   test:
+    - generic-470
     - generic-group-00
     - generic-group-01
     - generic-group-02
@@ -34,4 +35,3 @@ xfstests:
     - generic-group-14
     - generic-group-16
     - generic-group-18
-    - generic-470

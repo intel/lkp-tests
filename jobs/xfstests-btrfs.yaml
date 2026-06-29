@@ -12,7 +12,6 @@ fs:
 xfstests:
   test:
     # - btrfs-075
-    - btrfs-log-writes
     - btrfs-group-00
     - btrfs-group-01
     - btrfs-group-02
@@ -47,6 +46,7 @@ xfstests:
     - btrfs-group-32
     - btrfs-group-33
     - btrfs-group-34
+    - btrfs-log-writes
     # - btrfs-scratch-verity
 ---
 disk: 9HDD

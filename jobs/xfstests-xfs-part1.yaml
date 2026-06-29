@@ -11,9 +11,6 @@ fs:
 
 xfstests:
   test:
-    - xfs-realtime
-    # - xfs-realtime-scratch-rmapbt # [not run] rmapbt not supported by scratch filesystem type: xfs
-    # - xfs-realtime-scratch-reflink # [not run] Reflink not supported by scratch filesystem type: xfs
     - xfs-083
     - xfs-275
     - xfs-437
@@ -33,3 +30,6 @@ xfstests:
     - xfs-group-13
     - xfs-group-14
     - xfs-no-xfs-bug-on-assert
+    - xfs-realtime
+    # - xfs-realtime-scratch-reflink # [not run] Reflink not supported by scratch filesystem type: xfs
+    # - xfs-realtime-scratch-rmapbt # [not run] rmapbt not supported by scratch filesystem type: xfs
