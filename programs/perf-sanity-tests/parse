@@ -14,8 +14,9 @@ stats = LKP::Stats.new
 while (line = $stdin.gets)
   line = line.resolve_invalid_bytes
   case line
-  when /([\d.]+): (.+) :$/
-    #  11: Hwmon PMU                                                       :
+  when /([\d.]+): (.+?)\s*:$/
+    #  11: Hwmon PMU                                                       :  (old: padded)
+    #  11: Hwmon PMU:                                                        (new: no padding)
     # 114: perf metrics value validation:
     test_id = $1
     test_prefix = $2
@@ -25,7 +26,6 @@ while (line = $stdin.gets)
     test_prefix = nil
   when /([\d.]+): (.*): (FAILED!$|Ok$|Skip)/
     test_prefix = nil unless $1.start_with?("#{test_id}.")
-
     stats.add test_name(test_prefix, $2), $3
   when /make PERF passed/
     stats.add 'perf.make', 'pass'

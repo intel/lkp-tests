@@ -1,0 +1,5 @@
+Hwmon_PMU.Basic_parsing_test.pass: 1
+Hwmon_PMU.Parsing_without_PMU_name.pass: 1
+Hwmon_PMU.Parsing_with_PMU_name.pass: 1
+Tool_PMU.Parsing_without_PMU_name.pass: 1
+Tool_PMU.Parsing_with_PMU_name.pass: 1

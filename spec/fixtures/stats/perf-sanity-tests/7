@@ -1,0 +1,11 @@
+2026-06-30 02:45:24 sudo ASAN_OPTIONS=fast_unwind_on_malloc=0 /usr/src/linux-perf-x86_64-rhel-9.4-bpf-dc59e4fea9d83f03bad6bddf3fa2e52491777482/tools/perf/perf test 11 -v
+ 11: Hwmon PMU:
+ 11.1: Basic parsing test                                : Running (3 active)
+ 11.1: Basic parsing test                                : Ok
+ 11.2: Parsing without PMU name                          : Ok
+ 11.3: Parsing with PMU name                             : Ok
+2026-06-30 02:45:25 sudo ASAN_OPTIONS=fast_unwind_on_malloc=0 /usr/src/linux-perf-x86_64-rhel-9.4-bpf-dc59e4fea9d83f03bad6bddf3fa2e52491777482/tools/perf/perf test 12 -v
+ 12: Tool PMU:
+ 12.1: Parsing without PMU name                          : Running (2 active)
+ 12.1: Parsing without PMU name                          : Ok
+ 12.2: Parsing with PMU name                             : Ok
