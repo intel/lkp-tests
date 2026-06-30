@@ -3,6 +3,8 @@
 . $LKP_SRC/lib/reproduce-log.sh
 . $LKP_SRC/lib/debug.sh
 
+XFSTESTS_TESTS_DIR="$BENCHMARK_ROOT/xfstests/tests"
+
 check_add_user()
 {
 	[ "x$1" != "x" ] || return
@@ -123,7 +125,7 @@ _is_test_in_group()
 
 	[[ "$test_prefix" != "$group_prefix" ]] && return 1
 
-	local group_files=$(find $BENCHMARK_ROOT/xfstests/tests/ -mindepth 1 -maxdepth 1 -type f -regex "^.+/$group$")
+	local group_files=$(find "$XFSTESTS_TESTS_DIR/" -mindepth 1 -maxdepth 1 -type f -regex "^.+/$group$")
 	[[ $group_files ]] || return
 
 	grep -q -E "^$test_number$" $group_files
@@ -145,6 +147,37 @@ setup_logwrites_dev()
 setup_scratch_logdev()
 {
 	setup_partition_dev SCRATCH_LOGDEV
+}
+
+setup_zoned_nullb()
+{
+	modprobe null_blk nr_devices=1 zoned=1 zone_size=4 size=1024 || return 1
+	log_eval export SCRATCH_DEV=/dev/nullb0
+	has_zoned_nullb=true
+}
+
+teardown_zoned_nullb()
+{
+	umount /dev/nullb0 2>/dev/null || true
+	modprobe -r null_blk
+	has_zoned_nullb=false
+}
+
+# Return 0 if any test in $1 declares a zoned block device requirement via
+# _require_zoned_device or _require_xfs_scratch_zoned, so that setup_zoned_nullb
+# is called regardless of which xfs group the tests live in.
+test_needs_zoned_nullb()
+{
+	local prefix="${1%%-*}"
+	local group_file="$XFSTESTS_TESTS_DIR/$1"
+
+	if [[ -f "$group_file" ]]; then
+		sed "s|.*|$XFSTESTS_TESTS_DIR/$prefix/&|" "$group_file" |
+			xargs grep -qlE '_require_zoned_device|_require_xfs_scratch_zoned' 2>/dev/null
+	else
+		grep -qlE '_require_zoned_device|_require_xfs_scratch_zoned' \
+			"$XFSTESTS_TESTS_DIR/$prefix/${1#*-}" 2>/dev/null
+	fi
 }
 
 setup_mkfs_options()
@@ -181,9 +214,9 @@ setup_mkfs_options()
 		# Disable block-group-tree if any test in this group requires its absence.
 		# mkfs.btrfs enables block-group-tree by default; _require_btrfs_no_block_group_tree
 		# skips the test when BLOCK_GROUP_TREE is present in the superblock.
-		local group_file="$BENCHMARK_ROOT/xfstests/tests/$test"
+		local group_file="$XFSTESTS_TESTS_DIR/$test"
 		if [[ -f "$group_file" ]]; then
-			sed "s|.*|$BENCHMARK_ROOT/xfstests/tests/${test%%-*}/&|" "$group_file" | \
+			sed "s|.*|$XFSTESTS_TESTS_DIR/${test%%-*}/&|" "$group_file" | \
 				xargs grep -qlF '_require_btrfs_no_block_group_tree' 2>/dev/null && \
 				mkfs_options="-O ^block-group-tree"
 		fi
@@ -339,7 +372,13 @@ setup_fs_config()
 	if is_test_in_group "$test" "generic-dax" && [[ "$nr_partitions" -ge 3 ]]; then
 		log_eval export MOUNT_OPTIONS=\"-o dax\"
 	fi
-
+	# For test groups containing zoned xfstests, override SCRATCH_DEV with a
+	# software-emulated null_blk zoned device so those tests run rather than
+	# [not run].  Requires BLK_DEV_NULL_BLK=m; falls back gracefully if the
+	# module is unavailable.
+	if [[ "$fs" == "xfs" ]] && test_needs_zoned_nullb "$test"; then
+		setup_zoned_nullb || echo "WARNING: null_blk zoned setup failed; xfs zoned tests will [not run]" >&2
+	fi
 	return 0
 }
 
@@ -409,8 +448,6 @@ run_test()
 	## - generic-quick/mid/slow1/slow2
 	## - generic-new
 
-	local test_dir="/$BENCHMARK_ROOT/xfstests/tests"
-
 	local all_tests
 	local all_tests_cmd
 
@@ -421,9 +458,9 @@ run_test()
 	elif [[ "${test%[a-z4]-[0-9][0-9][0-9]}" != "$test" ]]; then
 		all_tests_cmd="echo ${test%-*}/${test#*-}"
 	elif [[ "${test%-*}" == "$fs" ]]; then
-		all_tests_cmd="sed \"s:^:${test%%-*}/:\" $test_dir/$test"
+		all_tests_cmd="sed \"s:^:${test%%-*}/:\" $XFSTESTS_TESTS_DIR/$test"
 	elif [[ "${test#*-}" != "$test" ]]; then
-		all_tests_cmd="sed \"s:^:${test%%-*}/:\" $test_dir/$test"
+		all_tests_cmd="sed \"s:^:${test%%-*}/:\" $XFSTESTS_TESTS_DIR/$test"
 	else
 		# Now rename $test-broken to $test-ignore wihch is easier to understand.
 		all_tests_cmd="cd tests && ls $test/[0-9][0-9][0-9]"

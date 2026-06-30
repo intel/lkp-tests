@@ -37,6 +37,7 @@ need_kconfig:
 - XFS_RT: y
 % end
 
+- BLK_DEV_NULL_BLK: m
 - BLK_DEV_ZONED_LOOP: m
 - CRYPTO_HCTR2: y
 - CRYPTO_POLYVAL: y

@@ -20,10 +20,13 @@ export LC_ALL=C
 export LANG=C
 # whether has created the virtual disk
 has_virtual_disk=false
+# whether a zoned null_blk device was set up for SCRATCH_DEV
+has_zoned_nullb=false
 read_env_vars
 set_env || exit
 run_test || die "fail to run test"
 
 # umonut the virtual disk
 [ "$has_virtual_disk" = true ] && losetup -d /dev/loop0
+[ "$has_zoned_nullb" = true ] && teardown_zoned_nullb
 upload_files -t results $BENCHMARK_ROOT/xfstests/results/*
