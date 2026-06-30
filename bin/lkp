@@ -16,12 +16,8 @@ EOF
 	for cmd in "$LKP_SRC/lkp-exec/"*; do
 		[ -x "$cmd" ] && [ -f "$cmd" ] || continue
 		cmd_name="${cmd##*/}"
-		usage=$(grep -E -m 1 -i "Usage:.*|opts\.banner.*" "$cmd" | sed -E -e 's/^[[:space:]]*//' -e 's/^(echo|opts\.banner[[:space:]]*=)?//' -e 's/^[[:space:]]*["'\'']//' -e 's/["'\''][[:space:]]*(1>&2)?.*$//' -e 's/^[[:space:]]*//')
-		if [ -n "$usage" ] && [ "$usage" != "Usage:" ]; then
-			printf "\t%-20s %s\n" "$cmd_name" "$usage"
-		else
-			printf "\t%-20s\n" "$cmd_name"
-		fi
+		usage=$(grep -E -m 1 -i "Usage:.*|opts\.banner.*" "$cmd" | sed -E -n 's/.*(Usage:|opts\.banner[[:space:]]*=)[[:space:]]*["'"'"']?([^"'"'"']*).*/\2/ip' | sed -E -e 's/^(lkp[[:space:]]+)?(\$script_name|\$0|#\{(\$PROGRAM_NAME)\}|'"$cmd_name"')[[:space:]]('"$cmd_name"'[[:space:]])?//i')
+		printf "\t%-20s %s\n" "$cmd_name" "$usage"
 	done
 }
 
