@@ -34,12 +34,7 @@ describe 'xfstests job YAML test list ordering' do
 
     it "#{basename} test list entries are sorted by effective name" do
       groups = xfstests_list_entry_groups(File.readlines(file))
-      groups.each do |group|
-        expect(group).to be_sorted,
-                         "#{basename}: entries not in alphabetical order — " \
-                         'check for commented-out entries placed by literal-string sort ' \
-                         "rather than by effective name (strip '# - ' prefix before comparing)"
-      end
+      expect(groups).to all be_sorted
     end
   end
 end
