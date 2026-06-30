@@ -15,6 +15,7 @@ kselftests-bpf:
     - net/openvswitch
     - net/ovpn
     - net/packetdrill
+    - net/ppp
     - net/rds
     - net/tcp_ao
 
@@ -24,17 +25,17 @@ kselftests-bpf:
     - net/netfilter
   test:
     - br_netfilter.sh
-    - bridge_brouter.sh
     - br_netfilter_queue.sh
+    - bridge_brouter.sh
+    - conntrack_clash.sh
     - conntrack_dump_flush.sh
     - conntrack_icmp_related.sh
     - conntrack_ipip_mtu.sh
-    - conntrack_tcp_unreplied.sh
     - conntrack_resize.sh
-    - conntrack_sctp_collision.sh
-    - conntrack_vrf.sh
-    - conntrack_clash.sh
     - conntrack_reverse_clash.sh
+    - conntrack_sctp_collision.sh
+    - conntrack_tcp_unreplied.sh
+    - conntrack_vrf.sh
     - ipvs.sh
     - nf_conntrack_packetdrill.sh
     - nf_nat_edemux.sh
@@ -63,18 +64,18 @@ kselftests-bpf:
   test:
     - fcnal-test.sh
   test_atomic:
+    - ipv4_bind
+    - ipv4_netfilter
     - ipv4_ping
+    - ipv4_runtime
     - ipv4_tcp
     - ipv4_udp
-    - ipv4_bind
-    - ipv4_runtime
-    - ipv4_netfilter
+    - ipv6_bind
+    - ipv6_netfilter
     - ipv6_ping
+    - ipv6_runtime
     - ipv6_tcp
     - ipv6_udp
-    - ipv6_bind
-    - ipv6_runtime
-    - ipv6_netfilter
     - use_cases
 
 ---
@@ -82,7 +83,7 @@ kselftests-bpf:
   group:
     - net
   test:
-    - tls
     - fib_nexthops.sh
-    - xfrm_policy.sh
     - pmtu.sh
+    - tls
+    - xfrm_policy.sh

@@ -47,6 +47,7 @@ kselftests:
     - kmod
     - lib
     - livepatch
+    - liveupdate
     # - lkdtm
     - locking
     - lsm
@@ -60,8 +61,10 @@ kselftests:
     - mount_setattr
     - move_mount_set_group
     - mqueue
+    - mseal_system_mappings
     - nci
     # - nolibc # not enabled yet
+    - nsfs
     # - ntb
     - openat2
     - perf_events
@@ -102,6 +105,7 @@ kselftests:
     - tpm2
     - tty
     # - turbostat
+    - ublk
     - uevent
     - user_events
     - vDSO
@@ -114,6 +118,7 @@ kselftests:
 
     # - wireguard
     - x86
+    - x86/bugs
     - zram
 
 ---
