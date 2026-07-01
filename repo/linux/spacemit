@@ -1,4 +1,4 @@
-url: https://github.com/spacemit-com/linux
+url: https://git.kernel.org/pub/scm/linux/kernel/git/spacemit/linux.git
 branch_denylist: .*
 branch_allowlist: .*for-next|.*fixes
 integration_testing_branches:
@@ -6,6 +6,6 @@ integration_testing_branches:
 - fixes
 notify_build_success_branch: .*
 owner:
-- Yixun Lan <dlan@gentoo.org>
+- Yixun Lan <dlan@kernel.org>
 mail_cc:
-- Yixun Lan <dlan@gentoo.org>
+- Yixun Lan <dlan@kernel.org>
