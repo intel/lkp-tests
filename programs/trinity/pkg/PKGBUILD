@@ -20,6 +20,6 @@ package()
 {
 	make_install_src_pkg
 
-	pack_contents /bin/trinity "${pkgdir}/bin"
+	pack_contents /usr/local/bin/trinity "${pkgdir}/bin"
 	INSTALL_PREFIX=$benchmark_path make_install_src_pkg
 }
