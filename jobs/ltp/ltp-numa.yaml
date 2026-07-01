@@ -7,5 +7,5 @@ need_node: 2
 
 ltp:
   test:
-    - numa
     - mm-numa
+    - numa

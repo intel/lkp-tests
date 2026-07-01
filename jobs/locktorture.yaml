@@ -8,5 +8,5 @@ runtime: 300s
 
 locktorture:
   test:
-    - default
     - cpuhotplug
+    - default

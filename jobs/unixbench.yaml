@@ -9,35 +9,35 @@ nr_task:
 
 unixbench:
   test:
-    - whetstone-double
-    - shell1
-    - shell8
-    - pipe
-    - context1
-    - spawn
-    - syscall
-    - dhry2reg
-    - fstime
-    - fsbuffer
-    - fsdisk
-    - fstime-w
-    - fstime-r
-    - fsbuffer-w
-    - fsbuffer-r
-    - fsdisk-w
-    - fsdisk-r
-    - shell16
-    - short
-    - int
-    - long
-    - float
-    - double
     - arithoh
     - C
+    - context1
     - dc
-    - hanoi
+    - dhry2reg
+    - double
+    - float
+    - fsbuffer
+    - fsbuffer-r
+    - fsbuffer-w
+    - fsdisk
+    - fsdisk-r
+    - fsdisk-w
+    - fstime
+    - fstime-r
+    - fstime-w
     - grep
+    - hanoi
+    - int
+    - long
+    - pipe
+    - shell1
+    - shell16
+    - shell8
+    - short
+    - spawn
+    - syscall
     - sysexec
+    - whetstone-double
 
 ---
 # execl uses a lot of mmap syscall which will cause perf to record

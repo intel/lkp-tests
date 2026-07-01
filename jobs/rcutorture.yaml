@@ -7,8 +7,8 @@ runtime: 300s
 
 rcutorture:
   test:
-    - default
     - cpuhotplug
+    - default
   torture_type:
     - rcu
     - srcu

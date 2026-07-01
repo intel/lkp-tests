@@ -19,9 +19,9 @@ if role client:
       - uperf
 
 protocol:
+  - SCTP
   - TCP
   - UDP
-  - SCTP
 winsize:
   - 32k
 datasize:

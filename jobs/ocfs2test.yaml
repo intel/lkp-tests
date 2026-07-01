@@ -14,12 +14,12 @@ need_memory: 1G
 
 ocfs2test:
   test:
-    # - test-mmaptruncate # runtime > 1h on 1SSD lkp-skl-d08
-    - test-buildkernel
-    # - test-tunefs # need a huge memory (up to 130GB at lkp-hsw-ep2)
-    - test-sendfile
-    - test-reserve_space
     # - test-backup_super # always works on rhel/ol/suse, no need to enable it on debian
+    - test-buildkernel
     - test-inline
-    - test-xattr
+    # - test-mmaptruncate # runtime > 1h on 1SSD lkp-skl-d08
     - test-reflink
+    - test-reserve_space
+    - test-sendfile
+    # - test-tunefs # need a huge memory (up to 130GB at lkp-hsw-ep2)
+    - test-xattr

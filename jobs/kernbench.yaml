@@ -5,5 +5,5 @@ category: benchmark
 kernbench:
 nr_loops: 5
 nr_threads:
-  - 100%
   - 50%
+  - 100%

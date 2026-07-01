@@ -6,18 +6,18 @@ disk: 1SSD
 
 blktests:
   test:
+    - nvme-032
     - nvme-group-00
     - nvme-group-01
     - nvme-group-02
-    - nvme-032
 
 ---
 blktests:
   test:
+    - nvme-032
     - nvme-group-00
     - nvme-group-01
     - nvme-group-02
-    - nvme-032
   nvme_trtype: rdma
   use_siw:
     - true

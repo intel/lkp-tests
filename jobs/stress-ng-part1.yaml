@@ -128,8 +128,8 @@ stress-ng:
   test:
     - fractal
   method:
-    - mandelbrot
     - julia
+    - mandelbrot
 
 ---
 stress-ng:

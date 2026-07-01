@@ -3,8 +3,8 @@ testcase: lib-micro
 category: benchmark
 
 test:
-  - fast
   - all
+  - fast
 
 nr_task:
   - 1

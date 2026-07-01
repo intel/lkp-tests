@@ -7,7 +7,7 @@ pm-qa:
     # - all
     - cpufreq
     - cpuhotplug
-    - thermal
     - cpuidle
-    # - suspend
     # - powertop
+    # - suspend
+    - thermal

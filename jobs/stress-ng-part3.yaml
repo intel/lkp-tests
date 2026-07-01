@@ -77,8 +77,8 @@ stress-ng:
   test:
     - qsort
   method:
-    - qsort-libc
     - qsort-bm
+    - qsort-libc
 
 ---
 stress-ng:
@@ -88,10 +88,10 @@ stress-ng:
     - builtin
     - builtinl0
     - builtinl3
+    - prefetchnta
     - prefetcht0
     - prefetcht1
     - prefetcht2
-    - prefetchnta
 
 ---
 stress-ng:
@@ -100,8 +100,8 @@ stress-ng:
   method:
     - factorial
     - inc
-    - pwr2
     - pwr10
+    - pwr2
 
 ---
 stress-ng:
@@ -115,10 +115,10 @@ stress-ng:
   test:
     - opcode
   method:
-    - random
-    - text
     - inc
     - mixed
+    - random
+    - text
 
 ---
 stress-ng:
@@ -126,12 +126,12 @@ stress-ng:
     - pipe
     - pthread
   sched:
-    - idle
-    - fifo
-    - rr
-    - other
     - batch
     - deadline
+    - fifo
+    - idle
+    - other
+    - rr
 ---
 need_memory: 224G
 stress-ng:

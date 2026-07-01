@@ -5,13 +5,11 @@ category: functional
 need_memory: 3G
 
 disk:
-  - 1SSD
   - 1HDD
+  - 1SSD
 
 blktests:
   test:
-    - block-group-00
-    - block-group-01
     - block-010
     # block-011: requires PCIe-connected device (_require_test_dev_is_pci).
     # SATA drives fail the check. Enable by adding a 1NVME disk stanza below.
@@ -24,6 +22,8 @@ blktests:
     # Enable by adding a 1NVMEhotplug disk stanza when such hardware is
     # available.
     # - block-019
+    - block-group-00
+    - block-group-01
 
 ---
 kernel_cmdline: "cgroup_no_v1=all"

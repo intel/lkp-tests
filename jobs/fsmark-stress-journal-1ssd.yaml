@@ -8,9 +8,9 @@ nr_threads: 1t
 disk: 1SSD
 
 fs:
-  - xfs
-  - ext4
   - btrfs
+  - ext4
+  - xfs
 fs2:
   - nfsv4
   -

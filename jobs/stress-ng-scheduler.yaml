@@ -100,9 +100,9 @@ stress-ng:
     - pipe
     - pthread
   sched:
-    - idle
-    - fifo
-    - rr
-    - other
     - batch
     - deadline
+    - fifo
+    - idle
+    - other
+    - rr

@@ -3,10 +3,10 @@ testcase: pigz
 category: benchmark
 
 nr_threads:
-  - 100%
   - 25%
+  - 100%
 
 pigz:
   blocksize:
-    - 512K
     - 128K
+    - 512K

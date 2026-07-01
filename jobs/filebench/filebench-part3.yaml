@@ -6,9 +6,9 @@ need_memory: 258G
 
 disk: 1HDD
 fs:
+  - btrfs
   - ext4
   - xfs
-  - btrfs
 fs2:
   - nfsv4
   - cifs

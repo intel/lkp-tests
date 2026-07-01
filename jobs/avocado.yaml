@@ -12,9 +12,9 @@ avocado:
     - lkvs.multi_vms
     - lkvs.td_boot_multimes
     - lkvs.td_debug
-    - lkvs.tdx_disable
     - lkvs.td_huge_resource
     - lkvs.tdx_basic
+    - lkvs.tdx_disable
     - lkvs.tdx_max_guests
     - lkvs.tsc_freq
     - lkvs.x86_cpu_flags

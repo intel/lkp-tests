@@ -24,12 +24,12 @@ test_size: 200G
 
 fio-setup-basic:
   rw:
-    - read
-    - write
     - randread
-    - randwrite
-    - rw
     - randrw
+    - randwrite
+    - read
+    - rw
+    - write
   bs:
     - 4k
     - 2M

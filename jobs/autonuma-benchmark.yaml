@@ -7,9 +7,9 @@ iterations:
 
 autonuma-benchmark:
   test:
-    - numa02_SMT
-    - numa01_THREAD_ALLOC
-    - numa02SMT_numa01THREAD_ALLOC
     - _HARD_BIND
     - _INVERSE_BIND
     - minimal_thread_per_numa
+    - numa01_THREAD_ALLOC
+    - numa02_SMT
+    - numa02SMT_numa01THREAD_ALLOC

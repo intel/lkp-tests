@@ -17,9 +17,9 @@ fs2:
 
 fsmark:
   filesize:
-    - 8K
-    - 5K
     - 9B
+    - 5K
+    - 8K
   test_size: {{
                case fs
                when 'ext4' then fs2 == 'nfsv4' ? '50M' : '100M'

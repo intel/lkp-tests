@@ -5,8 +5,8 @@ category: benchmark
 runtime: 300s
 
 nr_task:
-  - 200%
   - 50%
+  - 200%
 
 setup-kbuild:
 
@@ -21,5 +21,5 @@ kbuild:
 ---
 disk: 1HDD
 fs:
-  - ext4
   - btrfs
+  - ext4

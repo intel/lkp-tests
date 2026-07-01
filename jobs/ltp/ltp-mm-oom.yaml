@@ -9,5 +9,5 @@ oom-killer:
 
 ltp:
   test:
-    - mm-oom
     - mm-min_free_kbytes
+    - mm-oom

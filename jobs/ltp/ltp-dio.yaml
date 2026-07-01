@@ -6,10 +6,10 @@ need_memory: 4G
 
 disk: 1HDD
 fs:
-  - ext4
-  - xfs
   - btrfs
+  - ext4
   - f2fs
+  - xfs
 
 ltp:
   test:

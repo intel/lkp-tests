@@ -8,22 +8,22 @@ disk:
   - 1HDD
   - 1SSD
 fs:
-  - ext4
-  - xfs
   - btrfs
+  - ext4
   - f2fs
+  - xfs
 
 ltp:
   test:
+    - fork13.fork13
     - syscalls-00
     - syscalls-01
     - syscalls-02
     - syscalls-03
     - syscalls-04
     - syscalls-07
-    - writev03.writev03 # run standalone
-    - fork13.fork13
     - syscalls-setsockopt06 # need about 25mins
+    - writev03.writev03 # run standalone
 
 ---
 need_memory: 10G

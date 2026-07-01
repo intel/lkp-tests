@@ -4,9 +4,9 @@ category: benchmark
 
 disk: 1HDD
 fs:
+  - btrfs
   - ext4
   - xfs
-  - btrfs
 fs2:
   - nfsv4
   - cifs
@@ -16,26 +16,26 @@ filebench-setup:
   test:
     - copyfiles.f
     - createfiles.f
+    - cvar_example.f
     - fileserver.f
+    - fivestreamread.f
+    - fivestreamreaddirect.f
+    - fivestreamwrite.f
+    - fivestreamwritedirect.f
+    # - listdirs.f # runtime ~ 1h on nfsv4
+    - makedirs.f
+    # - netsfs.f # runtime > 1h 20m on nfsv4
     # - openfiles.f # runtime > 1.5h on nfsv4
-    - ratelimcopyfiles.f
     - randomfileaccess.f
     - randomread.f
     - randomrw.f
     - randomwrite.f
-    # - listdirs.f # runtime ~ 1h on nfsv4
-    - makedirs.f
+    - ratelimcopyfiles.f
     - removedirs.f
-    - singlestreamreaddirect.f
     - singlestreamread.f
+    - singlestreamreaddirect.f
     - singlestreamwritedirect.f
-    - fivestreamreaddirect.f
-    - fivestreamread.f
-    - fivestreamwritedirect.f
-    - fivestreamwrite.f
     - varmail.f
-    - cvar_example.f
     - webproxy.f
     - webserver.f
-    # - netsfs.f # runtime > 1h 20m on nfsv4
 filebench:

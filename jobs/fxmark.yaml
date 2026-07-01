@@ -9,34 +9,34 @@ media: hdd
 
 fxmark:
   test:
+    - dbench_client
+    - DRBH
+    - DRBL
+    - DRBM
     - DWAL
     - DWOL
     - DWOM
     - DWSL
-    - MWRL
-    - MWRM
-    - MWCL
-    - MWCM
-    - MWUM
-    - MWUL
     - DWTL
-    # - filebench_varmail
-    # - filebench_oltp
     # - filebench_fileserver
-    - dbench_client
+    # - filebench_oltp
+    # - filebench_varmail
+    - MRDL
+    - MRDM
+    - MRPH
     - MRPL
     - MRPM
-    - MRPH
-    - MRDM
-    - MRDL
-    - DRBH
-    - DRBM
-    - DRBL
+    - MWCL
+    - MWCM
+    - MWRL
+    - MWRM
+    - MWUL
+    - MWUM
   fstype:
+    - btrfs
     - ext4
     - ext4_no_jnl
     - xfs
-    - btrfs
   directio:
     - bufferedio
     - directio

@@ -12,9 +12,9 @@ swap:
 
 chromeswap:
   selection:
-    - uniform
-    - sequential
     - exponential
+    - sequential
+    - uniform
 
   nr_procs:
     - 5

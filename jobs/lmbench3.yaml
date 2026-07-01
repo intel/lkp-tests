@@ -19,20 +19,20 @@ nr_threads:
 lmbench3:
   mode: development
   test:
-    - MMAP
-    - SELECT
-    - PROC
-    - PAGEFAULT
-    - PIPE
-    - UNIX
-    - TCP
-    - OPS
-    - SYSCALL
-    - CTX
     # From Lmbench3 source scripts, run lat_connect when "$SYNC_MAX = 1", so case CONNECT only test with 1 thread.
     - CONNECT
+    - CTX
+    - MMAP
+    - OPS
+    - PAGEFAULT
+    - PIPE
+    - PROC
+    - SELECT
+    - SYSCALL
+    - TCP
     # Case UDP can get test result when nr_threads=1, if nr_threads set as 50%,100%, can't get correct result, showing "Recv timed out".
     - UDP
+    - UNIX
     # # MEM is about cache and memory latency related case, it will take more than 2 hours on test machine lkp-bdw-ep4.
     # - MEM
 

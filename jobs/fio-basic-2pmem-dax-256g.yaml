@@ -23,12 +23,12 @@ time_based: tb
 
 fio-setup-basic:
   rw:
-    - read
-    - write
     - randread
-    - randwrite
-    - rw
     - randrw
+    - randwrite
+    - read
+    - rw
+    - write
   bs:
     - 4k
     - 2M
@@ -49,10 +49,10 @@ fs:
 
 fio-setup-basic:
   rw:
-    - read
-    - write
     - randread
     - randwrite
+    - read
+    - write
   bs:
     - 4k
     - 2M

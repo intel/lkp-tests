@@ -6,8 +6,8 @@ need_memory: 2G
 
 perf-sanity-tests:
   perf_compiler:
-    - gcc
     - clang
+    - gcc
   group:
     - group-00
     - group-01

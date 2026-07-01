@@ -7,8 +7,8 @@ force_reboot: 1
 
 analyze-suspend:
   mode:
-    - mem
     - freeze
+    - mem
 
 runtime: 300s
 option: -dev

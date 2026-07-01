@@ -95,6 +95,6 @@ stress-ng:
     - sockmany
     - sockpair
   type:
-    - stream
     - dgram
     - seqpacket
+    - stream

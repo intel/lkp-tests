@@ -21,8 +21,8 @@ nvml:
     - pmreorder
     - set
     - unicode
-    - valgrind
     - util
+    - valgrind
 
 ---
 nvml:

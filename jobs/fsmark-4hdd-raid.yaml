@@ -11,9 +11,9 @@ disk: 4HDD
 md: RAID0
 
 fs:
-  - xfs
-  - ext4
   - btrfs
+  - ext4
+  - xfs
 
 fsmark:
   filesize: 4M

@@ -21,15 +21,15 @@ time_based: tb
 
 fio-setup-basic:
   rw:
-    - read
-    - write
     - randread
-    - randwrite
-    - rw
     - randrw
+    - randwrite
+    - read
+    - rw
+    - write
   bs:
-    - 4k
     - 128B
+    - 4k
   ioengine:
     - io_uring
     - libpmem

@@ -14,5 +14,5 @@ need_memory: 3G
 
 ocfs2test:
   test:
-    - test-quick
     - test-aiostress
+    - test-quick

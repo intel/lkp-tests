@@ -7,8 +7,8 @@ disk:
   - 1SSD
 
 fs:
+  - btrfs
   - ext4
   - xfs
-  - btrfs
 
 blogbench:

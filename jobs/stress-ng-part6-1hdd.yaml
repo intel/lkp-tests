@@ -84,9 +84,9 @@ stress-ng:
   test:
     - touch
   method:
-    - random
-    - open
     - creat
+    - open
+    - random
 
 ---
 stress-ng:
@@ -103,7 +103,7 @@ stress-ng:
     - fallocate
   mode:
     - keep-size
-    - keep-size,punch-hole
-    - keep-size,zero-range
     - keep-size,collapse-range
     - keep-size,insert-range
+    - keep-size,punch-hole
+    - keep-size,zero-range

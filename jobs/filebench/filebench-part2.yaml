@@ -4,9 +4,9 @@ category: benchmark
 
 disk: 1HDD
 fs:
+  - btrfs
   - ext4
   - xfs
-  - btrfs
 fs2:
   - nfsv4
   - cifs
@@ -19,8 +19,8 @@ filebench-setup:
     - filemicro_createrand.f
     - filemicro_delete.f
     - filemicro_rread.f
-    - filemicro_rwritedsync.f
     - filemicro_rwrite.f
+    - filemicro_rwritedsync.f
     - filemicro_rwritefsync.f
     - filemicro_seqread.f
     - filemicro_seqwrite.f

@@ -12,8 +12,8 @@ ltp:
     - net.ipv6
     - net.multicast
     - net.tcp_cmds
-    - syscalls-ipc-00
     - smoketest
+    # - staging # pan(3133): Must supply a file collection or a command
+    - syscalls-ipc-00
     - uevent
     # - watchqueue # test broken
-    # - staging # pan(3133): Must supply a file collection or a command

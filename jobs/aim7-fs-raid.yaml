@@ -11,9 +11,9 @@ md:
   - RAID0
   - RAID1
 fs:
-  - xfs
-  - ext4
   - btrfs
+  - ext4
+  - xfs
 
 aim7:
   test:

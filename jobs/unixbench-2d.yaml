@@ -10,14 +10,14 @@ need_x: true
 
 unixbench:
   test:
-    - 2d-rects
-    - 2d-lines
+    - 2d-aashapes
+    - 2d-blit
     - 2d-circle
     - 2d-ellipse
-    - 2d-shapes
-    - 2d-aashapes
+    - 2d-lines
     - 2d-polys
+    - 2d-rects
+    - 2d-shapes
     - 2d-text
-    - 2d-blit
     - 2d-window
     - ubgears

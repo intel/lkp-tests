@@ -8,8 +8,8 @@ nr_task: 100%
 reaim:
   test:
     - aim9
-    - alltests
     - all_utime
+    - alltests
     - compute
     - custom
     - dbase

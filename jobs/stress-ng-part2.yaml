@@ -127,25 +127,25 @@ stress-ng:
   test:
     - madvise
   advise:
-    - normal
-    - random
-    - sequential
-    - willneed
+    - cold
+    - collapse
+    - dodump
+    - dofork
+    - dontdump
+    - dontfork
     - dontneed
     - free
-    - remove
-    - dontfork
-    - dofork
-    - hwpoison
-    - mergeable
-    - unmergeable
-    - soft-offline
     - hugepage
-    - nohugepage
-    - dontdump
-    - dodump
-    - wipeonfork
+    - hwpoison
     - keeponfork
-    - cold
+    - mergeable
+    - nohugepage
+    - normal
     - pageout
-    - collapse
+    - random
+    - remove
+    - sequential
+    - soft-offline
+    - unmergeable
+    - willneed
+    - wipeonfork

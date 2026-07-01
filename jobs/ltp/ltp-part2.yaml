@@ -13,12 +13,12 @@ ltp:
     # - ltp-aiodio.part3
     - math
     - net.ipv6_lib
+    - net.rpc_tests
     - net.sctp
+    - net.tirpc_tests
     - nptl
     - power_management_tests
     - pty
-    - net.rpc_tests
     - sched
     # - smack # need CONFIG_SECURITY_SMACK=y and CONFIG_SECURITY_SELINUX not set, in test kconfig, it is just the opposite
-    - net.tirpc_tests
     # - tpm_tools # disable due to 9d67d269d7d2

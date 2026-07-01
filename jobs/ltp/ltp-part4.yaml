@@ -7,19 +7,20 @@ need_memory: 4G
 disk: 1HDD
 
 fs:
-  - ext4
-  - xfs
   - btrfs
+  - ext4
   - f2fs
+  - xfs
 
 ltp:
   test:
+    - fs-01
+    - fs_bind
+    - fs_perms_simple
     - fs_readonly-00
     - fs_readonly-01
     - fs_readonly-02
     - fs_readonly-03
-    - fs_bind
-    - fs_perms_simple
     - ltp-aiodio.part4-00
     - ltp-aiodio.part4-01
     - ltp-aiodio.part4-02
@@ -28,4 +29,3 @@ ltp:
     - ltp-aiodio.part4-DOR001
     - ltp-aiodio.part4-DOR002
     - ltp-aiodio.part4-DOR003
-    - fs-01

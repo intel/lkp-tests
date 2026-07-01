@@ -4,9 +4,9 @@ category: functional
 
 igt:
   group:
+    - gem_exec_reloc
     - group-20
     - group-21
     - group-22
     - group-23
     - group-24
-    - gem_exec_reloc

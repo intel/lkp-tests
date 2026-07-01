@@ -11,7 +11,7 @@ nr_task: 50%
 
 will-it-scale:
   mode:
-    - thread
     - process
+    - thread
   test:
     - page_fault1

@@ -14,8 +14,8 @@ fs:
 
 fio-setup-basic:
   rw:
-    - read
     - randread
+    - read
   bs:
     - 4k
     - 2M

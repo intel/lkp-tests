@@ -5,8 +5,8 @@ category: functional
 ktools:
   test:
     - radix-tree/idr-test
-    - radix-tree/multiorder
     - radix-tree/maple
+    - radix-tree/multiorder
     - radix-tree/xarray
     - rbtree
     - scatterlist/main

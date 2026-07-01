@@ -21,8 +21,8 @@ fsmark:
 
 ---
 fs:
-  - ext4
   - btrfs
+  - ext4
 
 fsmark:
   filesize: 4K

@@ -11,9 +11,9 @@ monitor_delay: 10
 disk: 1HDD
 
 fs:
+  - btrfs
   - ext4
   - xfs
-  - btrfs
 
 fs2:
   - cifs

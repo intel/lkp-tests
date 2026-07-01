@@ -9,16 +9,16 @@ disk:
   - 1BRD_48G
 
 fs:
-  - xfs
-  - ext4
   - btrfs
+  - ext4
+  - xfs
 
 aim7:
   test:
-    - disk_src
+    - disk_cp
     - disk_rr
     - disk_rw
-    - disk_cp
+    - disk_src
     # - disk_wrt
   load: {{
           if fs == 'btrfs'

@@ -64,7 +64,6 @@ stress-ng:
   test:
     - zlib
   method:
-    - random
     - 00ff
     - ascii01
     - asciidigits
@@ -78,16 +77,17 @@ stress-ng:
     - inc16
     - latin
     - lehmer
-    - logmap
     - lfsr32
+    - logmap
     - lrand48
     - morse
     - nybble
     - objcode
     - parity
     - pink
-    - rarely1
+    - random
     - rarely0
+    - rarely1
     - rdrand
     - ror32
     - text

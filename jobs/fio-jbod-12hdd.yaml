@@ -9,8 +9,8 @@ fs:
 
 fio:
   rw:
-    - randwrite
     - randrw
+    - randwrite
   ioengine:
     - io_uring
     - mmap

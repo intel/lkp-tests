@@ -7,9 +7,9 @@ nr_task: 100%
 
 disk: 1HDD
 fs:
+  - btrfs
   - ext4
   - xfs
-  - btrfs
 
 reaim:
   test:

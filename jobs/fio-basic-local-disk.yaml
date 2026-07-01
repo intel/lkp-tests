@@ -15,12 +15,12 @@ fs:
 
 fio-setup-basic:
   rw:
-    - read
-    - write
     - randread
-    - randwrite
-    - readwrite
     - randrw
+    - randwrite
+    - read
+    - readwrite
+    - write
   direct: 1
   bs:
     - 4k

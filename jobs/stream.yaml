@@ -3,9 +3,9 @@ testcase: stream
 category: benchmark
 
 nr_threads:
-  - 100%
-  - 50%
   - 25%
+  - 50%
+  - 100%
 
 iterations:
   - 10x

@@ -10,11 +10,11 @@ runtime: 300
 
 transparent_hugepage:
   thp_enabled:
-    - never
     - always
+    - never
   thp_defrag:
-    - never
     - always
+    - never
 
 size:
 
@@ -34,7 +34,7 @@ perf-profile:
 
 vm-scalability:
   test:
-    - swap-w-seq
     - swap-w-rand
-    - swap-w-seq-mt
     - swap-w-rand-mt
+    - swap-w-seq
+    - swap-w-seq-mt

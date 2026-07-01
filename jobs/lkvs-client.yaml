@@ -4,6 +4,6 @@ category: functional
 
 lkvs:
   test:
-    - rapl-client
     - cstate-client
+    - rapl-client
     - topology-client

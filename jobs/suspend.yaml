@@ -11,5 +11,5 @@ presync: presync
 
 suspend:
   mode:
-    - mem
     - freeze
+    - mem

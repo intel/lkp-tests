@@ -7,20 +7,20 @@ nr_threads: 100%
 
 disk: 1HDD
 fs:
-  - xfs
-  - ext4
   - btrfs
+  - ext4
+  - xfs
 
 size: 64G
 
 sysbench-fileio:
   filenum: 1024f
   rwmode:
-    - seqwr
-    - seqrewr
-    - seqrd
     - rndrd
     - rndrw
     - rndwr
+    - seqrd
+    - seqrewr
+    - seqwr
   iomode:
     - sync

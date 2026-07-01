@@ -11,9 +11,9 @@ md:
   - RAID5
 
 fs:
-  - xfs
-  - ext4
   - btrfs
+  - ext4
+  - xfs
 fs2:
   - nfsv4
   -

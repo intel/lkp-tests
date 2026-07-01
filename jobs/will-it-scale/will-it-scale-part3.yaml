@@ -9,8 +9,8 @@ nr_task:
 
 will-it-scale:
   mode:
-    - thread
     - process
+    - thread
   test:
     - page_fault1
     - page_fault2

@@ -15,7 +15,7 @@ ltp:
 need_memory: 8G
 ltp:
   test:
-    - net_stress.appl-ssh
     - net_stress.appl-dns
-    - net_stress.appl-http
     # - net_stress.appl-ftp # > 4h on lkp-skl-d02
+    - net_stress.appl-http
+    - net_stress.appl-ssh

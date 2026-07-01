@@ -3,8 +3,8 @@ testcase: hackbench
 category: benchmark
 
 nr_threads:
-  - 1600%
   - 100%
+  - 1600%
   # - 50%
 iterations: 8
 

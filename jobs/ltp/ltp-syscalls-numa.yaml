@@ -8,10 +8,10 @@ disk:
   # - 1HDD
   - 1SSD
 fs:
-  - ext4
-  - xfs
   - btrfs
+  - ext4
   - f2fs
+  - xfs
 
 need_node: 2
 

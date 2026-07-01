@@ -26,17 +26,17 @@ nr_threads: # nreaders
 
 rcurefscale:
   scale_type:
+    - acqrel
+    - clock
+    - lock
+    - lock-irq
     - rcu
-    - srcu
-    - rcu-trace
     - rcu-tasks
+    - rcu-trace
     - refcnt
     - rwlock
     - rwsem
-    - lock
-    - lock-irq
-    - acqrel
-    - clock
+    - srcu
   loops:
     - 10000 # default
     - 100000

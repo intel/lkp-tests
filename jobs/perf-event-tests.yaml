@@ -4,7 +4,7 @@ category: functional
 
 perf-event-tests:
   paranoid:
-    - not_paranoid_at_all
-    - disallow_raw_tracepoint
     - disallow_cpu_events
     - disallow_kernel_profiling
+    - disallow_raw_tracepoint
+    - not_paranoid_at_all
