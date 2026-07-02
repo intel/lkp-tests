@@ -630,6 +630,17 @@ fixup_mount_setattr()
 		grep "TEST_GEN_FILES +=" mount_setattr/Makefile | sed 's/TEST_GEN_FILES/TEST_PROGS/' >> mount_setattr/Makefile
 }
 
+fixup_move_mount_set_group()
+{
+	# move_mount_set_group/Makefile only declares its binary via
+	# TEST_GEN_FILES, so "make run_tests" builds it but never executes
+	# it: lib.mk's run_tests target only invokes TEST_GEN_PROGS,
+	# TEST_CUSTOM_PROGS and TEST_PROGS, not TEST_GEN_FILES. Same issue
+	# as mount_setattr above, same fix.
+	grep -q TEST_PROGS move_mount_set_group/Makefile ||
+		grep "TEST_GEN_FILES +=" move_mount_set_group/Makefile | sed 's/TEST_GEN_FILES/TEST_PROGS/' >> move_mount_set_group/Makefile
+}
+
 fixup_tc_testing()
 {
 	# Suggested by the author
