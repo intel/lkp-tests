@@ -426,6 +426,10 @@ run_smbv3_tests()
 
 run_fs_tests()
 {
+	# generic/781 tests zoned block device filesystems via zloop;
+	# ext4 has no zoned block device support, so _try_mkfs_dev always fails.
+	[[ "$fs" == "ext4" ]] && echo "generic/781" >> tests/exclude/ext4
+
 	[[ -s tests/exclude/$fs ]] && exclude_file="-E tests/exclude/$fs"
 	log_cmd ./check $exclude_file $all_tests
 }
