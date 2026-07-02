@@ -100,6 +100,7 @@ need_kconfig:
 - IMA: y
 - IMA_READ_POLICY: y
 - IMA_WRITE_POLICY: y
+- INTEGRITY_AUDIT: y
 
 % elsif ___.test == "kernel_misc"
 - HAVE_ARCH_MMAP_RND_BITS: y

@@ -231,6 +231,34 @@ fixup_test()
 	net.rpc_tests)
 		systemctl start openbsd-inetd || exit
 		;;
+	ima)
+		# ima_violations requires auditd running to produce /var/log/audit/audit.log.
+		# Disable space-based suspend in auditd.conf first: the ramdisk rootfs has
+		# little free space and triggers the low-space action before the first event.
+		sed -i -E 's/^(space_left_action).*/\1 = ignore/; s/^(admin_space_left_action).*/\1 = ignore/; s/^(disk_full_action).*/\1 = ignore/; s/^(disk_error_action).*/\1 = ignore/' /etc/audit/auditd.conf
+		systemctl start auditd || exit
+
+		# The default audit.rules leaves audit_enabled=0, silently dropping IMA
+		# integrity-audit records. Enable it so records reach audit.log.
+		auditctl -e 1 || exit
+
+		# ima_measurements/ima_violations/ima_keys require an active IMA policy.
+		# LTP_IMA_LOAD_POLICY=1 loads the built-in example policy via securityfs.
+		export LTP_IMA_LOAD_POLICY=1
+
+		# ima_kexec needs IMA_KEXEC_IMAGE. $BOOT_IMAGE (set by lkp-bootstrap from
+		# /proc/cmdline) gives the server path; the locally cached copy lives under
+		# $CACHE_DIR. If neither is found, IMA_KEXEC_IMAGE is unset and the test
+		# gets a natural TCONF.
+		# ima_kexec needs IMA_KEXEC_IMAGE pointing to the vmlinuz.  The kernel
+		# is downloaded to /opt/rootfs/tmp before kexec and persists there on
+		# disk.  $BOOT_IMAGE (set by lkp-bootstrap from /proc/cmdline) gives the
+		# server path, e.g. /pkg/linux/<kconfig>/<sha>/vmlinuz-<ver>.
+		if [[ -n "$BOOT_IMAGE" ]]; then
+			local local_path=/opt/rootfs/tmp${BOOT_IMAGE}
+			[[ -f "$local_path" ]] && export IMA_KEXEC_IMAGE="$local_path"
+		fi
+		;;
 	net_stress.appl-dns)
 		# dig -n is not a valid option in modern BIND9; the test script
 		# dns-stress02-rmt.sh uses it for IPv6 reverse lookups but it causes dig

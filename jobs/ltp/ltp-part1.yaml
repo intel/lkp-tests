@@ -15,7 +15,20 @@ ltp:
     - fcntl-locktests
     - hugetlb
     - hyperthreading
-    - ima
     - input
     - irq
     - kvm
+
+---
+# ima_measurements test3 ("verify not measuring user files") only runs its
+# real check when booted with the builtin "tcb" IMA policy on the kernel
+# command line - the runtime LTP_IMA_LOAD_POLICY=1 fallback (see the `ima)`
+# case in lib/tests/ltp.sh) satisfies ima_violations/ima_keys but not this
+# stricter policy-content check (verify_ima_policy()/test3() in upstream
+# testcases/kernel/security/integrity/ima/tests/ima_setup.sh,
+# ima_measurements.sh).
+kernel_cmdline: ima_policy=tcb
+
+ltp:
+  test:
+    - ima
