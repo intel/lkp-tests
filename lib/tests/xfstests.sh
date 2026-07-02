@@ -426,6 +426,9 @@ run_smbv3_tests()
 
 run_fs_tests()
 {
+	# generic/470 requires MAP_SYNC which is not supported on ext2
+	[[ "$fs" == "ext2" ]] && echo "generic/470" >> tests/exclude/ext2
+
 	# generic/781 tests zoned block device filesystems via zloop;
 	# ext4 has no zoned block device support, so _try_mkfs_dev always fails.
 	[[ "$fs" == "ext4" ]] && echo "generic/781" >> tests/exclude/ext4
