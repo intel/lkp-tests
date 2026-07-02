@@ -133,12 +133,12 @@ fixup_test()
 		[ -z "$partitions" ] && exit
 		big_dev="${partitions%% *}"
 		umount $big_dev
-		big_dev_opt="--env LTP_BIG_DEV_FS_TYPE=$fs --env LTP_BIG_DEV=$big_dev"
+		big_dev_opt="LTP_BIG_DEV_FS_TYPE=$fs LTP_BIG_DEV=$big_dev"
 		;;
 	fs_ext4)
 		[ -z "$partitions" ] && exit
 		big_dev="${partitions%% *}"
-		big_dev_opt="--env LTP_BIG_DEV=$big_dev"
+		big_dev_opt="LTP_BIG_DEV=$big_dev"
 		# match logic of is_excluded
 		sed -i "s/\t/ /g" runtest/fs_ext4
 		;;
