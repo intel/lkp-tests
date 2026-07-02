@@ -29,4 +29,4 @@ while (line = $stdin.gets)
 end
 per_io_type.each { |k, v| puts "#{k}_KBps: #{v.to_f / keys.size}" }
 per_record.each { |k, v| puts "#{k}: #{v.to_f / nr_records}" }
-puts "average_KBps: #{all_sum(0.0) / keys.size / nr_records}"
+puts "average_KBps: #{all_sum.to_f / keys.size / nr_records}"
