@@ -21,7 +21,15 @@ build_module()
 
 	local benchmark_path=$(get_benchmark_path)
 
-	log_cmd make -j${nr_cpu} -C $kdir M=$benchmark_path/$mdir 2>&1
+	# These LTP kernel modules predate C99 and rely on implicit function
+	# declarations and int-to-pointer assignments that GCC < 14 only
+	# warned about. GCC 14 made -Wimplicit-function-declaration and
+	# -Wint-conversion hard errors by default, which blocks the build
+	# even for modules that don't otherwise depend on removed kernel
+	# APIs. This is upstream LTP source, not owned by LKP, so restore
+	# the pre-GCC-14 warning severity via KCFLAGS instead of patching it.
+	log_cmd make -j"${nr_cpu}" -C "$kdir" M="$benchmark_path"/"$mdir" \
+		KCFLAGS="-Wno-implicit-function-declaration -Wno-int-conversion" 2>&1
 
 	cp $benchmark_path/$mdir/*.ko $benchmark_path/testcases/bin/
 }
