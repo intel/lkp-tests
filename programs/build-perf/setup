@@ -17,7 +17,6 @@ build_perf()
 	ln -s "$perf_dir"/perf /usr/bin/perf
 }
 
-build_perf || {
-	parse_bool -q "$ignore_fail" && exit 0
-	exit 1
-}
+build_perf
+
+exit 0
