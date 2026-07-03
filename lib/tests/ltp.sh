@@ -100,6 +100,22 @@ create_single_test_file()
 	}
 }
 
+reload_module()
+{
+	# Force an unconditional unload+reload rather than an idempotent
+	# lsmod-then-modprobe check. Some modules (e.g. scsi_debug) create a
+	# device whose configuration is fixed at load time, so an
+	# already-loaded instance may be a stale leftover from an earlier
+	# job/suite with different parameters; reusing it silently would give
+	# the test the wrong device. A stateless capability module (e.g.
+	# kvm_intel) has no such "wrong" loaded state, so it only needs a
+	# plain lsmod check instead of this helper.
+	local module=$1
+
+	modprobe -r "$module" 2>/dev/null
+	modprobe "$module"
+}
+
 fixup_test()
 {
 	# group test: syscalls-05
@@ -281,6 +297,12 @@ fixup_test()
 		# fix 'Unable to make dir /test/growfiles/XXX' error
 		mkdir -p /test/growfiles
 		;;
+	cve-03)
+		# ioctl_sg01 (cve-2018-1000204 regression test) needs a usable
+		# SCSI generic device; NVMe/virtio-only LKP hardware has none,
+		# so provide one via the scsi_debug module.
+		reload_module scsi_debug || exit 1
+		;;
 	kvm)
 		# SKIP - /dev/kvm not available (errno: 2): kvm_intel isn't
 		# loaded by default even when CONFIG_KVM/CONFIG_KVM_INTEL are
@@ -312,6 +334,9 @@ cleanup_ltp()
 	syscalls-0*)
 		[ "$relatime" != "" ] && mount -o remount,relatime,user_xattr /tmp
 		[ "$noatime" != "" ] && mount -o remount,noatime,user_xattr /tmp
+		;;
+	cve-03)
+		modprobe -r scsi_debug 2>/dev/null
 		;;
 	esac
 }

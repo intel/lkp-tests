@@ -50,6 +50,9 @@ need_kconfig:
 - USER_NS: y
 - VSOCKETS_LOOPBACK
 
+% elsif ___.test == "cve-03"
+- SCSI_DEBUG: m
+
 % elsif ___.test == "cve-04"
 - CRYPTO_GCM
 - INET_ESP
