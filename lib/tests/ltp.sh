@@ -281,6 +281,12 @@ fixup_test()
 		# fix 'Unable to make dir /test/growfiles/XXX' error
 		mkdir -p /test/growfiles
 		;;
+	kvm)
+		# SKIP - /dev/kvm not available (errno: 2): kvm_intel isn't
+		# loaded by default even when CONFIG_KVM/CONFIG_KVM_INTEL are
+		# built. Mirrors fixup_kvm() in lib/tests/kselftests.sh.
+		lsmod | grep -q 'kvm_intel' || modprobe kvm_intel
+		;;
 	tracing)
 		export LTP_TIMEOUT_MUL=5
 		;;
