@@ -539,6 +539,17 @@ fixup_connector()
 	}
 }
 
+fixup_mqueue()
+{
+	# selftests: mqueue: mq_perf_tests # TIMEOUT 180 seconds
+	# mq_perf_tests runs several 10-million-iteration send/recv timing
+	# passes back to back; the upstream default (settings: timeout=180)
+	# is not enough time to get through even the first pass on our test
+	# hardware, so the runner kills it mid-benchmark before it can print
+	# a result.
+	echo 'timeout=1800' >$group/settings
+}
+
 fixup_mm()
 {
 	local run_vmtests="run_vmtests.sh"
