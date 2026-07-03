@@ -17,6 +17,30 @@ abs_path()
 	fi
 }
 
+reload_module()
+{
+	# Force an unconditional unload+reload rather than an idempotent
+	# lsmod-then-modprobe check. Some modules (e.g. scsi_debug) create a
+	# device whose configuration is fixed at load time, so an
+	# already-loaded instance may be a stale leftover from an earlier
+	# job/suite with different parameters; reusing it silently would give
+	# the test the wrong device. A stateless capability module (e.g.
+	# kvm_intel with no extra parameters) has no such "wrong" loaded
+	# state, so it only needs a plain lsmod check instead of this helper.
+	#
+	# Only safe for a single, independent module. Do not use this in a
+	# loop to reload several modules that depend on each other (e.g.
+	# kvm_intel + kvm) -- unloading/reloading one at a time can fail
+	# with "module in use" once an earlier call reloads a module the next
+	# one depends on; those cases need their own explicit modprobe -r/
+	# modprobe sequence in the caller.
+	local module=$1
+	shift
+
+	modprobe -r "$module" 2>/dev/null
+	modprobe "$module" "$@"
+}
+
 echo_run()
 {
 	echo "$@"

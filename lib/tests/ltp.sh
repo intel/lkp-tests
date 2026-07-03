@@ -100,22 +100,6 @@ create_single_test_file()
 	}
 }
 
-reload_module()
-{
-	# Force an unconditional unload+reload rather than an idempotent
-	# lsmod-then-modprobe check. Some modules (e.g. scsi_debug) create a
-	# device whose configuration is fixed at load time, so an
-	# already-loaded instance may be a stale leftover from an earlier
-	# job/suite with different parameters; reusing it silently would give
-	# the test the wrong device. A stateless capability module (e.g.
-	# kvm_intel) has no such "wrong" loaded state, so it only needs a
-	# plain lsmod check instead of this helper.
-	local module=$1
-
-	modprobe -r "$module" 2>/dev/null
-	modprobe "$module"
-}
-
 fixup_test()
 {
 	# group test: syscalls-05
