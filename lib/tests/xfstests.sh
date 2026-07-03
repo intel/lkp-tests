@@ -215,6 +215,16 @@ setup_mkfs_options()
 		fi
 		;;
 	btrfs)
+		# mkfs.btrfs refuses to overwrite a device that already carries
+		# a recognized filesystem unless -f is given. Several tests call
+		# _scratch_mkfs()/_scratch_mkfs_sized() more than once against
+		# the same scratch device within a single test (e.g. btrfs/007's
+		# send/receive workout), so without a default force flag the
+		# second call fails with:
+		#   ERROR: <dev> appears to contain an existing filesystem (type=btrfs)
+		#   ERROR: use the -f option to force overwrite of <dev>
+		mkfs_options="-f"
+
 		# Disable block-group-tree if any test in this group requires its absence.
 		# mkfs.btrfs enables block-group-tree by default; _require_btrfs_no_block_group_tree
 		# skips the test when BLOCK_GROUP_TREE is present in the superblock.
@@ -222,7 +232,7 @@ setup_mkfs_options()
 		if [[ -f "$group_file" ]]; then
 			sed "s|.*|$XFSTESTS_TESTS_DIR/${test%%-*}/&|" "$group_file" |
 				xargs grep -qlF '_require_btrfs_no_block_group_tree' 2>/dev/null &&
-				mkfs_options="-O ^block-group-tree"
+				mkfs_options+=" -O ^block-group-tree"
 		fi
 		;;
 	esac
