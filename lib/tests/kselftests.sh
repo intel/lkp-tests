@@ -582,6 +582,21 @@ fixup_mm()
 		# shellcheck disable=SC2016
 		sed -i 's/^STRESS_PARAM="nr_threads=$NUM_CPUS test_repeat_count=20"/STRESS_PARAM="nr_threads='$nr_threads' test_repeat_count='$iterations'"/' mm/test_vmalloc.sh
 	fi
+
+	# mm/ksft_mdwe.sh and mm/ksft_page_frag.sh are real wrapper scripts
+	# (each just runs "./run_vmtests.sh -t <category>", identical to
+	# every other registered ksft_*.sh wrapper) but were never added to
+	# mm/Makefile's TEST_PROGS list, so "make run_tests" never invokes
+	# run_vmtests.sh with "-t mdwe" or "-t page_frag" and those two
+	# categories silently never execute - the mdwe_test binary still
+	# builds fine (TEST_GEN_FILES) and looks like full coverage, but a
+	# developer running the wrapper script directly would get results
+	# make run_tests never produces. Same class of gap as
+	# mount_setattr/move_mount_set_group below, just missing a
+	# TEST_PROGS line for an already-present wrapper file rather than a
+	# TEST_GEN_FILES entry.
+	grep -q ksft_mdwe.sh mm/Makefile || echo "TEST_PROGS += ksft_mdwe.sh" >>mm/Makefile
+	grep -q ksft_page_frag.sh mm/Makefile || echo "TEST_PROGS += ksft_page_frag.sh" >>mm/Makefile
 }
 
 fixup_landlock()
