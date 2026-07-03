@@ -21,6 +21,7 @@ kselftests:
     - clone3
     - connector
     - core
+    - coredump
     - cpu-hotplug
     - cpufreq
 
@@ -57,6 +58,7 @@ kselftests:
     - memfd
     - memory-hotplug
     - mincore
+    - module
     - mount
     - mount_setattr
     - move_mount_set_group
