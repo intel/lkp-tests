@@ -9,20 +9,18 @@ clear_cgroup()
 
 	if [ -n "$cgmounts" ]; then
 		echo "$cgmounts" |
-		while read -r line
-		do
-			subsys=$(echo $line | awk '{ print $1 }')
-			subsys_mount=$(echo $line | awk '{ print $2 }')
-			if [ $(basename $subsys_mount) = "systemd" ]; then
-				continue
-			fi
-			cgroups=$(find $subsys_mount -type d | tail -n +2 | tac)
-			for cgroup in $cgroups
-			do
-				rmdir $cgroup 2>/dev/null
+			while read -r line; do
+				subsys=$(echo $line | awk '{ print $1 }')
+				subsys_mount=$(echo $line | awk '{ print $2 }')
+				if [ $(basename $subsys_mount) = "systemd" ]; then
+					continue
+				fi
+				cgroups=$(find $subsys_mount -type d | tail -n +2 | tac)
+				for cgroup in $cgroups; do
+					rmdir $cgroup 2>/dev/null
+				done
+				umount $subsys_mount
 			done
-			umount $subsys_mount
-		done
 	fi
 }
 
@@ -33,8 +31,7 @@ clear_cgroup2()
 
 	if [ -n "$cgroup2_mount" ]; then
 		cgroups2=$(find $cgroup2_mount -type d | tail -n +2 | tac)
-		for cgroup2 in $cgroups2
-		do
+		for cgroup2 in $cgroups2; do
 			rmdir $cgroup2 2>&1
 		done
 		umount $cgroup2_mount 2>&1
@@ -49,10 +46,9 @@ create_cgroup()
 
 	subsys=$(awk 'NR > 1 {printf $1 " "}' /proc/cgroups)
 
-	for item in $subsys
-	do
+	for item in $subsys; do
 		if [ "$item" = "cpu" -o "$item" = "cpuacct" ] &&
-			   ! mountpoint -q "$CGROUP_MNT/cpu,cpuacct"; then
+			! mountpoint -q "$CGROUP_MNT/cpu,cpuacct"; then
 			log_cmd mkdir -p $CGROUP_MNT/cpu,cpuacct 2>/dev/null
 			log_cmd mount -t cgroup -o cpu,cpuacct cpu,cpuacct $CGROUP_MNT/cpu,cpuacct 2>/dev/null
 			log_cmd mkdir -p $CGROUP_MNT/cpu,cpuacct/$testcase
@@ -103,28 +99,27 @@ reset_current_cpuset()
 
 	if [ -n "$cgmounts" ]; then
 		echo "$cgmounts" |
-		while read -r line
-		do
-			subsys_mount=$(echo $line | awk '{ print $1 }')
-			# find the cpuset subsystem
-			# grep ' cgroup ' /proc/mounts |  awk '{ print $1 }'
-			# cgroup
-			# cpuset
-			# cpu,cpuacct
-			# blkio
-			# memory
-			# devices
-			# freezer
-			# net_cls
-			# perf_event
-			# net_prio
-			# hugetlb
-			# pids
-			# rdma
-			if [ $subsys_mount = "cpuset" ]; then
-				subsys_mount_dir=$(echo $line | awk '{ print $2 }')
-				echo $$ > $subsys_mount_dir/tasks
-			fi
-		done
+			while read -r line; do
+				subsys_mount=$(echo $line | awk '{ print $1 }')
+				# find the cpuset subsystem
+				# grep ' cgroup ' /proc/mounts |  awk '{ print $1 }'
+				# cgroup
+				# cpuset
+				# cpu,cpuacct
+				# blkio
+				# memory
+				# devices
+				# freezer
+				# net_cls
+				# perf_event
+				# net_prio
+				# hugetlb
+				# pids
+				# rdma
+				if [ $subsys_mount = "cpuset" ]; then
+					subsys_mount_dir=$(echo $line | awk '{ print $2 }')
+					echo $$ >$subsys_mount_dir/tasks
+				fi
+			done
 	fi
 }

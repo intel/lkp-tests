@@ -31,9 +31,9 @@ check_test_param()
 {
 	if [[ "$test" = "non-pmem" ]] || [[ "$test" = "pmem" ]] || [[ "$test" = "none" ]]; then
 		tmp_dir=$(mktemp -d)
-		echo "NON_PMEM_FS_DIR=$tmp_dir" > testconfig.sh
-		echo "PMEM_FS_DIR=/fs/pmem0" >> testconfig.sh
-		echo "ENABLE_NFIT_TESTS=y" >> testconfig.sh
+		echo "NON_PMEM_FS_DIR=$tmp_dir" >testconfig.sh
+		echo "PMEM_FS_DIR=/fs/pmem0" >>testconfig.sh
+		echo "ENABLE_NFIT_TESTS=y" >>testconfig.sh
 		mkdir -p /fs/pmem0
 	else
 		die "Parameter \"test\" is wrong"
@@ -84,27 +84,26 @@ enable_remote_node()
 	# localhost as remote node but need to do some configs as below.
 	# reference on follow link
 	# https://github.com/pmem/nvml/blob/3ab708efad653aeda0bcbc6b8d2b61d9ba9d5310/utils/docker/configure-tests.sh#L53
-	for n in {0..3}
-	do
-		echo "NODE[$n]=127.0.0.1" >> testconfig.sh
-		echo "NODE_WORKING_DIR[$n]=/tmp/node$n" >> testconfig.sh
-		echo "NODE_ADDR[$n]=127.0.0.1" >> testconfig.sh
-		echo "NODE_ENV[$n]=\"PMEM_IS_PMEM_FORCE=1\"" >> testconfig.sh
+	for n in {0..3}; do
+		echo "NODE[$n]=127.0.0.1" >>testconfig.sh
+		echo "NODE_WORKING_DIR[$n]=/tmp/node$n" >>testconfig.sh
+		echo "NODE_ADDR[$n]=127.0.0.1" >>testconfig.sh
+		echo "NODE_ENV[$n]=\"PMEM_IS_PMEM_FORCE=1\"" >>testconfig.sh
 	done
 
-	echo "TEST_PROVIDERS=sockets" >> testconfig.sh
+	echo "TEST_PROVIDERS=sockets" >>testconfig.sh
 	# enable ssh localhost without password
 	pgrep -l sshd || die "ssh server do not run"
 
 	log_cmd ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
 
-	log_cmd cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+	log_cmd cat ~/.ssh/id_rsa.pub >>~/.ssh/authorized_keys
 
 	expect -c "set timeout -1;
         spawn ssh 127.0.0.1 exit;
         expect {
             *(yes/no*)* {send -- yes\r;exp_continue;}
-        }";
+        }"
 
 	return 0
 }
@@ -138,14 +137,13 @@ run()
 	log_cmd ln -sf /usr/local/bin/ndctl /usr/bin/ndctl
 
 	# enable remote valgrind test
-	echo "RPMEM_VALGRIND_ENABLED=y" >> testconfig.sh
+	echo "RPMEM_VALGRIND_ENABLED=y" >>testconfig.sh
 
 	# to fix no point to a PMEM device
-	echo "PMEM_FS_DIR_FORCE_PMEM=1" >> testconfig.sh
+	echo "PMEM_FS_DIR_FORCE_PMEM=1" >>testconfig.sh
 
-	[ "$test" = "pmem" ] && echo "PMEM_FS_DIR_FORCE_PMEM=2" >> testconfig.sh
-	for testcase in $testcases
-	do
+	[ "$test" = "pmem" ] && echo "PMEM_FS_DIR_FORCE_PMEM=2" >>testconfig.sh
+	for testcase in $testcases; do
 		test_cmd="./RUNTESTS.sh -f $test"
 		# If exist TESTS.py, call RUNTESTS.py to run tests
 		[[ -x "$testcase/TESTS.py" ]] && test_cmd="./RUNTESTS.py"
@@ -162,7 +160,7 @@ run()
 			log_cmd chown lkp:lkp -R /fs/pmem0
 			log_eval su lkp -c "$test_cmd $testcase  2>&1"
 		else
-			log_eval $test_cmd $testcase  2>&1
+			log_eval $test_cmd $testcase 2>&1
 		fi
 
 		# unset env variable in case it do impact on other tests
@@ -189,28 +187,24 @@ build_generate_testgroup()
 	#     c. keyword: require_fs_type pmem -> put into fs_type pmem
 	#     d. keyword: require_fs_type any -> put into fs_type both non-pmem and pmem
 	#     e. no keyword 'require_fs_type' -> put into fs_type both non-pmem and pmem
-	for nvml_case in *
-	do
+	for nvml_case in *; do
 		[ -f "$nvml_case/TEST0" ] || continue
 		[ -x "$nvml_case/TEST0" ] || continue
 		cd "$nvml_case" || continue
 		scripts=$(ls -1 TEST* | grep -v -i -e "\.ps1" | sort -V)
 
-		for run_script in $scripts
-		do
+		for run_script in $scripts; do
 			req_fs=$(grep -w "require_fs_type" "$run_script") || {
-				echo  "$nvml_case" >> ../group_pmem
-				echo  "$nvml_case" >> ../group_non-pmem
+				echo "$nvml_case" >>../group_pmem
+				echo "$nvml_case" >>../group_non-pmem
 				continue
 			}
 			fs_type=${req_fs:15}
-			for type in $fs_type
-			do
-				case "$type"
-				in
+			for type in $fs_type; do
+				case "$type" in
 				any)
-					echo "$nvml_case" >> ../group_pmem
-					echo "$nvml_case" >> ../group_non-pmem
+					echo "$nvml_case" >>../group_pmem
+					echo "$nvml_case" >>../group_non-pmem
 					;;
 				non-pmem)
 					echo "$nvml_case" >>../group_non-pmem
@@ -226,10 +220,9 @@ build_generate_testgroup()
 		done
 		cd - >/dev/null || return
 	done
-	for type in pmem non-pmem none
-	do
-	    echo "$type:" >> group_by_fs_type.yaml
-	    awk -F '_' '{print $1}' group_$type | sort -u | sed 's/^/  - /g'>> group_by_fs_type.yaml
+	for type in pmem non-pmem none; do
+		echo "$type:" >>group_by_fs_type.yaml
+		awk -F '_' '{print $1}' group_$type | sort -u | sed 's/^/  - /g' >>group_by_fs_type.yaml
 	done
 	rm -f group_none group_non-pmem group_pmem
 	return 0
@@ -239,5 +232,5 @@ build_generate_testgroup()
 build_user_filter_file()
 {
 	cd "$source_dir" || return
-	git grep "require_no_superuser" | awk -F '[:/]' '{if (!a[$3]++ && $3 != "unittest") {print $3} }' > user_filter
+	git grep "require_no_superuser" | awk -F '[:/]' '{if (!a[$3]++ && $3 != "unittest") {print $3} }' >user_filter
 }

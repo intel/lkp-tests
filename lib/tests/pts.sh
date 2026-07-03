@@ -197,7 +197,7 @@ fixup_hpcc()
 		export MPI_INCLUDE=$mpdir/include
 		export MPI_LIBS=$mpdir/lib/libmpi.so
 		export MPI_CC=/usr/bin/mpicc.openmpi
-		export MPI_VERSION=`$MPI_CC -showme:version 2>&1 | grep MPI | cut -d "(" -f1  | cut -d ":" -f2`
+		export MPI_VERSION=$($MPI_CC -showme:version 2>&1 | grep MPI | cut -d "(" -f1 | cut -d ":" -f2)
 		phoronix-test-suite force-install pts/$test
 	}
 
@@ -244,10 +244,10 @@ fixup_fio()
 	local test_disk="/tmp/test_fio.img"
 	local test_dir="/media/test_fio"
 	fallocate -l 10G $test_disk || return
-	mkfs -t ext4 $test_disk 2> /dev/null || return
+	mkfs -t ext4 $test_disk 2>/dev/null || return
 	mkdir -p $test_dir || return
 	modprobe loop || return
-	mount -t auto -o loop $test_disk $test_dir ||return
+	mount -t auto -o loop $test_disk $test_dir || return
 
 	sed -i 's,#!/bin/sh,#!/bin/dash,' "$target"
 	sed -i "s#filename=\$DIRECTORY_TO_TEST#filename=$test_dir/fiofile#" "$target"
@@ -454,7 +454,7 @@ fixup_gcrypt_install()
 {
 	local test=$1
 	local target=/var/lib/phoronix-test-suite/test-profiles/pts/${test}/install.sh
-	sed -i '5a sed -i \"s,\\$(CPP) _\\$@,\\$(CPP) -P _\\$@,g\" src/Makefile*'  "$target"
+	sed -i '5a sed -i \"s,\\$(CPP) _\\$@,\\$(CPP) -P _\\$@,g\" src/Makefile*' "$target"
 	sed -i "15a sed -i \"s,define G10_MPI_INLINE_DECL  extern __inline__,define G10_MPI_INLINE_DECL  extern inline __attribute__ ((__gnu_inline__)),g\" mpi/mpi-inline.h" "$target"
 }
 
@@ -565,6 +565,7 @@ fixup_install()
 		;;
 	x264-opencl-*)
 		fixup_x264_opencl_install $test || die "failed to fixup x264-opencl install"
+		;;
 	esac
 }
 
@@ -573,187 +574,187 @@ fixup_test()
 	local test=$1
 
 	case $test in
-		systester-[0-9]*)
-			# Choose
-			# 1: Gauss-Legendre algorithm [Recommended.]
-			# 1: 4 Million Digits [This Test could take a while to finish.]
-			# 3: 4 threads [2+ Cores Recommended]
-			# TODO: select different test according to testbox's hardware
-			test_opt="\n1\n1\n3\nn"
-			fixup_systester $test
-			;;
-		java-jmh-*)
-			fixup_java_jmh $test
-			;;
-		iozone-*)
-			# Choose
-			# 1: 1MB
-			# 2: 2GB
-			# 3: Test All Options
-			test_opt="\n3\n2\n3\nn"
-			;;
-		interbench-*)
-			# Choose
-			# 1: Video
-			# 2: Burn
-			test_opt="\n4\n6\nn"
+	systester-[0-9]*)
+		# Choose
+		# 1: Gauss-Legendre algorithm [Recommended.]
+		# 1: 4 Million Digits [This Test could take a while to finish.]
+		# 3: 4 threads [2+ Cores Recommended]
+		# TODO: select different test according to testbox's hardware
+		test_opt="\n1\n1\n3\nn"
+		fixup_systester $test
+		;;
+	java-jmh-*)
+		fixup_java_jmh $test
+		;;
+	iozone-*)
+		# Choose
+		# 1: 1MB
+		# 2: 2GB
+		# 3: Test All Options
+		test_opt="\n3\n2\n3\nn"
+		;;
+	interbench-*)
+		# Choose
+		# 1: Video
+		# 2: Burn
+		test_opt="\n4\n6\nn"
 
-			# produce big file to /opt/rootfs when test on cluster
-			[ "$LKP_LOCAL_RUN" = "1" ] || fixup_interbench $test
-			;;
-		numenta-nab-*)
-			# fix issue: SyntaxError: Missing parentheses in call to 'print'.
-			setup_python2
-			;;
-		mandel*gpu-*)
-			# Choose
-			# 2. GPU
-			test_opt="\n2\nn"
-			;;
-		smallpt-gpu-*)
-			# Choose
-			# 2: GPU
-			# 1: Complex
-			test_opt="\n2\n1\nn"
-			;;
-		juliagpu-*)
-			# Choose
-			# 2: GPU
-			test_opt="\n2\nn"
-			;;
-		luxmark-*)
-			# Choose
-			# 2: GPU
-			# 3: Hotel
-			test_opt="\n2\n3\nn"
-			;;
-		x11perf-*)
-			# Choose
-			# 1: 500px PutImage Square
-			test_opt="\n1\nn"
-			export DISPLAY=:0
-			;;
-		tesseract-*)
-			export DISPLAY=:0
-			;;
-		smart-*)
-			# Choose 1st disk to get smart info
-			# 1: /dev/sda
-			test_opt="\n1\nn"
-			fixup_smart
-			;;
-		urbanterror-*)
-			export DISPLAY=:0
-			;;
-		hdparm-read-*)
-			# Choose
-			# 1: /dev/sda
-			test_opt="\n1\nn"
-			;;
-		plaidml-*)
-			# Choose
-			# 1: No
-			# 2: Inference
-			# 3: Mobilenet
-			# 4: OpenCL
-			test_opt="\n2\n2\n1\n2\nn"
-			export DISPLAY=:0
-			;;
-		video-cpu-usage-*)
-			# Choose
-			# 1: OS X CoreVideo
-			test_opt="\n5\na\nb\nc\nn"
-			export DISPLAY=:0
-			;;
-		netperf-*)
-			fixup_netperf $test
-			;;
-		startup-time-*)
-			fixup_startup_time $test
-			;;
-		ior-*)
-			fixup_ior $test
-			;;
-		iperf-*)
-			fixup_iperf $test
-			;;
-		nuttcp-*)
-			fixup_nuttcp $test
-			;;
-		sqlite-[0-9]*)
-			fixup_sqlite $test
-			;;
-		blogbench-*)
-			fixup_blogbench $test
-			;;
-		systemd-boot-total-*)
-			# Choose
-			# 1: Total 2: Userspace 3: Kernel
-			test_opt="\n1,2,3\nn"
-			fixup_systemd_boot_total $test
-			;;
-		mcperf-*)
-			fixup_mcperf $test
-			;;
-		network-loopback-*)
-			fixup_network_loopback $test
-			;;
-		build-mplayer-*)
-			fixup_build_mplayer $test
-			;;
-		mysqlslap-*)
-			fixup_mysqlslap $test
-			;;
-		ffmpeg-*)
-			fixup_ffmpeg $test
-			;;
-		lammps-*)
-			fixup_lammps $test
-			;;
-		npb-*)
-			fixup_npb $test
-			;;
-		aom-av1-*)
-			fixup_aom_av1 $test
-			;;
-		bullet-*)
-			fixup_bullet $test
-			;;
-		gpu-residency-*)
-			fixup_gpu_residency $test
-			;;
-		fio-*)
-			fixup_fio $test
-			;;
-		hpcc-*)
-			fixup_hpcc $test
-			;;
-		open-porous-media-*)
-			fixup_open_porous_media $test
-			;;
-		crafty-*)
-			fixup_crafty $test
-			;;
-		gluxmark-*)
-			fixup_gluxmark $test
-			;;
-		java-gradle-perf-*)
-			fixup_java_gradle_perf
-			;;
-		unigine-heaven-*|unigine-valley-*)
-			export DISPLAY=:0
-			;;
-		glmark2-*|openarena-*|gputest-*|supertuxkart-*)
-			export DISPLAY=:0
-			;;
-		clpeak-*)
-			# 7: Kernel Latency
-			# 4: Integer Compute INT # this subtest was disabled on Intel platform
-			test_opt="\n7\nn"
-			;;
-		pgbench-*)
-			fixup_pgbench $test
-			;;
+		# produce big file to /opt/rootfs when test on cluster
+		[ "$LKP_LOCAL_RUN" = "1" ] || fixup_interbench $test
+		;;
+	numenta-nab-*)
+		# fix issue: SyntaxError: Missing parentheses in call to 'print'.
+		setup_python2
+		;;
+	mandel*gpu-*)
+		# Choose
+		# 2. GPU
+		test_opt="\n2\nn"
+		;;
+	smallpt-gpu-*)
+		# Choose
+		# 2: GPU
+		# 1: Complex
+		test_opt="\n2\n1\nn"
+		;;
+	juliagpu-*)
+		# Choose
+		# 2: GPU
+		test_opt="\n2\nn"
+		;;
+	luxmark-*)
+		# Choose
+		# 2: GPU
+		# 3: Hotel
+		test_opt="\n2\n3\nn"
+		;;
+	x11perf-*)
+		# Choose
+		# 1: 500px PutImage Square
+		test_opt="\n1\nn"
+		export DISPLAY=:0
+		;;
+	tesseract-*)
+		export DISPLAY=:0
+		;;
+	smart-*)
+		# Choose 1st disk to get smart info
+		# 1: /dev/sda
+		test_opt="\n1\nn"
+		fixup_smart
+		;;
+	urbanterror-*)
+		export DISPLAY=:0
+		;;
+	hdparm-read-*)
+		# Choose
+		# 1: /dev/sda
+		test_opt="\n1\nn"
+		;;
+	plaidml-*)
+		# Choose
+		# 1: No
+		# 2: Inference
+		# 3: Mobilenet
+		# 4: OpenCL
+		test_opt="\n2\n2\n1\n2\nn"
+		export DISPLAY=:0
+		;;
+	video-cpu-usage-*)
+		# Choose
+		# 1: OS X CoreVideo
+		test_opt="\n5\na\nb\nc\nn"
+		export DISPLAY=:0
+		;;
+	netperf-*)
+		fixup_netperf $test
+		;;
+	startup-time-*)
+		fixup_startup_time $test
+		;;
+	ior-*)
+		fixup_ior $test
+		;;
+	iperf-*)
+		fixup_iperf $test
+		;;
+	nuttcp-*)
+		fixup_nuttcp $test
+		;;
+	sqlite-[0-9]*)
+		fixup_sqlite $test
+		;;
+	blogbench-*)
+		fixup_blogbench $test
+		;;
+	systemd-boot-total-*)
+		# Choose
+		# 1: Total 2: Userspace 3: Kernel
+		test_opt="\n1,2,3\nn"
+		fixup_systemd_boot_total $test
+		;;
+	mcperf-*)
+		fixup_mcperf $test
+		;;
+	network-loopback-*)
+		fixup_network_loopback $test
+		;;
+	build-mplayer-*)
+		fixup_build_mplayer $test
+		;;
+	mysqlslap-*)
+		fixup_mysqlslap $test
+		;;
+	ffmpeg-*)
+		fixup_ffmpeg $test
+		;;
+	lammps-*)
+		fixup_lammps $test
+		;;
+	npb-*)
+		fixup_npb $test
+		;;
+	aom-av1-*)
+		fixup_aom_av1 $test
+		;;
+	bullet-*)
+		fixup_bullet $test
+		;;
+	gpu-residency-*)
+		fixup_gpu_residency $test
+		;;
+	fio-*)
+		fixup_fio $test
+		;;
+	hpcc-*)
+		fixup_hpcc $test
+		;;
+	open-porous-media-*)
+		fixup_open_porous_media $test
+		;;
+	crafty-*)
+		fixup_crafty $test
+		;;
+	gluxmark-*)
+		fixup_gluxmark $test
+		;;
+	java-gradle-perf-*)
+		fixup_java_gradle_perf
+		;;
+	unigine-heaven-* | unigine-valley-*)
+		export DISPLAY=:0
+		;;
+	glmark2-* | openarena-* | gputest-* | supertuxkart-*)
+		export DISPLAY=:0
+		;;
+	clpeak-*)
+		# 7: Kernel Latency
+		# 4: Integer Compute INT # this subtest was disabled on Intel platform
+		test_opt="\n7\nn"
+		;;
+	pgbench-*)
+		fixup_pgbench $test
+		;;
 	esac
 }
 
@@ -782,8 +783,7 @@ run_test()
 	patch_to_detect_wrong_test_option
 	if [ -n "$option_a" ]; then
 		test_opt=''
-		for i in {a..j}
-		do
+		for i in {a..j}; do
 			eval option=\$option_${i}
 			[ -n "$option" ] || break
 			test_opt="$test_opt$option\n"

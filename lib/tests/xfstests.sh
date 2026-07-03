@@ -56,6 +56,7 @@ cifs_version()
 		;;
 	default)
 		die "unknow version"
+		;;
 	esac
 }
 
@@ -195,7 +196,9 @@ setup_mkfs_options()
 			# new version of mkfs.xfs set reflink=1 as default and conflict with DAX mount
 			# need to set reflink=0 manually
 			mkfs_options="-mreflink=0"
-		elif is_test_in_group "$test" "generic-group-[0-9]*" || { [[ "$nr_partitions" -ge 3 ]] && is_test_in_group "$test" "btrfs-log-writes" "generic-log-writes"; }; then
+		elif is_test_in_group "$test" "generic-group-[0-9]*" || {
+			[[ "$nr_partitions" -ge 3 ]] && is_test_in_group "$test" "btrfs-log-writes" "generic-log-writes"
+		}; then
 			mkfs_options="-mreflink=1"
 		else
 			# this doesn't apply to xfs-realtime-scratch-reflink
@@ -216,8 +219,8 @@ setup_mkfs_options()
 		# skips the test when BLOCK_GROUP_TREE is present in the superblock.
 		local group_file="$XFSTESTS_TESTS_DIR/$test"
 		if [[ -f "$group_file" ]]; then
-			sed "s|.*|$XFSTESTS_TESTS_DIR/${test%%-*}/&|" "$group_file" | \
-				xargs grep -qlF '_require_btrfs_no_block_group_tree' 2>/dev/null && \
+			sed "s|.*|$XFSTESTS_TESTS_DIR/${test%%-*}/&|" "$group_file" |
+				xargs grep -qlF '_require_btrfs_no_block_group_tree' 2>/dev/null &&
 				mkfs_options="-O ^block-group-tree"
 		fi
 		;;
@@ -332,13 +335,13 @@ setup_fs_config()
 	}
 
 	is_test_in_group "$test" "generic-no-xfs-bug-on-assert" "xfs-no-xfs-bug-on-assert" && {
-		[[ -f /sys/fs/xfs/debug/bug_on_assert ]] && echo 0 > /sys/fs/xfs/debug/bug_on_assert
+		[[ -f /sys/fs/xfs/debug/bug_on_assert ]] && echo 0 >/sys/fs/xfs/debug/bug_on_assert
 	}
 
 	is_test_in_group "xfs-437" "$test" && {
-		echo "LC_ALL=en_US.UTF-8" >> /etc/environment
-		echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
-		echo "LANG=en_US.UTF-8" > /etc/locale.conf
+		echo "LC_ALL=en_US.UTF-8" >>/etc/environment
+		echo "en_US.UTF-8 UTF-8" >>/etc/locale.gen
+		echo "LANG=en_US.UTF-8" >/etc/locale.conf
 		locale-gen en_US.UTF-8
 		log_eval export WORKAREA="$BENCHMARK_ROOT/xfstests/src/xfsprogs-dev"
 	}
@@ -393,8 +396,7 @@ set_env()
 	umount $mount_points
 
 	# clear filesystem in partition
-	for dev in ${partitions#* }
-	do
+	for dev in ${partitions#* }; do
 		dd if=/dev/zero bs=512 count=512 of=$dev
 	done
 
@@ -418,20 +420,20 @@ run_smbv2_tests()
 run_smbv3_tests()
 {
 	# generic/478 run over 1 hour in smbv3_test
-	echo "generic/478" >> tests/cifs/exclude.very-slow.txt
+	echo "generic/478" >>tests/cifs/exclude.very-slow.txt
 	# generic/013 caused last_state: OOM
-	echo "generic/013" >> tests/cifs/exclude.incompatible-smb3.txt
+	echo "generic/013" >>tests/cifs/exclude.incompatible-smb3.txt
 	log_cmd ./check -E tests/cifs/exclude.incompatible-smb3.txt $exclude_file $all_tests
 }
 
 run_fs_tests()
 {
 	# generic/470 requires MAP_SYNC which is not supported on ext2
-	[[ "$fs" == "ext2" ]] && echo "generic/470" >> tests/exclude/ext2
+	[[ "$fs" == "ext2" ]] && echo "generic/470" >>tests/exclude/ext2
 
 	# generic/781 tests zoned block device filesystems via zloop;
 	# ext4 has no zoned block device support, so _try_mkfs_dev always fails.
-	[[ "$fs" == "ext4" ]] && echo "generic/781" >> tests/exclude/ext4
+	[[ "$fs" == "ext4" ]] && echo "generic/781" >>tests/exclude/ext4
 
 	[[ -s tests/exclude/$fs ]] && exclude_file="-E tests/exclude/$fs"
 	log_cmd ./check $exclude_file $all_tests

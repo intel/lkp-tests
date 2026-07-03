@@ -42,24 +42,22 @@ is_excluded()
 
 	# regex match
 	grep -v '^#' "$exclude_file" | grep -w "^${test}:.*:regex$" | awk -F: 'NF == 3 {print $2}' |
-	while read -r regex
-	do
-		echo "# regex: $regex generated" >> ./exclude
-		cat runtest/$test | awk '{print $1}' | grep -G "$regex" | awk -v prefix=$test":" '$0=prefix$0' >> ./exclude
-	done
+		while read -r regex; do
+			echo "# regex: $regex generated" >>./exclude
+			cat runtest/$test | awk '{print $1}' | grep -G "$regex" | awk -v prefix=$test":" '$0=prefix$0' >>./exclude
+		done
 
 	orig_test=$(echo "$test" | sed 's/-[0-9]\{2\}$//')
 	grep -v '^#' ./exclude | grep -w "^$orig_test" | awk -F: 'NF == 2' |
-	while read -r i
-	do
-		ignore=$(echo $i | awk -F: '{print $2}')
-		grep -q "^${ignore}" runtest/${test} || continue
-		sed -i "s/^${ignore} /#${ignore} /g" runtest/${test}
-		echo "<<<test_start>>>"
-		echo "tag=${ignore}"
-		echo "${ignore} 0 exclude"
-		echo "<<<test_end>>>"
-	done
+		while read -r i; do
+			ignore=$(echo $i | awk -F: '{print $2}')
+			grep -q "^${ignore}" runtest/${test} || continue
+			sed -i "s/^${ignore} /#${ignore} /g" runtest/${test}
+			echo "<<<test_start>>>"
+			echo "tag=${ignore}"
+			echo "${ignore} 0 exclude"
+			echo "<<<test_end>>>"
+		done
 }
 
 fixup_env()
@@ -96,9 +94,9 @@ create_single_test_file()
 
 	# hugetlb/hugeshmget02
 	echo "$test" | grep -qE ".+/.+" && {
-		local group=${test%%/*} # hugetlb
-		local sub_test=${test##*/} # hugeshmget02
-		grep -E "^$sub_test " "$BENCHMARK_ROOT/ltp/runtest/$group" > $BENCHMARK_ROOT/ltp/runtest/temp_single_test # hugeshmget02 hugeshmget02 -i 10
+		local group=${test%%/*}                                                                                  # hugetlb
+		local sub_test=${test##*/}                                                                               # hugeshmget02
+		grep -E "^$sub_test " "$BENCHMARK_ROOT/ltp/runtest/$group" >$BENCHMARK_ROOT/ltp/runtest/temp_single_test # hugeshmget02 hugeshmget02 -i 10
 	}
 }
 
@@ -155,9 +153,9 @@ fixup_test()
 		$LKP_SRC/tools/split-tests lvm.local 2 lvm.local-
 		cd -
 		;;
-	mm-oom|mm-min_free_kbytes)
+	mm-oom | mm-min_free_kbytes)
 		local pid_job="$(cat $TMP/run-job.pid)"
-		echo 0 > /proc/$pid_job/oom_score_adj
+		echo 0 >/proc/$pid_job/oom_score_adj
 		;;
 	mm-00)
 		[ -z "$partitions" ] && exit
@@ -173,10 +171,10 @@ fixup_test()
 		unzip $(ls TPM_Emulator*.zip | head -1)
 		rsync -av $(ls -l . | awk '/^d/ {print $NF}' | head -1)"/" /
 		cd ..
-		killall tpmd > /dev/null 2>&1
-		tpmd -f -d clear > /dev/null 2>&1 &
-		killall tcsd > /dev/null 2>&1
-		tcsd -e -f > /dev/null 2>&1 &
+		killall tpmd >/dev/null 2>&1
+		tpmd -f -d clear >/dev/null 2>&1 &
+		killall tcsd >/dev/null 2>&1
+		tcsd -e -f >/dev/null 2>&1 &
 		sleep 5
 		export LTPROOT=${PWD}
 		export LTPBIN=$LTPROOT/testcases/bin
@@ -189,13 +187,13 @@ fixup_test()
 		export P11_USER_PWD="HELLO7"
 		export NEW_P11_USER_PWD="HELLO8"
 		;;
-	ltp-aiodio.part[24]*|dio-0*|io)
+	ltp-aiodio.part[24]* | dio-0* | io)
 		specify_tmpdir || exit
 		;;
 	syscalls-ipc-msgstress)
 		# avoid soft_timeout by reducing the max number of message
 		# queues to 10000(default is 32000)
-		echo 10000 > /proc/sys/kernel/msgmni
+		echo 10000 >/proc/sys/kernel/msgmni
 		;;
 	syscalls-0*)
 		export LTP_TIMEOUT_MUL=5
@@ -207,7 +205,7 @@ fixup_test()
 			mount -o remount,strictatime /tmp
 		fi
 
-		echo "#\$SystemLogSocketName /run/systemd/journal/syslog" > /etc/rsyslog.d/listen.conf
+		echo "#\$SystemLogSocketName /run/systemd/journal/syslog" >/etc/rsyslog.d/listen.conf
 		systemctl restart rsyslog || exit
 		[ -f /var/log/maillog ] || {
 			touch /var/log/maillog && chmod 600 /var/log/maillog
@@ -302,7 +300,7 @@ cleanup_ltp()
 		# remove LVM volume groups created by prepare_lvm.sh and release the associated loop devices
 		log_cmd testcases/bin/cleanup_lvm.sh
 		;;
-	mm-oom|mm-min_free_kbytes)
+	mm-oom | mm-min_free_kbytes)
 		dmesg -C
 		;;
 	syscalls-0*)

@@ -102,7 +102,7 @@ task :shfmt do
                   ENV['file']
                 else
                   dir = ENV['dir'] || '.'
-                  `find #{dir} -type f -executable ! -path "./.git*" ! -path "./vendor*" ! -path "*/node_modules/*" ! -path "*/sbin/makepkg" ! -path "*/sbin/pacman-LKP" ! -size +100k | xargs -P$(nproc) grep -s -l -e '^#!/.*bash$' -e '^#!/bin/sh$'`.split("\n").join(' ')
+                  `find #{dir} -type f -executable ! -path "./.git*" ! -path "./vendor*" ! -path "*/node_modules/*" ! -path "*/sbin/makepkg" ! -path "*/sbin/pacman-LKP" ! -path "*/kbuild/kbuild.sh" ! -size +100k | xargs -P$(nproc) grep -s -l -e '^#!/.*bash$' -e '^#!/bin/sh$'`.split("\n").join(' ')
                 end
 
   version = `shfmt --version 2>&1`.strip.delete_prefix('v')

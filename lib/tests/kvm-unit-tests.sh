@@ -28,12 +28,12 @@ remove_case()
 
 	sl=$(grep "^\[$to_be_removed\]" $casesfile -n | awk -F':' '{print $1}')
 	[ -n "$sl" ] || return
-	el=$(sed -n "$((sl+1)),$ p" $casesfile | grep '^\[' -n -m 1 | awk -F':' '{print $1}')
+	el=$(sed -n "$((sl + 1)),$ p" $casesfile | grep '^\[' -n -m 1 | awk -F':' '{print $1}')
 
 	if [ -z "$el" ]; then
 		sed -i "$sl,$ d" $casesfile # delete $sl to the end
 	else
-		el=$((el+sl-1))
+		el=$((el + sl - 1))
 		sed -i "$sl,$el d" $casesfile # delete $sl to $el
 	fi
 }
@@ -61,7 +61,7 @@ setup_test_environment()
 {
 	# fix "SKIP pmu (/proc/sys/kernel/nmi_watchdog not equal to 0)"
 	[ "$(cat /proc/sys/kernel/nmi_watchdog)" != "0" ] && {
-		echo 0 > /proc/sys/kernel/nmi_watchdog || return
+		echo 0 >/proc/sys/kernel/nmi_watchdog || return
 	}
 	is_virt || load_kvm_param
 

@@ -11,11 +11,11 @@ check_vmem_param()
 	log_cmd cd "$BENCHMARK_ROOT/$casename/src/test" || die "Can not find $casename/src/test dir"
 
 	if [[ "$group" = "vmem" ]]; then
-		echo "DEVICE_DAX_PATH=(/dev/dax0.0)" > testconfig.sh
+		echo "DEVICE_DAX_PATH=(/dev/dax0.0)" >testconfig.sh
 	fi
 
 	tmp_dir=$(mktemp -d)
-	echo "TEST_DIR=$tmp_dir" >> testconfig.sh
+	echo "TEST_DIR=$tmp_dir" >>testconfig.sh
 
 	[[ -n "$group" ]] || die "Parameter \"group\" is empty"
 
@@ -50,12 +50,11 @@ run_vmem()
 	fi
 
 	log_cmd cd "$BENCHMARK_ROOT/$casename/src/test"
-	for testcase in $testcases
-	do
+	for testcase in $testcases; do
 		if [ "$LKP_LOCAL_RUN" != "1" ]; then
 			log_cmd su lkp -c "./RUNTESTS $testcase  2>&1"
 		else
-			log_cmd ./RUNTESTS $testcase  2>&1
+			log_cmd ./RUNTESTS $testcase 2>&1
 		fi
 	done
 

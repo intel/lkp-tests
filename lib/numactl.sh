@@ -51,18 +51,18 @@ __node_binding()
 	__nodes=$5
 
 	case "$__node_binding_mode" in
-		none)
-			__binding=
-			;;
-		even)
-			__binding=$((__seq_no%nr_node))
-			;;
-		even-list)
-			__binding=$(cpu_list_ref "$__even_nodes" $((__seq_no%__nr_even_node)))
-			;;
-		adhoc)
-			__binding="$__nodes"
-			;;
+	none)
+		__binding=
+		;;
+	even)
+		__binding=$((__seq_no % nr_node))
+		;;
+	even-list)
+		__binding=$(cpu_list_ref "$__even_nodes" $((__seq_no % __nr_even_node)))
+		;;
+	adhoc)
+		__binding="$__nodes"
+		;;
 	esac
 }
 
@@ -72,10 +72,10 @@ numa_node_binding()
 	__seq_no=$1
 
 	__node_binding "$__seq_no" "$__cpu_node_binding_mode" \
-		       "$__cpu_even_nodes" "$__nr_cpu_even_node" "$__cpu_nodes"
+		"$__cpu_even_nodes" "$__nr_cpu_even_node" "$__cpu_nodes"
 	[ -n "$__binding" ] && __cpu_binding="--cpunodebind=$__binding"
 	__node_binding "$__seq_no" "$__mem_node_binding_mode" \
-		       "$__mem_even_nodes" "$__nr_mem_even_node" "$__mem_nodes"
+		"$__mem_even_nodes" "$__nr_mem_even_node" "$__mem_nodes"
 	[ -n "$__binding" ] && __mem_binding="--membind=$__binding"
 	if [ -n "$__cpu_binding" ] || [ -n "$__mem_binding" ]; then
 		echo -n "numactl $numactl_opts $__cpu_binding $__mem_binding --"

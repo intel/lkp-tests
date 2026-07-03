@@ -66,7 +66,7 @@ build_lkvs()
 fixup_tdx_compliance()
 {
 	log_cmd insmod tdx-compliance/tdx-compliance.ko
-	echo all > /sys/kernel/debug/tdx/tdx-tests
+	echo all >/sys/kernel/debug/tdx/tdx-tests
 	log_cmd cat /sys/kernel/debug/tdx/tdx-tests
 }
 
@@ -100,34 +100,34 @@ runtests()
 		log_cmd ./runtests -f $test/tests
 	else
 		case $test in
-			cstate-client)
-				log_cmd ./runtests -f cstate/tests-client
-				;;
-			cstate-server)
-				log_cmd ./runtests -f cstate/tests-server
-				;;
-			prefetchi)
-				log_cmd prefetchi/prefetchi
-				;;
-			rapl-client)
-				log_cmd ./runtests -f rapl/tests-client
-				;;
-			rapl-server)
-				log_cmd ./runtests -f rapl/tests-server
-				;;
-			th)
-				log_cmd ./runtests -c "th/th_test 1"
-				log_cmd ./runtests -c "th/th_test 2"
-				;;
-			topology-client)
-				log_cmd ./runtests -f topology/tests-client
-				;;
-			topology-server)
-				log_cmd ./runtests -f topology/tests-server
-				;;
-			*)
-				die "unknown $test"
-				;;
+		cstate-client)
+			log_cmd ./runtests -f cstate/tests-client
+			;;
+		cstate-server)
+			log_cmd ./runtests -f cstate/tests-server
+			;;
+		prefetchi)
+			log_cmd prefetchi/prefetchi
+			;;
+		rapl-client)
+			log_cmd ./runtests -f rapl/tests-client
+			;;
+		rapl-server)
+			log_cmd ./runtests -f rapl/tests-server
+			;;
+		th)
+			log_cmd ./runtests -c "th/th_test 1"
+			log_cmd ./runtests -c "th/th_test 2"
+			;;
+		topology-client)
+			log_cmd ./runtests -f topology/tests-client
+			;;
+		topology-server)
+			log_cmd ./runtests -f topology/tests-server
+			;;
+		*)
+			die "unknown $test"
+			;;
 		esac
 	fi
 }

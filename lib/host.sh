@@ -22,7 +22,8 @@ set_tbox_group()
 	fi
 }
 
-create_host_config() {
+create_host_config()
+{
 	[ -n "$DRY_RUN" ] && return
 
 	local host_name=$(get_hostname)
@@ -31,10 +32,10 @@ create_host_config() {
 		echo "Creating testbox configuration file: $host_config."
 
 		local mem_kb="$(grep MemTotal /proc/meminfo | awk '{print $2}')"
-		local mem_gb="$(((mem_kb)/1024/1024))"
+		local mem_gb="$(((mem_kb) / 1024 / 1024))"
 		local nr_cpu=$(nproc)
 
-		cat <<EOT >> $host_config
+		cat <<EOT >>$host_config
 nr_cpu: $nr_cpu
 memory: ${mem_gb}G
 hdd_partitions: ${hdd_partitions[*]}

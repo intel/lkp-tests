@@ -104,9 +104,9 @@ prepare_for_bpf()
 			#  CLNG-BPF [test_maps] bpf_iter_task_vma.o
 			# /bin/sh: 1: ./tools/bpf/resolve_btfids/resolve_btfids: not found
 			cd $linux_selftests_dir &&
-			make -j${nr_cpu} -C tools/bpf/resolve_btfids 2>&1 &&
-			mkdir -p $linux_headers_mod_dirs/tools/bpf/resolve_btfids &&
-			cp tools/bpf/resolve_btfids/resolve_btfids $linux_headers_mod_dirs/tools/bpf/resolve_btfids/
+				make -j${nr_cpu} -C tools/bpf/resolve_btfids 2>&1 &&
+				mkdir -p $linux_headers_mod_dirs/tools/bpf/resolve_btfids &&
+				cp tools/bpf/resolve_btfids/resolve_btfids $linux_headers_mod_dirs/tools/bpf/resolve_btfids/
 		)
 	fi
 }
@@ -142,8 +142,7 @@ check_kconfig()
 	local dependent_config=$1
 	local kernel_config=$2
 
-	while read -r line
-	do
+	while read -r line; do
 		# Avoid commentary on config
 		[[ "$line" =~ ^CONFIG_ ]] || continue
 
@@ -166,7 +165,7 @@ check_kconfig()
 				echo "LKP WARN miss config $line of $dependent_config"
 			}
 		fi
-	done < $dependent_config
+	done <$dependent_config
 }
 
 fixup_dma()
@@ -176,14 +175,14 @@ fixup_dma()
 	local name=$(ls -U /sys/bus/pci/devices/ | head -1)
 	[[ $name ]] || return
 
-	echo dma_map_benchmark > /sys/bus/pci/devices/$name/driver_override || return
+	echo dma_map_benchmark >/sys/bus/pci/devices/$name/driver_override || return
 
 	local old_bind_dir=$(ls -d /sys/bus/pci/drivers/*/$name)
 	[[ $old_bind_dir ]] && {
-		echo $name > $(dirname $old_bind_dir)/unbind || return
+		echo $name >$(dirname $old_bind_dir)/unbind || return
 	}
 
-	echo $name > /sys/bus/pci/drivers/dma_map_benchmark/bind
+	echo $name >/sys/bus/pci/drivers/dma_map_benchmark/bind
 }
 
 fixup_cgroup()
@@ -197,8 +196,7 @@ skip_standalone_cgroup_tests()
 
 	# skip specific cases from cgroup group
 	local skip_from_cgroup="test_cpuset_v1_hp.sh"
-	for i in $(echo "$skip_from_cgroup")
-	do
+	for i in $(echo "$skip_from_cgroup"); do
 		sed -i "s/$i//" cgroup/Makefile 2>/dev/null || true
 	done
 }
@@ -209,8 +207,7 @@ skip_standalone_net_tests()
 
 	# skip specific cases from net group
 	local skip_from_net="tls fcnal-test.sh fib_nexthops.sh xfrm_policy.sh pmtu.sh"
-	for i in $(echo $skip_from_net)
-	do
+	for i in $(echo $skip_from_net); do
 		sed -i "s/$i//" net/Makefile
 	done
 }
@@ -262,10 +259,10 @@ fixup_net()
 	[ "$test" = "fcnal-test.sh" ] && [ "$test_atomic" ] && setup_fcnal_test_atomic
 	[ "$test" = "fcnal-test.sh" ] && {
 		recover_sysctl_output
-		echo "timeout=2000" >> $group/settings
+		echo "timeout=2000" >>$group/settings
 	}
 
-	[[ $test = "fib_nexthops.sh" ]] && echo "timeout=3600" >> $group/settings
+	[[ $test = "fib_nexthops.sh" ]] && echo "timeout=3600" >>$group/settings
 
 	[[ -d ../../net/ynl ]] && {
 		kselftests_make -C ../../net/ynl || return
@@ -315,7 +312,7 @@ fixup_ftrace()
 
 	# Stop tracing while reading the trace file by default
 	# inspired by https://lkml.org/lkml/2021/10/26/1195
-	echo 1 > /sys/kernel/debug/tracing/options/pause-on-trace
+	echo 1 >/sys/kernel/debug/tracing/options/pause-on-trace
 }
 
 fixup_firmware()
@@ -352,7 +349,7 @@ fixup_net_netfilter()
 	# table `broute' is obsolete commands.
 	update-alternatives --set ebtables /usr/sbin/ebtables-legacy
 
-	echo "timeout=3600" >> net/netfilter/settings
+	echo "timeout=3600" >>net/netfilter/settings
 	sed -ie "s/[\t[:space:]]\.\.\/\.\.\/\.\.\/samples\/pktgen\/pktgen_bench_xmit_mode_netif_receive.sh/\.\.\/\.\.\/\.\.\/\.\.\/samples\/pktgen\/pktgen_bench_xmit_mode_netif_receive.sh/g" net/netfilter/nft_concat_range.sh
 }
 
@@ -527,13 +524,13 @@ prepare_for_selftest_mfs()
 fixup_cpufreq()
 {
 	# cpufreq selftests runs longer on machine with large number of cpus
-	echo 'timeout=600' > $group/settings
+	echo 'timeout=600' >$group/settings
 }
 
 fixup_connector()
 {
 	# selftests: connector: proc_filter # TIMEOUT 300 seconds
-	echo 'timeout=1800' > $group/settings
+	echo 'timeout=1800' >$group/settings
 
 	# proc_filter is designed to run infinitely until interrupted, and wait for events.
 	# Inject alarm so that it interrupts after 15 seconds instead of 1800s.
@@ -558,10 +555,10 @@ fixup_mm()
 	# 64 < nr_cpu <= 128, memory=128*2, needmem=memory*2
 	# 128 < nr_cpu < (128 + 64), memory=128*3, needmem=memory*2
 	[ $nr_cpu -gt 64 ] && {
-		local memory=$((nr_cpu/64+1))
-		memory=$((memory*128))
+		local memory=$((nr_cpu / 64 + 1))
+		memory=$((memory * 128))
 		sed -i "s#./userfaultfd hugetlb 128 32#./userfaultfd hugetlb $memory 32#" mm/$run_vmtests
-		memory=$((memory*1024*2))
+		memory=$((memory * 1024 * 2))
 		sed -i "s#needmem=262144#needmem=$memory#" mm/$run_vmtests
 	}
 
@@ -600,7 +597,7 @@ fixup_filesystems()
 
 fixup_intel_pstate()
 {
-	echo 'timeout=900' >> $group/settings
+	echo 'timeout=900' >>$group/settings
 }
 
 fixup_x86()
@@ -627,7 +624,7 @@ fixup_mount_setattr()
 {
 	# fix no real run for mount_setattr
 	grep -q TEST_PROGS mount_setattr/Makefile ||
-		grep "TEST_GEN_FILES +=" mount_setattr/Makefile | sed 's/TEST_GEN_FILES/TEST_PROGS/' >> mount_setattr/Makefile
+		grep "TEST_GEN_FILES +=" mount_setattr/Makefile | sed 's/TEST_GEN_FILES/TEST_PROGS/' >>mount_setattr/Makefile
 }
 
 fixup_move_mount_set_group()
@@ -638,7 +635,7 @@ fixup_move_mount_set_group()
 	# TEST_CUSTOM_PROGS and TEST_PROGS, not TEST_GEN_FILES. Same issue
 	# as mount_setattr above, same fix.
 	grep -q TEST_PROGS move_mount_set_group/Makefile ||
-		grep "TEST_GEN_FILES +=" move_mount_set_group/Makefile | sed 's/TEST_GEN_FILES/TEST_PROGS/' >> move_mount_set_group/Makefile
+		grep "TEST_GEN_FILES +=" move_mount_set_group/Makefile | sed 's/TEST_GEN_FILES/TEST_PROGS/' >>move_mount_set_group/Makefile
 }
 
 fixup_tc_testing()
@@ -684,7 +681,7 @@ fixup_test_group()
 	fixup_non_executable_script "$group"
 
 	local fixup_handler="fixup_${group//[\/-]/_}"
-	if declare -f "$fixup_handler" > /dev/null; then
+	if declare -f "$fixup_handler" >/dev/null; then
 		echo "$FUNCNAME: $fixup_handler $PWD"
 		$fixup_handler || return
 	fi
@@ -717,8 +714,7 @@ check_test_group_kconfig()
 	get_kconfig "$kernel_config" || return
 
 	local group_config
-	for group_config in "$group/config" "$group/config.x86_64" "$group/config.common"
-	do
+	for group_config in "$group/config" "$group/config.x86_64" "$group/config.common"; do
 		# bpf/config.x86_64
 		# hid/config.common
 		[[ -s "$group_config" ]] && check_kconfig "$group_config" "$kernel_config"
@@ -839,7 +835,7 @@ clean_test_group()
 	local group=$1
 
 	local clean_handler="clean_${group//[\/-]/_}"
-	if declare -f "$clean_handler" > /dev/null; then
+	if declare -f "$clean_handler" >/dev/null; then
 		$clean_handler || return
 	fi
 }

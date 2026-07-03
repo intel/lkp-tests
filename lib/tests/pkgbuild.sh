@@ -208,7 +208,7 @@ pack_avocado_vt()
 	log_cmd mkdir -p "$(dirname $avocado_conf_file)"
 	log_cmd mkdir -p "$avocado_data_dir"
 
-	cat <<EOT > $avocado_conf_file
+	cat <<EOT >$avocado_conf_file
 [datadir.paths]
 data_dir = $avocado_data_dir
 EOT
@@ -336,7 +336,7 @@ pack_to_cgz()
 {
 	local output="$1"
 	shift
-	cpio -o -H newc --quiet "$@" | gzip -n -9 > "$output"
+	cpio -o -H newc --quiet "$@" | gzip -n -9 >"$output"
 }
 
 # Usage:
@@ -480,8 +480,7 @@ install_kernel_selftests()
 	pack_contents "${header_dir}/include/asm" "${benchmark_path}/tools/include/uapi"
 
 	local dir
-	for dir in arch/x86 scripts kernel/bpf samples Makefile tools include lib
-	do
+	for dir in arch/x86 scripts kernel/bpf samples Makefile tools include lib; do
 		pack_contents $dir $(dirname ${benchmark_path}/$dir)
 	done
 }

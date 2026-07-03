@@ -11,7 +11,7 @@ check_elements()
 	[ -n "$param" ] || die "parameter \"paranoid\" is empty"
 
 	[ -e "$perf_event_paranoid" ] || die "can not find file $perf_event_paranoid"
-	cat $perf_event_paranoid > /tmp/paranoid_old_value
+	cat $perf_event_paranoid >/tmp/paranoid_old_value
 }
 
 setup_test_env()
@@ -19,13 +19,13 @@ setup_test_env()
 	local param=$1
 
 	case "$param" in
-		not_paranoid_at_all)		paranoid_value=-1;;
-		disallow_raw_tracepoint)	paranoid_value=0;;
-		disallow_cpu_events)		paranoid_value=1;;
-		disallow_kernel_profiling)	paranoid_value=2;;
+	not_paranoid_at_all) paranoid_value=-1 ;;
+	disallow_raw_tracepoint) paranoid_value=0 ;;
+	disallow_cpu_events) paranoid_value=1 ;;
+	disallow_kernel_profiling) paranoid_value=2 ;;
 	esac
 
-	echo $paranoid_value > $perf_event_paranoid
+	echo $paranoid_value >$perf_event_paranoid
 	[ $paranoid_value = $(cat $perf_event_paranoid) ] || die "write value $paranoid_value to $perf_event_paranoid failed"
 
 	# eaccess will fail if paranoid_value in [1,2], so run eacces under lkp
@@ -44,7 +44,7 @@ clean_test_env()
 {
 	if [ -e "/tmp/paranoid_old_value" ]; then
 		local orig_value=$(cat /tmp/paranoid_old_value)
-		echo $orig_value > $perf_event_paranoid
+		echo $orig_value >$perf_event_paranoid
 		[ $orig_value = $(cat $perf_event_paranoid) ] || echo "Warning: write value $orig_value to $perf_event_paranoid failed"
 		rm -f /tmp/paranoid_old_value
 	fi

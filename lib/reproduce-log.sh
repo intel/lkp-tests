@@ -6,7 +6,7 @@ log_echo()
 {
 	date=$(date +'%F %T')
 	echo "$date $@"
-	echo "$@" >> $TMP_RESULT_ROOT/reproduce.sh
+	echo "$@" >>$TMP_RESULT_ROOT/reproduce.sh
 }
 
 log_eval()
@@ -44,7 +44,7 @@ log_write_file()
 	done
 	cmdline="$cmdline > '$file'"
 	log_echo "$cmdline"
-	echo "$@" > "$file"
+	echo "$@" >"$file"
 }
 
 # To make it easy to log something like: echo abc >> file
@@ -58,5 +58,5 @@ log_append_file()
 	done
 	cmdline="$cmdline >> '$file'"
 	log_echo "$cmdline"
-	echo "$@" >> "$file"
+	echo "$@" >>"$file"
 }
