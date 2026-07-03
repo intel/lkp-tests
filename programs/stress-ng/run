@@ -112,7 +112,7 @@ setup_test()
 		log_cmd sysctl -w net.core.somaxconn=4096
 		common_opts="${common_opts} --oom-avoid"
 		;;
-	"bigheap" | "brk" | "loadavg" | "memthrash" | "mmaphuge" | "mmapcow" | "mmapmany")
+	"bigheap" | "brk" | "loadavg" | "memthrash" | "mmaphuge" | "mmapcow" | "mmapmany" | "secretmem")
 		common_opts="${common_opts} --oom-avoid"
 		;;
 	"bad-ioctl" | "sysinval" | "cpu-online" | "mlockmany" | "oom-pipe" | "bind-mount" | "watchdog" | "smi")
