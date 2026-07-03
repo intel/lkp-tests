@@ -1,0 +1,33 @@
+suite: stress-ng
+testcase: stress-ng
+category: benchmark
+
+# Bucket for stress-ng stressors whose per-worker memory footprint scales
+# with the host's own core count, so a fixed need_memory value can't
+# portably express the requirement (a value safe for a 256-core/256GB
+# host would still OOM a 512-core/128GB host at the same nr_threads:
+# 100% - the total need is proportional to nr_cpu, not a flat number).
+# Kept at nr_threads: 100% (instead of reducing the workload) to
+# preserve full cache/memory-bandwidth contention for regression-
+# detection fidelity.
+
+nr_threads: 100%
+
+testtime:
+  - 60s
+
+# prefetch privately mmaps (MAP_POPULATE, so pages are committed
+# immediately) a buffer sized to the host's detected L3 cache per
+# worker instance, e.g. observed "using a 344064K L3 cache" (~336MB) on
+# a Granite Rapids host - 256 workers x ~336MB ~= 86GB at 100% threads.
+stress-ng:
+  test:
+    - prefetch
+  method:
+    - builtin
+    - builtinl0
+    - builtinl3
+    - prefetchnta
+    - prefetcht0
+    - prefetcht1
+    - prefetcht2

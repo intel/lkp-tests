@@ -80,18 +80,10 @@ stress-ng:
     - qsort-bm
     - qsort-libc
 
----
-stress-ng:
-  test:
-    - prefetch
-  method:
-    - builtin
-    - builtinl0
-    - builtinl3
-    - prefetchnta
-    - prefetcht0
-    - prefetcht1
-    - prefetcht2
+# prefetch: moved to stress-ng-largemem.yaml - its per-worker buffer is
+# sized to the host's detected L3 cache, so at 100% nr_threads on a
+# high-core-count host it needs far more memory than a fixed
+# need_memory value can portably express (see that file for detail).
 
 ---
 stress-ng:

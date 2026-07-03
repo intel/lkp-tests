@@ -68,6 +68,8 @@ stress-ng:
     - reverse
 
 ---
+nr_threads: 50%
+
 stress-ng:
   test:
     - prefetch
