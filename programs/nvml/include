@@ -1,5 +1,5 @@
 need_kconfig:
-- NVDIMM_PFN: y # Depends on: MMU && !( ARM || MIPS || SPARC ) && ( ZONE_DEVICE || FS_DAX_LIMITED )
-- MMU: y
 - FS_DAX: y # Depends on: ZONE_DEVICE
+- MMU: y
+- NVDIMM_PFN: y # Depends on: MMU && !( ARM || MIPS || SPARC ) && ( ZONE_DEVICE || FS_DAX_LIMITED )
 - ZONE_DEVICE: y

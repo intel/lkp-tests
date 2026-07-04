@@ -2,10 +2,10 @@
 avoid_nfs: 1
 
 need_kconfig:
-- PM_DEBUG: y
-- PM_SLEEP_DEBUG: y
 - FTRACE: y
-- FUNCTION_TRACER: y
 - FUNCTION_GRAPH_TRACER: y
+- FUNCTION_TRACER: y
 - KPROBES: y
 - KPROBES_ON_FTRACE: y
+- PM_DEBUG: y
+- PM_SLEEP_DEBUG: y

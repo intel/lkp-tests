@@ -1,4 +1,4 @@
 need_kconfig:
-- SWAP: y
-- MMU: y
 - BLOCK: y
+- MMU: y
+- SWAP: y

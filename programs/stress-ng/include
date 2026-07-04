@@ -1,14 +1,18 @@
 need_kconfig:
 % if ___.class == "security" || ___.test == "apparmor"
-- SECURITY: y
 - NET: y
+- SECURITY: y
 - SECURITY_APPARMOR: y
-% elsif ___.test == "tun"
-- TUN: m
-% elsif ___.test == "userfaultfd"
-- USERFAULTFD: y
+
 % elsif ___.test == "module"
 - TEST_LKM: m
+
 % elsif ___.test == "sctp"
 - IP_SCTP: m
+
+% elsif ___.test == "tun"
+- TUN: m
+
+% elsif ___.test == "userfaultfd"
+- USERFAULTFD: y
 % end

@@ -1,14 +1,17 @@
 need_kernel_version:
 - '>= v4.17, gcc'
 - '>= v5.12, clang'
+
 need_kconfig:
-- TORTURE_TEST: m
-- RCU_REF_SCALE_TEST: m
 - MODULE_UNLOAD: y
+- RCU_REF_SCALE_TEST: m
+- TORTURE_TEST: m
+
 # 5f654af150fd (refscale: Allow refscale without RCU Tasks)
-- RCU_EXPERT: y
 - FORCE_TASKS_RCU: y
+- RCU_EXPERT: y
 - TASKS_RCU: y
+
 # dec86781a54f (refscale: Allow refscale without RCU Tasks Rude/Trace)
 - FORCE_TASKS_TRACE_RCU: y
 - TASKS_TRACE_RCU: y

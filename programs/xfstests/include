@@ -2,15 +2,19 @@ need_kconfig:
 % if job['fs'] == "bcachefs"
 - BCACHEFS_FS: m
 - BCACHEFS_QUOTA: y
+
 % elsif job['fs'] == "btrfs"
 - DM_DUST
+
 % elsif job['fs'] == "ext2"
 - EXT2_FS: m
 - EXT2_FS_POSIX_ACL: y
 - EXT2_FS_SECURITY: y
 - EXT2_FS_XATTR: y
+
 % elsif job['fs'] == "ext4"
 - EXT4_ENCRYPTION: y
+
 % elsif job['fs'] == "f2fs"
 - F2FS_FAULT_INJECTION: y
 - F2FS_FS: m
@@ -24,13 +28,16 @@ need_kconfig:
 - F2FS_FS_SECURITY: y
 - F2FS_FS_XATTR: y
 - F2FS_FS_ZSTD: y
+
 % elsif job['fs'] == "ocfs2"
 - OCFS2_FS: m
 - OCFS2_FS_O2CB: m
 - OCFS2_FS_STATS: y
 - OCFS2_FS_USERSPACE_CLUSTER: m
+
 % elsif job['fs'] == "udf"
 - UDF_FS: m
+
 % elsif job['fs'] == "xfs"
 - XFS_ONLINE_REPAIR: y
 - XFS_ONLINE_SCRUB: y

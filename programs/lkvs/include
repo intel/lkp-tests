@@ -3,26 +3,30 @@ initrds+:
 - linux_selftests
 
 need_kconfig:
+- AS_WRUSS: y
 - INTEL_UNCORE_FREQ_CONTROL
 - INTEL_UNCORE_FREQ_CONTROL_TPMI
 - INTEL_VSEC
 - X86_USER_SHADOW_STACK: y
-- AS_WRUSS: y
 
-% if ___.test == "x86"
-- INTEL_RAPL: m
-% elsif ___.test == "ifs"
+% if ___.test == "ifs"
 - INTEL_IFS: m
-% elsif ___.test == "ufs" || ___.test == "tpmi"
-- INTEL_TPMI: m
-- INTEL_VSEC: m
-% elsif ___.test == "tpm"
-- TCG_TPM: y
+
 % elsif ___.test == "ras"
-- EDAC_SKX: m
+- EDAC_I10NM: m
+- EDAC_I7CORE: m
 - EDAC_IE31200: m
 - EDAC_IGEN6: m
 - EDAC_SBRIDGE: m
-- EDAC_I10NM: m
-- EDAC_I7CORE: m
+- EDAC_SKX: m
+
+% elsif ___.test == "tpm"
+- TCG_TPM: y
+
+% elsif ___.test == "ufs" || ___.test == "tpmi"
+- INTEL_TPMI: m
+- INTEL_VSEC: m
+
+% elsif ___.test == "x86"
+- INTEL_RAPL: m
 % end

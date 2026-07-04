@@ -1,5 +1,5 @@
 need_kconfig:
-- RUNTIME_TESTING_MENU: y
 - BPF: y
-- TEST_BPF: m
 - BPF_JIT: y
+- RUNTIME_TESTING_MENU: y
+- TEST_BPF: m

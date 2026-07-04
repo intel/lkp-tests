@@ -9,21 +9,18 @@ need_kernel_version:
 % end
 
 need_kconfig:
-% if ___.group == "x86"
-- POSIX_TIMERS: y
-
-% elsif ___.group == "lib"
-- PRIME_NUMBERS: m
-- TEST_BITMAP: m
-- TEST_BITOPS: m
-
-% elsif ___.group == "cgroup"
+% if ___.group == "cgroup"
 - CGROUPS: y
 - CGROUP_CPUACCT: y
 - CGROUP_FREEZER: y
 - CGROUP_SCHED: y
 - MEMCG: y
 - PAGE_COUNTER: y
+
+% elsif ___.group == "coredump"
+- COREDUMP: y
+- NET: y
+- UNIX: y
 
 % elsif ___.group == "cpufreq"
 - CPU_FREQ: y
@@ -33,6 +30,158 @@ need_kconfig:
 - CPU_FREQ_GOV_SCHEDUTIL: y
 - CPU_FREQ_GOV_USERSPACE: y
 - CPU_FREQ_STAT: y
+
+% elsif ___.group == "damon"
+- DAMON: y
+- DAMON_DEBUG_SANITY: y
+- DAMON_LRU_SORT: y
+- DAMON_PADDR: y
+- DAMON_RECLAIM: y
+- DAMON_SYSFS: y
+- DAMON_VADDR: y
+
+% elsif ___.group == "dma"
+- DMA_MAP_BENCHMARK: y
+
+% elsif ___.group == "dmabuf-heaps"
+- DMABUF_HEAPS: y
+- DMABUF_HEAPS_SYSTEM: y
+- DRM
+- DRM_VGEM
+
+% elsif ___.group == "dynamic_debug"
+- DYNAMIC_DEBUG: y
+- TEST_DYNAMIC_DEBUG: m
+
+% elsif ___.group == "efivarfs"
+- EFI: y
+- EFIVAR_FS # Depends on: EFI [: y]
+
+% elsif ___.group == "exec"
+- BLK_DEV: y
+- BLK_DEV_LOOP: y
+
+% elsif ___.group == "filesystems"
+- ANDROID_BINDERFS: y
+- ANDROID_BINDER_IPC: y
+- PID_NS: y
+- USER_NS: y
+- UTS_NS: y
+
+% elsif ___.group == "firmware"
+- FW_LOADER: y
+- FW_LOADER_USER_HELPER: y
+- FW_UPLOAD: y
+- IKCONFIG: y
+- IKCONFIG_PROC: y
+- RUNTIME_TESTING_MENU: y
+- TEST_FIRMWARE: m
+
+% elsif ___.group == "fpu"
+- TEST_FPU: m
+
+% elsif ___.group == "gpio"
+- GPIOLIB: y
+- GPIO_AGGREGATOR: m
+- GPIO_CDEV: y
+- GPIO_MOCKUP: m
+- GPIO_SIM: m
+
+% elsif ___.group == "iommu"
+- DEBUG_KERNEL: y
+- FAILSLAB: y
+- FAULT_INJECTION: y
+- FAULT_INJECTION_DEBUG_FS: y
+- IOMMUFD
+- IOMMUFD_TEST: y
+
+% elsif ___.group == "ipc"
+- CHECKPOINT_RESTORE: y
+- EXPERT: y
+
+% elsif ___.group == "ir"
+- RC_CORE: m
+- RC_DEVICES: y
+- RC_LOOPBACK: m
+
+% elsif ___.group == "kexec"
+- IMA: y
+- IMA_APPRAISE: y
+- IMA_ARCH_POLICY: y
+- KEXEC_SIG: y
+- SECURITYFS: y
+
+% elsif ___.group == "kmod"
+- TEST_KMOD: m
+- TEST_LKM: m
+
+% elsif ___.group == "kvm"
+- EVENTFD: y
+- IDLE_PAGE_TRACKING: y
+- KVM
+- KVM_AMD
+- KVM_INTEL
+- USERFAULTFD: y
+
+% elsif ___.group == "landlock"
+- AF_UNIX_OOB: y
+- AUDIT: y
+- CGROUPS: y
+- CGROUP_SCHED: y
+- INET: y
+- IPV6
+- KEYS: y
+- MPTCP: y
+- MPTCP_IPV6: y
+- NET: y
+- NET_NS: y
+- OVERLAY_FS
+- PROC_FS: y
+- SECURITY: y
+- SECURITY_LANDLOCK: y
+- SHMEM: y
+- SYSFS: y
+- TMPFS: y
+- TMPFS_XATTR: y
+
+% elsif ___.group == "lib"
+- PRIME_NUMBERS: m
+- TEST_BITMAP: m
+- TEST_BITOPS: m
+
+% elsif ___.group == "livepatch"
+- DYNAMIC_DEBUG: y
+- LIVEPATCH: y
+- TEST_LIVEPATCH: m
+
+% elsif ___.group == "liveupdate"
+- BLK_DEV_INITRD: y
+- KEXEC_FILE: y
+- KEXEC_HANDOVER: y
+- KEXEC_HANDOVER_DEBUG: y
+- KEXEC_HANDOVER_DEBUGFS: y
+- KEXEC_HANDOVER_ENABLE_DEFAULT: y
+- LIVEUPDATE: y
+- LIVEUPDATE_TEST: y
+- MEMFD_CREATE: y
+- SHMEM: y
+- TMPFS: y
+
+% elsif ___.group == "lkdtm"
+- DEBUG_LIST: y
+- FORTIFY_SOURCE: y
+- HARDENED_USERCOPY: y
+- INIT_ON_ALLOC_DEFAULT_ON: y
+- INIT_ON_FREE_DEFAULT_ON: y
+- KSTACK_ERASE: y
+- LKDTM: y
+- RANDOMIZE_KSTACK_OFFSET_DEFAULT: y
+- SLAB_FREELIST_HARDENED: y
+- SLUB_DEBUG: y
+- SLUB_DEBUG_ON: y
+- STACKPROTECTOR_STRONG: y
+- UBSAN: y
+- UBSAN_BOUNDS: y
 
 % elsif ___.group == "locking"
 - DEBUG_ATOMIC_SLEEP: y
@@ -46,13 +195,19 @@ need_kconfig:
 - PROVE_LOCKING: y
 - WW_MUTEX_SELFTEST: m
 
-% elsif ___.group == "kvm"
-- EVENTFD: y
-- IDLE_PAGE_TRACKING: y
-- KVM
-- KVM_AMD
-- KVM_INTEL
-- USERFAULTFD: y
+% elsif ___.group == "lsm"
+- SECURITY: y
+- SECURITYFS: y
+- SYSFS: y
+
+% elsif ___.group == "memfd"
+- FUSE_FS: m
+
+% elsif ___.group == "memory-hotplug"
+- MEMORY_HOTPLUG: y
+- MEMORY_HOTREMOVE: y
+- MEMORY_NOTIFIER_ERROR_INJECT
+- NOTIFIER_ERROR_INJECTION
 
 % elsif ___.group == "mm"
 - ANON_VMA_NAME: y
@@ -78,36 +233,34 @@ need_kconfig:
 - UPROBES: y
 - USERFAULTFD: y
 
-% elsif ___.group == "livepatch"
-- DYNAMIC_DEBUG: y
-- LIVEPATCH: y
-- TEST_LIVEPATCH: m
+% elsif ___.group == "module"
+- TEST_KALLSYMS: m
+- TEST_RUNTIME: y
+- TEST_RUNTIME_MODULE: y
 
-% elsif ___.group == "liveupdate"
-- BLK_DEV_INITRD: y
-- KEXEC_FILE: y
-- KEXEC_HANDOVER: y
-- KEXEC_HANDOVER_DEBUG: y
-- KEXEC_HANDOVER_DEBUGFS: y
-- KEXEC_HANDOVER_ENABLE_DEFAULT: y
-- LIVEUPDATE: y
-- LIVEUPDATE_TEST: y
-- MEMFD_CREATE: y
-- SHMEM: y
-- TMPFS: y
+% elsif ___.group == "mount"
+- USER_NS: y
 
-% elsif ___.group == "dynamic_debug"
-- DYNAMIC_DEBUG: y
-- TEST_DYNAMIC_DEBUG: m
+% elsif ___.group == "mount_setattr"
+- USER_NS: y
 
-% elsif ___.group == "firmware"
-- FW_LOADER: y
-- FW_LOADER_USER_HELPER: y
-- FW_UPLOAD: y
-- IKCONFIG: y
-- IKCONFIG_PROC: y
-- RUNTIME_TESTING_MENU: y
-- TEST_FIRMWARE: m
+% elsif ___.group == "move_mount_set_group"
+- USER_NS: y
+
+% elsif ___.group == "mseal_system_mappings"
+- MSEAL_SYSTEM_MAPPINGS: y
+
+% elsif ___.group == "nci"
+- NFC
+- NFC_NCI
+- NFC_VIRTUAL_NCI
+
+% elsif ___.group == "perf_events"
+- PERF_EVENTS: y
+
+% elsif ___.group == "pid_namespace"
+- PID_NS: y
+- USER_NS: y
 
 % elsif ___.group == "pidfd"
 - CGROUPS: y
@@ -119,114 +272,11 @@ need_kconfig:
 - USER_NS: y
 - UTS_NS: y
 
-% elsif ___.group == "timens"
-- TIME_NS: y
+% elsif ___.group == "prctl"
+- ANON_VMA_NAME: y
 
-% elsif ___.group == "tdx"
-- TDX_GUEST_DRIVER
-
-% elsif ___.group == "nci"
-- NFC
-- NFC_NCI
-- NFC_VIRTUAL_NCI
-
-% elsif ___.group == "sync"
-- STAGING: y
-- SW_SYNC: y
-- SYNC_FILE: y
-
-% elsif ___.group == "landlock"
-- AF_UNIX_OOB: y
-- AUDIT: y
-- CGROUPS: y
-- CGROUP_SCHED: y
-- INET: y
-- IPV6
-- KEYS: y
-- MPTCP: y
-- MPTCP_IPV6: y
-- NET: y
-- NET_NS: y
-- OVERLAY_FS
+% elsif ___.group == "proc"
 - PROC_FS: y
-- SECURITY: y
-- SECURITY_LANDLOCK: y
-- SHMEM: y
-- SYSFS: y
-- TMPFS: y
-- TMPFS_XATTR: y
-
-% elsif ___.group == "iommu"
-- DEBUG_KERNEL: y
-- FAILSLAB: y
-- FAULT_INJECTION: y
-- FAULT_INJECTION_DEBUG_FS: y
-- IOMMUFD
-- IOMMUFD_TEST: y
-
-% elsif ___.group == "ipc"
-- CHECKPOINT_RESTORE: y
-- EXPERT: y
-
-% elsif ___.group == "filesystems"
-- ANDROID_BINDERFS: y
-- ANDROID_BINDER_IPC: y
-- PID_NS: y
-- USER_NS: y
-- UTS_NS: y
-
-% elsif ___.group == "pid_namespace"
-- PID_NS: y
-- USER_NS: y
-
-% elsif ___.group == "damon"
-- DAMON: y
-- DAMON_DEBUG_SANITY: y
-- DAMON_LRU_SORT: y
-- DAMON_PADDR: y
-- DAMON_RECLAIM: y
-- DAMON_SYSFS: y
-- DAMON_VADDR: y
-
-% elsif ___.group == "dmabuf-heaps"
-- DMABUF_HEAPS: y
-- DMABUF_HEAPS_SYSTEM: y
-- DRM
-- DRM_VGEM
-
-% elsif ___.group == "kmod"
-- TEST_KMOD: m
-- TEST_LKM: m
-
-% elsif ___.group == "splice"
-- TEST_LKM: m
-
-% elsif ___.group == "kexec"
-- IMA: y
-- IMA_APPRAISE: y
-- IMA_ARCH_POLICY: y
-- KEXEC_SIG: y
-- SECURITYFS: y
-
-% elsif ___.group == "lsm"
-- SECURITY: y
-- SECURITYFS: y
-- SYSFS: y
-
-% elsif ___.group == "safesetid"
-- SECURITY: y
-- SECURITYFS: y
-- SECURITY_SAFESETID: y
-
-% elsif ___.group == "gpio"
-- GPIOLIB: y
-- GPIO_AGGREGATOR: m
-- GPIO_CDEV: y
-- GPIO_MOCKUP: m
-- GPIO_SIM: m
-
-% elsif ___.group == "dma"
-- DMA_MAP_BENCHMARK: y
 
 % elsif ___.group == "pstore"
 - MISC_FILESYSTEMS: y
@@ -235,45 +285,6 @@ need_kconfig:
 - PSTORE_PMSG: y
 - PSTORE_RAM: m
 
-% elsif ___.group == "zram"
-- ZRAM
-- ZSMALLOC
-
-% elsif ___.group == "syscall_user_dispatch"
-- GENERIC_ENTRY: y
-
-% elsif ___.group == "seccomp"
-- PID_NS: y
-- SECCOMP: y
-- SECCOMP_FILTER: y
-- USER_NS: y
-
-% elsif ___.group == "rlimits"
-- USER_NS: y
-
-% elsif ___.group == "tty"
-- LEGACY_TIOCSTI: y
-
-% elsif ___.group == "ublk"
-- BLK_DEV_UBLK: m
-
-% elsif ___.group == "uevent"
-- NET: y
-- USER_NS: y
-
-% elsif ___.group == "mount"
-- USER_NS: y
-
-% elsif ___.group == "mount_setattr"
-- USER_NS: y
-
-% elsif ___.group == "move_mount_set_group"
-- USER_NS: y
-
-% elsif ___.group == "sysctl"
-- PROC_SYSCTL: y
-- TEST_SYSCTL: m
-
 % elsif ___.group == "resctrl"
 - PROC_CPU_RESCTRL: y
 - X86_CPU_RESCTRL: y
@@ -281,6 +292,43 @@ need_kconfig:
 % elsif ___.group == "ring-buffer"
 - FTRACE: y
 - TRACER_SNAPSHOT: y
+
+% elsif ___.group == "rlimits"
+- USER_NS: y
+
+% elsif ___.group == "rseq"
+- EXPERT: y
+- RSEQ: y
+- RSEQ_SLICE_EXTENSION: y
+
+% elsif ___.group == "safesetid"
+- SECURITY: y
+- SECURITYFS: y
+- SECURITY_SAFESETID: y
+
+% elsif ___.group == "seccomp"
+- PID_NS: y
+- SECCOMP: y
+- SECCOMP_FILTER: y
+- USER_NS: y
+
+% elsif ___.group == "splice"
+- TEST_LKM: m
+
+% elsif ___.group == "static_keys"
+- TEST_STATIC_KEYS: m
+
+% elsif ___.group == "sync"
+- STAGING: y
+- SW_SYNC: y
+- SYNC_FILE: y
+
+% elsif ___.group == "syscall_user_dispatch"
+- GENERIC_ENTRY: y
+
+% elsif ___.group == "sysctl"
+- PROC_SYSCTL: y
+- TEST_SYSCTL: m
 
 % elsif ___.group == "tc-testing"
 - DUMMY
@@ -380,22 +428,24 @@ need_kconfig:
 - NETDEVSIM
 - PTP_1588_CLOCK_MOCK: m
 
-% elsif ___.group == "memory-hotplug"
-- MEMORY_HOTPLUG: y
-- MEMORY_HOTREMOVE: y
-- MEMORY_NOTIFIER_ERROR_INJECT
-- NOTIFIER_ERROR_INJECTION
+% elsif ___.group == "tdx"
+- TDX_GUEST_DRIVER
+
+% elsif ___.group == "timens"
+- TIME_NS: y
+
+% elsif ___.group == "tty"
+- LEGACY_TIOCSTI: y
+
+% elsif ___.group == "ublk"
+- BLK_DEV_UBLK: m
+
+% elsif ___.group == "uevent"
+- NET: y
+- USER_NS: y
 
 % elsif ___.group == "user_events"
 - USER_EVENTS: y
-
-% elsif ___.group == "efivarfs"
-- EFI: y
-- EFIVAR_FS # Depends on: EFI [: y]
-
-% elsif ___.group == "exec"
-- BLK_DEV: y
-- BLK_DEV_LOOP: y
 
 % elsif ___.group == "wireguard"
 - IPV6_MULTIPLE_TABLES: y
@@ -407,60 +457,10 @@ need_kconfig:
 - TMPFS: y
 - VETH
 
-% elsif ___.group == "perf_events"
-- PERF_EVENTS: y
+% elsif ___.group == "x86"
+- POSIX_TIMERS: y
 
-% elsif ___.group == "static_keys"
-- TEST_STATIC_KEYS: m
-
-% elsif ___.group == "prctl"
-- ANON_VMA_NAME: y
-
-% elsif ___.group == "proc"
-- PROC_FS: y
-
-% elsif ___.group == "memfd"
-- FUSE_FS: m
-
-% elsif ___.group == "mseal_system_mappings"
-- MSEAL_SYSTEM_MAPPINGS: y
-
-% elsif ___.group == "fpu"
-- TEST_FPU: m
-
-% elsif ___.group == "lkdtm"
-- DEBUG_LIST: y
-- FORTIFY_SOURCE: y
-- HARDENED_USERCOPY: y
-- INIT_ON_ALLOC_DEFAULT_ON: y
-- INIT_ON_FREE_DEFAULT_ON: y
-- KSTACK_ERASE: y
-- LKDTM: y
-- RANDOMIZE_KSTACK_OFFSET_DEFAULT: y
-- SLAB_FREELIST_HARDENED: y
-- SLUB_DEBUG: y
-- SLUB_DEBUG_ON: y
-- STACKPROTECTOR_STRONG: y
-- UBSAN: y
-- UBSAN_BOUNDS: y
-
-% elsif ___.group == "ir"
-- RC_CORE: m
-- RC_DEVICES: y
-- RC_LOOPBACK: m
-
-% elsif ___.group == "coredump"
-- COREDUMP: y
-- NET: y
-- UNIX: y
-
-% elsif ___.group == "module"
-- TEST_KALLSYMS: m
-- TEST_RUNTIME: y
-- TEST_RUNTIME_MODULE: y
-
-% elsif ___.group == "rseq"
-- EXPERT: y
-- RSEQ: y
-- RSEQ_SLICE_EXTENSION: y
+% elsif ___.group == "zram"
+- ZRAM
+- ZSMALLOC
 % end

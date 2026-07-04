@@ -1,13 +1,18 @@
 need_kernel_version:
 - '>= v4.17, gcc'
 - '>= v5.12, clang'
+
 need_kconfig:
 - LOCK_TORTURE_TEST: m
+
 # LoadPin: kernel-module old-api-denied obj=<unknown> pid=731 cmdline="modprobe locktorture onoff_interval=3 onoff_holdoff=30"
+
 # FATAL: Error inserting locktorture (/lib/modules/5.10.0-rc6-00066-gc82a505c007f/kernel/kernel/locking/locktorture.ko): Operation not permitted
 - SECURITY_LOADPIN_ENABLED: n
 - SECURITY_LOADPIN_ENFORCE: n
+
 # Lockdown: modprobe: unsigned module loading is restricted; see man kernel_lockdown.7
+
 # modprobe: ERROR: could not insert 'locktorture': Operation not permitted
-- SECURITY_LOCKDOWN_LSM: n
 - MODULE_UNLOAD: y
+- SECURITY_LOCKDOWN_LSM: n

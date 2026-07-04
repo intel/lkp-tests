@@ -1,23 +1,24 @@
 initrds+:
 - testing_nvdimm_modules
+
 need_kconfig:
-- LIBNVDIMM: m
-- BLK_DEV_PMEM: m
-- BLK_DEV
-- ND_BTT: m
-- ND_PFN: m
 - ACPI_NFIT: m
+- BLK_DEV
+- BLK_DEV_PMEM: m
+- BTT: y
+- CMA: y
+- CMA_SIZE_MBYTES: [200, x86_64]
 - DEV_DAX: m
 - DEV_DAX_PMEM: m
-- HAVE_DMA_CONTIGUOUS: y
-- CMA: y
 - DMA_CMA: y
-- CMA_SIZE_MBYTES: [200, x86_64]
-- ZONE_DEVICE: y
+- HAVE_DMA_CONTIGUOUS: y
+- LIBNVDIMM: m
 - MEMORY_HOTPLUG: y
 - MEMORY_HOTREMOVE: y
-- SPARSEMEM_VMEMMAP: y
-- BTT: y
-- NVDIMM_PFN: y
+- ND_BTT: m
+- ND_PFN: m
 - NVDIMM_DAX: y
+- NVDIMM_PFN: y
+- SPARSEMEM_VMEMMAP: y
 - TRANSPARENT_HUGEPAGE: y
+- ZONE_DEVICE: y

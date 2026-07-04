@@ -1,5 +1,5 @@
 need_kconfig:
 - X86_MCE: y
-- X86_MCE_INTEL: y
 - X86_MCELOG_LEGACY: y
 - X86_MCE_INJECT: m
+- X86_MCE_INTEL: y

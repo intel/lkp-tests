@@ -1,6 +1,6 @@
 need_kconfig:
+- BLK_CGROUP: y
 - CGROUPS: y
-- MEMCG: y
 - CGROUP_PIDS: y
 - CGROUP_RDMA: y
-- BLK_CGROUP: y
+- MEMCG: y

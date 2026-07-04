@@ -1,30 +1,36 @@
 need_kernel_version:
 - '>= v4.17, gcc'
 - '>= v5.12, clang'
+
 need_kconfig:
+- MODULE_UNLOAD: y
 - RCU_PERF_TEST: m
 - RCU_SCALE_TEST: m
 - SECURITY_LOADPIN_ENABLED: n
 - SECURITY_LOADPIN_ENFORCE: n
-- MODULE_UNLOAD: y
+
 # 4df002d90879 (rcuscale: Allow rcuscale without RCU Tasks)
-- RCU_EXPERT: y
 - FORCE_TASKS_RCU: y
+- RCU_EXPERT: y
 - TASKS_RCU: y
+
 # 5ce027f4cd0e (rcuscale: Allow rcuscale without RCU Tasks Rude/Trace)
 - FORCE_TASKS_TRACE_RCU: y
-- TASKS_TRACE_RCU: y
-- X86_VSMP: n
+- MODULE_UNLOAD: y
 - SECURITY_LOADPIN_ENABLED: n
 - SECURITY_LOADPIN_ENFORCE: n
-- MODULE_UNLOAD: y
+- TASKS_TRACE_RCU: y
+- X86_VSMP: n
+
 # 3b6e1dd42317 (rcutorture: Allow rcutorture without RCU Tasks)
-- RCU_EXPERT: y
 - FORCE_TASKS_RCU: y
+- RCU_EXPERT: y
 - TASKS_RCU: y
+
 # 40c1278aa7cd (rcutorture: Allow rcutorture without RCU Tasks Trace)
 - FORCE_TASKS_TRACE_RCU: y
 - TASKS_TRACE_RCU: y
+
 # 4c3f7b0e1e88 (rcutorture: Allow rcutorture without RCU Tasks Rude)
 - FORCE_TASKS_RUDE_RCU: y
 - TASKS_RUDE_RCU: y
