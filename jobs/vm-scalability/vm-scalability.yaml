@@ -33,14 +33,6 @@ vm-scalability:
 size: 16G
 
 vm-scalability:
-  test:
-    - shm-pread-rand
-    - shm-xread-rand
-
----
-size: 16G
-
-vm-scalability:
   unit_size: 1G
   test:
     - shm-pread-rand-mt

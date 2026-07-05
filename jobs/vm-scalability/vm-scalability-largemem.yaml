@@ -1,0 +1,25 @@
+suite: vm-scalability
+testcase: vm-scalability
+category: benchmark
+
+perf-profile:
+
+runtime: 300s
+
+# Bucket for vm-scalability tests whose working set is MemTotal/2 (the
+# benchmark internally sizes its shm segment to total physical RAM).
+# On a 256G/2-node host that is ~124 GB -- too large for 128G hosts but
+# fine on 256G hosts (~124 GB headroom remaining).  The working set
+# scales with total RAM rather than with core count, so a fixed
+# need_memory value cannot portably express the requirement.
+# Requires a host with at least 256 GB RAM to avoid OOM.
+
+---
+# shm-pread-rand / shm-xread-rand: usemem --prealloc allocates MemTotal/2
+# (~124 GB on a 256G host) before the timed run.
+size: 16G
+
+vm-scalability:
+  test:
+    - shm-pread-rand
+    - shm-xread-rand
