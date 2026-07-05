@@ -13,7 +13,6 @@ will-it-scale:
     - thread
   test:
     - page_fault1
-    - page_fault2
     - page_fault3
     - pipe1
     - poll1

@@ -1,0 +1,22 @@
+suite: will-it-scale
+testcase: will-it-scale
+category: benchmark
+
+# Bucket for will-it-scale tests whose per-thread memory footprint makes
+# them OOM on 64 GB hosts at nr_task: 100%.  Kept at nr_task: 100%
+# (instead of reducing the workload) to preserve full-system memory-
+# bandwidth contention for regression-detection fidelity.
+# Requires a host with sufficient RAM to run all threads without OOM.
+
+nr_task: 100%
+
+---
+# page_fault2: each thread mmaps and faults in a large anonymous region;
+# observed peak ~243 MB/thread at nr_task: 100% on a 256-core host
+# (~62 GB total), exhausting 64 GB hosts.  Requires >=256 GB RAM.
+will-it-scale:
+  mode:
+    - process
+    - thread
+  test:
+    - page_fault2
