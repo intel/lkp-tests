@@ -191,7 +191,7 @@ build_generate_testgroup()
 		[ -f "$nvml_case/TEST0" ] || continue
 		[ -x "$nvml_case/TEST0" ] || continue
 		cd "$nvml_case" || continue
-		scripts=$(ls -1 TEST* | grep -v -i -e "\.ps1" | sort -V)
+		scripts=$(printf '%s\n' TEST* | grep -v -i -e "\.ps1" | sort -V)
 
 		for run_script in $scripts; do
 			req_fs=$(grep -w "require_fs_type" "$run_script") || {

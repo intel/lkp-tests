@@ -3,7 +3,7 @@
 cpu_info()
 {
 	str=$1
-	grep -E "$str[[:space:]]+:" "/proc/cpuinfo" | uniq | cut -d ':' -f 2 | sed -e 's/^[ ]*//g' | sed -e 's/[ ]*$//g'
+	grep -E "${str}[[:space:]]+:" "/proc/cpuinfo" | uniq | cut -d ':' -f 2 | sed -e 's/^[ ]*//g' | sed -e 's/[ ]*$//g'
 }
 
 create_links()

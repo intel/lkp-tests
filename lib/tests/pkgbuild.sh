@@ -4,6 +4,7 @@
 . $LKP_SRC/lib/install.sh
 . $LKP_SRC/lib/reproduce-log.sh
 
+# shellcheck disable=SC2120
 get_benchmark_path()
 {
 	local pkgdir=${1:-$pkgdir}
@@ -75,6 +76,7 @@ generate_configure()
 }
 
 # Args: everything before '--' goes to configure, everything after to make
+# shellcheck disable=SC2120
 make_src_pkg()
 {
 	local configure_args=()
@@ -89,7 +91,7 @@ make_src_pkg()
 	[[ -x "autogen.sh" ]] && ./autogen.sh
 	[[ -x "configure" ]] && ./configure "${configure_args[@]}"
 
-	make -j$(nproc) "${make_args[@]}"
+	make -j"$(nproc)" "${make_args[@]}"
 }
 
 make_install_src_pkg()
@@ -140,9 +142,7 @@ build_pahole()
 	cd_src_pkg_dir pahole
 
 	mkdir build
-	cd build
-
-	log_cmd mkdir -p $pkgdir/usr
+	cd build || return
 	log_cmd cmake -D__LIB=lib -DCMAKE_INSTALL_PREFIX=$pkgdir/usr ..
 	log_cmd make install
 }
@@ -217,7 +217,7 @@ EOT
 
 	# reduce package size
 	rm -rf $avocado_data_dir/avocado-vt/images/*
-	find $avocado_data_dir/avocado-vt/virttest/test-providers.d -depth -name .git -type d | xargs -P$(nproc) rm -rf
+	find $avocado_data_dir/avocado-vt/virttest/test-providers.d -depth -name .git -type d -exec rm -rf {} +
 
 	pack_contents "$avocado_conf_file"
 	pack_contents "$avocado_data_dir"
@@ -241,7 +241,7 @@ EOT
 pack_contents()
 {
 	if [[ "$#" == 0 ]]; then
-		echo "$FUNCNAME: miss argument" 1>&2
+		echo "${FUNCNAME[0]}: miss argument" 1>&2
 		return 1
 	elif [[ "$#" == 1 ]]; then
 		local src="$1"
@@ -252,10 +252,11 @@ pack_contents()
 		# last argument is dst_dir
 		mkdir -p "${!#}"
 
-		log_cmd cp -a $@
+		log_cmd cp -a "$@"
 	fi
 }
 
+# shellcheck disable=SC2120
 pack_src_pkg_contents()
 {
 	local dst_dir=${DESTDIR:-$benchmark_path}
@@ -265,9 +266,9 @@ pack_src_pkg_contents()
 		pack_contents "$src_pkg_dir/." "$dst_dir"
 	else
 		(
-			cd $src_pkg_dir
+			cd "$src_pkg_dir" || exit
 
-			pack_contents $@ "$dst_dir"
+			pack_contents "$@" "$dst_dir"
 		)
 	fi
 }
@@ -279,7 +280,7 @@ pack_src_pkg_execs()
 	mkdir -p $benchmark_path
 
 	(
-		cd $(get_src_pkg_dir)
+		cd "$(get_src_pkg_dir)" || exit
 
 		if [[ "$exec_prefix" ]]; then
 			find . -maxdepth 1 -type f -executable -name "${exec_prefix}*" -exec cp -a {} $benchmark_path \;
@@ -352,7 +353,7 @@ build_install_valgrind_pmem()
 
 	./autogen.sh
 	./configure --prefix=$prefix CFLAGS="-fno-stack-protector"
-	make -j$(nproc)
+	make -j"$(nproc)"
 	make install
 }
 
@@ -390,7 +391,7 @@ build_install_libcxx()
 	$cmake_cmd -DLLVM_PATH="${srcdir}/llvm" \
 		-DCMAKE_INSTALL_PREFIX="${install_path}" \
 		"${srcdir}/llvm/projects/libcxxabi/"
-	make -j$(nproc)
+	make -j"$(nproc)"
 	make install
 
 	# xlocale.h was removed since libc6-dev 2.26
@@ -405,7 +406,7 @@ build_install_libcxx()
 		-DCMAKE_INSTALL_PREFIX="${install_path}" \
 		-DLIBCXX_CXX_ABI_LIBRARY_PATH="${install_path}/lib" \
 		"${srcdir}/llvm/projects/libcxx"
-	make -j$(nproc)
+	make -j"$(nproc)"
 	make install
 }
 
@@ -463,7 +464,7 @@ build_kernel_selftests_tools()
 	make allyesconfig
 	make prepare
 	# build cpupower
-	cd tools/power/cpupower
+	cd tools/power/cpupower || return
 	make
 }
 
@@ -481,6 +482,6 @@ install_kernel_selftests()
 
 	local dir
 	for dir in arch/x86 scripts kernel/bpf samples Makefile tools include lib; do
-		pack_contents $dir $(dirname ${benchmark_path}/$dir)
+		pack_contents $dir "$(dirname "${benchmark_path}/$dir")"
 	done
 }

@@ -19,7 +19,7 @@ build_selftests()
 	# temporarily workaround compile error on gcc-6
 	[[ "$LKP_LOCAL_RUN" = "1" ]] && {
 		# local user may contain both gcc-5 and gcc-6
-		CC=$(basename $(readlink $(which gcc)))
+		CC=$(basename "$(readlink "$(which gcc)")")
 		# force to use gcc-5 to build x86
 		[[ "$CC" = "gcc-6" ]] && has_cmd gcc-5 && sed -i -e '/^include ..\/lib.mk/a CC=gcc-5' x86/Makefile
 	}
@@ -32,8 +32,8 @@ prepare_kselftests_dir()
 {
 	# lkp qemu needs linux-selftests_dir and linux_headers_dir to reproduce kselftests.
 	# when reproduce bug reported by kernel test robot, the downloaded linux-selftests file is stored at /usr/src/linux-selftests
-	linux_selftests_dir=(/usr/src/linux-selftests-*)
-	linux_selftests_dir=$(realpath $linux_selftests_dir)
+	local -a _linux_selftests_dirs=(/usr/src/linux-selftests-*)
+	linux_selftests_dir=$(realpath "${_linux_selftests_dirs[0]}")
 	if [[ $linux_selftests_dir ]]; then
 		# when reproduce bug reported by kernel test robot, the downloaded linux-headers file is stored at /usr/src/linux-headers
 		linux_headers_dir=$(get_linux_headers_dir "linux-headers*")
@@ -49,7 +49,7 @@ prepare_kselftests_dir()
 		mount --bind $linux_headers_dir/include/asm $linux_selftests_dir/tools/include/uapi/asm || return
 
 		local build_link="/lib/modules/$(uname -r)/build"
-		[ "$linux_selftests_dir" != "$build_link" ] && ln -snf "$linux_selftests_dir" "$build_link"
+		[[ "$linux_selftests_dir" != "$build_link" ]] && ln -snf "$linux_selftests_dir" "$build_link"
 
 		linux_headers_bpf_dir=$(get_linux_headers_dir "linux-headers*-bpf")
 		[[ -n "$linux_headers_bpf_dir" ]] || die "failed to find linux-headers-bpf package"
@@ -74,7 +74,7 @@ prepare_test_env()
 	prepare_kselftests_dir || return
 
 	# Only update llvm for bpf test
-	[ "$group" = "bpf" -o "$group" = "net" -o "$group" = "tc-testing" ] && {
+	[[ "$group" = "bpf" || "$group" = "net" || "$group" = "tc-testing" ]] && {
 		prepare_for_llvm || die "install newest llvm failed"
 	}
 
@@ -179,7 +179,7 @@ fixup_dma()
 
 	local old_bind_dir=$(ls -d /sys/bus/pci/drivers/*/$name)
 	[[ $old_bind_dir ]] && {
-		echo $name >$(dirname $old_bind_dir)/unbind || return
+		echo $name >"$(dirname "$old_bind_dir")"/unbind || return
 	}
 
 	echo $name >/sys/bus/pci/drivers/dma_map_benchmark/bind
@@ -203,7 +203,7 @@ skip_standalone_cgroup_tests()
 
 skip_standalone_net_tests()
 {
-	[ "$test" ] && return # test will be run standalone
+	[[ "$test" ]] && return # test will be run standalone
 
 	# skip specific cases from net group
 	local skip_from_net="tls fcnal-test.sh fib_nexthops.sh xfrm_policy.sh pmtu.sh"
@@ -256,8 +256,8 @@ fixup_net()
 	modprobe -q fou
 	modprobe -q nf_conntrack_broadcast
 
-	[ "$test" = "fcnal-test.sh" ] && [ "$test_atomic" ] && setup_fcnal_test_atomic
-	[ "$test" = "fcnal-test.sh" ] && {
+	[[ "$test" = "fcnal-test.sh" ]] && [[ "$test_atomic" ]] && setup_fcnal_test_atomic
+	[[ "$test" = "fcnal-test.sh" ]] && {
 		recover_sysctl_output
 		echo "timeout=2000" >>$group/settings
 	}
@@ -276,12 +276,12 @@ fixup_net()
 fixup_efivarfs()
 {
 	[[ -d "/sys/firmware/efi" ]] || {
-		echo "$FUNCNAME: no /sys/firmware/efi"
+		echo "${FUNCNAME[0]}: no /sys/firmware/efi"
 		return 1
 	}
 
 	grep -q -F -w efivarfs /proc/filesystems || modprobe efivarfs || {
-		echo "$FUNCNAME: modprobe efivarfs fails"
+		echo "${FUNCNAME[0]}: modprobe efivarfs fails"
 		return 1
 	}
 
@@ -289,7 +289,7 @@ fixup_efivarfs()
 	# efivarfs is supported since this requires some specified hardwares, such as booting from
 	# uefi, so check again
 	mount | grep efivarfs || log_cmd mount -t efivarfs efivarfs /sys/firmware/efi/efivars || {
-		echo "$FUNCNAME: mount -t efivarfs fails"
+		echo "${FUNCNAME[0]}: mount -t efivarfs fails"
 		return 1
 	}
 }
@@ -320,7 +320,7 @@ fixup_firmware()
 	# As this case suggested, some distro(suse/debian) udev may have /lib/udev/rules.d/50-firmware.rules
 	# which contains "SUBSYSTEM==firmware, ACTION==add, ATTR{loading}=-1", it will
 	# immediately cancel all fallback requests, so here we remove it and restore after this case
-	[ -e /lib/udev/rules.d/50-firmware.rules ] || return 0
+	[[ -e /lib/udev/rules.d/50-firmware.rules ]] || return 0
 	log_cmd mv /lib/udev/rules.d/50-firmware.rules . && {
 		# udev have many rules located at /lib/udev/rules.d/, once those rules are changed
 		# we need to restart udev service to reload the latest rules.
@@ -419,7 +419,7 @@ fixup_bpf()
 
 	# some sh scripts actually need bash
 	# ./test_libbpf.sh: 9: ./test_libbpf.sh: 0: not found
-	[ "$(cmd_path bash)" = '/bin/bash' ] && [ $(readlink -e /bin/sh) != '/bin/bash' ] &&
+	[[ "$(cmd_path bash)" = '/bin/bash' ]] && [[ "$(readlink -e /bin/sh)" != '/bin/bash' ]] &&
 		ln -fs bash /bin/sh
 
 	local python_version=$(python3 --version)
@@ -515,10 +515,10 @@ prepare_for_selftest_mfs()
 	else
 		selftest_mfs=$(find $group -name Makefile)
 		# assume the Makefile is a valid make TARGETS if including lib.mk
-		selftest_mfs=$(echo "$selftest_mfs" | xargs -P$(nproc) -r grep -l '/lib.mk')
+		selftest_mfs=$(echo "$selftest_mfs" | xargs -P"$(nproc)" -r grep -l '/lib.mk')
 	fi
 
-	[ -n "$selftest_mfs" ] || die "empty selftest_mfs"
+	[[ -n "$selftest_mfs" ]] || die "empty selftest_mfs"
 }
 
 fixup_cpufreq()
@@ -565,7 +565,7 @@ fixup_mm()
 	# for example:
 	# 64 < nr_cpu <= 128, memory=128*2, needmem=memory*2
 	# 128 < nr_cpu < (128 + 64), memory=128*3, needmem=memory*2
-	[ $nr_cpu -gt 64 ] && {
+	[[ $nr_cpu -gt 64 ]] && {
 		local memory=$((nr_cpu / 64 + 1))
 		memory=$((memory * 128))
 		sed -i "s#./userfaultfd hugetlb 128 32#./userfaultfd hugetlb $memory 32#" mm/$run_vmtests
@@ -641,7 +641,7 @@ fixup_x86()
 fixup_livepatch()
 {
 	# livepatch check if dmesg meet expected exactly, so disable redirect stdout&stderr to kmsg
-	[[ -s "/tmp/pid-tail-global" ]] && cat /tmp/pid-tail-global | xargs -P$(nproc) kill -9 && echo "" >/tmp/pid-tail-global
+	[[ -s "/tmp/pid-tail-global" ]] && cat /tmp/pid-tail-global | xargs -P"$(nproc)" kill -9 && echo "" >/tmp/pid-tail-global
 
 	return 0
 }
@@ -708,7 +708,7 @@ fixup_test_group()
 
 	local fixup_handler="fixup_${group//[\/-]/_}"
 	if declare -f "$fixup_handler" >/dev/null; then
-		echo "$FUNCNAME: $fixup_handler $PWD"
+		echo "${FUNCNAME[0]}: $fixup_handler $PWD"
 		$fixup_handler || return
 	fi
 
@@ -754,7 +754,7 @@ prepare_tests()
 	prepare_test_env || die "prepare test env failed"
 
 	# Workaround for Debian: ensure awk points to gawk if available, as some tests require awk -e
-	has_cmd gawk && ln -sf $(command -v gawk) /usr/bin/awk
+	has_cmd gawk && ln -sf "$(command -v gawk)" /usr/bin/awk
 
 	cd $linux_selftests_dir/tools/testing/selftests || die
 
@@ -786,7 +786,7 @@ make_run_tests()
 
 run_tests()
 {
-	local selftest_mfs=$@
+	local selftest_mfs="$*"
 
 	# kselftest introduced runner.sh since kernel commit 42d46e57ec97 "selftests: Extract single-test shell logic from lib.mk"
 	[[ -e kselftest/runner.sh ]] && log_cmd sed -i 's/default_timeout=45/default_timeout=300/' kselftest/runner.sh
@@ -835,7 +835,7 @@ run_tests()
 			quicktest=1 make_run_tests
 
 			if [[ -f bpf/test_progs && -f bpf/test_progs-no_alu32 ]]; then
-				cd bpf
+				cd bpf || return
 				echo "# selftests: bpf: test_progs"
 				log_cmd ./test_progs -b sk_assign -b xdp_bonding -b get_branch_snapshot -b perf_branches -b perf_event_stackmap -b snprintf_btf
 				log_cmd ./test_progs -a get_branch_snapshot -a perf_branches -a perf_event_stackmap -a snprintf_btf

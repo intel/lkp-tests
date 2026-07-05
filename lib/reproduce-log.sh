@@ -5,14 +5,14 @@
 log_echo()
 {
 	date=$(date +'%F %T')
-	echo "$date $@"
+	echo "$date" "$@"
 	echo "$@" >>$TMP_RESULT_ROOT/reproduce.sh
 }
 
 log_eval()
 {
 	log_echo "$@"
-	eval "$@"
+	eval "$*"
 }
 
 log_cmd()
@@ -23,7 +23,7 @@ log_cmd()
 
 log_bg_cmd()
 {
-	log_echo "$@ &"
+	log_echo "$* &"
 	"$@" &
 }
 
@@ -38,7 +38,7 @@ log_write_file()
 {
 	file="$1"
 	shift
-	cmdline=echo
+	cmdline='echo'
 	for param; do
 		cmdline="$cmdline '$param'"
 	done
@@ -52,7 +52,7 @@ log_append_file()
 {
 	file="$1"
 	shift
-	cmdline=echo
+	cmdline='echo'
 	for param; do
 		cmdline="$cmdline '$param'"
 	done

@@ -32,9 +32,9 @@ fixup_python()
 	has_cmd python && return
 
 	if has_cmd python2; then
-		ln -sf $(cmd_path python2) /usr/bin/python
+		ln -sf "$(cmd_path python2)" /usr/bin/python
 	elif has_cmd python3; then
-		ln -sf $(cmd_path python3) /usr/bin/python
+		ln -sf "$(cmd_path python3)" /usr/bin/python
 	else
 		die "No python found"
 	fi

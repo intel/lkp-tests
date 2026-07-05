@@ -10,7 +10,7 @@ fixup_ffmpeg()
 	[ -n "$environment_directory" ] || return
 	local test=$1
 	local target=${environment_directory}/pts/${test}/ffmpeg
-	if [ -z $(grep -w 'NUM_CPU_CORES=64' $target) ]; then
+	if [ -z "$(grep -w 'NUM_CPU_CORES=64' $target)" ]; then
 		sed "2a[ \$NUM_CPU_CORES -gt 64 ] && export NUM_CPU_CORES=64" -i "$target"
 	fi
 }
@@ -306,7 +306,7 @@ fixup_gluxmark()
 
 fixup_java_gradle_perf()
 {
-	local javapath=$(readlink -f $(which java) | awk -F/bin '{print $1}')
+	local javapath=$(readlink -f "$(which java)" | awk -F/bin '{print $1}')
 	[ -z "$javapath" ] && echo "ERROR: NO avaliable JAVA_HOME" >&2 && return 1
 	export JAVA_HOME="$javapath"
 }
@@ -351,14 +351,14 @@ fixup_mcperf()
 setup_python2()
 {
 	python -V 2>&1 | grep -q "^Python 2" && return
-	ln -sf $(which python2) $(which python) || return
-	ln -sf $(which pip2) $(which pip) || return
+	ln -sf "$(which python2)" "$(which python)" || return
+	ln -sf "$(which pip2)" "$(which pip)" || return
 }
 
 setup_python3()
 {
 	python -V 2>&1 | grep -q "^Python 3" && return
-	ln -sf $(which python3) $(which python) || return
+	ln -sf "$(which python3)" "$(which python)" || return
 }
 
 fixup_aom_av1_install()

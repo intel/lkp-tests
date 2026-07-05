@@ -12,7 +12,7 @@ clear_cgroup()
 			while read -r line; do
 				subsys=$(echo $line | awk '{ print $1 }')
 				subsys_mount=$(echo $line | awk '{ print $2 }')
-				if [ $(basename $subsys_mount) = "systemd" ]; then
+				if [ "$(basename $subsys_mount)" = "systemd" ]; then
 					continue
 				fi
 				cgroups=$(find $subsys_mount -type d | tail -n +2 | tac)
@@ -47,6 +47,7 @@ create_cgroup()
 	subsys=$(awk 'NR > 1 {printf $1 " "}' /proc/cgroups)
 
 	for item in $subsys; do
+		# shellcheck disable=SC2166
 		if [ "$item" = "cpu" -o "$item" = "cpuacct" ] &&
 			! mountpoint -q "$CGROUP_MNT/cpu,cpuacct"; then
 			log_cmd mkdir -p $CGROUP_MNT/cpu,cpuacct 2>/dev/null

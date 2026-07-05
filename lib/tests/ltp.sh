@@ -149,9 +149,9 @@ fixup_test()
 		log_cmd testcases/bin/prepare_lvm.sh
 
 		# split test to avoid soft_timeout
-		cd runtest
+		cd runtest || return
 		$LKP_SRC/tools/split-tests lvm.local 2 lvm.local-
-		cd -
+		cd - || return
 		;;
 	mm-oom | mm-min_free_kbytes)
 		local pid_job="$(cat $TMP/run-job.pid)"
@@ -166,10 +166,10 @@ fixup_test()
 	tpm_tools)
 		[ $USER ] || USER=root
 		rm -rf /var/lib/opencryptoki/tpm/$USER
-		cd tpm-emulater
+		cd tpm-emulater || return
 		find . -depth -maxdepth 1 -type d -name "TPM_Emulator*" -exec rm -rf {} \;
-		unzip $(ls TPM_Emulator*.zip | head -1)
-		rsync -av $(ls -l . | awk '/^d/ {print $NF}' | head -1)"/" /
+		unzip "$(ls TPM_Emulator*.zip | head -1)"
+		rsync -av "$(ls -l . | awk '/^d/ {print $NF}' | head -1)/" /
 		cd ..
 		killall tpmd >/dev/null 2>&1
 		tpmd -f -d clear >/dev/null 2>&1 &

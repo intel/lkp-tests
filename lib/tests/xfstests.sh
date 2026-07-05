@@ -83,7 +83,7 @@ setup_cifs_config()
 	log_eval export SCRATCH_MNT=/fs/scratch
 	log_cmd mkdir -p $SCRATCH_MNT
 
-	log_eval export CIFS_MOUNT_OPTIONS=\"-ousername=root,password=pass,noperm,vers=$(cifs_version),mfsymlinks,actimeo=0\"
+	log_eval export CIFS_MOUNT_OPTIONS=\"-ousername=root,password=pass,noperm,vers="$(cifs_version)",mfsymlinks,actimeo=0\"
 }
 
 setup_fs2_config()

@@ -17,7 +17,7 @@ __next_job()
 	echo "getting new job..."
 	local mac="$(show_mac_addr)"
 	local last_kernel=
-	[ -n "$job" ] && last_kernel="last_kernel=$(escape_cgi_param $(grep ^kernel: $job | cut -d \" -f 2))&"
+	[ -n "$job" ] && last_kernel="last_kernel=$(escape_cgi_param "$(grep ^kernel: $job | cut -d \" -f 2)")&"
 	http_get_cgi "cgi-bin/gpxelinux.cgi?hostname=${HOSTNAME}&mac=$mac&${last_kernel}${manual_reboot}lkp_wtmp" \
 		$NEXT_JOB || {
 		echo "cannot get next job" 1>&2

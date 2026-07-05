@@ -13,7 +13,7 @@ prepare_perf()
 
 prepare_vmlinux()
 {
-	local build_dir=$(readlink /lib/modules/$(uname -r)/build)
+	local build_dir=$(readlink "/lib/modules/$(uname -r)/build")
 	[[ -n "$build_dir" ]] || return
 
 	[[ -f $build_dir/vmlinux ]]

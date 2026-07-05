@@ -331,5 +331,16 @@ is_kernel_version()
 	local other_kernel_version_major=${other%.*}
 	local other_kernel_version_minor=${other#*.}
 
-	(( (kernel_version_major * 100 + kernel_version_minor) $operator (other_kernel_version_major * 100 + other_kernel_version_minor) ))
+	local lhs=$(( kernel_version_major * 100 + kernel_version_minor ))
+	local rhs=$(( other_kernel_version_major * 100 + other_kernel_version_minor ))
+
+	case "$operator" in
+		'==') (( lhs == rhs )) ;;
+		'!=') (( lhs != rhs )) ;;
+		'<')  (( lhs < rhs ))  ;;
+		'>')  (( lhs > rhs ))  ;;
+		'<=') (( lhs <= rhs )) ;;
+		'>=') (( lhs >= rhs )) ;;
+		*)    echo "is_kernel_version: unknown operator '$operator'" >&2; return 1 ;;
+	esac
 }
