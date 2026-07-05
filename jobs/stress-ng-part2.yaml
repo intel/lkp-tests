@@ -52,7 +52,6 @@ stress-ng:
     - memcpy
     - memfd
     - memhotplug
-    - memrate
     - mergesort
     - min-nanosleep
     - mincore

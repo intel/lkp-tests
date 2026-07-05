@@ -16,6 +16,15 @@ nr_threads: 100%
 testtime:
   - 60s
 
+# memrate allocates a fixed ~256MB buffer per worker (default
+# --memrate-bytes) for memory bandwidth measurement; at nr_threads: 100%
+# on a 256-core host that's 256 x ~256MB ~= 64GB - fills the 64G hosts.
+stress-ng:
+  test:
+    - memrate
+
+---
+
 # prefetch privately mmaps (MAP_POPULATE, so pages are committed
 # immediately) a buffer sized to the host's detected L3 cache per
 # worker instance, e.g. observed "using a 344064K L3 cache" (~336MB) on
