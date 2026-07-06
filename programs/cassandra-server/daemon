@@ -34,6 +34,11 @@ touch $gc_log
 
 cp $cassandra_conf $TMP_RESULT_ROOT/
 
+# Cassandra 5.0.x calls System.setSecurityManager() which throws on Java 18+
+# unless explicitly allowed; this flag is supported on Java 18-21 and is a
+# no-op on Java 11/17 where the Security Manager still works unconditionally.
+export JVM_EXTRA_OPTS="-Djava.security.manager=allow"
+
 # log command
 log_echo $cassandra_server -f -R
 

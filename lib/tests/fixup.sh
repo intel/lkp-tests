@@ -11,6 +11,8 @@ fixup_java_home()
 	elif [ -d /usr/lib/jvm/java-11-openjdk-amd64 ]; then
 		export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 		export CASSANDRA_USE_JDK11=true
+	elif [ -d /usr/lib/jvm/java-17-openjdk-amd64 ]; then
+		export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 	else
 		local dir
 		for dir in "/usr/lib/jvm/java-"*-openjdk*; do
