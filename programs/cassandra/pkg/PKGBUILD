@@ -1,5 +1,5 @@
 pkgname=cassandra
-pkgver=5.0.5
+pkgver=5.0.8
 pkgrel=0
 pkgdesc="The Apache Cassandra database is the right choice when you need scalability and high availability without compromising performance."
 arch=('i386' 'x86_64' 'aarch64')
