@@ -38,6 +38,7 @@ read_kernel_cmdline_vars()
 		[ "${i#ip=}" != "$i" ] && export "$i"
 		[ "${i#NO_NETWORK=}" != "$i" ] && export "$i"
 		[ "${i#result_service}" != "$i" ] && export "$i"
+		[ "${i#BOOT_IMAGE=}" != "$i" ] && export "$i"
 	done
 	return 0
 }
