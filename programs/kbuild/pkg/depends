@@ -2,6 +2,7 @@ bc
 bison
 build-essential
 flex
+gawk
 libelf-dev
 libssl-dev
 openssl
