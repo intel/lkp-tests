@@ -1,5 +1,5 @@
 pkgname=kbuild
-pkgver=6.7
+pkgver=6.12
 pkgrel=1
 arch=('i386' 'x86_64' 'aarch64')
 url="https://www.kernel.org/pub/linux/kernel"
