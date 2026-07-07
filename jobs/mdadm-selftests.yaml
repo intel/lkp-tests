@@ -11,7 +11,6 @@ force_reboot: 1
 mdadm-selftests:
   test_prefix:
     - "00linear"
-    # - "00multipath" # runtime > 7h
     - "00names"
     - "00raid"
     - "00readonly"
@@ -26,15 +25,12 @@ mdadm-selftests:
     - "06"
     - "07auto"
     - "07changelevelintr"
-    # - "07changelevels" # runtime > 4h
     - "07layout"
-    - "07reshape"
     - "07revert"
     - "09"
     - "10ddf-assemble-missing"
     - "10ddf-create" # include 10ddf-create and 10ddf-create-fail-rebuild
     - "10ddf-fail"
-    # - 10ddf-geometry # soft timeout
     - "10ddf-incremental-wrong-order"
     - "10ddf-sudden-degraded"
     - "11"
@@ -46,7 +42,6 @@ mdadm-selftests:
     - "18"
     - "19raid6auto-repair"
     - "19raid6check"
-    # - "19raid6repair" # runtime > 30m
     - "19repair-does-not-destroy"
     - "20"
     - "21"

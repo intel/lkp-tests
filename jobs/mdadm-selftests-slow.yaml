@@ -1,0 +1,19 @@
+suite: mdadm-selftests
+testcase: mdadm-selftests
+category: functional
+
+need_memory: 1G
+
+disk: 1HDD
+
+force_reboot: 1
+
+timeout: 4h
+
+mdadm-selftests:
+  test_prefix:
+    - "00multipath"
+    - "07changelevels"
+    - "07reshape"
+    - "10ddf-geometry"
+    - "19raid6repair"
