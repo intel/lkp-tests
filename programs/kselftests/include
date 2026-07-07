@@ -235,8 +235,10 @@ need_kconfig:
 
 % elsif ___.group == "module"
 - TEST_KALLSYMS: m
-- TEST_RUNTIME: y
-- TEST_RUNTIME_MODULE: y
+# TEST_RUNTIME and TEST_RUNTIME_MODULE are invisible kconfigs.
+# They are automatically selected by TEST_KALLSYMS.
+# - TEST_RUNTIME: y
+# - TEST_RUNTIME_MODULE: y
 
 % elsif ___.group == "mount"
 - USER_NS: y
