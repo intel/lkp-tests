@@ -807,10 +807,6 @@ run_tests()
 
 			log_cmd mm/test_vmalloc.sh ${test##vmalloc-} 2>&1
 			log_cmd dmesg | grep -E '(Summary|All test took)' 2>&1
-		elif [[ $group = resctrl ]]; then
-			kselftests_make TARGETS=$group || continue
-
-			log_cmd resctrl/resctrl_tests 2>&1
 		elif [[ $group = sched_ext ]]; then
 			kselftests_make -C $group || continue
 			kselftests_make run_tests -C $group
