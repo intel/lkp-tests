@@ -6,6 +6,8 @@ AllCops:
   TargetRubyVersion: 3.1
   NewCops: enable
   SuggestExtensions: false
+  Exclude:
+    - workspace_tmp/**/*
 
 Layout/FirstArrayElementIndentation:
   Enabled: false

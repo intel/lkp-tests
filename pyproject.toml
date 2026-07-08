@@ -1,3 +1,3 @@
 [tool.ruff]
 line-length = 120
-exclude = ["spec/fixtures"]
+exclude = ["spec/fixtures", "workspace_tmp"]

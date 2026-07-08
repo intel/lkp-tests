@@ -19,6 +19,7 @@ ignore: |
   .git/
   node_modules/
   vendor/
+  workspace_tmp/
   spec/**/*.yaml
   jobs/pts-avx-part1.yaml
   jobs/pts-bad.yaml
