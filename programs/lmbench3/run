@@ -212,6 +212,22 @@ if [[ "${standalone}" != "1" ]]; then
 	# So limit the the maximum test memory size to 10GB.
 	[[ "$test_memory_size" -gt 10240 ]] && test_memory_size=10240
 
+	# When running with multiple threads, cap per-thread memory so that
+	# nr_threads * test_memory_size stays within 80% of physical RAM.
+	# Without this guard, total working set can exceed physical memory and
+	# cause heavy swap pressure that makes the benchmark run indefinitely.
+	if [[ "${nr_threads:-0}" -gt 1 ]]; then
+		mem_total_mb=$(awk '/MemTotal/ {print int($2/1024)}' /proc/meminfo)
+		max_per_thread=$((mem_total_mb * 80 / 100 / nr_threads))
+		[[ "$test_memory_size" -gt "$max_per_thread" ]] && test_memory_size=$max_per_thread
+
+		# Furthermore, the lmbench suite benchmarks powers-of-two memory chunks iteratively
+		# up to test_memory_size. With multiple threads, memory bandwidth contention scales
+		# non-linearly and causes massive slowdowns over large bucket sizes. Cap tightly
+		# at 512MB to stay within the 2h timeout budget on high-core machines.
+		[[ "$test_memory_size" -gt 512 ]] && test_memory_size=512
+	fi
+
 fi
 
 cd_benchmark
