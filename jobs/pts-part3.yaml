@@ -97,9 +97,9 @@ pts:
       # - All Algorithms     [This option can be very time consuming.]
 
   - test: hammerdb-mariadb-1.1.0
-    option_a:
-      - 8
-      # - 16
+    option_a: # Virtual Users
+      # - 1 # this is "1: 8", but do not use 8 as 8 is "8: Test All Options"
+      - 16
       # - 32
       # - 64
       # - 128
