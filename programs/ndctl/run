@@ -9,6 +9,12 @@ shopt -s nullglob
 . $LKP_SRC/lib/reproduce-log.sh
 . $LKP_SRC/lib/env.sh
 
+# pkg/PKGBUILD builds ndctl with rootprefix="$benchmark_path", so the ndctl
+# binary and its libndctl/libdaxctl/libcxl shared libraries are installed
+# under $BENCHMARK_ROOT/ndctl/{bin,lib} instead of the default /usr/{bin,lib}.
+export PATH="$BENCHMARK_ROOT/ndctl/bin:$PATH"
+export LD_LIBRARY_PATH="$BENCHMARK_ROOT/ndctl/lib:$LD_LIBRARY_PATH"
+
 has_cmd ndctl || die "Can not find executable ndctl file"
 
 #1) check if nfit_test and its dependencies are available on local host
