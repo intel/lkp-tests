@@ -63,7 +63,9 @@ kselftests:
     - mount_setattr
     - move_mount_set_group
     - mqueue
-    - mseal_system_mappings
+    # - mseal_system_mappings # CONFIG_MSEAL_SYSTEM_MAPPINGS depends on
+    # !CHECKPOINT_RESTORE, which the ipc/mm/pidfd groups require as y on
+    # the same kernel flavor, so it can never build
     - nci
     # - nolibc # not enabled yet
     - nsfs
