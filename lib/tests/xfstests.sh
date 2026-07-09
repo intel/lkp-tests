@@ -3,8 +3,6 @@
 . $LKP_SRC/lib/reproduce-log.sh
 . $LKP_SRC/lib/debug.sh
 
-XFSTESTS_TESTS_DIR="$BENCHMARK_ROOT/xfstests/tests"
-
 check_add_user()
 {
 	[ "x$1" != "x" ] || return
@@ -111,6 +109,9 @@ _is_test_in_group()
 	# group: xfs-no-xfs-bug-on-assert | ext4-logdev
 	local test=$1
 	local group=$2
+	# Computed here (not at source time) since BENCHMARK_ROOT is only
+	# exported by the caller after this file is sourced.
+	local XFSTESTS_TESTS_DIR="$BENCHMARK_ROOT/xfstests/tests"
 
 	# Check for an exact match. This handles cases where:
 	# 1. The 'test' is actually a full group name (e.g. test="generic-dax" matches group="generic-dax")
@@ -171,6 +172,9 @@ teardown_zoned_nullb()
 test_needs_zoned_nullb()
 {
 	local prefix="${1%%-*}"
+	# Computed here (not at source time) since BENCHMARK_ROOT is only
+	# exported by the caller after this file is sourced.
+	local XFSTESTS_TESTS_DIR="$BENCHMARK_ROOT/xfstests/tests"
 	local group_file="$XFSTESTS_TESTS_DIR/$1"
 
 	if [[ -f "$group_file" ]]; then
@@ -185,6 +189,9 @@ test_needs_zoned_nullb()
 setup_mkfs_options()
 {
 	local mkfs_options=""
+	# Computed here (not at source time) since BENCHMARK_ROOT is only
+	# exported by the caller after this file is sourced.
+	local XFSTESTS_TESTS_DIR="$BENCHMARK_ROOT/xfstests/tests"
 
 	case "$fs" in
 	f2fs)
@@ -470,6 +477,9 @@ run_test()
 
 	local all_tests
 	local all_tests_cmd
+	# Computed here (not at source time) since BENCHMARK_ROOT is only
+	# exported by the caller after this file is sourced.
+	local XFSTESTS_TESTS_DIR="$BENCHMARK_ROOT/xfstests/tests"
 
 	if [[ "${test#*-}" == "all" ]]; then
 		all_tests_cmd="cd tests && ls ${test%-*}/[0-9][0-9][0-9]"
