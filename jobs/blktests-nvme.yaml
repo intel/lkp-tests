@@ -10,6 +10,9 @@ blktests:
     - nvme-group-00
     - nvme-group-01
     - nvme-group-02
+  nvme_trtype:
+    - loop
+    - tcp
 
 ---
 blktests:
