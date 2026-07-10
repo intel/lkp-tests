@@ -4,9 +4,7 @@ category: functional
 
 need_memory: 4G
 
-disk:
-  - 1HDD
-  - 1SSD
+disk: 1HDD
 fs:
   - btrfs
   - ext4
@@ -24,10 +22,3 @@ ltp:
     - syscalls-07
     - syscalls-setsockopt06 # need about 25mins
     - writev03.writev03 # run standalone
-
----
-need_memory: 10G
-
-ltp:
-  test:
-    - syscalls-06

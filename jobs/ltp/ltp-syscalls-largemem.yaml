@@ -1,0 +1,16 @@
+suite: ltp
+testcase: ltp
+category: functional
+
+need_memory: 10G
+
+disk: 1HDD
+fs:
+  - btrfs
+  - ext4
+  - f2fs
+  - xfs
+
+ltp:
+  test:
+    - syscalls-06
