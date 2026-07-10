@@ -13,7 +13,6 @@ md5sums=('SKIP' 'SKIP' 'SKIP')
 build_blktests()
 {
 	make_src_pkg
-	make -C src miniublk
 }
 
 build_nvme_cli()
