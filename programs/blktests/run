@@ -62,6 +62,14 @@ set_env()
 	nbd-* | loop-*)
 		partition=""
 		;;
+	scsi-009)
+		# scsi/009 defines its own fallback_device() that configures a
+		# scsi_debug device with atomic_wr=1 to emulate atomic-write
+		# support; that fallback only runs when TEST_DEVS is empty, so
+		# leave partition unset here instead of forcing a real device
+		# that never supports atomic writes.
+		partition=""
+		;;
 	scsi-* | block-*)
 		partition=${partitions%% *}
 		# block/019 and block/011 need a whole disk to test PCI hotplug

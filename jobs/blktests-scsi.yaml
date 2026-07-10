@@ -8,4 +8,5 @@ disk: 1HDD
 
 blktests:
   test:
+    - scsi-009
     - scsi-group-00
