@@ -4,9 +4,7 @@ require "#{LKP_SRC}/lib/erb"
 # Any programs/<suite>/include file that uses the `% if`/`% elsif` ERB
 # pattern for its need_kconfig: section gets two checks here, fully dynamic
 # (no suite names hardcoded, so a newly added suite using this convention is
-# automatically covered the next time this spec runs). Mirrors the parsing
-# logic in lkp-core's .agents/skills/lkp-tunetest/scripts/kconfig-block-tool
-# -- keep the two in sync if the condition forms recognized there change.
+# automatically covered the next time this spec runs).
 #
 # Recognized condition forms: `___.<field> == "value"`, `___.<field> =~
 # /regex/`, and `job['<field>'] == "value"`. A condition that ORs multiple

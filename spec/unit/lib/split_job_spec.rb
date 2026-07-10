@@ -8,7 +8,11 @@ describe 'lkp-split-job' do
   before(:all) do
     @tmp_src_dir = LKP::TmpDir.new('split-job-spec-src-')
 
-    Bash.run("rsync -aix --exclude .git #{LKP_SRC}/ #{@tmp_src_dir}")
+    # Exclude local scratch directories: they are untracked, can grow large,
+    # and (if they happen to contain a nested copy of the source tree) would
+    # make this rsync copy itself into itself.
+    exclude_opts = '--exclude .git --exclude /workspace_tmp/ --exclude /tmp/'
+    Bash.run("rsync -aix #{exclude_opts} #{LKP_SRC}/ #{@tmp_src_dir}")
     Bash.run("rsync -aix --exclude .git #{LKP_SRC}/spec/fixtures/split-job/programs/ #{@tmp_src_dir}/programs/")
 
     Dir.chdir(@tmp_src_dir.to_s) do
