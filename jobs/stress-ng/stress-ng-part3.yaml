@@ -65,14 +65,6 @@ stress-ng:
     - rtc
 
 ---
-nr_threads: 50%
-need_memory: 216G
-
-stress-ng:
-  test:
-    - oom-pipe
-
----
 stress-ng:
   test:
     - qsort
@@ -124,8 +116,3 @@ stress-ng:
     - idle
     - other
     - rr
----
-need_memory: 224G
-stress-ng:
-  test:
-    - resources

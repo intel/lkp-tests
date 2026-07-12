@@ -2,12 +2,15 @@ suite: stress-ng
 testcase: stress-ng
 category: benchmark
 
-# Bucket for stress-ng stressors whose per-worker memory footprint scales
-# with the host's own core count, so a fixed need_memory value can't
-# portably express the requirement (a value safe for a 256-core/256GB
-# host would still OOM a 512-core/128GB host at the same nr_threads:
-# 100% - the total need is proportional to nr_cpu, not a flat number).
-# Kept at nr_threads: 100% (instead of reducing the workload) to
+# Bucket for stress-ng stressors that need more memory than a standard
+# 64G host can provide - either because per-worker memory footprint
+# scales with the host's own core count, so a fixed need_memory value
+# can't portably express the requirement (a value safe for a
+# 256-core/256GB host would still OOM a 512-core/128GB host at the same
+# nr_threads: 100% - the total need is proportional to nr_cpu, not a
+# flat number), or because the workload's own need_memory is a fixed
+# value that already exceeds a 64G host's capacity outright. Kept at
+# each stressor's full nr_threads (instead of reducing the workload) to
 # preserve full cache/memory-bandwidth contention for regression-
 # detection fidelity.
 
@@ -40,3 +43,24 @@ stress-ng:
     - prefetcht0
     - prefetcht1
     - prefetcht2
+
+---
+
+# oom-pipe's own need_memory (216G) already exceeds a 64G host's
+# capacity outright, independent of core count.
+nr_threads: 50%
+need_memory: 216G
+
+stress-ng:
+  test:
+    - oom-pipe
+
+---
+
+# resources' own need_memory (224G) already exceeds a 64G host's
+# capacity outright, independent of core count.
+need_memory: 224G
+
+stress-ng:
+  test:
+    - resources
