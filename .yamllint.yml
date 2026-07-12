@@ -21,14 +21,14 @@ ignore: |
   vendor/
   workspace_tmp/
   spec/**/*.yaml
-  jobs/pts-avx-part1.yaml
-  jobs/pts-bad.yaml
-  jobs/pts-part1.yaml
-  jobs/pts-part2.yaml
-  jobs/pts-part3.yaml
-  jobs/pts-slow.yaml
-  jobs/fsmark.yaml
-  jobs/fsmark-1hdd-400m.yaml
+  jobs/pts/pts-avx-part1.yaml
+  jobs/pts/pts-bad.yaml
+  jobs/pts/pts-part1.yaml
+  jobs/pts/pts-part2.yaml
+  jobs/pts/pts-part3.yaml
+  jobs/pts/pts-slow.yaml
+  jobs/fsmark/fsmark.yaml
+  jobs/fsmark/fsmark-1hdd-400m.yaml
   jobs/aim7-fs-1brd.yaml
   jobs/aim7-fs-raid.yaml
   jobs/postmark.yaml

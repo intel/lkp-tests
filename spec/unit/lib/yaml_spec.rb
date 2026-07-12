@@ -53,25 +53,25 @@ end
 describe 'yaml_merge_included_files' do
   yaml_merge_spec = <<EOF
 contents: &borrow-1d
-  #{YAML.load_file('jobs/borrow-1d.yaml').to_json}
+  #{YAML.load_file('jobs/borrow/borrow-1d.yaml').to_json}
 
 :merge project path:
-                        - <<: jobs/borrow-1d.yaml
+                        - <<: jobs/borrow/borrow-1d.yaml
                         - *borrow-1d
 :merge relative path:
-                        - <<: ../../../jobs/borrow-1d.yaml
+                        - <<: ../../../jobs/borrow/borrow-1d.yaml
                         - *borrow-1d
 :merge absolute path:
-                        - <<: #{LKP_SRC}/jobs/borrow-1d.yaml
+                        - <<: #{LKP_SRC}/jobs/borrow/borrow-1d.yaml
                         - *borrow-1d
 :merge into hash:
                         - a:
-                          <<: jobs/borrow-1d.yaml
+                          <<: jobs/borrow/borrow-1d.yaml
                         - a:
                           <<: *borrow-1d
 :merge hash and update:
                         - a:
-                          <<: jobs/borrow-1d.yaml
+                          <<: jobs/borrow/borrow-1d.yaml
                           runtime: 1
                           b: c
                         - a:
@@ -82,7 +82,7 @@ contents: &borrow-1d
                         - a:
                           b: c
                           runtime: 1
-                          <<: jobs/borrow-1d.yaml
+                          <<: jobs/borrow/borrow-1d.yaml
                         - a:
                           b: c
                           runtime: 1
