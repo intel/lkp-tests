@@ -12,7 +12,17 @@ md5sums=('SKIP' 'SKIP' 'SKIP')
 
 build_blktests()
 {
-	make_src_pkg
+	# src/Makefile probes for the new ublk uapi interface with
+	# $(shell echo -e "#include <...>\n#ifdef X\nHAVE_X\n#endif" | ...).
+	# GNU Make's $(shell) runs under /bin/sh, which is dash on this
+	# distro. dash's builtin echo does not recognize "-e" as a flag and
+	# prints it literally as the first token, corrupting the leading
+	# #include line so the header is never actually pulled in -- the
+	# probe then always resolves the interface as unsupported, even on
+	# a host whose kernel headers genuinely define it, and miniublk is
+	# silently left out of the package. Forcing SHELL=/bin/bash makes
+	# the same probe run correctly, matching upstream's own intent.
+	make_src_pkg -- SHELL=/bin/bash
 }
 
 build_nvme_cli()
