@@ -55,6 +55,15 @@ enable_nvme_auth()
 	done
 }
 
+setup_normal_user()
+{
+	local user="blktests_user"
+
+	grep -q -w "$user" /etc/passwd && return
+
+	useradd -m "$user"
+}
+
 set_env()
 {
 	local partition
@@ -112,6 +121,9 @@ set_env()
 
 	[[ "$nvme_trtype" ]] && echo "nvme_trtype=$nvme_trtype" >>config
 	[[ "$use_siw" == "true" ]] && echo "use_siw=1" >>config
+
+	setup_normal_user
+	echo "NORMAL_USER=blktests_user" >>config
 
 	# fix the issue: losetup: cannot find an unused loop device
 	lsmod | grep -q loop || modprobe loop
