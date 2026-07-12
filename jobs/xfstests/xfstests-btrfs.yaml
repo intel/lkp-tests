@@ -48,8 +48,13 @@ xfstests:
     - btrfs-group-34
     - btrfs-log-writes
     # - btrfs-scratch-verity
----
-disk: 9HDD
-xfstests:
-  test:
-    - btrfs-group-29
+
+# btrfs-group-29 (btrfs/292, btrfs/294) needs a TEST_DEV plus 6-8 SCRATCH_DEV_POOL
+# devices, so it requires a 9HDD host; keep it disabled until such a host is
+# available, otherwise it is abandoned as "not enough HDD disks" wherever this
+# job is scheduled.
+# ---
+# disk: 9HDD
+# xfstests:
+#   test:
+#     - btrfs-group-29
