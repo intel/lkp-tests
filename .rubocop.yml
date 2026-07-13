@@ -7,6 +7,7 @@ AllCops:
   NewCops: enable
   SuggestExtensions: false
   Exclude:
+    - vendor/**/*
     - workspace_tmp/**/*
 
 Layout/FirstArrayElementIndentation:
