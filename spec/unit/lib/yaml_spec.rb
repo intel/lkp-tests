@@ -102,7 +102,7 @@ EOF
   end
 end
 
-describe 'yaml_merge_included_files with ignore' do
+describe 'yaml_merge_included_files with overrides' do
   let(:include_content) do
     <<~YAML
       key1: value1
@@ -127,35 +127,43 @@ describe 'yaml_merge_included_files with ignore' do
     FileUtils.rm_f(include_filename)
   end
 
-  it 'ignores keys with unquoted filename' do
-    yaml_input = "<<: #{absolute_path}, ignore: :key1"
+  it 'includes a plain file with no overrides' do
+    yaml_input = "<<: #{absolute_path}"
     merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
     result = YAML.unsafe_load(merged_yaml)
 
-    expect(result).not_to have_key('key1')
+    expect(result['key1']).to eq 'value1'
+    expect(result['disk']).to eq 'some_disk'
+  end
+
+  it 'includes a plain quoted file with no overrides' do
+    yaml_input = "<<: '#{absolute_path}'"
+    merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
+    result = YAML.unsafe_load(merged_yaml)
+
+    expect(result['key1']).to eq 'value1'
+  end
+
+  it 'overrides a key using standard-YAML flow-mapping syntax' do
+    yaml_input = "<<: {file: #{absolute_path}, disk: 'other_disk'}"
+    merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
+    result = YAML.unsafe_load(merged_yaml)
+
+    expect(result['disk']).to eq 'other_disk'
     expect(result['key2']).to eq 'value2'
   end
 
-  it 'overrides keys directly in include line' do
-    yaml_input = "<<: '#{absolute_path}', ignore: :key1, key2: 'value_new'"
+  it 'overrides multiple keys using standard-YAML flow-mapping syntax' do
+    yaml_input = "<<: {file: #{absolute_path}, disk: 'other_disk', key2: 'value_new'}"
     merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
     result = YAML.unsafe_load(merged_yaml)
 
-    expect(result).not_to have_key('key1')
+    expect(result['disk']).to eq 'other_disk'
     expect(result['key2']).to eq 'value_new'
   end
 
-  it 'overrides keys using unquoted filename syntax' do
-    yaml_input = "<<: #{absolute_path}, key2: 'value_override'"
-    merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
-    result = YAML.unsafe_load(merged_yaml)
-
-    expect(result['key2']).to eq 'value_override'
-  end
-
-  it 'ignores a single key' do
-    yaml_input = "<<: '#{absolute_path}', ignore: :key1"
-    # Use dirname matching the file location or absolute path
+  it 'ignores a single key using standard-YAML flow-mapping syntax' do
+    yaml_input = "<<: {file: #{absolute_path}, ignore: [key1]}"
     merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
     result = YAML.unsafe_load(merged_yaml)
 
@@ -163,8 +171,8 @@ describe 'yaml_merge_included_files with ignore' do
     expect(result['key2']).to eq 'value2'
   end
 
-  it 'ignores multiple keys' do
-    yaml_input = "<<: '#{absolute_path}', ignore: [:key1, :key3]"
+  it 'ignores multiple keys using standard-YAML flow-mapping syntax' do
+    yaml_input = "<<: {file: #{absolute_path}, ignore: [key1, key3]}"
     merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
     result = YAML.unsafe_load(merged_yaml)
 
@@ -175,21 +183,12 @@ describe 'yaml_merge_included_files with ignore' do
 
   it 'does not ignore partial matches' do
     # Should ignore 'd' but keep 'disk'
-    yaml_input = "<<: '#{absolute_path}', ignore: :d"
+    yaml_input = "<<: {file: #{absolute_path}, ignore: [d]}"
     merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
     result = YAML.unsafe_load(merged_yaml)
 
     expect(result).not_to have_key('d')
     expect(result['disk']).to eq 'some_disk'
-  end
-
-  it 'supports IRB style array of ignore symbols' do
-    yaml_input = "<<: '#{absolute_path}', ignore: [:key1, :key3]"
-    merged_yaml = yaml_merge_included_files(yaml_input, File.dirname(absolute_path))
-    result = YAML.unsafe_load(merged_yaml)
-
-    expect(result).not_to have_key('key1')
-    expect(result).not_to have_key('key3')
   end
 end
 

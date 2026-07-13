@@ -1,3 +1,1 @@
-<<: stress-ng-part6-1hdd.yaml
-
-disk: "1SSD"
+<<: {file: stress-ng-part6-1hdd.yaml, disk: '1SSD'}

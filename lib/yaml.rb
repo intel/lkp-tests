@@ -120,30 +120,28 @@ def search_file_in_paths(file, relative_to = nil, search_paths = nil)
 end
 
 def parse_include_content(content)
-  begin
-    args = eval("[#{content}]")
-  rescue SyntaxError, NameError
-    # Support unquoted filenames (e.g. "file.yaml, ignore: keys")
-    # by quoting the part before the first comma.
+  content = content.strip
+
+  # Standard-YAML flow-mapping syntax, e.g.:
+  #   <<: {file: base.yaml, disk: '1SSD'}
+  # Parsed with YAML.safe_load so it never executes arbitrary code, and is
+  # valid standalone YAML on its own (no yamllint ignore entry needed).
+  if content.start_with?('{')
     begin
-      if (comma_index = content.index(','))
-        file_part = content[0...comma_index].strip
-        rest_part = content[comma_index..]
-        args = eval("['#{file_part}'#{rest_part}]")
-      else
-        args = [content.strip]
-      end
-    rescue SyntaxError, NameError
-      return [content, []]
+      parsed = YAML.safe_load(content)
+    rescue Psych::Exception
+      parsed = nil
+    end
+
+    if parsed.is_a?(Hash) && parsed.key?('file')
+      options = parsed.except('file').transform_keys(&:to_sym)
+      return [parsed['file'], options]
     end
   end
 
-  return [content, {}] unless args.is_a?(Array) && args.first.is_a?(String)
-
-  file = args[0]
-  options = args[1]
-  options = {} unless options.is_a?(Hash)
-  [file, options]
+  # Plain include with no overrides, e.g. "<<: base.yaml" or "<<: 'base.yaml'".
+  file = content.sub(/\A(['"])(.*)\1\z/, '\2')
+  [file, {}]
 end
 
 def yaml_merge_included_files(yaml, relative_to, search_paths = nil)

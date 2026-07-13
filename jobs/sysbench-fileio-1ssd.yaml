@@ -1,3 +1,1 @@
-<<: sysbench-fileio.yaml
-
-disk: 1SSD
+<<: {file: sysbench-fileio.yaml, disk: '1SSD'}

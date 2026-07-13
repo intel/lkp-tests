@@ -21,6 +21,30 @@ If the job file contains a line
 
 The hash contents of FILE will be merged into the current YAML location.
 
+### Overriding or ignoring keys from the included file
+
+To override one or more keys from FILE, or to drop keys from it entirely,
+use a standard-YAML flow mapping instead of a plain filename:
+
+	<< : {file: FILE, key1: 'value1', key2: 'value2'}
+
+	<< : {file: FILE, ignore: [key1, key2]}
+
+`file:` and `ignore:` are the only reserved names; any other key is treated
+as a value that overrides the corresponding line in FILE. This is parsed
+with `YAML.safe_load` (see `parse_include_content` in `lib/yaml.rb`), so it
+never executes arbitrary code, and the include line itself is valid
+standalone YAML (no special-casing needed in `.yamllint.yml`).
+
+Prefer this form over placing a plain `key: value` line *after* a simple
+`<< : FILE` include when FILE contains multiple `---`-separated documents
+(see "Multi-part job file" below): a line placed after the include is a
+plain textual append landing after the *entire* included file, so it only
+ever reaches the *last* document, silently leaving every earlier document
+at FILE's original value. The flow-mapping override instead substitutes
+the value into FILE's own raw text wherever that key is declared, so it
+reaches every document derived from it.
+
 In the most fundamental form, a job YAML contains a hash table of key-values.
 The keys fall into 2 main categories:
 

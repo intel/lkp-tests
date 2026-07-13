@@ -1,3 +1,1 @@
-<<: reaim-disk.yaml
-
-disk: 1SSD
+<<: {file: reaim-disk.yaml, disk: '1SSD'}

@@ -1,4 +1,1 @@
-<<: fxmark.yaml
-
-disk: 1SSD
-media: ssd
+<<: {file: fxmark.yaml, disk: '1SSD', media: 'ssd'}
