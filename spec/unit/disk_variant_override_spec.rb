@@ -1,6 +1,6 @@
 require 'spec_helper'
-require "#{LKP_SRC}/lib/yaml"
 require "#{LKP_SRC}/lib/job"
+require "#{LKP_SRC}/lib/yaml"
 
 # Regression guard for the class of bug where a disk-variant job YAML
 # (e.g. "<suite>-1ssd.yaml") includes a multi-document base file via
