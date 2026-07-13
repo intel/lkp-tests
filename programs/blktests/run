@@ -109,12 +109,20 @@ set_env()
 	esac
 
 	if [[ -n "$partition" ]]; then
-		echo "TEST_DEVS=$partition" >config
 		if [[ "${test%%-*}" == "nvme" ]]; then
 			enable_nvme_auth
 
+			# blktests' own convention is a bare namespace device
+			# in TEST_DEVS (README: TEST_DEVS=(/dev/nvme0n1 ...)).
+			# nvme/046 and nvme/049 derive their /dev/ngX passthrough
+			# device via ${TEST_DEV/nvme/ng}, which only produces a
+			# valid path for a bare namespace device -- on a
+			# partition (nvme0n1p1) it mangles into the nonexistent
+			# ng0n1p1.
+			echo "TEST_DEVS=${partition%p[0-9]*}" >config
 			log_cmd mkdir -p /mnt/$test && log_cmd mount $partition /mnt/$test
 		else
+			echo "TEST_DEVS=$partition" >config
 			umount "${partition}"* 2>/dev/null || true
 		fi
 	fi
