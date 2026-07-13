@@ -190,7 +190,7 @@ def parse
       fields[2] = fields[2][/.*\/(.*)\//, 1]
     end
 
-    return false if fields.none? { |field| events.include?(field) }
+    return false unless fields.intersect?(events)
 
     prev_time = time
     time = stime.to_f
