@@ -9,8 +9,18 @@ stats = Hash.new { |h, k| h[k] = [] }
 while (line = $stdin.gets)
   case line
   when /^rsa.*4096.*bits/
-    stats['sign_per_sec'] = line.split[5]
-    stats['verify_per_sec'] = line.split[6]
+    # Fields after "rsa 4096 bits" are an equal split of timings
+    # followed by rates: older openssl prints sign,verify,sign/s,
+    # verify/s while newer releases add encrypt/decrypt timings and
+    # rates (sign,verify,encrypt,decrypt,sign/s,verify/s,encr./s,
+    # decr./s). Locate the rate columns by halving the remainder
+    # instead of a fixed index, so added timing columns don't shift
+    # sign/s and verify/s out of position.
+    fields = line.split[3..]
+    rates = fields[(fields.size / 2)..]
+
+    stats['sign_per_sec'] = rates[0]
+    stats['verify_per_sec'] = rates[1]
   when /^sha256.*/
     stats['16_size_block_Kbps'] = line.split[1].delete('k').to_f
     stats['64_size_block_Kbps'] = line.split[2].delete('k').to_f

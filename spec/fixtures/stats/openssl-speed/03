@@ -1,0 +1,16 @@
+Running openssl-speed benchmark...
+2026-07-14 15:13:21 ./apps/openssl speed -multi 256 -seconds 30 rsa4096
+Forked child 0
+Forked child 1
+Got: +F2:4:4096:145.433333:4963.200000:4908.133333:144.851716 from 255
+version: 4.0.0-dev
+built on: Fri Oct 10 14:26:16 2025 UTC
+options: bn(64,64)
+compiler: gcc -fPIC -pthread -m64 -Wa,--noexecstack -march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4 -DOPENSSL_USE_NODELETE -DL_ENDIAN -DOPENSSL_PIC -DOPENSSL_BUILDING_OPENSSL -DNDEBUG -D_FORTIFY_SOURCE=2
+CPUINFO: OPENSSL_ia32cap=0x7ffef3ffefebffff:0xfb4027bc239cb7ef:0x4c8809d0fc1c4432:0x0000000100060030:0x0000000000000000
+                   sign    verify    encrypt   decrypt   sign/s verify/s  encr./s  decr./s
+rsa  4096 bits 0.000027s 0.000001s 0.000001s 0.000027s  37194.7 1263871.1 1249692.8  36930.9
+                               keygen    encaps    decaps keygens/s  encaps/s  decaps/s
+                    rsa4096 0.005772s 0.000001s 0.000027s     173.2 1243835.5   37149.9
+                               keygen     signs    verify keygens/s    sign/s  verify/s
+                    rsa4096 0.005736s 0.000027s 0.000001s     174.3   37077.0 1269275.4
