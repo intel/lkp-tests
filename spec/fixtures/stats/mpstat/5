@@ -1,0 +1,16 @@
+{"sysstat": {
+	"hosts": [
+		{
+			"nodename": "lkp-gnr-2sp3",
+			"sysname": "Linux",
+			"release": "6.1.0",
+			"machine": "x86_64",
+			"number-of-cpus": 4,
+			"date": "2026-07-14",
+			"statistics": [
+
+
+			]
+		}
+	]
+}}

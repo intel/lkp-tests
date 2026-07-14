@@ -158,6 +158,8 @@ def display_result(hash)
 end
 
 def display_max_util(idle_pct, iowait_pct)
+  return if idle_pct.empty?
+
   utils = idle_pct.each_with_index.map { |idle, index| 100 - idle - iowait_pct[index] }
   max_util, max_index = utils.each_with_index.max_by { |util, _index| util }
 
