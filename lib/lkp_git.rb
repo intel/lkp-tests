@@ -96,6 +96,18 @@ def linus_release_tag(commit)
   end
 end
 
+# substitute a /result/-rooted path's commit sha with its Linus release
+# tag (e.g. v6.10-rc1) when one applies, so paths for the same tagged
+# release group together regardless of which commit under it was tested
+def result_root_with_release_tag(result_root)
+  return result_root unless result_root.start_with?('/result/')
+
+  commit = File.basename(File.dirname(result_root))
+  tag = linus_release_tag(commit)
+
+  tag ? result_root.sub(commit, tag) : result_root
+end
+
 # if commit has a version tag, return it directly;
 # otherwise checkout commit and get latest version from Makefile.
 def __last_linus_release_tag(commit)
