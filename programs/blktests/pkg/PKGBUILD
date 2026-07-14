@@ -50,7 +50,7 @@ package()
 
 pack_nvme_cli()
 {
-	DESTDIR="$pkgdir" pkgname="nvme-cli" meson_install_src_pkg
+	pkgname="nvme-cli" meson_install_src_pkg
 }
 
 generate_new_tests()
