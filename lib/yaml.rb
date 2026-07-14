@@ -168,11 +168,26 @@ def yaml_merge_included_files(yaml, relative_to, search_paths = nil)
       yaml_val = YAML.dump(value).sub(/\A---\s*\n?/, '').chomp
       pattern = /^(#{Regexp.escape(key)})\s*:\s+.*$/
 
-      if to_merge.match?(pattern)
-        to_merge = to_merge.gsub(pattern, "#{key}: #{yaml_val}")
-      else
-        to_merge += "\n#{key}: #{yaml_val}"
+      # The included file may be a multi-document YAML stream (documents
+      # separated by "---" lines). Applying the override once against the
+      # whole raw string picks either the replace branch or the append
+      # branch for the ENTIRE file: if any single document already has the
+      # key, every document is scanned for a replace, but a document that
+      # lacks the key entirely is left untouched instead of getting the
+      # override appended - so the override silently fails to reach it.
+      # Split into per-document chunks and replace-or-append in each one
+      # independently so every document ends up with the same override.
+      docs = to_merge.split(/^---[ \t]*\n/, -1)
+      docs = docs.map do |doc|
+        next doc if doc.strip.empty?
+
+        if doc.match?(pattern)
+          doc.gsub(pattern, "#{key}: #{yaml_val}")
+        else
+          "#{doc.chomp}\n#{key}: #{yaml_val}\n"
+        end
       end
+      to_merge = docs.join("---\n")
     end
 
     indent = prefix.tr '^ ', ' '
