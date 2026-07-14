@@ -71,6 +71,12 @@ check_binary_output()
 	[[ $program = mpstat ]] && return
 	[[ $program = iostat ]] && return
 
+	# generate_log_from_serial() reconstructs $log from the raw dmesg/kmsg
+	# capture, which is the same content that dmesg/kmsg are already
+	# exempted above for, so it can carry the same binary/control-char
+	# noise even though $program isn't dmesg/kmsg.
+	[[ $from_serial_log = 1 ]] && return
+
 	# kmsg may actually read the dmesg file
 	# refer to the exception cases in check_empty_output()
 	[[ -e $log ]] || return
@@ -150,10 +156,12 @@ generate_log_from_serial()
 	# [    0.000000][    T0] BIOS-provided physical RAM map:
 	# [    0.000000][    T0] BIOS-e820: [mem 0x0000000000000100-0x000000000009ebff] usable
 	if [[ -f $dmesg_log ]]; then
-		perl -pe 's/^(\[.*?\])* *//g' <"$dmesg_log" >"$log"
+		perl -pe 's/^(\[.*?\])* *//g' <"$dmesg_log" | tr -d '\0' >"$log"
 	elif [[ -f $kmsg_log ]]; then
-		perl -pe 's/^(\[.*?\])* *//g' <"$kmsg_log" >"$log"
+		perl -pe 's/^(\[.*?\])* *//g' <"$kmsg_log" | tr -d '\0' >"$log"
 	fi
+
+	from_serial_log=1
 }
 
 # When stats script returns failure, we need decide whether it is a bad rt
