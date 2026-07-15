@@ -4,8 +4,14 @@ need_kconfig:
 - SECURITY: y
 - SECURITY_APPARMOR: y
 
+% elsif ___.test == "acct"
+- BSD_PROCESS_ACCT: y
+
 % elsif ___.test == "module"
 - TEST_LKM: m
+
+% elsif ___.test == "ovpn"
+- OVPN: m
 
 % elsif ___.test == "sctp"
 - IP_SCTP: m

@@ -39,6 +39,7 @@ stress-ng:
     - sigq
     - sigrt
     - sigsegv
+    - sigstop
     - sigsuspend
     - sigtrap
     - sigurg

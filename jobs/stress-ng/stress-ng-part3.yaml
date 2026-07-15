@@ -20,7 +20,9 @@ stress-ng:
     # - null
     - numa
     - numacopy
+    - ovpn
     - pagemove
+    - pagescatter
     - pageswap
     - pci
     - personality

@@ -9,6 +9,7 @@ testtime:
 
 stress-ng:
   test:
+    - gamma
     - get
     - getrandom
     - goto

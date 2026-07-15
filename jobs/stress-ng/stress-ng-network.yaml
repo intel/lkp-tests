@@ -15,6 +15,7 @@ stress-ng:
     - eth-sniff
     - icmp-flood
     - netdev
+    - ovpn
     - ping-sock
     - rawpkt
     - rawsock
