@@ -120,7 +120,20 @@ set_env()
 			# partition (nvme0n1p1) it mangles into the nonexistent
 			# ng0n1p1.
 			echo "TEST_DEVS=${partition%p[0-9]*}" >config
-			log_cmd mkdir -p /mnt/$test && log_cmd mount $partition /mnt/$test
+			log_cmd mkdir -p /mnt/$test
+			log_cmd mount $partition /mnt/$test || {
+				# LKP's disk setup only records the partition
+				# path; it never formats it, so a fresh or
+				# reassigned partition has no filesystem yet
+				# and mount fails silently here. Without a
+				# real, O_DIRECT-capable mountpoint, nvmet
+				# file-backed namespace tests (e.g. nvme/054)
+				# fail to open their backing file and
+				# mis-report as an unrelated missing-feature
+				# skip instead of the actual mount failure.
+				log_cmd mkfs.ext4 -F $partition
+				log_cmd mount $partition /mnt/$test || die "mount $partition /mnt/$test failed"
+			}
 		else
 			echo "TEST_DEVS=$partition" >config
 			umount "${partition}"* 2>/dev/null || true
