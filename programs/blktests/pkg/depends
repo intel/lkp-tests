@@ -42,5 +42,6 @@ nbd-server
 parted
 pciutils
 python
+uuid-runtime
 virt-what
 xfsprogs
