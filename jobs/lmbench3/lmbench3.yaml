@@ -37,8 +37,13 @@ lmbench3:
     # - MEM
 
 ---
+# nr_threads at 10% (~22 threads on a 224-CPU host) causes severe
+# multi-thread memory-bandwidth contention across BCOPY's power-of-two
+# buffer-size sweep, exceeding the 2h soft-timeout budget even with
+# test_memory_size capped down (see programs/lmbench3/run). Use a small
+# fixed thread count instead.
 nr_threads:
-  - 10%
+  - 4
 
 lmbench3:
   mode: development
