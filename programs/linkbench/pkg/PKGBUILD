@@ -14,6 +14,15 @@ build()
 {
 	cd_src_pkg_dir
 
+	# pom.xml hardcodes maven-compiler-plugin source/target 1.7, which
+	# javac from JDK 8+ rejects outright ("Source option 7 is no longer
+	# supported. Use 8 or later."); bump to the oldest version javac
+	# still accepts.
+	sed -i \
+		-e 's|<source>1.7</source>|<source>1.8</source>|' \
+		-e 's|<target>1.7</target>|<target>1.8</target>|' \
+		pom.xml
+
 	mvn clean package -DskipTests || {
 		echo -e "\e[31msetup network proxy please refer to https://maven.apache.org/guides/mini/guide-proxies.html\e[0m" >&2
 		echo
