@@ -11,6 +11,17 @@ summary_start = false
 while (line = $stdin.gets)
   line = line.resolve_invalid_bytes
 
+  # Skip avx512vbmi/tests due to dependece, please check /tmp/lkvs_dependence.log
+  #
+  # runtests exits the whole test file at the dependency-check stage (e.g. the
+  # CPU lacks the required CPUID feature), so no per-testcase [RESULT] line is
+  # ever emitted for it. Record it as a single skipped testcase here, or the
+  # run produces no stats at all and gets misclassified as an incomplete run.
+  if line =~ %r{^Skip (\S+) due to dependece}
+    stats.add $1, 'skip', overwrite: true
+    next
+  end
+
   summary_start = true if !summary_start && line =~ /Test Start Time:/
   next unless summary_start
 

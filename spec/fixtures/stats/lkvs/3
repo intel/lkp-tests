@@ -1,0 +1,12 @@
+Skip avx512vbmi/tests due to dependece, please check /tmp/lkvs_dependence.log
+Test Start Time: 2026-06-24_00-48-43
+--------------------------------------------------------
+Testcase                                                                     Result    Exit Value  Duration
+--------                                                                     ------    ----------  --------
+--------------------------------------------------------
+LKVS log ./lkvs.log as above. Execution time:1s.
+The dependency info /tmp/lkvs_dependence.log is as follows:
+-----------------------------------------------------------------
+Feature                            |HW_support  |Other_support  |Other_WARN  |Reason
+-------                            -----------  --------------  -----------  -------
+avx512vbmi/tests                   |BLOCK       |SKIP           |SKIP        |@hw_dep: CPU doesn't support VBMI CPUID.(EAX=07H,ECX=0H):ECX[bit 1]
