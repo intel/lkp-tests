@@ -4,7 +4,7 @@ pkgrel=1
 arch=('i386' 'x86_64' 'aarch64')
 url="https://github.com/osandov/blktests"
 license=('GPL')
-source=("https://github.com/osandov/blktests.git" "https://github.com/karelzak/util-linux.git" "https://github.com/linux-nvme/nvme-cli.git")
+source=("https://github.com/osandov/blktests.git" "https://github.com/karelzak/util-linux.git" "https://github.com/linux-nvme/nvme-cli.git#tag=v3.0-a.1")
 md5sums=('SKIP' 'SKIP' 'SKIP')
 
 . $LKP_SRC/lib/install.sh

@@ -2,6 +2,7 @@ autopoint
 build-essential
 gettext
 libcap-ng-dev
+libjson-c-dev
 libncurses-dev
 libpam0g-dev
 libreadline-dev

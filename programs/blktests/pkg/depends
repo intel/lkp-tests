@@ -22,6 +22,7 @@ libglusterfs0
 libgnutls30
 libibverbs1
 libidn2-0
+libjson-c5
 libnl-cli-3-200
 libnl-idiag-3-200
 libnl-nf-3-200
