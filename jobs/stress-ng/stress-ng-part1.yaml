@@ -10,7 +10,7 @@ testtime:
 stress-ng:
   test:
     - acct
-    - af-alg
+    # - af-alg # less useful test https://lore.kernel.org/all/20260715162749.GA1794078@google.com/
     - affinity
     - aio
     - alarm
