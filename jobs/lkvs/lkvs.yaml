@@ -21,7 +21,6 @@ lkvs:
     - pstate
     - pt
     - ras
-    - sdsi
     # - tdx-compliance
     # - tdx-osv-sanity
     - telemetry
@@ -37,6 +36,13 @@ lkvs:
   test:
     - ifs
     - splitlock
+
+---
+need_cpu_model: Sapphire_Rapids,Emerald_Rapids,Granite_Rapids
+
+lkvs:
+  test:
+    - sdsi # models in BM/sdsi/sdsi_fms_list: SPR, EMR, GNR_X, GNR_D
 
 ---
 need_cpuid: 173

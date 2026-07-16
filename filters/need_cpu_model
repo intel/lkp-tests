@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# check if testbox's CPU model is in the allowed list to run the job
+#
+# need_cpuid's numeric ">=" comparison assumes model IDs increase
+# monotonically with generation, which only holds within one product
+# line (client or server). A newer client model ID can numerically
+# exceed an older server model ID's threshold, so a capability that
+# is tied to specific models (not "this generation and everything
+# after it") must be matched by an explicit model list instead.
+
+model_key=$(echo "$model" | sed -e 's/[[:blank:]]/_/g' -e 's/-/_/g')
+
+IFS=',' read -ra allowed_models <<<"$need_cpu_model"
+for allowed_model in "${allowed_models[@]}"; do
+	[[ "$model_key" == "$allowed_model" ]] && exit 0
+done
+
+echo "rm $job_file due to cpu model is not match"
+echo "need cpu model in: $need_cpu_model, has cpu model: $model"
+exit 1
