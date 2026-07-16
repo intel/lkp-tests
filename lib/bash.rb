@@ -15,7 +15,12 @@ module Bash
       @stderr = stderr
       @exitstatus = exitstatus
 
-      super("Command failed with exit #{exitstatus}: #{command}: #{stderr}")
+      # A command string that redirects stderr into stdout itself (e.g. a
+      # trailing "2>&1") never has anything in `stderr` -- TTY::Command
+      # only sees the merged stream on stdout. Fall back to stdout so the
+      # message isn't silently blank in that case.
+      output = stderr.empty? ? stdout : stderr
+      super("Command failed with exit #{exitstatus}: #{command}: #{output}")
     end
   end
 

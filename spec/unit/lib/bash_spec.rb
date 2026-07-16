@@ -25,6 +25,26 @@ describe Bash do
       expect(e.exitstatus).to eq(2)
     end
 
+    it 'includes stdout in the error message when a command redirects stderr into stdout itself' do
+      # A command string ending in its own "2>&1" merges stderr into stdout
+      # before TTY::Command ever sees it, so `stderr` is empty; the message
+      # must fall back to `stdout` instead of going blank. The expected
+      # marker ("RESULT_42") is computed by the inner shell at run time and
+      # never appears verbatim in the command string itself ("$((40+2))"
+      # does) -- so matching on it only passes if the message truly carries
+      # the captured stdout, not just the command that produced it.
+      error = nil
+      begin
+        described_class.run('bash -c "echo RESULT_$((40+2)) 1>&2; exit 127" 2>&1')
+      rescue Bash::BashCallError => e
+        error = e
+      end
+
+      expect(error).not_to be_nil
+      expect(error.stderr).to be_empty
+      expect(error.message).to include('RESULT_42')
+    end
+
     it 'preserves bash functionality (<())' do
       res = described_class.run('cat <(echo ok)')
       expect(res).to eq('ok')
