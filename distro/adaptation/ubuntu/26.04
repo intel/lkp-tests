@@ -1,0 +1,49 @@
+# resolute
+crda:
+cython:
+dh-systemd: debhelper
+exfat-utils: exfatprogs
+freeglut:
+fuse: fuse3
+lib32gcc-dev: lib32gcc-15-dev
+libaio:
+libarchive: libarchive13t64
+libasound2:
+libcurl:
+libdw1: libdw1t64
+libevent-openssl: libevent-openssl-2.1-7t64
+libevent: libevent-2.1-7t64
+libglut3: libglut3.12
+libgsl: libgsl28
+libiniparser:
+libipsec-mb: libipsec-mb2
+libjson: libjson-c5
+libldap: libldap2
+libncurses: libncurses6
+libnfs: libnfs14
+libntfs: libntfs-3g89t64
+libperl5:
+libpolly-dev: libpolly-18-dev
+libprocps-dev:
+libprocps:
+libpython2:
+libpython3: libpython3.14
+libreadline5: readline-common
+libssl: libssl3t64
+libtirpc: libtirpc-common
+libunwind: libunwind-18
+liburcu:
+liburing: liburing2
+libx32gcc-dev: libx32gcc-15-dev
+libx32gcc1: libx32gcc-s1
+netpipe-lam:
+netpipe-mpich2:
+netpipe-openmpi:
+netpipe-pvm:
+netpipe-tcp:
+perl-modules-5: perl-modules-5.40
+python3-crypto: python3-pycryptodome
+python3-gobject:
+python3-tox: tox
+python: python-is-python3
+qt5-default: qtbase5-dev
