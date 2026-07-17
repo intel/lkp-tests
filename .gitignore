@@ -4,3 +4,4 @@ bin/event/wakeup
 deploy
 Gemfile.lock
 update
+/.claude/worktrees/

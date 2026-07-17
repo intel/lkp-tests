@@ -20,6 +20,7 @@ ignore: |
   node_modules/
   vendor/
   workspace_tmp/
+  .claude/worktrees/
   spec/**/*.yaml
   jobs/pts/pts-avx-part1.yaml
   jobs/pts/pts-bad.yaml

@@ -74,7 +74,7 @@ end
 desc 'Run syntax check'
 task :syntax do
   puts 'syntax start...'.yellow
-  executables = `find -type f -executable ! -path "./.git*" ! -path "./vendor*" ! -path "*/node_modules/*" ! -path "*/workspace_tmp/*" ! -size +100k`.split("\n").join(' ')
+  executables = `find -type f -executable ! -path "./.git*" ! -path "./vendor*" ! -path "*/node_modules/*" ! -path "*/workspace_tmp/*" ! -path "*/.claude/worktrees/*" ! -size +100k`.split("\n").join(' ')
 
   sh "grep -s -l '^#!/.*ruby$' #{executables} | xargs -P$(nproc) -n1 ruby -c >/dev/null", verbose: false do |ok, res|
     exit res.exitstatus unless ok
@@ -108,6 +108,7 @@ task :shfmt do
                               '! -path "*/sbin/makepkg" ' \
                               '! -path "*/sbin/pacman-LKP" ' \
                               '! -path "*/workspace_tmp/*" ' \
+                              '! -path "*/.claude/worktrees/*" ' \
                               '! -path "./.git*" ' \
                               '! -path "./vendor*" ' \
                               '! -size +100k'
@@ -137,7 +138,7 @@ task :shellcheck do
     next
   end
 
-  executables = ENV['file'] || `find -type f -executable ! -path "./.git*" ! -path "./vendor*" ! -path "*/node_modules/*" ! -path "*/workspace_tmp/*" ! -size +100k | xargs -P$(nproc) grep -s -l -e '^#!/.*bash$' -e '^#!/bin/sh$'`.split("\n").join(' ')
+  executables = ENV['file'] || `find -type f -executable ! -path "./.git*" ! -path "./vendor*" ! -path "*/node_modules/*" ! -path "*/workspace_tmp/*" ! -path "*/.claude/worktrees/*" ! -size +100k | xargs -P$(nproc) grep -s -l -e '^#!/.*bash$' -e '^#!/bin/sh$'`.split("\n").join(' ')
 
   format = ENV['format'] || 'tty'
 
