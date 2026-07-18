@@ -1,7 +1,7 @@
 .src_git_version
 .vscode
+/.claude/worktrees/
 bin/event/wakeup
 deploy
 Gemfile.lock
 update
-/.claude/worktrees/
