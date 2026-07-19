@@ -15,6 +15,14 @@ def tool_available?(cmd)
   system("which #{cmd} >/dev/null 2>&1")
 end
 
+GIT_SCANNABLE_FILES = 'git ls-files -z --cached --others --exclude-standard -- . ":!workspace_tmp"'.freeze
+
+# Same file set, narrowed to executables under 100k, matching the `find
+# -type f -executable ! -size +100k` filter every lint task used to repeat.
+def scannable_executables_cmd
+  "#{GIT_SCANNABLE_FILES} | xargs -0 -I{} find \"{}\" -maxdepth 0 -type f -executable ! -size +100k 2>/dev/null"
+end
+
 desc 'Show help'
 task :help do
   puts <<~EOF
@@ -74,7 +82,7 @@ end
 desc 'Run syntax check'
 task :syntax do
   puts 'syntax start...'.yellow
-  executables = `find -type f -executable ! -path "./.git*" ! -path "./vendor*" ! -path "*/node_modules/*" ! -path "*/workspace_tmp/*" ! -path "*/.claude/worktrees/*" ! -size +100k`.split("\n").join(' ')
+  executables = `#{scannable_executables_cmd}`.split("\n").join(' ')
 
   sh "grep -s -l '^#!/.*ruby$' #{executables} | xargs -P$(nproc) -n1 ruby -c >/dev/null", verbose: false do |ok, res|
     exit res.exitstatus unless ok
@@ -138,7 +146,7 @@ task :shellcheck do
     next
   end
 
-  executables = ENV['file'] || `find -type f -executable ! -path "./.git*" ! -path "./vendor*" ! -path "*/node_modules/*" ! -path "*/workspace_tmp/*" ! -path "*/.claude/worktrees/*" ! -size +100k | xargs -P$(nproc) grep -s -l -e '^#!/.*bash$' -e '^#!/bin/sh$'`.split("\n").join(' ')
+  executables = ENV['file'] || `#{scannable_executables_cmd} | xargs -P$(nproc) grep -s -l -e '^#!/.*bash$' -e '^#!/bin/sh$'`.split("\n").join(' ')
 
   format = ENV['format'] || 'tty'
 
