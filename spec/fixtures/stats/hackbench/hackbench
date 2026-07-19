@@ -1,0 +1,43 @@
+Instance: 1
+PATH=/lkp/benchmarks/hackbench/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/lkp/rli9/src/bin
+Iterations: 1
+2026-07-19 18:06:13 hackbench -g 256 -f 20 --process --pipe -l 30000 -s 100
+Running in process mode with 256 groups using 40 file descriptors each (== 10240 tasks)
+Each sender will pass 30000 messages of 100 bytes
+perf version 7.2.rc3.g94515f3a7d42
+Time: 9.541
+Iterations: 2
+2026-07-19 18:06:24 hackbench -g 256 -f 20 --process --pipe -l 30000 -s 100
+Running in process mode with 256 groups using 40 file descriptors each (== 10240 tasks)
+Each sender will pass 30000 messages of 100 bytes
+Time: 10.018
+Iterations: 3
+2026-07-19 18:06:34 hackbench -g 256 -f 20 --process --pipe -l 30000 -s 100
+Running in process mode with 256 groups using 40 file descriptors each (== 10240 tasks)
+Each sender will pass 30000 messages of 100 bytes
+Time: 12.241
+Iterations: 4
+2026-07-19 18:06:47 hackbench -g 256 -f 20 --process --pipe -l 30000 -s 100
+Running in process mode with 256 groups using 40 file descriptors each (== 10240 tasks)
+Each sender will pass 30000 messages of 100 bytes
+Time: 9.950
+Iterations: 5
+2026-07-19 18:06:58 hackbench -g 256 -f 20 --process --pipe -l 30000 -s 100
+Running in process mode with 256 groups using 40 file descriptors each (== 10240 tasks)
+Each sender will pass 30000 messages of 100 bytes
+Time: 10.014
+Iterations: 6
+2026-07-19 18:07:09 hackbench -g 256 -f 20 --process --pipe -l 30000 -s 100
+Running in process mode with 256 groups using 40 file descriptors each (== 10240 tasks)
+Each sender will pass 30000 messages of 100 bytes
+Time: 10.497
+Iterations: 7
+2026-07-19 18:07:20 hackbench -g 256 -f 20 --process --pipe -l 30000 -s 100
+Running in process mode with 256 groups using 40 file descriptors each (== 10240 tasks)
+Each sender will pass 30000 messages of 100 bytes
+Time: 9.924
+Iterations: 8
+2026-07-19 18:07:31 hackbench -g 256 -f 20 --process --pipe -l 30000 -s 100
+Running in process mode with 256 groups using 40 file descriptors each (== 10240 tasks)
+Each sender will pass 30000 messages of 100 bytes
+Time: 9.998

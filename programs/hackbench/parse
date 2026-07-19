@@ -5,18 +5,26 @@ LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 3)
 require "#{LKP_SRC}/lib/statistics"
 
 time = []
+instance = 1
+per_instance = Hash.new { |h, k| h[k] = { tasks: nil, messages: nil, bytes: nil, time: [] } }
 
 while (line = gets)
   case line
+  when /^Instance: (\d+)/
+    instance = $1.to_i
   when /^Running in .* mode with (\d+) groups using (\d+) file descriptors each \(== (\d+) tasks\)/
     tasks = $3.to_i
+    per_instance[instance][:tasks] = tasks
   when /^Each sender will pass (\d+) messages of (\d+) bytes/,
        /^Each sender passed (\d+) messages of (\d+) bytes in average/
     messages = $1.to_i
     bytes = $2.to_i
+    per_instance[instance][:messages] = messages
+    per_instance[instance][:bytes] = bytes
   when /^Time:/
     _name, seconds = line.split
     time << seconds.to_f
+    per_instance[instance][:time] << seconds.to_f
   end
 end
 
@@ -32,3 +40,18 @@ puts "throughput: #{kb / best_time}"
 puts "throughput_best: #{kb / best_time}"
 puts "throughput_avg: #{kb / avg_time}"
 puts "throughput_worst: #{kb / worst_time}"
+
+# Per-instance breakdown: only meaningful when nr_instances > 1 (e.g. a
+# cgroup2 job with asymmetric nr_threads_by_instance across sibling
+# cgroups); a plain single-instance run only ever populates instance 1,
+# so it adds nothing beyond the combined stats above.
+if per_instance.size > 1
+  per_instance.sort.each do |id, stat|
+    next if stat[:time].empty?
+
+    i_kb = (stat[:tasks] * stat[:messages] * stat[:bytes]) >> 10
+    puts "throughput.instance#{id}: #{i_kb / stat[:time].min}"
+    puts "throughput_avg.instance#{id}: #{i_kb / (stat[:time].sum(0.0) / stat[:time].size)}"
+    puts "throughput_worst.instance#{id}: #{i_kb / stat[:time].max}"
+  end
+end

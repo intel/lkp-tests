@@ -1,0 +1,87 @@
+Instance: 1
+PATH=/lkp/benchmarks/hackbench/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/lkp/rli9/src/bin
+Iterations: 1
+2026-07-19 18:00:37 hackbench -g 2 -f 20 --threads --pipe -l 7680000 -s 100
+Running in threaded mode with 2 groups using 40 file descriptors each (== 80 tasks)
+Each sender will pass 7680000 messages of 100 bytes
+Time: 765.710
+Iterations: 2
+2026-07-19 18:13:23 hackbench -g 2 -f 20 --threads --pipe -l 7680000 -s 100
+Running in threaded mode with 2 groups using 40 file descriptors each (== 80 tasks)
+Each sender will pass 7680000 messages of 100 bytes
+Time: 941.530
+Iterations: 3
+2026-07-19 18:29:04 hackbench -g 2 -f 20 --threads --pipe -l 7680000 -s 100
+Running in threaded mode with 2 groups using 40 file descriptors each (== 80 tasks)
+Each sender will pass 7680000 messages of 100 bytes
+Time: 893.702
+Iterations: 4
+2026-07-19 18:43:58 hackbench -g 2 -f 20 --threads --pipe -l 7680000 -s 100
+Running in threaded mode with 2 groups using 40 file descriptors each (== 80 tasks)
+Each sender will pass 7680000 messages of 100 bytes
+Time: 626.166
+Iterations: 5
+2026-07-19 18:54:24 hackbench -g 2 -f 20 --threads --pipe -l 7680000 -s 100
+Running in threaded mode with 2 groups using 40 file descriptors each (== 80 tasks)
+Each sender will pass 7680000 messages of 100 bytes
+Time: 753.592
+Iterations: 6
+2026-07-19 19:06:58 hackbench -g 2 -f 20 --threads --pipe -l 7680000 -s 100
+Running in threaded mode with 2 groups using 40 file descriptors each (== 80 tasks)
+Each sender will pass 7680000 messages of 100 bytes
+Time: 757.467
+Iterations: 7
+2026-07-19 19:19:35 hackbench -g 2 -f 20 --threads --pipe -l 7680000 -s 100
+Running in threaded mode with 2 groups using 40 file descriptors each (== 80 tasks)
+Each sender will pass 7680000 messages of 100 bytes
+Time: 827.852
+Iterations: 8
+2026-07-19 19:33:23 hackbench -g 2 -f 20 --threads --pipe -l 7680000 -s 100
+Running in threaded mode with 2 groups using 40 file descriptors each (== 80 tasks)
+Each sender will pass 7680000 messages of 100 bytes
+Time: 863.786
+Instance: 2
+PATH=/lkp/benchmarks/hackbench/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/lkp/rli9/src/bin
+kernel.pid_max = 655360
+kernel.threads-max = 655360
+vm.max_map_count = 32768000
+Iterations: 1
+2026-07-19 18:00:37 hackbench -g 8192 -f 20 --threads --pipe -l 1875 -s 100
+Running in threaded mode with 8192 groups using 40 file descriptors each (== 327680 tasks)
+Each sender will pass 1875 messages of 100 bytes
+Time: 47.847
+Iterations: 2
+2026-07-19 18:02:21 hackbench -g 8192 -f 20 --threads --pipe -l 1875 -s 100
+Running in threaded mode with 8192 groups using 40 file descriptors each (== 327680 tasks)
+Each sender will pass 1875 messages of 100 bytes
+Time: 58.362
+Iterations: 3
+2026-07-19 18:04:18 hackbench -g 8192 -f 20 --threads --pipe -l 1875 -s 100
+Running in threaded mode with 8192 groups using 40 file descriptors each (== 327680 tasks)
+Each sender will pass 1875 messages of 100 bytes
+Time: 58.526
+Iterations: 4
+2026-07-19 18:06:09 hackbench -g 8192 -f 20 --threads --pipe -l 1875 -s 100
+Running in threaded mode with 8192 groups using 40 file descriptors each (== 327680 tasks)
+Each sender will pass 1875 messages of 100 bytes
+Time: 54.657
+Iterations: 5
+2026-07-19 18:08:01 hackbench -g 8192 -f 20 --threads --pipe -l 1875 -s 100
+Running in threaded mode with 8192 groups using 40 file descriptors each (== 327680 tasks)
+Each sender will pass 1875 messages of 100 bytes
+Time: 75.854
+Iterations: 6
+2026-07-19 18:10:09 hackbench -g 8192 -f 20 --threads --pipe -l 1875 -s 100
+Running in threaded mode with 8192 groups using 40 file descriptors each (== 327680 tasks)
+Each sender will pass 1875 messages of 100 bytes
+Time: 70.944
+Iterations: 7
+2026-07-19 18:12:14 hackbench -g 8192 -f 20 --threads --pipe -l 1875 -s 100
+Running in threaded mode with 8192 groups using 40 file descriptors each (== 327680 tasks)
+Each sender will pass 1875 messages of 100 bytes
+Time: 68.091
+Iterations: 8
+2026-07-19 18:14:19 hackbench -g 8192 -f 20 --threads --pipe -l 1875 -s 100
+Running in threaded mode with 8192 groups using 40 file descriptors each (== 327680 tasks)
+Each sender will pass 1875 messages of 100 bytes
+Time: 94.161

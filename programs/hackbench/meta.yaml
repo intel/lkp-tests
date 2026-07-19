@@ -12,9 +12,17 @@ homepage: https://github.com/linux-test-project/ltp/blob/master/testcases/kernel
 parameters:
   runtime:
   nr_threads: number of pairs of schedulable entities (either threads or processes)
+  nr_threads_by_instance: >
+    space-separated nr_threads override per instance_id (1-based position),
+    used with nr_instances/cgroup2 to give sibling cgroups different
+    concurrency instead of every instance running identical nr_threads; a
+    blank/absent position keeps the shared nr_threads for that instance
   mode: [process, thread]
   ipc: [pipe]
   iterations:
 
 results:
   hackbench.throughput: unit-KB/s
+  hackbench.throughput.instanceN: >
+    unit-KB/s, only emitted when nr_instances > 1: per sibling-cgroup
+    throughput, keyed by instance_id

@@ -1,0 +1,16 @@
+<<: hackbench.yaml
+
+nr_threads: 1600%
+
+# Two sibling cgroups: instance 1 is deliberately kept at low concurrency
+# while instance 2 keeps the suite's normal high concurrency, so a
+# per-cgroup CPU-share calculation that depends on each sibling's own task
+# count relative to the others is actually exercised. Every other existing
+# multi-cgroup job (e.g. kbuild8.yaml) runs identical concurrency in every
+# sibling, which never produces this asymmetric shape.
+cgroup2:
+  cg_count: 2
+
+nr_instances: 2
+
+nr_threads_by_instance: 2
