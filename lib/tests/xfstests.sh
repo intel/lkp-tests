@@ -453,6 +453,17 @@ run_fs_tests()
 	# ext4 has no zoned block device support, so _try_mkfs_dev always fails.
 	[[ "$fs" == "ext4" ]] && echo "generic/781" >>tests/exclude/ext4
 
+	# xfs/022-025 call _require_tape, which needs a real (or SCSI-emulated)
+	# tape device; no LKP host has one, so these always [not run].
+	if [[ "$fs" == "xfs" ]]; then
+		{
+			echo "xfs/022"
+			echo "xfs/023"
+			echo "xfs/024"
+			echo "xfs/025"
+		} >>tests/exclude/xfs
+	fi
+
 	[[ -s tests/exclude/$fs ]] && exclude_file="-E tests/exclude/$fs"
 	log_cmd ./check $exclude_file $all_tests
 }
