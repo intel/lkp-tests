@@ -347,7 +347,12 @@ class MatrixPlotter < MatrixPlotterBase
           else
             if (np % @nr_plot).zero?
               p.terminal format('dumb nofeed size %d,%d', @char_size[0], @char_size[1])
-              p.multiplot "layout 1,#{@nr_plot}"
+              # A single subplot per canvas needs no multiplot layout at
+              # all -- gnuplot warns "Reading from '-' inside a multiplot
+              # not supported; use a datablock instead" on every inline
+              # dataset once `set multiplot` is active, even though only
+              # one plot is ever drawn per canvas here.
+              p.multiplot "layout 1,#{@nr_plot}" if @nr_plot > 1
             end
             np += 1
           end
