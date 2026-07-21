@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+while (line = $stdin.gets)
+  puts "total_time_sec: #{$1}" if line =~ /Total time:\s*([\d.]+)\s*\[sec\]/
+end

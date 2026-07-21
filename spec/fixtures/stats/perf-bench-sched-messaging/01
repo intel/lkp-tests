@@ -1,0 +1,5 @@
+# Running 'sched/messaging' benchmark:
+# 20 sender and receiver processes per group
+# 10 groups == 400 processes run
+
+     Total time: 0.055 [sec]

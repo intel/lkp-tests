@@ -1,0 +1,23 @@
+#!/bin/bash
+# - loops
+# - groups
+# - ipc
+# - mode
+
+## perf began as a tool for using the performance counters
+## subsystem in Linux, and has had various enhancements
+## to add tracing capabilities.
+
+. "$LKP_SRC"/lib/env.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/debug.sh
+
+set_perf_path "/lkp/benchmarks/perf/perf"
+
+opts=()
+[[ -n "$loops" ]] && opts+=(--nr_loops "$loops")
+[[ -n "$groups" ]] && opts+=(--group "$groups")
+[[ "$ipc" = 'pipe' ]] && opts+=(--pipe)
+[[ "$mode" = 'thread' ]] && opts+=(--thread)
+
+log_cmd "$perf" bench sched messaging "${opts[@]}"

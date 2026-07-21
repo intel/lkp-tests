@@ -1,0 +1,13 @@
+suite: perf-bench-sched-messaging
+testcase: perf-bench-sched-messaging
+category: benchmark
+
+perf-bench-sched-messaging:
+  loops: 100
+  groups: 10
+  ipc:
+    - pipe
+    - socket
+  mode:
+    - process
+    - thread

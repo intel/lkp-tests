@@ -1,0 +1,21 @@
+short_description: >
+  Scheduler and IPC benchmark using perf bench sched messaging
+
+description: >
+  perf bench sched messaging forms groups of sender and receiver
+  processes (or threads) that pass fixed-size messages to each other
+  through pipes or UNIX domain sockets, for a configurable number of
+  loops. It reports the total wall-clock time to complete all groups,
+  giving a combined measure of scheduler and IPC throughput under
+  many-to-many process/thread communication.
+
+homepage: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+
+parameters:
+  loops:
+  groups:
+  pipe:
+  thread:
+
+results:
+  total_time_sec:
