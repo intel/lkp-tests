@@ -1,0 +1,12 @@
+getppid.total_time_sec: 1.234
+getppid.usecs_per_op: 0.123400
+getppid.ops_per_sec: 8103727
+getpgid.total_time_sec: 1.456
+getpgid.usecs_per_op: 0.145600
+getpgid.ops_per_sec: 6868131
+fork.total_time_sec: 0.789
+fork.usecs_per_op: 78.900000
+fork.ops_per_sec: 12674
+execve.total_time_sec: 1.567
+execve.usecs_per_op: 156.700000
+execve.ops_per_sec: 6382

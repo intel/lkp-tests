@@ -1,0 +1,23 @@
+# Executed 10000000 getppid() calls
+     Total time: 1.234 [sec]
+
+       0.123400 usecs/op
+     8103727 ops/sec
+
+# Executed 10000000 getpgid() calls
+     Total time: 1.456 [sec]
+
+       0.145600 usecs/op
+     6868131 ops/sec
+
+# Executed 10000 fork() calls
+     Total time: 0.789 [sec]
+
+      78.900000 usecs/op
+       12674 ops/sec
+
+# Executed 10000 execve() calls
+     Total time: 1.567 [sec]
+
+     156.700000 usecs/op
+        6382 ops/sec

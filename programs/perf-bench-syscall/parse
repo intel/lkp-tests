@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+
+name = nil
+
+$stdin.each_line do |line|
+  case line
+  when /^# Executed [\d,]+ (\w+)\(\) calls/
+    name = $1
+  when /Total time:\s*([\d.]+)\s*\[sec\]/
+    puts "#{name}.total_time_sec: #{$1}"
+  when /([\d.]+)\s*usecs\/op/
+    puts "#{name}.usecs_per_op: #{$1}"
+  when /([\d,]+)\s*ops\/sec/
+    puts "#{name}.ops_per_sec: #{$1.delete(',')}"
+  end
+end

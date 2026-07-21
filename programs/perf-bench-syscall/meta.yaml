@@ -1,0 +1,17 @@
+short_description: >
+  System call performance microbenchmark using perf bench syscall
+
+description: >
+  perf bench syscall measures raw syscall entry/exit overhead by looping a
+  minimal syscall (getppid, getpgid) or a full fork()/execve() cycle many
+  times and reporting per-operation latency and throughput. It isolates
+  syscall-path cost from application-level behavior, complementing broader
+  process-creation and scheduler benchmarks.
+
+homepage: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+
+parameters:
+  op:
+  loop:
+
+results:

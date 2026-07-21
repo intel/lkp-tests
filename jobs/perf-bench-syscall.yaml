@@ -1,0 +1,10 @@
+suite: perf-bench-syscall
+testcase: perf-bench-syscall
+category: benchmark
+
+perf-bench-syscall:
+  op:
+    - basic
+    - execve
+    - fork
+    - getpgid

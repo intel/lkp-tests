@@ -1,0 +1,20 @@
+#!/bin/bash
+# - op
+# - loop
+
+## perf began as a tool for using the performance counters
+## subsystem in Linux, and has had various enhancements
+## to add tracing capabilities.
+
+. "$LKP_SRC"/lib/env.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/debug.sh
+
+set_perf_path "/lkp/benchmarks/perf/perf"
+
+[[ -n "$op" ]] || die "op must be specified"
+
+opts=()
+[[ -n "$loop" ]] && opts+=(--loop "$loop")
+
+log_cmd "$perf" bench syscall "$op" "${opts[@]}"
