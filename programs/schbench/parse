@@ -10,6 +10,11 @@ class SchbenchParser
     @wakeup_end_latency = Hash.new { |h, k| h[k] = [] }
     @requeststats = Hash.new { |h, k| h[k] = [] }
     @request_end_latency = Hash.new { |h, k| h[k] = [] }
+    @instance = 1
+    @per_instance = Hash.new do |h, id|
+      h[id] = { wakeupstats: Hash.new { |h2, k2| h2[k2] = [] },
+                requeststats: Hash.new { |h2, k2| h2[k2] = [] } }
+    end
     @counter = -1
     @in_wakeup_section = false
     @in_request_section = false
@@ -17,6 +22,8 @@ class SchbenchParser
 
   def parse(line)
     case line
+    when /^Instance: (\d+)/
+      @instance = $1.to_i
     when /^Iteration/
       @counter += 1
     when /^Wakeup Latencies percentiles/
@@ -45,9 +52,11 @@ class SchbenchParser
     if @in_wakeup_section
       @wakeupstats[key] << value
       @wakeup_end_latency[key][@counter] = value
+      @per_instance[@instance][:wakeupstats][key] << value
     elsif @in_request_section
       @requeststats[key] << value
       @request_end_latency[key][@counter] = value
+      @per_instance[@instance][:requeststats][key] << value
     end
   end
 
@@ -61,9 +70,13 @@ class SchbenchParser
     if @in_wakeup_section
       @wakeupstats[key1] << val1
       @wakeupstats[key2] << val2
+      @per_instance[@instance][:wakeupstats][key1] << val1
+      @per_instance[@instance][:wakeupstats][key2] << val2
     elsif @in_request_section
       @requeststats[key1] << val1
       @requeststats[key2] << val2
+      @per_instance[@instance][:requeststats][key1] << val1
+      @per_instance[@instance][:requeststats][key2] << val2
     end
   end
 
@@ -86,6 +99,29 @@ class SchbenchParser
     @request_end_latency.each do |k, v|
       puts "request_end_#{k}_max: #{v.max}"
       puts "request_end_#{k}_stddev%: #{v.relative_stddev.round(2)}"
+    end
+
+    print_per_instance_summary
+  end
+
+  # Per-instance breakdown: only meaningful when nr_instances > 1 (e.g. a
+  # cgroup2 job with asymmetric worker_threads_by_instance across sibling
+  # cgroups); a plain single-instance run only ever populates instance 1,
+  # so it adds nothing beyond the combined stats above.
+  def print_per_instance_summary
+    return unless @per_instance.size > 1
+
+    @per_instance.sort.each do |id, stat|
+      stat[:wakeupstats].each do |k, v|
+        next if v.empty?
+
+        puts "wakeup_#{k}.instance#{id}: #{v.average.round(2)}"
+      end
+      stat[:requeststats].each do |k, v|
+        next if v.empty?
+
+        puts "request_#{k}.instance#{id}: #{v.average.round(2)}"
+      end
     end
   end
 end

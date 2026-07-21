@@ -6,44 +6,56 @@ homepage: https://git.kernel.org/pub/scm/linux/kernel/git/mason/schbench.git
 parameters:
   message_threads: number of message threads
   worker_threads: number of workers per message thread
+  worker_threads_by_instance: >
+    space-separated worker_threads override per instance_id (1-based
+    position), used with nr_instances/cgroup2 to give sibling cgroups
+    different concurrency instead of every instance running identical
+    worker_threads; a blank/absent position keeps the shared
+    worker_threads for that instance
   runtime: seconds to run before exiting
   iterations: number of iterations
 
 results:
-  schbench.wakeup_latency_50%_us
-  schbench.wakeup_latency_50%_us_stddev%
-  schbench.wakeup_latency_90%_us
-  schbench.wakeup_latency_90%_us_stddev%
-  schbench.wakeup_latency_99%_us
-  schbench.wakeup_latency_99%_us_stddev%
-  schbench.wakeup_latency_99.9%_us
-  schbench.wakeup_latency_min_us
-  schbench.wakeup_latency_max_us
-  schbench.wakeup_latency_max_us_stddev%
-  schbench.wakeup_end_latency_50%_us_max
-  schbench.wakeup_end_latency_50%_us_stddev%
-  schbench.wakeup_end_latency_90%_us_max
-  schbench.wakeup_end_latency_90%_us_stddev%
-  schbench.wakeup_end_latency_99%_us_max
-  schbench.wakeup_end_latency_99%_us_stddev%
-  schbench.wakeup_end_latency_99.9%_us_max
-  schbench.request_latency_50%_us
-  schbench.request_latency_50%_us_stddev%
-  schbench.request_latency_90%_us
-  schbench.request_latency_90%_us_stddev%
-  schbench.request_latency_99%_us
-  schbench.request_latency_99%_us_stddev%
-  schbench.request_latency_99.9%_us
-  schbench.request_latency_99.9%_us_stddev%
-  schbench.request_latency_min_us
-  schbench.request_latency_min_us_stddev%
-  schbench.request_latency_max_us
-  schbench.request_latency_max_us_stddev%
-  schbench.request_end_latency_50%_us_max
-  schbench.request_end_latency_50%_us_stddev%
-  schbench.request_end_latency_90%_us_max
-  schbench.request_end_latency_90%_us_stddev%
-  schbench.request_end_latency_99%_us_max
-  schbench.request_end_latency_99%_us_stddev%
-  schbench.request_end_latency_99.9%_us_max
-  schbench.request_end_latency_99.9%_us_stddev%
+  schbench.wakeup_latency_50%_us: average wakeup latency at 50th percentile
+  schbench.wakeup_latency_50%_us_stddev%: relative stddev of wakeup latency at 50th percentile across iterations
+  schbench.wakeup_latency_90%_us: average wakeup latency at 90th percentile
+  schbench.wakeup_latency_90%_us_stddev%: relative stddev of wakeup latency at 90th percentile across iterations
+  schbench.wakeup_latency_99%_us: average wakeup latency at 99th percentile
+  schbench.wakeup_latency_99%_us_stddev%: relative stddev of wakeup latency at 99th percentile across iterations
+  schbench.wakeup_latency_99.9%_us: average wakeup latency at 99.9th percentile
+  schbench.wakeup_latency_min_us: average minimum wakeup latency across iterations
+  schbench.wakeup_latency_max_us: average maximum wakeup latency across iterations
+  schbench.wakeup_latency_max_us_stddev%: relative stddev of maximum wakeup latency across iterations
+  schbench.wakeup_end_latency_50%_us_max: highest per-iteration wakeup latency at 50th percentile
+  schbench.wakeup_end_latency_50%_us_stddev%: relative stddev of per-iteration wakeup latency at 50th percentile
+  schbench.wakeup_end_latency_90%_us_max: highest per-iteration wakeup latency at 90th percentile
+  schbench.wakeup_end_latency_90%_us_stddev%: relative stddev of per-iteration wakeup latency at 90th percentile
+  schbench.wakeup_end_latency_99%_us_max: highest per-iteration wakeup latency at 99th percentile
+  schbench.wakeup_end_latency_99%_us_stddev%: relative stddev of per-iteration wakeup latency at 99th percentile
+  schbench.wakeup_end_latency_99.9%_us_max: highest per-iteration wakeup latency at 99.9th percentile
+  schbench.request_latency_50%_us: average request latency at 50th percentile
+  schbench.request_latency_50%_us_stddev%: relative stddev of request latency at 50th percentile across iterations
+  schbench.request_latency_90%_us: average request latency at 90th percentile
+  schbench.request_latency_90%_us_stddev%: relative stddev of request latency at 90th percentile across iterations
+  schbench.request_latency_99%_us: average request latency at 99th percentile
+  schbench.request_latency_99%_us_stddev%: relative stddev of request latency at 99th percentile across iterations
+  schbench.request_latency_99.9%_us: average request latency at 99.9th percentile
+  schbench.request_latency_99.9%_us_stddev%: relative stddev of request latency at 99.9th percentile across iterations
+  schbench.request_latency_min_us: average minimum request latency across iterations
+  schbench.request_latency_min_us_stddev%: relative stddev of minimum request latency across iterations
+  schbench.request_latency_max_us: average maximum request latency across iterations
+  schbench.request_latency_max_us_stddev%: relative stddev of maximum request latency across iterations
+  schbench.request_end_latency_50%_us_max: highest per-iteration request latency at 50th percentile
+  schbench.request_end_latency_50%_us_stddev%: relative stddev of per-iteration request latency at 50th percentile
+  schbench.request_end_latency_90%_us_max: highest per-iteration request latency at 90th percentile
+  schbench.request_end_latency_90%_us_stddev%: relative stddev of per-iteration request latency at 90th percentile
+  schbench.request_end_latency_99%_us_max: highest per-iteration request latency at 99th percentile
+  schbench.request_end_latency_99%_us_stddev%: relative stddev of per-iteration request latency at 99th percentile
+  schbench.request_end_latency_99.9%_us_max: highest per-iteration request latency at 99.9th percentile
+  schbench.wakeup_latency_50%_us.instanceN: >
+    only emitted when nr_instances > 1: per sibling-cgroup wakeup latency,
+    keyed by instance_id
+  schbench.request_latency_50%_us.instanceN: >
+    only emitted when nr_instances > 1: per sibling-cgroup request
+    latency, keyed by instance_id
+  schbench.request_end_latency_99.9%_us_stddev%: relative stddev of per-iteration request latency at 99.9th percentile

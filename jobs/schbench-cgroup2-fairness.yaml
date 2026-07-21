@@ -1,0 +1,27 @@
+suite: schbench
+testcase: schbench
+category: benchmark
+
+iterations:
+  - 3x
+
+# Two sibling cgroups: instance 1 is deliberately kept at low worker-thread
+# concurrency while instance 2 keeps the suite's normal high concurrency,
+# so a per-cgroup CPU-share calculation that depends on each sibling's own
+# task count relative to the others is actually exercised -- the same
+# asymmetric-sibling idea as hackbench-cgroup2-fairness.yaml, but through
+# schbench's LATENCY metrics rather than hackbench's throughput: the
+# fairness signal here is whether the low-concurrency sibling's own
+# wakeup/request latency stays low despite a noisy, high-concurrency
+# neighbor, not whether its throughput stays proportional.
+cgroup2:
+  cg_count: 2
+
+nr_instances: 2
+
+schbench:
+  message_threads: 2
+  worker_threads: 100%
+  runtime: 300s
+
+worker_threads_by_instance: 4

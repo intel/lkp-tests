@@ -1,0 +1,40 @@
+Instance: 1
+Iteration : 1
+2026-07-21 10:00:00 ./schbench -m 1 -t 128 -r 10
+warmup done, zeroing stats
+Wakeup Latencies percentiles (usec) runtime 10 (s) (100 total samples)
+          50.0th: 5          (50 samples)
+          90.0th: 7          (30 samples)
+        * 99.0th: 9          (15 samples)
+          99.9th: 13         (5 samples)
+          min=1, max=20
+Request Latencies percentiles (usec) runtime 10 (s) (100 total samples)
+          50.0th: 6000       (50 samples)
+          90.0th: 8000       (30 samples)
+        * 99.0th: 9000       (15 samples)
+          99.9th: 9500       (5 samples)
+          min=5000, max=10000
+RPS percentiles (requests) runtime 10 (s) (1 total samples)
+        * 50.0th: 16000      (1 samples)
+          min=16000, max=16000
+average rps: 16000.00
+Instance: 2
+Iteration : 1
+2026-07-21 10:00:00 ./schbench -m 1 -t 128 -r 10
+warmup done, zeroing stats
+Wakeup Latencies percentiles (usec) runtime 10 (s) (100 total samples)
+          50.0th: 50         (50 samples)
+          90.0th: 70         (30 samples)
+        * 99.0th: 90         (15 samples)
+          99.9th: 130        (5 samples)
+          min=10, max=200
+Request Latencies percentiles (usec) runtime 10 (s) (100 total samples)
+          50.0th: 60000      (50 samples)
+          90.0th: 80000      (30 samples)
+        * 99.0th: 90000      (15 samples)
+          99.9th: 95000      (5 samples)
+          min=50000, max=100000
+RPS percentiles (requests) runtime 10 (s) (1 total samples)
+        * 50.0th: 1600       (1 samples)
+          min=1600, max=1600
+average rps: 1600.00

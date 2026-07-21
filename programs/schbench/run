@@ -1,6 +1,7 @@
 #!/bin/bash
 # - message_threads
 # - worker_threads
+# - worker_threads_by_instance
 # - runtime
 # - iterations
 # - intervaltime_s
@@ -24,6 +25,23 @@ cd_benchmark
 [[ $message_threads -eq 0 ]] && message_threads=2
 
 [[ -n "$intervaltime_s" ]] && interval_opt="-i $intervaltime_s"
+
+# When running as multiple nr_instances (one per sibling cgroup2), let each
+# instance use its own worker_threads instead of every sibling running
+# identical concurrency: worker_threads_by_instance is a space-separated
+# list, indexed by instance_id (1-based); an instance whose position is
+# blank or absent keeps the job's shared worker_threads unchanged.
+# instance_id is always exported by bin/run-test (defaults to 1 for a
+# plain single-instance job), so this is a no-op unless a job explicitly
+# sets worker_threads_by_instance.
+if [[ -n "$worker_threads_by_instance" ]]; then
+	# shellcheck disable=SC2206
+	instance_worker_threads=($worker_threads_by_instance)
+	override=${instance_worker_threads[$((instance_id - 1))]}
+	[[ -n "$override" ]] && worker_threads=$override
+fi
+
+echo "Instance: ${instance_id:-1}"
 
 # the source code print the output to stderr, here redirection stderr to stdout
 for i in $(seq $iterations); do
