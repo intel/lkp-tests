@@ -234,7 +234,7 @@ def load_base_matrix(matrix_path, head_matrix, options) # rubocop:disable Metric
 
     # FIXME: rli9 after above change, below situation is not reasonable, keep it for debugging purpose now
     unless order
-      log_error "unknown version #{version} matrix: #{matrix_path} options: #{options}"
+      log_error('unknown version matrix', version:, matrix_path:, options:)
       return
     end
   end
