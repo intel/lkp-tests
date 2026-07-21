@@ -4,6 +4,7 @@
 ## doing a particular type of I/O action as specified by the user.
 ## The typical use of fio is to write a job file matching
 ## the I/O load one wants to simulate.
+# - iodepth_by_instance
 
 . $LKP_SRC/lib/common.sh
 . $LKP_SRC/lib/debug.sh
@@ -13,6 +14,33 @@ task=$(cat /$TMP_RESULT_ROOT/fio.task)
 
 [[ -n "$task" ]] || die "fio task file isn't setup properly!"
 
+# When running as multiple nr_instances (one per sibling cgroup2), let each
+# instance use its own iodepth instead of every sibling running an
+# identical IO queue depth: iodepth_by_instance is a space-separated list,
+# indexed by instance_id (1-based); an instance whose position is blank or
+# absent keeps the shared iodepth baked into fio.task by fio-setup-basic
+# unchanged. instance_id is always exported by bin/run-test (defaults to 1
+# for a plain single-instance job), so this is a no-op unless a job
+# explicitly sets iodepth_by_instance.
+if [[ -n "$iodepth_by_instance" ]]; then
+	# shellcheck disable=SC2206
+	instance_iodepth=($iodepth_by_instance)
+	override=${instance_iodepth[$((instance_id - 1))]}
+	[[ -n "$override" ]] && task=$(echo "$task" | sed "s/^iodepth=.*/iodepth=$override/")
+fi
+
+# Every instance shares one fio.task written once by fio-setup-basic, but
+# each instance runs concurrently as its own process (bin/run-test spawns
+# one per instance_id): keep each instance's result in its own file so
+# concurrent instances don't clobber a single shared fio.output. A plain
+# single-instance job (nr_instances unset or 1) keeps the original fixed
+# filename so its parse path is unchanged.
+if [[ -n "$nr_instances" && $nr_instances -gt 1 ]]; then
+	fio_output=$TMP_RESULT_ROOT/fio.output.$instance_id
+else
+	fio_output=$TMP_RESULT_ROOT/fio.output
+fi
+
 log_echo "\
 echo '$task' | fio --output-format=json -"
-echo "$task" | fio --output-format=json - >$TMP_RESULT_ROOT/fio.output
+echo "$task" | fio --output-format=json - >$fio_output

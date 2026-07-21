@@ -6,59 +6,108 @@ LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 3)
 require 'json'
 require "#{LKP_SRC}/lib/log"
 
-workload = 0
 OPS = %w(read write).freeze
 PERCENTILES = %w(90.000000 95.000000 99.000000).freeze
 
-if ENV['RESULT_ROOT']
-  fn = File.join ENV['RESULT_ROOT'], 'fio.output'
-elsif ARGV[0]
-  fn = ARGV[0]
-end
+# Parse one read/write op sub-object of a fio JSON job into its
+# "#{ops}_..." stats, merging them into the given stats hash. Returns
+# the op's contribution to the total workload count.
+def parse_op_stats(stats, ops, res_op)
+  stats["#{ops}_bw_MBps"] = res_op['bw'].to_f / 1024
+  stats["#{ops}_iops"] = res_op['iops']
 
-contents = File.read(fn)
-idx = contents.index('{')
-unless idx
-  log_error "#{fn}: maybe it is not a json format file"
-  exit
-end
-contents = contents[idx..] # contents should start with '{'
-res = JSON.parse(contents)
-unless res
-  log_error 'Invalid/empty fio output'
-  exit
-end
-res_job = res['jobs'].first
-OPS.each do |ops|
-  res = res_job[ops]
-  puts "#{ops}_bw_MBps: #{res['bw'].to_f / 1024}"
-  puts "#{ops}_iops: #{res['iops']}"
-  workload += res['total_ios'].to_i
-  res_clat = res['clat'] || res['clat_ns']
-  res_clat_percentiles = res_clat['percentile']
-  puts "#{ops}_clat_mean_ns: #{res_clat['mean']}"
-  puts "#{ops}_clat_stddev: #{res_clat['stddev']}"
-  if res_clat_percentiles
-    PERCENTILES.each do |p|
-      sp = p.chomp('0')
-      true while sp.chomp!('0')
-      sp.chomp!('.')
-      puts "#{ops}_clat_#{sp}%_ns: #{res_clat_percentiles[p]}"
-    end
+  res_clat = res_op['clat'] || res_op['clat_ns']
+  stats["#{ops}_clat_mean_ns"] = res_clat['mean']
+  stats["#{ops}_clat_stddev"] = res_clat['stddev']
+  res_clat['percentile']&.each do |p, v|
+    next unless PERCENTILES.include?(p)
+
+    sp = p.chomp('0')
+    true while sp.chomp!('0')
+    sp.chomp!('.')
+    stats["#{ops}_clat_#{sp}%_ns"] = v
   end
-  res_slat = res['slat'] || res['slat_ns']
-  puts "#{ops}_slat_mean_us: #{res_slat['mean']}"
-  puts "#{ops}_slat_stddev: #{res_slat['stddev']}"
+
+  res_slat = res_op['slat'] || res_op['slat_ns']
+  stats["#{ops}_slat_mean_us"] = res_slat['mean']
+  stats["#{ops}_slat_stddev"] = res_slat['stddev']
+
+  res_op['total_ios'].to_i
 end
 
-res_latency_us = res_job['latency_us']
-res_latency_us.each do |k, v|
-  puts "latency_#{k}us%: #{v}"
+# Parse a single fio --output-format=json output file into a flat
+# key => value stats hash. Returns nil (after logging) if the file isn't
+# valid fio JSON output.
+def parse_fio_output(fn)
+  contents = File.read(fn)
+  idx = contents.index('{')
+  unless idx
+    log_error "#{fn}: maybe it is not a json format file"
+    return nil
+  end
+  contents = contents[idx..] # contents should start with '{'
+  res = JSON.parse(contents)
+  unless res
+    log_error 'Invalid/empty fio output'
+    return nil
+  end
+  res_job = res['jobs'].first
+
+  stats = {}
+  workload = OPS.sum { |ops| parse_op_stats(stats, ops, res_job[ops]) }
+
+  res_job['latency_us']&.each { |k, v| stats["latency_#{k}us%"] = v }
+  res_job['latency_ms']&.each { |k, v| stats["latency_#{k}ms%"] = v }
+  stats[:workload] = workload
+
+  stats
 end
 
-res_latency_ms = res_job['latency_ms']
-res_latency_ms.each do |k, v|
-  puts "latency_#{k}ms%: #{v}"
+def print_stats(stats, suffix = '')
+  stats.each do |k, v|
+    puts "#{k}#{suffix}: #{v}"
+  end
 end
 
-puts "workload: #{workload}"
+# Combine several instances' stats into one aggregate view using the same
+# key names as a plain single-instance run: additive metrics (bandwidth,
+# iops, workload) are summed, latency-style metrics are averaged.
+def combine_stats(per_instance)
+  combined = {}
+  per_instance.values.first.each_key do |k|
+    values = per_instance.values.filter_map { |s| s[k] }
+    next if values.empty?
+
+    additive = k == :workload || k.to_s.end_with?('_iops', '_bw_MBps')
+    combined[k] = additive ? values.sum : values.sum.to_f / values.size
+  end
+  combined
+end
+
+if ARGV[0]
+  stats = parse_fio_output(ARGV[0])
+  print_stats(stats) if stats
+elsif ENV['RESULT_ROOT']
+  result_root = ENV['RESULT_ROOT']
+  single_fn = File.join(result_root, 'fio.output')
+  instance_fns = Dir.glob(File.join(result_root, 'fio.output.*')).sort_by { |fn| fn[/\.(\d+)\z/, 1].to_i }
+
+  if File.exist?(single_fn)
+    stats = parse_fio_output(single_fn)
+    print_stats(stats) if stats
+  elsif instance_fns.any?
+    # Per-instance breakdown: only reached when nr_instances > 1 (e.g. a
+    # cgroup2 job with asymmetric iodepth_by_instance across sibling
+    # cgroups). The combined view above uses the same key names as a
+    # plain single-instance run so existing dashboards keep working; the
+    # per-instance rows below are the fairness signal.
+    per_instance = instance_fns.filter_map do |fn|
+      id = fn[/\.(\d+)\z/, 1].to_i
+      stats = parse_fio_output(fn)
+      [id, stats] if stats
+    end.to_h
+
+    print_stats(combine_stats(per_instance)) unless per_instance.empty?
+    per_instance.sort.each { |id, stats| print_stats(stats, ".instance#{id}") }
+  end
+end

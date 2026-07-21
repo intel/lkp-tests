@@ -25,6 +25,11 @@ parameters:
   bs: block size for I/O units. Default to 4k
   ioengine: defines how the job issues I/O
   iodepth: number of I/O units to keep in flight against the file
+  iodepth_by_instance: >
+    space-separated iodepth override per instance_id (1-based position),
+    used with nr_instances/cgroup2 to give sibling cgroups different IO
+    queue depth instead of every instance running identical iodepth; a
+    blank/absent position keeps the shared iodepth for that instance
   direct: a boolean parameter, if true, use non-buffered I/O (usually O_DIRECT). Default to false.
   test_size: total size of I/O for this job, fio will run until this many bytes have been transfered,
                unless limited by other options (runtime, for instance)
@@ -47,3 +52,9 @@ results:
   fio.write_iops: average write IOPS
   fio.read_bw_MBps: average read bandwith
   fio.read_iops: average read IOPS
+  fio.read_bw_MBps.instanceN: >
+    only emitted when nr_instances > 1: per sibling-cgroup read bandwidth,
+    keyed by instance_id
+  fio.write_bw_MBps.instanceN: >
+    only emitted when nr_instances > 1: per sibling-cgroup write
+    bandwidth, keyed by instance_id

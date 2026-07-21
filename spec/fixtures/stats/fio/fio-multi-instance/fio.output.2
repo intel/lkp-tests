@@ -1,0 +1,46 @@
+{
+  "fio version" : "fio-3.19",
+  "jobs" : [
+    {
+      "jobname" : "fio-basic-cgroup2-fairness",
+      "read" : {
+        "bw" : 40960,
+        "iops" : 9000,
+        "total_ios" : 5000,
+        "clat_ns" : {
+          "mean" : 3000,
+          "stddev" : 500,
+          "percentile" : {
+            "90.000000" : 5000,
+            "95.000000" : 6000,
+            "99.000000" : 8000
+          }
+        },
+        "slat_ns" : {
+          "mean" : 15,
+          "stddev" : 3
+        }
+      },
+      "write" : {
+        "bw" : 0,
+        "iops" : 0,
+        "total_ios" : 0,
+        "clat_ns" : {
+          "mean" : 0,
+          "stddev" : 0,
+          "percentile" : {}
+        },
+        "slat_ns" : {
+          "mean" : 0,
+          "stddev" : 0
+        }
+      },
+      "latency_us" : {
+        "250" : 5.0
+      },
+      "latency_ms" : {
+        "2" : 95.0
+      }
+    }
+  ]
+}

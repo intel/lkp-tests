@@ -13,13 +13,20 @@ describe 'stats' do
         old_stat = File.read yaml_file
 
         stat_script = LKP::Programs.find_parser(script)
-        new_stat = case script
-                   when /^(kmsg)$/
-                     Bash.run("RESULT_ROOT=/boot/1/vm- #{stat_script} #{file}")
-                   when /^(dmesg|mpstat|fio)$/
-                     Bash.run("#{stat_script} #{file}")
+        new_stat = if File.directory?(file)
+                     # Multi-file fixture (e.g. a RESULT_ROOT-driven multi-instance
+                     # suite like fio, which discovers a set of per-instance
+                     # fio.output.N files instead of taking a single file argument).
+                     Bash.run("RESULT_ROOT=#{file} #{stat_script}")
                    else
-                     Bash.run("#{stat_script} < #{file}")
+                     case script
+                     when /^(kmsg)$/
+                       Bash.run("RESULT_ROOT=/boot/1/vm- #{stat_script} #{file}")
+                     when /^(dmesg|mpstat|fio)$/
+                       Bash.run("#{stat_script} #{file}")
+                     else
+                       Bash.run("#{stat_script} < #{file}")
+                     end
                    end
         raise "stats script exitstatus #{$CHILD_STATUS.exitstatus}" unless $CHILD_STATUS.success?
 

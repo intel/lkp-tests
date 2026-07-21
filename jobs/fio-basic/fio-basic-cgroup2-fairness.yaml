@@ -1,0 +1,35 @@
+suite: fio-basic
+testcase: fio-basic
+category: benchmark
+
+disk: 1SSD
+fs:
+  - ext4
+
+runtime: 300s
+nr_task: 1
+
+fio-setup-basic:
+  rw: randread
+  bs: 4k
+  ioengine: libaio
+  iodepth: 32
+  test_size: 8G
+  testfile: y
+
+fio:
+
+# Two sibling cgroups: instance 1 is deliberately kept at low IO queue
+# depth while instance 2 keeps the suite's normal high queue depth, so a
+# per-cgroup io.weight (blkio) proportional-share calculation that depends
+# on each sibling's own IO demand relative to the others is actually
+# exercised. Both cgroups keep the same (default) weight -- only the
+# workload demand differs -- mirroring hackbench-cgroup2-fairness.yaml's
+# design for the CPU controller, applied here to the IO controller
+# instead.
+cgroup2:
+  cg_count: 2
+
+nr_instances: 2
+
+iodepth_by_instance: 1
