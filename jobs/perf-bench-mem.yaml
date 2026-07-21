@@ -1,0 +1,9 @@
+suite: perf-bench-mem
+testcase: perf-bench-mem
+category: benchmark
+
+perf-bench-mem:
+  op:
+    - memcpy
+    - memset
+  function: all

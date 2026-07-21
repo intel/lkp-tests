@@ -1,0 +1,31 @@
+# Running 'mem/memcpy' benchmark:
+# function 'default' (Default memcpy() provided by glibc)
+# Copying 1MB bytes ...
+
+       8.245310 GB/sec
+
+# function 'x86-64-unrolled' (unrolled memcpy() in arch/x86/lib/memcpy_64.S)
+# Copying 1MB bytes ...
+
+       9.643290 GB/sec
+
+# function 'x86-64-movsq' (movsq-based memcpy() in arch/x86/lib/memcpy_64.S)
+# Copying 1MB bytes ...
+
+      12.328273 GB/sec
+
+# Running 'mem/memset' benchmark:
+# function 'default' (Default memset() provided by glibc)
+# Copying 1MB bytes ...
+
+      10.512233 GB/sec
+
+# function 'x86-64-unrolled' (unrolled memset() in arch/x86/lib/memset_64.S)
+# Copying 1MB bytes ...
+
+      11.877654 GB/sec
+
+# function 'x86-64-stosq' (movsq-based memset() in arch/x86/lib/memset_64.S)
+# Copying 1MB bytes ...
+
+      15.234561 GB/sec

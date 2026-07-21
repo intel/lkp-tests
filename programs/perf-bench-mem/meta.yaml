@@ -1,0 +1,21 @@
+short_description: >
+  Memory copy/set throughput microbenchmark using perf bench mem
+
+description: >
+  perf bench mem measures raw memcpy()/memset() throughput using the
+  routines built into perf itself (a mix of the libc implementation and
+  hand-written architecture-specific assembly routines from the kernel
+  tree). It complements broader memory-bandwidth benchmarks such as
+  STREAM and lmbench3 by isolating basic copy/set primitives instead of
+  a full application memory-access pattern.
+
+homepage: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+
+parameters:
+  op:
+  function:
+  size:
+  nr_loops:
+  chunk:
+
+results:

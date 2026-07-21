@@ -1,0 +1,6 @@
+memcpy.default.GB_per_sec: 8.245310
+memcpy.x86-64-unrolled.GB_per_sec: 9.643290
+memcpy.x86-64-movsq.GB_per_sec: 12.328273
+memset.default.GB_per_sec: 10.512233
+memset.x86-64-unrolled.GB_per_sec: 11.877654
+memset.x86-64-stosq.GB_per_sec: 15.234561

@@ -1,0 +1,26 @@
+#!/bin/bash
+# - op
+# - function
+# - size
+# - nr_loops
+# - chunk
+
+## perf began as a tool for using the performance counters
+## subsystem in Linux, and has had various enhancements
+## to add tracing capabilities.
+
+. "$LKP_SRC"/lib/env.sh
+. "$LKP_SRC"/lib/reproduce-log.sh
+. "$LKP_SRC"/lib/debug.sh
+
+set_perf_path "/lkp/benchmarks/perf/perf"
+
+[[ -n "$op" ]] || die "op must be specified"
+
+opts=()
+[[ -n "$function" ]] && opts+=(--function "$function")
+[[ -n "$size" ]] && opts+=(--size "$size")
+[[ -n "$nr_loops" ]] && opts+=(--nr_loops "$nr_loops")
+[[ -n "$chunk" ]] && opts+=(--chunk "$chunk")
+
+log_cmd "$perf" bench mem "$op" "${opts[@]}"

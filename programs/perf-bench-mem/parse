@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+op = nil
+function = 'default'
+
+$stdin.each_line do |line|
+  case line
+  when /^# Running 'mem\/(\w+)' benchmark:/
+    op = $1
+  when /^# function '([^']+)'/
+    function = $1
+  when /^\s*([\d.]+)d?\s+(bytes|KB|MB|GB)\/sec/
+    puts "#{op}.#{function}.#{$2}_per_sec: #{$1}"
+  end
+end
