@@ -158,6 +158,10 @@ donorname=$donorname
 "
 fi
 
+if [ -z "${buffered+x}" ]; then
+	buffered=$((1 - direct))
+fi
+
 buffered=$(parse_bool $buffered)
 create_task="
 $create_task
