@@ -1,10 +1,10 @@
 throughput: 1253997.1158066336
 throughput_best: 1253997.1158066336
-throughput_avg: 137965.78362337526
+throughput_avg: 137965.78
 throughput_worst: 63726.062897624084
 throughput.instance1: 95821.23590230066
-throughput_avg.instance1: 74652.34171176264
+throughput_avg.instance1: 74652.34
 throughput_worst.instance1: 63726.062897624084
 throughput.instance2: 1253997.1158066336
-throughput_avg.instance2: 908330.5263396929
+throughput_avg.instance2: 908330.53
 throughput_worst.instance2: 637206.4867620352

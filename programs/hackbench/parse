@@ -38,7 +38,7 @@ avg_time = time.sum(0.0) / time.size
 # meanning to avoid triggering bisect.
 puts "throughput: #{kb / best_time}"
 puts "throughput_best: #{kb / best_time}"
-puts "throughput_avg: #{kb / avg_time}"
+puts "throughput_avg: #{(kb / avg_time).round(2)}"
 puts "throughput_worst: #{kb / worst_time}"
 
 # Per-instance breakdown: only meaningful when nr_instances > 1 (e.g. a
@@ -51,7 +51,7 @@ if per_instance.size > 1
 
     i_kb = (stat[:tasks] * stat[:messages] * stat[:bytes]) >> 10
     puts "throughput.instance#{id}: #{i_kb / stat[:time].min}"
-    puts "throughput_avg.instance#{id}: #{i_kb / (stat[:time].sum(0.0) / stat[:time].size)}"
+    puts "throughput_avg.instance#{id}: #{(i_kb / (stat[:time].sum(0.0) / stat[:time].size)).round(2)}"
     puts "throughput_worst.instance#{id}: #{i_kb / stat[:time].max}"
   end
 end
