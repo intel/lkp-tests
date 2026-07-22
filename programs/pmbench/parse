@@ -11,64 +11,60 @@ histo_details_w = []
 latencies = []
 throughputs = []
 init_times = []
-sum_r = 0.0
-sum_w = 0.0
 mode = nil
 READ = :read
 WRITE = :write
+sum = { READ => 0.0, WRITE => 0.0 }
+instance = 1
+per_instance = Hash.new { |h, k| h[k] = { latencies: [], throughputs: [] } }
+
+# Bump histo_r/w, and for a detailed (sub-bucketed) line also
+# histo_details_r/w, for the given mode/bucket.
+def accumulate_bucket(mode, p, cnt, histo_r, histo_w, data, histo_details_r, histo_details_w)
+  histo = mode == READ ? histo_r : histo_w
+  histo[p] += cnt
+  return unless data
+
+  details = mode == READ ? histo_details_r : histo_details_w
+  data.each_with_index do |v, i|
+    details[p] ||= []
+    details[p][i] ||= 0
+    details[p][i] += v.to_i
+  end
+end
 
 $stdin.each_line do |line|
   case line
+  when /^Instance: (\d+)/
+    instance = $1.to_i
   when /^Read:/
     mode = READ
   when /^Write:/
     mode = WRITE
   when /^  Page latency during benchmark \(inc. gen\): (\d+\.\d+) us \(\d+ clks\)/
     latencies << $1.to_f
+    per_instance[instance][:latencies] << $1.to_f
   when / Benchmark done - took (\d+\.\d+) sec for (\d+) page access/
-    throughputs << ($2.to_f / $1.to_f)
+    throughput = $2.to_f / $1.to_f
+    throughputs << throughput
+    per_instance[instance][:throughputs] << throughput
   when /nitialization took (\d+\.\d+) ms/
     init_times << ($1.to_f / 1000)
   when /^2\^\((\d+),(\d+)\) ns: (\d+)  \[(.*)\]/
-    end_n = $2.to_i
     cnt = $3.to_i
-    p = end_n - 8
-    data = $4.split(', ')
-    data.each_with_index do |v, i|
-      if mode == READ
-        histo_details_r[p] ||= []
-        histo_details_r[p][i] ||= 0
-        histo_details_r[p][i] += v.to_i
-      else
-        histo_details_w[p] ||= []
-        histo_details_w[p][i] ||= 0
-        histo_details_w[p][i] += v.to_i
-      end
-    end
-    if mode == READ
-      sum_r += cnt
-      histo_r[p] += cnt
-    else
-      sum_w += cnt
-      histo_w[p] += cnt
-    end
+    sum[mode] += cnt
+    accumulate_bucket(mode, $2.to_i - 8, cnt, histo_r, histo_w, $4.split(', '), histo_details_r, histo_details_w)
   when /^2\^\((\d+),(\d+)\) ns: (\d+)/
     end_n = $2.to_i
     cnt = $3.to_i
-    p = if end_n < 32
-          end_n - 8
-        else
-          end_n - 9
-        end
-    if mode == READ
-      sum_r += cnt
-      histo_r[p] += cnt
-    else
-      sum_w += cnt
-      histo_w[p] += cnt
-    end
+    sum[mode] += cnt
+    p = end_n < 32 ? end_n - 8 : end_n - 9
+    accumulate_bucket(mode, p, cnt, histo_r, histo_w, nil, histo_details_r, histo_details_w)
   end
 end
+
+sum_r = sum[READ]
+sum_w = sum[WRITE]
 
 def format_power2(num)
   p = 0
@@ -131,4 +127,18 @@ puts "throughput.std_dev%: #{throughputs.standard_deviation * 100 / throughputs.
 unless init_times.empty?
   init_time_avg = init_times.sum / init_times.length
   puts "init_time.avg: #{init_time_avg}"
+end
+
+# Per-instance breakdown: only meaningful when nr_instances > 1 (e.g. a
+# cgroup2 job with asymmetric setsize_by_instance across sibling cgroups);
+# a plain single-instance run only ever populates instance 1, so it adds
+# nothing beyond the combined stats above.
+if per_instance.size > 1
+  per_instance.sort.each do |id, stat|
+    puts "latency.ns.average.instance#{id}: #{(stat[:latencies].sum / stat[:latencies].length) * 1000}" unless stat[:latencies].empty?
+
+    next if stat[:throughputs].empty?
+
+    puts "throughput.aps.instance#{id}: #{stat[:throughputs].sum}"
+  end
 end

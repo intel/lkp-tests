@@ -12,6 +12,12 @@ parameters:
   runtime:
   mapsize: Specify virtual address map size in Mebibyte (2^20 bytes)  unit. The default is 256.
   setsize: Specify  working  set  size  in  Mebibyte unit.  It should be no greater than mapsize. The default is 128.
+  setsize_by_instance: >
+    space-separated setsize override per instance_id (1-based position),
+    used with nr_instances/cgroup2 to give sibling cgroups different
+    working-set size instead of every instance running an identical
+    setsize; a blank/absent position keeps the shared setsize for that
+    instance
   pattern: (linear, uniform, normal, pareto)
   shape: Pattern-specific  numeric parameter that determines the shape of the distribution.  See Usage for details.
   jobs: Number of concurrent worker threads to spawn for the  benchmark. Some releases may not support this option. The default is 1.
@@ -27,6 +33,12 @@ parameters:
 
 results:
   pmbench.latency.ns.average:
+  pmbench.latency.ns.average.instanceN: >
+    only emitted when nr_instances > 1: per sibling-cgroup average page
+    access latency, keyed by instance_id
+  pmbench.throughput.aps.instanceN: >
+    only emitted when nr_instances > 1: per sibling-cgroup page access
+    throughput, keyed by instance_id
   pmbench.read.latency.ns.0-256%:
   pmbench.read.latency.ns.256-512%:
   pmbench.read.latency.ns.512-1K%:

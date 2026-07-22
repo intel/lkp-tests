@@ -1,0 +1,16 @@
+Instance: 1
+Read:
+  Page latency during benchmark (inc. gen): 200.000 us (400 clks)
+2^(8,16) ns: 8000  [1000, 1000, 2000, 1000]
+Write:
+  Page latency during benchmark (inc. gen): 250.000 us (500 clks)
+2^(8,16) ns: 2000  [200, 200, 400, 200]
+ Benchmark done - took 60.000 sec for 12000000 page access
+Instance: 2
+Read:
+  Page latency during benchmark (inc. gen): 900.000 us (1800 clks)
+2^(16,24) ns: 20000
+Write:
+  Page latency during benchmark (inc. gen): 950.000 us (1900 clks)
+2^(16,24) ns: 5000
+ Benchmark done - took 60.000 sec for 3000000 page access

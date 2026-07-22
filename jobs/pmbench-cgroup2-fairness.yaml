@@ -1,0 +1,17 @@
+<<: pmbench.yaml
+
+# Two sibling cgroups: instance 1 is deliberately kept at a small
+# working-set size while instance 2 keeps the suite's normal (pmbench's
+# own 128M default) working-set size, so a per-cgroup memory-demand
+# signal that depends on each sibling's own working-set size relative to
+# the others is actually exercised -- the same asymmetric-sibling idea as
+# hackbench-cgroup2-fairness.yaml (CPU) and fio-basic-cgroup2-fairness.yaml
+# (blkio), applied here to the memory controller via pmbench's
+# working-set-size (setsize) knob instead of thread count or IO queue
+# depth.
+cgroup2:
+  cg_count: 2
+
+nr_instances: 2
+
+setsize_by_instance: 16M

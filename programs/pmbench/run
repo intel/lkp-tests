@@ -3,6 +3,7 @@
 # - pattern
 # - mapsize
 # - setsize
+# - setsize_by_instance
 # - total_setsize
 # - shape
 # - nr_processes
@@ -19,9 +20,28 @@
 
 . "$LKP_SRC/lib/common.sh"
 . "$LKP_SRC/lib/reproduce-log.sh"
+. "$LKP_SRC/lib/unit.sh"
 
 : "${runtime:=300}"
 : "${nr_processes:=1}"
+: "${instance_id:=1}"
+
+# When running as multiple nr_instances (one per sibling cgroup2), let each
+# instance use its own setsize instead of every sibling running an
+# identical working-set size: setsize_by_instance is a space-separated
+# list, indexed by instance_id (1-based); an instance whose position is
+# blank or absent keeps the job's shared setsize/total_setsize unchanged.
+# instance_id is always exported by bin/run-test (defaults to 1 for a
+# plain single-instance job), so this is a no-op unless a job explicitly
+# sets setsize_by_instance.
+if [[ -n "$setsize_by_instance" ]]; then
+	# shellcheck disable=SC2206
+	instance_setsize=($setsize_by_instance)
+	override=${instance_setsize[$((instance_id - 1))]}
+	[[ -n "$override" ]] && setsize=$(to_byte "$override")
+fi
+
+echo "Instance: $instance_id"
 
 set_opt()
 {
@@ -55,7 +75,6 @@ set_opt()
 
 set_opt
 
-: "${instance_id:=1}"
 pmb_tmp_dir="$TMP/$instance_id/pmbench"
 rm -rf "$pmb_tmp_dir"
 mkdir -p "$pmb_tmp_dir"
