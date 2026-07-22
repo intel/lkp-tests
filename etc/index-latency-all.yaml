@@ -32,6 +32,7 @@ simoop\.write_latency_usec\.p95: -0.1
 simoop\.write_latency_usec\.p99: -0.1
 sockperf\..+\.avg-lat: -0.1
 sockperf\..+\.std-dev: -0.1
+stress-ng\.vm\.ms_m(un)?map_(avg|max|min)\._duration: -0.1
 sysbench-fileio\.latency_95th_ms: -0.1
 sysbench-fileio\.latency_max_ms: -0.1
 tbench\.max_latency: -0.1
