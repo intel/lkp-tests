@@ -221,6 +221,20 @@ setup_mkfs_options()
 			mkfs_options="-O encrypt"
 		fi
 		;;
+	udf)
+		# generic/495 requires the swap file allocation unit to match
+		# PAGE_SIZE, but UDF's default block size doesn't, so the test
+		# is always [not run]. Scope via is_test_in_group (matching the
+		# same pattern used above for ext4/generic-693) so this also
+		# takes effect when generic/495 runs as part of a
+		# generic-group-NN batch, not just a standalone invocation.
+		# Verified on real hardware that forcing this for the whole
+		# generic-group-49 batch does not change results for sibling
+		# tests 490-494/496-499.
+		if is_test_in_group "generic-495" "$test"; then
+			mkfs_options="-b $(getconf PAGE_SIZE)"
+		fi
+		;;
 	btrfs)
 		# mkfs.btrfs refuses to overwrite a device that already carries
 		# a recognized filesystem unless -f is given. Several tests call
@@ -248,6 +262,8 @@ setup_mkfs_options()
 
 	local force_flag="-f"
 	[[ "$fs" == "ext4" ]] && force_flag="-F"
+	# mkfs.udf has no force/overwrite flag.
+	[[ "$fs" == "udf" ]] && force_flag=""
 
 	mkfs.$fs $force_flag $mkfs_options $TEST_DEV || die "mkfs.$fs $TEST_DEV failed"
 	log_eval export MKFS_OPTIONS="\"$mkfs_options\""
