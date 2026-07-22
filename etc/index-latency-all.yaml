@@ -26,6 +26,10 @@ schbench\.request_latency_max_us: -0.1
 schbench\.request_latency_min_us: -0.1
 schbench\.wakeup_latency_max_us: -0.1
 schbench\.wakeup_latency_min_us: -0.1
+simoop\.read_latency_usec\.p95: -0.1
+simoop\.read_latency_usec\.p99: -0.1
+simoop\.write_latency_usec\.p95: -0.1
+simoop\.write_latency_usec\.p99: -0.1
 sockperf\..+\.avg-lat: -0.1
 sockperf\..+\.std-dev: -0.1
 sysbench-fileio\.latency_95th_ms: -0.1

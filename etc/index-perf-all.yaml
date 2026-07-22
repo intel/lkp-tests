@@ -185,6 +185,7 @@ rcurefscale\..+-ref-scale\.duration_per_loop\.ns: -1
 reaim\.jobs_per_min: 1
 redis\..+_throughput_rps: 1
 rt-app\..+\.average: -1
+simoop\.work_rate_avg_per_sec: 1
 sockperf\.throughput\..+\.BandWidth_MBps: 1
 sockperf\.throughput\..+\.msg_per_sec: 1
 specjbb2015\.critical-jOPS: 1
