@@ -21,6 +21,7 @@
 . "$LKP_SRC/lib/common.sh"
 . "$LKP_SRC/lib/reproduce-log.sh"
 . "$LKP_SRC/lib/unit.sh"
+. "$LKP_SRC/lib/run.sh"
 
 : "${runtime:=300}"
 : "${nr_processes:=1}"
@@ -31,17 +32,10 @@
 # identical working-set size: setsize_by_instance is a space-separated
 # list, indexed by instance_id (1-based); an instance whose position is
 # blank or absent keeps the job's shared setsize/total_setsize unchanged.
-# instance_id is always exported by bin/run-test (defaults to 1 for a
-# plain single-instance job), so this is a no-op unless a job explicitly
-# sets setsize_by_instance.
-if [[ -n "$setsize_by_instance" ]]; then
-	# shellcheck disable=SC2206
-	instance_setsize=($setsize_by_instance)
-	override=${instance_setsize[$((instance_id - 1))]}
-	[[ -n "$override" ]] && setsize=$(to_byte "$override")
-fi
+override=$(instance_override "$setsize_by_instance")
+[[ -n "$override" ]] && setsize=$(to_byte "$override")
 
-echo "Instance: $instance_id"
+echo_instance
 
 set_opt()
 {

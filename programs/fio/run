@@ -9,6 +9,7 @@
 . $LKP_SRC/lib/common.sh
 . $LKP_SRC/lib/debug.sh
 . $LKP_SRC/lib/reproduce-log.sh
+. $LKP_SRC/lib/run.sh
 
 task=$(cat /$TMP_RESULT_ROOT/fio.task)
 
@@ -19,15 +20,9 @@ task=$(cat /$TMP_RESULT_ROOT/fio.task)
 # identical IO queue depth: iodepth_by_instance is a space-separated list,
 # indexed by instance_id (1-based); an instance whose position is blank or
 # absent keeps the shared iodepth baked into fio.task by fio-setup-basic
-# unchanged. instance_id is always exported by bin/run-test (defaults to 1
-# for a plain single-instance job), so this is a no-op unless a job
-# explicitly sets iodepth_by_instance.
-if [[ -n "$iodepth_by_instance" ]]; then
-	# shellcheck disable=SC2206
-	instance_iodepth=($iodepth_by_instance)
-	override=${instance_iodepth[$((instance_id - 1))]}
-	[[ -n "$override" ]] && task=$(echo "$task" | sed "s/^iodepth=.*/iodepth=$override/")
-fi
+# unchanged.
+override=$(instance_override "$iodepth_by_instance")
+[[ -n "$override" ]] && task=$(echo "$task" | sed "s/^iodepth=.*/iodepth=$override/")
 
 # Every instance shares one fio.task written once by fio-setup-basic, but
 # each instance runs concurrently as its own process (bin/run-test spawns

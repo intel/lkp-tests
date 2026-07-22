@@ -2,6 +2,7 @@
 
 LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 3)
 
+require "#{LKP_SRC}/lib/per_instance"
 require "#{LKP_SRC}/lib/statistics"
 
 class SchbenchParser
@@ -10,8 +11,7 @@ class SchbenchParser
     @wakeup_end_latency = Hash.new { |h, k| h[k] = [] }
     @requeststats = Hash.new { |h, k| h[k] = [] }
     @request_end_latency = Hash.new { |h, k| h[k] = [] }
-    @instance = 1
-    @per_instance = Hash.new do |h, id|
+    @per_instance = LKP::PerInstance.new do |h, id|
       h[id] = { wakeupstats: Hash.new { |h2, k2| h2[k2] = [] },
                 requeststats: Hash.new { |h2, k2| h2[k2] = [] } }
     end
@@ -21,9 +21,9 @@ class SchbenchParser
   end
 
   def parse(line)
+    return if @per_instance.scan(line)
+
     case line
-    when /^Instance: (\d+)/
-      @instance = $1.to_i
     when /^Iteration/
       @counter += 1
     when /^Wakeup Latencies percentiles/
@@ -52,11 +52,11 @@ class SchbenchParser
     if @in_wakeup_section
       @wakeupstats[key] << value
       @wakeup_end_latency[key][@counter] = value
-      @per_instance[@instance][:wakeupstats][key] << value
+      @per_instance.current[:wakeupstats][key] << value
     elsif @in_request_section
       @requeststats[key] << value
       @request_end_latency[key][@counter] = value
-      @per_instance[@instance][:requeststats][key] << value
+      @per_instance.current[:requeststats][key] << value
     end
   end
 
@@ -70,13 +70,13 @@ class SchbenchParser
     if @in_wakeup_section
       @wakeupstats[key1] << val1
       @wakeupstats[key2] << val2
-      @per_instance[@instance][:wakeupstats][key1] << val1
-      @per_instance[@instance][:wakeupstats][key2] << val2
+      @per_instance.current[:wakeupstats][key1] << val1
+      @per_instance.current[:wakeupstats][key2] << val2
     elsif @in_request_section
       @requeststats[key1] << val1
       @requeststats[key2] << val2
-      @per_instance[@instance][:requeststats][key1] << val1
-      @per_instance[@instance][:requeststats][key2] << val2
+      @per_instance.current[:requeststats][key1] << val1
+      @per_instance.current[:requeststats][key2] << val2
     end
   end
 
@@ -109,9 +109,9 @@ class SchbenchParser
   # cgroups); a plain single-instance run only ever populates instance 1,
   # so it adds nothing beyond the combined stats above.
   def print_per_instance_summary
-    return unless @per_instance.size > 1
+    return unless @per_instance.many?
 
-    @per_instance.sort.each do |id, stat|
+    @per_instance.each_sorted do |id, stat|
       stat[:wakeupstats].each do |k, v|
         next if v.empty?
 
