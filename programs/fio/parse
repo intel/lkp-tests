@@ -84,10 +84,14 @@ def combine_stats(per_instance)
   combined
 end
 
-if ARGV[0]
-  stats = parse_fio_output(ARGV[0])
-  print_stats(stats) if stats
-elsif ENV['RESULT_ROOT']
+if ENV['RESULT_ROOT']
+  # RESULT_ROOT must take priority over ARGV[0]: bin/run-stats always
+  # exports RESULT_ROOT *and* passes its own raw stdout-capture file
+  # (RESULT_ROOT/fio, which only holds the echoed fio command line, not
+  # its JSON output) as ARGV[0]. The real fio JSON always lives at
+  # RESULT_ROOT/fio.output (or RESULT_ROOT/fio.output.<instance_id> for
+  # a multi-instance job), so RESULT_ROOT must be consulted first or
+  # every single-instance run mistakenly parses the command-trace file.
   result_root = ENV['RESULT_ROOT']
   single_fn = File.join(result_root, 'fio.output')
   instance_fns = Dir.glob(File.join(result_root, 'fio.output.*')).sort_by { |fn| fn[/\.(\d+)\z/, 1].to_i }
@@ -110,4 +114,7 @@ elsif ENV['RESULT_ROOT']
     print_stats(combine_stats(per_instance)) unless per_instance.empty?
     per_instance.sort.each { |id, stats| print_stats(stats, ".instance#{id}") }
   end
+elsif ARGV[0]
+  stats = parse_fio_output(ARGV[0])
+  print_stats(stats) if stats
 end

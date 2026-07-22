@@ -17,7 +17,19 @@ describe 'stats' do
                      # Multi-file fixture (e.g. a RESULT_ROOT-driven multi-instance
                      # suite like fio, which discovers a set of per-instance
                      # fio.output.N files instead of taking a single file argument).
-                     Bash.run("RESULT_ROOT=#{file} #{stat_script}")
+                     # If the directory also holds a raw file literally named
+                     # after the script (e.g. RESULT_ROOT/fio), pass it as
+                     # ARGV[0]/stdin too: this is exactly what bin/run-stats
+                     # always does in production (export RESULT_ROOT *and*
+                     # pass its own raw capture file), so the harness must
+                     # exercise both together to catch a script mistakenly
+                     # preferring ARGV[0] over RESULT_ROOT.
+                     raw_fn = File.join(file, script)
+                     if File.exist?(raw_fn)
+                       Bash.run("RESULT_ROOT=#{file} #{stat_script} #{raw_fn} < #{raw_fn}")
+                     else
+                       Bash.run("RESULT_ROOT=#{file} #{stat_script}")
+                     end
                    else
                      case script
                      when /^(kmsg)$/
