@@ -1,4 +1,4 @@
-# How To Add Test Cases
+# How to Add Test Cases
 
 In this document, we'll talk about how to add a test case to lkp-tests
 for running.  We will take [netperf](http://www.netperf.org/netperf/)
@@ -136,7 +136,7 @@ needing paramter(s), need such comment lines and follow exactly the
 same format `# - parameter`.
 
 
-## Job File
+## Job file
 
 Once we know what the test case does, and what kind of major options
 they are, it's an easy task to write a job file.
@@ -170,15 +170,15 @@ netperf:
 ```
 
 
-## stats script
+## Parse script
 
 All result data has to be converted to a style of `key: value` format.
 
-This is done by a script, and it should be located at `stats/` with
-file name the same as the script key: netperf.
+This is done by a script, and it should be located at
+`programs/netperf/parse`.
 
-Note that just like script at `tests/`, script at `stats/` is also
-test case specific and it must follow below two rules:
+Note that just like the test script at `programs/netperf/run`, the parse
+script is also test case specific and it must follow below two rules:
 
 - it has to be `key: value` format
 
@@ -188,10 +188,10 @@ test case specific and it must follow below two rules:
 - value has to be a number
 
 For example, the main netperf output is Throughput. Hence the job of
-`stats/netperf` is clear: extract the Throughput field and its value
-out:
+`programs/netperf/parse` is clear: extract the Throughput field and its
+value out:
 
-```ruby
+```bash
 #!/bin/sh
 
 throughput=$(tail -n 1 | awk '{print $5}')
@@ -201,7 +201,7 @@ echo "Throughput_Mbps: $throughput"
 To check whether the script works right, use below commands
 
 ```bash
-$ netperf -t TCP_STREAM -c -C -l 10 -- -m 1M | stats/netperf
+$ netperf -t TCP_STREAM -c -C -l 10 -- -m 1M | programs/netperf/parse
 ```
 
 If the output is something like below `key: value` pairs, then the
@@ -212,14 +212,14 @@ Throughput_Mbps: 54790.22
 ```
 
 Note: Above script is a very simple script to help illustrate how to
-write a script in /stats.  In real test, `stats/netperf` script is
-much more complex than above, as the output layout is different for
+write a parse script. The real `programs/netperf/parse` script is much
+more complex than above, as the output layout is different for
 measuring bulk data transfer performance and measuring
 request/response performance. And the real test also supports
 multiprocess of netperf client.
 
 
-## pack netperf
+## Package netperf
 
 This step is to generate a netperf package in case there is no netperf
 installed in the test OS.  The package includes all information that
@@ -229,7 +229,7 @@ binaries.
 The method used to install additional packages is using the makepkg
 from Arch Linux, which is a script to automate the building of
 packages. A script named PKGBUILD is needed to use this script.
-PKGBUILD files of some packages can be download from 
+PKGBUILD files of some packages can be download from
 [AUR](https://aur.archlinux.org/).
 
 Below is a sample. It downloads the source code and build it. And the
@@ -258,16 +258,16 @@ package() {
 
 ```
 
-## add depends
+## Add dependencies
 
 The installation of package netperf may depends on some packages.
 To have these depends installed first, add these names to the files:
 
-	distro/depends/netperf
-	distro/depends/netperf-dev
+	programs/netperf/pkg/depends
+	programs/netperf/pkg/depends-dev
 
-The file netperf is the packages needed to run netperf test, and 
-netperf-dev is the development packages needed to build netperf.
+The file `depends` lists the packages needed to run the netperf test, and
+`depends-dev` lists the development packages needed to build netperf.
 
 Theses packages could be provided by distribution or built by makepkg.
 The package names on Debian are used as the base and they will be
@@ -288,11 +288,11 @@ $adapted_pkg, then add the line to the file distro/adaptation/$distro:
 $pkgname: $adapted_pkgname
 ```
 
-To install netperf with the PKGBUILD on desired distribution $distro, 
+To install netperf with the PKGBUILD on desired distribution $distro,
 add the package name to the distro/adaptation-pkg/$distro:
 
 ```
-netperf:: 
+netperf::
 ```
 
 If the package name installed by PKGBUILD is also needs to be adapted,
@@ -308,18 +308,18 @@ netperf: $adapted_pkgname
 Give an example to explain how to add one testcase, take hwsim as example:
 
 1) add one PKGBUILD script and relevant dependency package config
-	pkg/hwsim/PKGBUILD
-	distro/depends/hwsim
-	distro/depends/hwsim-dev
+	programs/hwsim/pkg/PKGBUILD
+	programs/hwsim/pkg/depends
+	programs/hwsim/pkg/depends-dev
 
    add the package adaptation "hwsim:: " to the adaptation-pkg files:
 	distro/adaptation-pkg/$distribution
 
 2) add one test script
-	tests/hwsim
+	programs/hwsim/run
 
 3) add one parse script
-	stats/hwsim
+	programs/hwsim/parse
 
 4) add one job file
 	jobs/hwsim.yaml
@@ -346,7 +346,7 @@ Give an example to explain how to add one testcase, take hwsim as example:
 	lkp install -f ./hwsim-hwsim-00.yaml
 	# or you can run the following command, it only builds the test
 	# case itself
-	lkp install -f lkp-tests/tests/hwsim
+	lkp install -f lkp-tests/programs/hwsim/run
 
 	lkp run ./hwsim-hwsim-00.yaml
 
@@ -355,22 +355,25 @@ NOTE:
 The test case run time should be about 300s~600s.
 
 
-# How to add rspec tests for a new testcase stats script
+## How to add rspec tests for a new testcase parse script
 
 RSpec is a unit test framework for the Ruby programming language. RSpec is a Behavior driven
 development tool. Tests written in RSpec focus on the "behavior" of an application being tested.
 RSpec does not put emphasis on, how the application works but instead on how it behaves, in other
 words, what the application actually does.
 
-In order to test the ruby scripts under "lkp-tests/stats/", we've created spec file `spec/stats_spec.rb`,
-we also need to create example input file and expected output file under
-"lkp-tests/spec/stats/". Then run rspec test to check it's result. If it's result not showing
-failure, that means the testcase stats script can output result as examples expected.
+In order to test the parse scripts under "lkp-tests/programs/*/parse", we've
+created spec file `spec/unit/lib/stats_spec.rb`, we also need to create
+example input file and expected output file under
+"lkp-tests/spec/fixtures/stats/". Then run rspec test to check it's result.
+If it's result not showing failure, that means the testcase parse script can
+output result as examples expected.
 
-An example to explain how to add rspec test for stats/mpstat:
+An example to explain how to add rspec test for programs/mpstat/parse:
 
-1. Check code stats/mpstat, make it have a choice to get input data by calling argument
-   `ARGV[0]` or variable `$stdin`. Such as the following lines from stats/mpstat:
+1. Check code programs/mpstat/parse, make it have a choice to get input data
+   by calling argument `ARGV[0]` or variable `$stdin`. Such as the following
+   lines from programs/mpstat/parse:
 ```ruby
     if ARGV[0]
       mpstat = ARGV[0]
@@ -380,22 +383,26 @@ An example to explain how to add rspec test for stats/mpstat:
     end
 ```
 
-2. Prepare file `mpstat.01` and `mpstat.01.yaml` under lkp-tests/spec/stat.
+2. Prepare file `1` and `1.yaml` under lkp-tests/spec/fixtures/stats/mpstat.
 
-   File `lkp-tests/spec/stat/mpstat.01` is typical raw data example that need to be handled by "stats/mpstat" as input.
+   File `lkp-tests/spec/fixtures/stats/mpstat/1` is typical raw data example
+   that need to be handled by "programs/mpstat/parse" as input.
 
-   File `lkp-tests/spec/stat/mpstat.01.yaml` is some data output by executing "stats/mpstat mpstat".
-   If the script have several types of raw data, then can create several example files named in order, such as
-   `mpstat.01`,`mpstat.02` in "lkp-tests/spec/stat".
+   File `lkp-tests/spec/fixtures/stats/mpstat/1.yaml` is the data output by
+   executing "programs/mpstat/parse < 1". If the script has several types of
+   raw data, then several example file pairs can be created, numbered in
+   order, such as `1`/`1.yaml`, `2`/`2.yaml` in
+   "lkp-tests/spec/fixtures/stats/mpstat".
 
 3. Run rspec test by command:
 ```bash
     cd lkp-tests
-    rake spec spec=stats
+    bundle exec rspec spec/unit/lib/stats_spec.rb -e "spec/fixtures/stats/mpstat"
 ```
 
 4. Check rspec test result. If have any failure reported in results, then need to check
-code "stats/mpstat" and spec examples file under "lkp-tests/spec/stat", and do some deep analysis.
+code "programs/mpstat/parse" and spec examples file under
+"lkp-tests/spec/fixtures/stats/mpstat", and do some deep analysis.
 
    The following result indicate the rspec test is pass.
 ```

@@ -1,6 +1,7 @@
 # 0day/LKP FAQ
 
 [General](#general)
+[Installation troubleshooting](#installation-troubleshooting)
 [Kbuild tests](#kbuild-tests)
 [Boot tests](#boot-tests)
 [Performance tests](#performance-tests)
@@ -82,6 +83,31 @@ free to notify us.
 #### Q: How to contact you?
 
 A: You may email to lkp@intel.com to reach all team members.
+
+## Installation troubleshooting
+
+#### Q: `sbin/split-job` (or any other command) fails with a Ruby syntax error, e.g. `unknown type of %string (SyntaxError)`
+
+lkp-tests requires Ruby >= 3.1 (see the "Getting started" section in the
+top-level [README.md](../README.md)). This error means the `ruby` on your
+`$PATH` is too old to parse lkp-tests' syntax. Check your version:
+
+```
+$ ruby -v
+```
+
+If it reports something older than 3.1, install a newer Ruby using your
+distribution's package manager or a version manager such as `rbenv` or
+`rvm`, then make sure the new `ruby` takes precedence on `$PATH`.
+
+#### Q: `lkp install` fails with `Unable to locate package <name>-dev`
+
+Some distributions use different package name suffixes for development
+packages (for example `libunwind-dev` vs `libunwind8-dev`). If a package
+is not found, check `distro/depends/*` for the dependency declaration and
+add/adjust the mapping for your distribution under `distro/adaptation/*`,
+as described in the "Adding distribution support" section of the
+top-level [README.md](../README.md).
 
 ## LKML patch testing
 

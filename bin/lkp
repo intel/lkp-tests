@@ -7,7 +7,35 @@ show_help()
 {
 	cat <<EOF
 Usage: lkp <command> [options]
-$(cat $LKP_SRC/doc/command-index/* 2>/dev/null)
+
+INSTALLATION
+
+	install JOB			install binary dependencies for JOB
+
+JOB
+
+	split JOB			split JOB matrix
+	compile JOB			compile JOB into shell script
+
+TESTING
+
+	run JOB				run test JOB locally
+	qemu JOB			run test JOB in QEMU virtual machine
+
+RESULT
+
+	result|rt|_rt|__rt PATTERNs	show result dirs
+	ls|ll PATTERNs			ls result dirs
+	rm-path result			remove result dirs
+	_rm PATTERNs			remove _result dirs
+
+	stat [options]			show result stats
+	compare [options]		compare result stats
+
+DEBUG
+
+	irb				run irb with lib/*.rb loaded
+	pry				run pry with lib/*.rb loaded
 
 More commands can be found in ${LKP_SRC}/{bin,sbin,tools,lkp-exec}/
 EOF

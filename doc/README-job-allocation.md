@@ -1,1 +1,0 @@
-../allot/README.md

@@ -153,5 +153,3 @@ into an executable shell script. Here is a conceptual demo.
 	  setup_script2:                           $LKP_SRC/programs/setup_script2/setup
 	  test_script:                             $LKP_SRC/programs/test_script/run
 ```
-## job allocation
-[This page](README-job-allocation.html) talks about job allocation.

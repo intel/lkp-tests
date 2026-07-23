@@ -126,7 +126,9 @@ You will also want to add a case for your distribution on sync_distro_sources()
 on the file lib/install.sh.
 
 ## Extra Documentation
-Refer to https://github.com/intel/lkp-tests/wiki
+See [doc/README.md](doc/README.md) for guides on writing tests, job files,
+monitors/daemons, and FAQ. Also refer to
+https://github.com/intel/lkp-tests/wiki
 
 ## Contributing
 

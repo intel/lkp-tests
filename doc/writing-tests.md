@@ -1,24 +1,25 @@
-
-# Linux Kernel Performance tests HOWTO
-
+# Writing and Running Tests
 
 ## Abstract
 
-This document explains the steps of setting up and running the test
-suite for Linux kernel test.
+This document explains the steps of writing a new test case for
+lkp-tests, then setting up and running the test suite for the Linux
+kernel.
 
 
 ## Preface
 
-This document is written to help developers leveraging Intel [0-Day](https://01.org/lkp/documentation/0-day-brief-introduction),a Linux kernel test infrastructure to run tests and get
-the results on local development machine and bring the community up
-to speed on the ins and outs of the Linux Kernel Performance test
-project.
+This document is written to help developers use the Linux Kernel
+Performance (LKP) test infrastructure to run tests and get results on
+a local development machine, and to bring the community up to speed on
+the ins and outs of the lkp-tests project. See the top-level
+[README.md](../README.md) for a quick start, and [faq.md](faq.md) for
+common questions.
 
 
 ### Copyright
 
-Refer to [COPYING](COPYING.html).
+Refer to [COPYING](../COPYING).
 
 
 ### Disclaimer
@@ -40,10 +41,6 @@ You are strongly recommended to take a backup of your system
 before major installation and backups at regular intervals.
 
 
-## Introduction
-Before using the Linux kernel test infrastrucutre, please go to [LKP website](https://01.org/lkp) to understand about what the infrastructure can do. 
-
-
 ## Writing Tests
 
 In general, we can sum up to three steps to write a simple test
@@ -51,27 +48,24 @@ on the infrastructure.
 
 Let's describe step by step with an example: ebizzy.
 
-- Create a package maker script.
+- Write a package script.
 
- The package maker script should follow the main package maker
- infrastructure. Look into the "pack/default" to see if the
- default method "download(), build(), install(), pack() and
- cleanup()" can fit the new benchmark. If yes, just set some
- variables like the benchmark package URL, the default method
- can use the variables to download, build, install and pack the
- benchmark to specified location. If any method is not fit, just
- write as expected with the same name, then they will cover the
- same named method in "pack/default".
+ Each test case has its own directory under `programs/<name>/`. The
+ package script lives at `programs/<name>/pkg/PKGBUILD` and follows the
+ [Arch Linux PKGBUILD](https://wiki.archlinux.org/title/PKGBUILD) format
+ to download, build, and install the benchmark binary.
 
- Look into "pack/ebizzy" for a example, all methods except "install()"
- are fit for ebizzy, so we only rewrite the "install()" method here.
+ See [programs/ebizzy/pkg/PKGBUILD](../programs/ebizzy/pkg/PKGBUILD) for
+ an example. Runtime and build-time dependencies are declared in the
+ sibling `programs/<name>/pkg/depends` and `programs/<name>/pkg/depends-dev`
+ files.
 
 - Write the main test case script.
 
- The main test case script should be placed to "tests" directory.
+ The main test case script should be placed at `programs/<name>/run`.
  Create an executable script and write the benchmark running process in.
  Note that the parameters should be declared at the top of the script
- like following from "tests/ebizzy":
+ like following from `programs/ebizzy/run`:
 
 ```
 		#!/bin/sh
@@ -80,7 +74,7 @@ Let's describe step by step with an example: ebizzy.
 		# - iterations
 ```
 
- The next step is writing a [job file](README-job-file.html) for the new created test case script
+ The next step is writing a [job file](job-file.html) for the new created test case script
  under "jobs" directory so that we can easily testing new parameters by
  just changing the yaml formated jobfile.
 
@@ -99,7 +93,7 @@ Let's describe step by step with an example: ebizzy.
 - Write the test case result parser.
 
  While after running, the benchmark will generate result, and we should know
- how to use the result. The scripts under "stats" directory will do the result
+ how to use the result. The `programs/<name>/parse` script will do the result
  parse for each test case. The parser script should convert the general output
  of the test case script to a json format result, so that we can use the json
  format result to do some comparation. We can find and compute all the data useful
@@ -207,9 +201,9 @@ Use setup-local command to configure local test environment.
 ```
 
 It is easy to understand the options '--hdd' and '--ssd'. While the argument
-"script" means the scripts path under the directories "monitors",
-"pack", "setup" and "tests". And "jobfile" means the generated job files path
-we split from above split-job command.
+"script" means a test case name under "programs/" (its `run`, `setup`, or
+`daemon` script), or a script under "monitors". And "jobfile" means the
+generated job files path we split from above split-job command.
 
 This setup-local command will prepare the environment for the following test
 running. The preparation contains creating the necessary directories,
