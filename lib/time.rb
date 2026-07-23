@@ -24,4 +24,26 @@ class Time
   end
 end
 
+# active_support/deprecator was introduced in activesupport 7.1.
+# activesupport >= 7.2 calls ActiveSupport.deprecator at runtime (inside
+# preserve_timezone), but the file is absent in 6.x, so guard with rescue.
+begin
+  require 'active_support/deprecation'
+  require 'active_support/deprecator'
+rescue LoadError
+  nil
+end
+
+# active_support/time.rb never requires active_support/isolated_execution_state
+# itself -- it is normally pulled in only via the top-level active_support.rb
+# autoload table. Requiring active_support/time directly (as this shim and
+# every caller of it do) skips that autoload registration, so any Date/Time
+# method that reads ActiveSupport::IsolatedExecutionState (e.g. beginning_of_week,
+# prev_week, beginning_of_month) raises "uninitialized constant" at call time,
+# not at load time. Require it explicitly to guarantee the constant exists.
+begin
+  require 'active_support/isolated_execution_state'
+rescue LoadError
+  nil
+end
 require 'active_support/time'
