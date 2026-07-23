@@ -448,16 +448,30 @@ run_cifs_tests()
 
 run_smbv2_tests()
 {
-	log_cmd ./check -E tests/cifs/exclude.incompatible-smb2.txt $exclude_file $all_tests
+	# generic/751 stress-writes large folios via fio (numjobs=nproc)
+	# against a local smbd; the combined footprint OOMs a standard cifs
+	# testbox. Only jobs/xfstests/xfstests-cifs-largemem.yaml, which
+	# requests it by its own name and is allotted to a host with enough
+	# RAM, should run it; exclude it everywhere else (e.g. when it's
+	# only reached through xfstests-cifs.yaml's generic-group-75 bucket).
+	[[ "$test" == "generic-751" ]] ||
+		echo "generic/751" >>tests/exclude/smbv2
+	# generic/755 checks that ctime updates when a hardlink is removed;
+	# Samba derives ctime from mtime and never updates it on unlink, so
+	# this always fails against a Samba server regardless of client fix
+	echo "generic/755" >>tests/exclude/smbv2
+	# generic/478 runs over an hour
+	echo "generic/478" >>tests/exclude/smbv2
+	log_cmd ./check -E tests/exclude/smbv2 $exclude_file $all_tests
 }
 
 run_smbv3_tests()
 {
-	# generic/478 run over 1 hour in smbv3_test
-	echo "generic/478" >>tests/cifs/exclude.very-slow.txt
+	# generic/478 runs over an hour
+	echo "generic/478" >>tests/exclude/smbv3
 	# generic/013 caused last_state: OOM
-	echo "generic/013" >>tests/cifs/exclude.incompatible-smb3.txt
-	log_cmd ./check -E tests/cifs/exclude.incompatible-smb3.txt $exclude_file $all_tests
+	echo "generic/013" >>tests/exclude/smbv3
+	log_cmd ./check -E tests/exclude/smbv3 $exclude_file $all_tests
 }
 
 run_fs_tests()
@@ -486,10 +500,7 @@ run_fs_tests()
 
 run_fs2_tests()
 {
-	fs2_is_cifs && {
-		exclude_file="$exclude_file -E tests/cifs/exclude.very-slow.txt"
-		run_"$fs2"_tests
-	}
+	fs2_is_cifs && run_"$fs2"_tests
 }
 
 run_test()

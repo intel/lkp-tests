@@ -99,13 +99,20 @@ generate_exclude_files()
 
 	cd -
 
-	# # cifs exclude files, https://wiki.samba.org/index.php/Xfstesting-cifs
-	# wget https://wiki.samba.org/images/d/db/Xfstests.exclude.very-slow.txt -O $benchmark_path/tests/cifs/exclude.very-slow.txt
-	# wget https://wiki.samba.org/images/b/b0/Xfstests.exclude.incompatible-smb3.txt -O $benchmark_path/tests/cifs/exclude.incompatible-smb3.txt
-	# wget https://wiki.samba.org/images/9/9f/Xfstests.exclude.incompatible-smb2.txt -O $benchmark_path/tests/cifs/exclude.incompatible-smb2.txt
-
-	# # download cifs config file
-	# wget https://wiki.samba.org/images/9/99/Xfstests.local.config.txt -O $benchmark_path/cifs-local.config
+	# cifs exclude files, https://wiki.samba.org/index.php/Xfstesting-cifs
+	# very-slow applies regardless of protocol version, so it goes into
+	# both smbv2's and smbv3's own exclude file (tolerate a failed/empty
+	# download the same way the fs loop above does: run_smbv2_tests()/
+	# run_smbv3_tests() already treat an empty/missing tests/exclude/$fs2
+	# as "no excludes from Samba's list").
+	for fs2 in smbv2 smbv3
+	do
+		wget --no-check-certificate -O - https://wiki.samba.org/images/d/db/Xfstests.exclude.very-slow.txt >>"$benchmark_path/tests/exclude/$fs2" 2>/dev/null || true
+	done
+	wget --no-check-certificate -O - https://wiki.samba.org/images/9/9f/Xfstests.exclude.incompatible-smb2.txt >>"$benchmark_path/tests/exclude/smbv2" 2>/dev/null || true
+	wget --no-check-certificate -O - https://wiki.samba.org/images/b/b0/Xfstests.exclude.incompatible-smb3.txt >>"$benchmark_path/tests/exclude/smbv3" 2>/dev/null || true
+	[[ -s $benchmark_path/tests/exclude/smbv2 ]] || rm -f "$benchmark_path/tests/exclude/smbv2"
+	[[ -s $benchmark_path/tests/exclude/smbv3 ]] || rm -f "$benchmark_path/tests/exclude/smbv3"
 }
 
 hide()

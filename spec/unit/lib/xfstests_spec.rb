@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'tmpdir'
 require "#{LKP_SRC}/lib/bash"
 require "#{LKP_SRC}/lib/programs"
 
@@ -62,6 +63,36 @@ EOF
       it "#{entry[:test]} not belongs to #{entry[:groups]}" do
         expect(is_test_in_group(entry[:test], entry[:groups])).to eq('1')
       end
+    end
+  end
+
+  describe 'run_smbv2_tests' do
+    def excludes_751?(test)
+      out = Bash.run <<EOF
+        source #{LKP_SRC}/lib/tests/xfstests.sh
+
+        exclude_file=""
+        all_tests=""
+        test=#{test}
+
+        check() { :; }
+        log_cmd() { "$@"; }
+
+        cd #{Dir.mktmpdir}
+        mkdir -p tests/exclude
+        run_smbv2_tests >/dev/null
+
+        grep -qx generic/751 tests/exclude/smbv2 && echo yes || echo no
+EOF
+      out.strip == 'yes'
+    end
+
+    it 'excludes generic/751 when reached via the generic-group-75 bucket' do
+      expect(excludes_751?('generic-group-75')).to be(true)
+    end
+
+    it 'does not exclude generic/751 when requested by its own name' do
+      expect(excludes_751?('generic-751')).to be(false)
     end
   end
 

@@ -1,0 +1,28 @@
+suite: xfstests
+testcase: xfstests
+category: functional
+
+# Bucket for xfstests/cifs tests whose memory footprint exceeds what a
+# standard 32G cifs testbox can provide. Kept as its own file (instead
+# of a need_memory: override inside xfstests-cifs.yaml) because that
+# file is already committed to running on a fixed 32G host; a bigger
+# need_memory value there would not by itself move the test off that
+# host. This file must instead be run on a host with at least 48G RAM.
+need_memory: 48G
+
+disk: 4HDD
+
+fs:
+  - ext4
+
+fs2:
+  - smbv2
+
+xfstests:
+  test:
+    # generic/751 stress-writes large folios via fio (numjobs=nproc)
+    # against a local smbd; the combined footprint OOMs a standard cifs
+    # testbox. run_smbv2_tests() in lib/tests/xfstests.sh excludes it
+    # everywhere except when requested by this exact name, so it only
+    # runs here, on the host this file's need_memory: 48G is allotted to.
+    - generic-751
