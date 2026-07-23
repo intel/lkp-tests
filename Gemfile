@@ -7,6 +7,7 @@ gem 'pry'
 gem 'pry-doc'
 gem 'rake'
 gem 'term-ansicolor'
+gem 'text-table'
 gem 'tty-command'
 
 group :test do
