@@ -90,10 +90,24 @@ kill_tests()
 
 check_oom()
 {
-	dmesg | grep -q -F \
+	local dmesg_out="$(dmesg)"
+
+	echo "$dmesg_out" | grep -q -F \
 		-e 'Out of memory' \
 		-e 'invoked oom-killer: gfp_mask=0x' \
 		-e ': page allocation failure: order:' || return
+
+	# 'invoked oom-killer: gfp_mask=0x' is printed for both system-wide
+	# and memcg-scoped OOM, but only a system-wide kill also prints
+	# 'Out of memory' (mm/oom_kill.c prints "Memory cgroup out of
+	# memory" for a memcg-scoped one instead). kirk, LTP's test runner,
+	# places each test in its own per-test memory cgroup
+	# (/ltp/test-<pid>); a memcg kill confined there only terminates
+	# that one test, which kirk already records as failed and moves
+	# past, so it must not abort the whole job.
+	if ! echo "$dmesg_out" | grep -q -F -e 'Out of memory' -e ': page allocation failure: order:'; then
+		echo "$dmesg_out" | grep -q -E 'oom-kill:constraint=CONSTRAINT_MEMCG,oom_memcg=/ltp/test-[0-9]+,' && return
+	fi
 
 	touch $TMP/OOM
 }
