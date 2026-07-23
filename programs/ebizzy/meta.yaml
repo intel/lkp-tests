@@ -11,8 +11,16 @@ homepage: http://ebizzy.sourceforge.net/
 
 parameters:
   nr_threads:
+  nr_threads_by_instance: >
+    space-separated nr_threads override per instance_id (1-based position),
+    used with nr_instances/cgroup2 to give sibling cgroups different
+    concurrency instead of every instance running identical nr_threads; a
+    blank/absent position keeps the shared nr_threads for that instance
   duration:
   iterations:
 
 results:
   ebizzy.throughput:
+  ebizzy.throughput.instanceN: >
+    only emitted when nr_instances > 1: per sibling-cgroup throughput,
+    keyed by instance_id

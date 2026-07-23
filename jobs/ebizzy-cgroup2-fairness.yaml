@@ -1,0 +1,14 @@
+<<: ebizzy.yaml
+
+# Two sibling cgroups: instance 1 is deliberately kept at low thread
+# concurrency while instance 2 keeps the suite's normal high concurrency, so
+# a per-cgroup CPU-share calculation that depends on each sibling's own
+# thread count relative to the others is actually exercised -- the same
+# asymmetric-sibling idea as hackbench-cgroup2-fairness.yaml, applied here
+# via ebizzy's own thread-count (nr_threads) knob.
+cgroup2:
+  cg_count: 2
+
+nr_instances: 2
+
+nr_threads_by_instance: 2

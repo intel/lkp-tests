@@ -1,5 +1,6 @@
 #!/bin/bash
 # - nr_threads
+# - nr_threads_by_instance
 # - duration
 # - iterations
 # - mmap
@@ -20,6 +21,16 @@ duration=${duration%%s}
 
 [[ -n "$mmap" ]] && opt_mmap=" -m "
 [[ -n "$linear" ]] && opt_linear=" -z "
+
+# When running as multiple nr_instances (one per sibling cgroup2), let each
+# instance use its own nr_threads instead of every sibling running identical
+# concurrency: nr_threads_by_instance is a space-separated list, indexed by
+# instance_id (1-based); an instance whose position is blank or absent keeps
+# the job's shared nr_threads unchanged.
+override=$(instance_override "$nr_threads_by_instance")
+[[ -n "$override" ]] && nr_threads=$override
+
+echo_instance
 
 for i in $(seq 1 $iterations); do
 	echo Iteration: $i

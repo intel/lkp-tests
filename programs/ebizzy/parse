@@ -5,15 +5,20 @@
 
 LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 3)
 
+require "#{LKP_SRC}/lib/per_instance"
 require "#{LKP_SRC}/lib/statistics"
 
 workload = 0
+per_instance = LKP::PerInstance.new { |h, k| h[k] = { throughput: nil, workload: 0.0 } }
 
 while (line = $stdin.gets)
+  next if per_instance.scan(line)
+
   case line
   when /^(\d+) records\/s(.*)$/
     puts "throughput: #{$1}"
     throughput = $1.to_i
+    per_instance.current[:throughput] = throughput
     data = $2.split.map(&:to_i)
 
     puts "throughput.per_thread.min: #{data.min}"
@@ -23,6 +28,7 @@ while (line = $stdin.gets)
     puts "time.real: #{$1}"
     time = $1.to_f
     workload += throughput * time
+    per_instance.current[:workload] += per_instance.current[:throughput] * time
   when /^user\ +(\d+.\d+) s/
     puts "time.user: #{$1}"
   when /^sys\ +(\d+.\d+) s/
@@ -31,3 +37,16 @@ while (line = $stdin.gets)
 end
 
 puts "workload: #{workload}"
+
+# Per-instance breakdown: only meaningful when nr_instances > 1 (e.g. a
+# cgroup2 job with asymmetric nr_threads_by_instance across sibling
+# cgroups); a plain single-instance run only ever populates instance 1,
+# so it adds nothing beyond the combined stats above.
+if per_instance.many?
+  per_instance.each_sorted do |id, stat|
+    next if stat[:throughput].nil?
+
+    puts "throughput.instance#{id}: #{stat[:throughput]}"
+    puts "workload.instance#{id}: #{stat[:workload]}"
+  end
+end

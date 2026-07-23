@@ -1,0 +1,8 @@
+throughput: 36245
+throughput.per_thread.min: 18122
+throughput.per_thread.max: 18123
+throughput.per_thread.stddev_percent: 0.0013795006207752794
+time.real: 10.00
+time.user: 9.83
+time.sys: 0.17
+workload: 362450.0

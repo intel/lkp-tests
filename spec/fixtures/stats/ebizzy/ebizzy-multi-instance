@@ -1,0 +1,22 @@
+Instance: 1
+Iteration: 1
+36245 records/s 18122 18123
+real 10.00 s
+user 9.83 s
+sys 0.17 s
+Iteration: 2
+35998 records/s 18000 17998
+real 10.00 s
+user 9.81 s
+sys 0.18 s
+Instance: 2
+Iteration: 1
+1245789 records/s 623000 622789
+real 10.00 s
+user 9.70 s
+sys 0.28 s
+Iteration: 2
+1198765 records/s 600100 598665
+real 10.00 s
+user 9.75 s
+sys 0.24 s
