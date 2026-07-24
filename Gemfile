@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'colorize'
-gem 'git', '~> 1.7.0'
+gem 'git', '~> 3.1.1'
 gem 'gnuplot'
 gem 'pry'
 gem 'pry-doc'

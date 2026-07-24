@@ -7,8 +7,8 @@ require "#{LKP_SRC}/lib/string"
 
 module Git
   class Lib
-    def command_lines(cmd, opts = [], _redirect = '', chdir: true)
-      command_lines = command(cmd, opts, chdir: chdir)
+    def command_lines(*args, **kwargs)
+      command_lines = command(*args, **kwargs)
 
       # to deal with "GIT error: cat-file ["commit", "9f86262dcc573ca195488de9ec6e4d6d74288ad3"]: invalid byte sequence in US-ASCII"
       # - one possibility is the encoding of string is wrongly set (due to unknown reason), e.g. UTF-8 string's encoding is set as US-ASCII
@@ -19,17 +19,5 @@ module Git
 
     public :command_lines
     public :command
-
-    alias orig_command command
-
-    ENV_VARIABLE_NAMES = %w(GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_SSH).freeze unless defined? ENV_VARIABLE_NAMES
-
-    def command(cmd, opts = [], redirect = '', chdir: true, &block)
-      system_env_variables = ENV_VARIABLE_NAMES.to_h { |name| [name, ENV.fetch(name, nil)] }
-
-      orig_command(cmd, opts, chdir, redirect, &block)
-    ensure
-      system_env_variables.each { |name, value| ENV[name] = value }
-    end
   end
 end

@@ -12,6 +12,33 @@ require "#{LKP_SRC}/lib/git/object"
 
 module Git
   class << self
+    # Mark one or more directories (or every directory, with '*') as a
+    # git safe.directory for the current process, via the GIT_CONFIG_*
+    # environment variables git itself reads. Every subsequent git
+    # invocation in this process -- including the gem's own internal
+    # worktree-root check -- inherits this regardless of $HOME/UID.
+    #
+    # git >=2.35.2 refuses to operate on a repository not owned by the
+    # current user ("detected dubious ownership") unless that repository
+    # is explicitly marked safe. A caller whose own account differs from
+    # the repository owner (e.g. a daemon running as a service account
+    # against a checkout owned by a different account) hits this even
+    # though the checkout itself is perfectly valid; callers that know
+    # they run this way should call this explicitly at startup, scoped
+    # to only the directories they actually need (or '*' when the caller
+    # cannot know its exact set of repos up front).
+    #
+    # example
+    #    Git.mark_safe_directory(GIT_ROOT_DIR)
+    #    Git.mark_safe_directory('*')
+    def mark_safe_directory(*dirs)
+      dirs.each_with_index do |dir, i|
+        ENV["GIT_CONFIG_KEY_#{i}"] = 'safe.directory'
+        ENV["GIT_CONFIG_VALUE_#{i}"] = dir
+      end
+      ENV['GIT_CONFIG_COUNT'] = dirs.size.to_s
+    end
+
     # init a repository
     #
     # options

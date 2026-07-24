@@ -3,6 +3,8 @@
 LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__, 2)
 
 require 'git'
+require 'open3'
+require 'set'
 
 module Git
   class Object
@@ -15,7 +17,7 @@ module Git
         # this is to convert non sha1 40 such as tag name to corresponding commit sha
         # otherwise Object::AbstractObject uses @base.lib.revparse(@objectish) to get sha
         # which sometimes is not as expected when we give a tag name
-        self.objectish = command('rev-list', ['-1', objectish]) unless Git.sha1_40?(objectish)
+        self.objectish = command('rev-list', '-1', objectish) unless Git.sha1_40?(objectish)
       end
 
       def project
@@ -29,7 +31,7 @@ module Git
       end
 
       def tags
-        @tags ||= command("tag --points-at #{sha} | grep -v ^error:").split
+        @tags ||= command('tag', '--points-at', sha).split
       end
 
       def parent_shas
@@ -63,9 +65,10 @@ module Git
         if project == 'linux' && !@base.project_spec['use_customized_release_tag_pattern']
           @base.linux_last_release_tag_strategy(sha)
         else
-          last_release_sha = command("rev-list #{sha} | grep -m1 -Fx \"#{@base.release_shas.join("\n")}\"").chomp
+          release_shas = @base.release_shas.to_set
+          last_release_sha = command_lines('rev-list', sha).find { |commit| release_shas.include?(commit) }
 
-          last_release_sha.empty? ? nil : [@base.release_shas2tags[last_release_sha], false]
+          last_release_sha.nil? ? nil : [@base.release_shas2tags[last_release_sha], false]
         end
       end
 
@@ -171,7 +174,7 @@ module Git
 
       def reachable_from?(branch)
         branch = @base.gcommit(branch)
-        r = command('rev-list', ['-n', '1', sha, "^#{branch.sha}"])
+        r = command('rev-list', '-n', '1', sha, "^#{branch.sha}")
         r.strip.empty?
       end
 
@@ -188,7 +191,7 @@ module Git
       end
 
       def relative_commit_date
-        command("log -n1 --format=format:'%cr' #{sha}")
+        command('log', '-n1', '--format=format:%cr', sha)
       end
 
       def prev_official_release
@@ -210,27 +213,31 @@ module Git
       end
 
       def files
-        command("diff-tree --no-commit-id --name-only -r #{sha}").split
+        command('diff-tree', '--no-commit-id', '--name-only', '-r', sha).split
       end
 
       def fixed?(branch)
         short_sha = sha[0..7]
-        !command("log --grep 'Fixes:' #{sha}..#{branch} | grep \"Fixes: #{short_sha}\"").empty?
+        command_lines('log', '--grep=Fixes:', "#{sha}..#{branch}").any? { |line| line.include?("Fixes: #{short_sha}") }
       end
 
       def fixed_by(branch)
-        command_lines("log --grep='^Fixes: #{sha[0..7]}' -P --oneline --format='%H' #{sha}..#{branch}").map { |commit| @base.gcommit(commit) }
+        command_lines('log', "--grep=^Fixes: #{sha[0..7]}", '-P', '--oneline', '--format=%H', "#{sha}..#{branch}")
+          .map { |commit| @base.gcommit(commit) }
       end
 
       def reverted?(branch)
-        reverted_subject = "Revert \\\"#{subject.gsub(/(["\[\]])/, '\\\\\1')}\\\""
-        !command("log --format=%s #{sha}..#{branch} | grep -x -m1 \"#{reverted_subject}\"").empty?
+        reverted_subject = "Revert \"#{subject}\""
+        command_lines('log', '--format=%s', "#{sha}..#{branch}").any?(reverted_subject)
       end
 
       def exist_in?(branch)
         # $ git merge-base --is-ancestor 071e7d275bd4abeb7d75844020b05bd77032ac62 origin/master
         # fatal: Not a valid commit name 071e7d275bd4abeb7d75844020b05bd77032ac62
-        command("merge-base --is-ancestor #{sha} #{branch} 2>/dev/null; echo $?").to_i.zero?
+        command('merge-base', '--is-ancestor', sha, branch)
+        true
+      rescue Git::GitExecuteError
+        false
       end
 
       def mainline?
@@ -246,7 +253,14 @@ module Git
       def patch_id
         return @patch_id if @patch_id
 
-        @patch_id = command("show #{sha} 2>/dev/null | git patch-id --stable").split.first
+        diff = begin
+          command('show', sha)
+        rescue Git::GitExecuteError
+          ''
+        end
+
+        out, = Open3.capture2('git', 'patch-id', '--stable', stdin_data: diff)
+        @patch_id = out.split.first
       end
 
       def changes(base_commit = nil)
@@ -254,8 +268,7 @@ module Git
         # drivers/block/sunvdc.c
         base_commit ||= "#{sha}~"
 
-        cmd = "diff --name-status #{base_commit} #{sha}"
-        command_lines(cmd)
+        command_lines('diff', '--name-status', base_commit, sha)
       end
 
       def ancestor?(commit)
@@ -270,18 +283,18 @@ module Git
         @ancestors[commit] = exist_in?(commit)
       end
 
-      def command(cmd, opts = [], redirect = '', chdir: true, &block)
-        @base.command(cmd, opts, redirect, chdir: chdir, &block)
+      def command(*args, **kwargs)
+        @base.command(*args, **kwargs)
       end
 
-      def command_lines(cmd, opts = [], redirect = '', chdir: true)
-        @base.command_lines(cmd, opts, redirect, chdir: chdir)
+      def command_lines(*args, **kwargs)
+        @base.command_lines(*args, **kwargs)
       end
     end
 
     class Tag
       def commit
-        @base.gcommit(@base.command('rev-list', ['-1', @name]))
+        @base.gcommit(@base.command('rev-list', '-1', @name))
       end
     end
   end

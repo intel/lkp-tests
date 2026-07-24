@@ -31,7 +31,7 @@ module Git
     end
 
     def commit_exist?(commit)
-      command('rev-list', ['-1', commit])
+      command('rev-list', '-1', commit)
     rescue StandardError
       false
     else
@@ -39,15 +39,15 @@ module Git
     end
 
     def remote_exist?(remote)
-      command('remote').split.include?(remote)
+      lib.remotes.include?(remote)
     end
 
     def branch_exist?(pattern)
-      !command('branch', ['--list', '-a', pattern]).empty?
+      !command('branch', '--list', '-a', pattern).empty?
     end
 
     def branch_exist_in_remote?(remote_url, branch)
-      command("ls-remote -h #{remote_url} #{branch}").split.include?("refs/heads/#{branch}")
+      command('ls-remote', '-h', remote_url, branch).split.include?("refs/heads/#{branch}")
     end
 
     def kernel_branch?(branch)
@@ -96,7 +96,7 @@ module Git
       return @commits_tags if @commits_tags
 
       @commits_tags = {}
-      command('show-ref', ['--tags']).each_line do |line|
+      command('show-ref', '--tags').each_line do |line|
         commit, tag = line.split ' refs/tags/'
         @commits_tags[commit] = tag.chomp if tag
       end
@@ -148,7 +148,7 @@ module Git
     end
 
     def release_shas
-      @release_shas ||= release_tags.map { |release_tag| command('rev-list', ['-1', release_tag]) }
+      @release_shas ||= release_tags.map { |release_tag| command('rev-list', '-1', release_tag) }
     end
 
     def release_tags2shas
@@ -182,11 +182,11 @@ module Git
     def sort_commits(commits)
       scommits = commits.map(&:to_s)
       if scommits.size == 2
-        r = command('rev-list', ['-n', '1', "^#{scommits[0]}", scommits[1]])
+        r = command('rev-list', '-n', '1', "^#{scommits[0]}", scommits[1])
         scommits.reverse! if r.strip.empty?
       else
         scommits.sort! do |c1, c2|
-          r = command('rev-list', ['-n', '1', "^#{c1}", c2])
+          r = command('rev-list', '-n', '1', "^#{c1}", c2)
           if r.strip.empty?
             1
           else
@@ -199,15 +199,15 @@ module Git
     end
 
     def first_sha
-      command('rev-list --reverse HEAD |head -1')
+      command_lines('rev-list', '--reverse', 'HEAD').first
     end
 
-    def command(cmd, opts = [], redirect = '', chdir: true, &block)
-      lib.command(cmd, opts, redirect, chdir: chdir, &block)
+    def command(*args, **kwargs)
+      lib.command(*args, **kwargs)
     end
 
-    def command_lines(cmd, opts = [], redirect = '', chdir: true)
-      lib.command_lines(cmd, opts, redirect, chdir: chdir)
+    def command_lines(*args, **kwargs)
+      lib.command_lines(*args, **kwargs)
     end
   end
 end
