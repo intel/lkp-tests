@@ -26,13 +26,10 @@ exclude_tests()
 
 exclude_tests
 
-denylist=$BENCHMARK_ROOT/igt/tests/intel-ci/blacklist.txt
-if [[ -f "$denylist" ]]; then
-	grep -v -e ^# -e ^$ "$denylist" >"$(dirname "$denylist")/denylist"
-	denylist=$(dirname "$denylist")/denylist
-else
-	denylist=
-fi
+denylist=$BENCHMARK_ROOT/igt/tests/intel-ci/i915.blocklist.txt
+[[ -f "$denylist" ]] || die "igt denylist file not found: $denylist"
+grep -v -e ^# -e ^$ "$denylist" >"$(dirname "$denylist")/denylist"
+denylist=$(dirname "$denylist")/denylist
 
 while read -r testcase; do
 	if [[ $test ]]; then
@@ -53,7 +50,7 @@ while read -r testcase; do
 			continue
 		}
 
-		[[ -n "$denylist" ]] && echo "$full_test_name" | grep -q -E -f "$denylist" && {
+		echo "$full_test_name" | grep -q -E -f "$denylist" && {
 			echo "LKP SKIP $full_test_name"
 			continue
 		}
