@@ -17,12 +17,14 @@ fs:
 
 fs2:
   - smbv2
+  - smbv3
 
 xfstests:
   test:
     # generic/751 stress-writes large folios via fio (numjobs=nproc)
     # against a local smbd; the combined footprint OOMs a standard cifs
-    # testbox. run_smbv2_tests() in lib/tests/xfstests.sh excludes it
-    # everywhere except when requested by this exact name, so it only
-    # runs here, on the host this file's need_memory: 48G is allotted to.
+    # testbox. run_smbv2_tests()/run_smbv3_tests() in lib/tests/xfstests.sh
+    # exclude it everywhere except when requested by this exact name, so
+    # it only runs here, on the host this file's need_memory: 48G is
+    # allotted to.
     - generic-751
