@@ -5,8 +5,9 @@ arch=('i686' 'x86_64' 'aarch64')
 url="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git"
 license=('GPL')
 source=('https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git'
-	'https://git.kernel.org/pub/scm/devel/pahole/pahole.git')
-md5sums=('SKIP' 'SKIP')
+	'https://git.kernel.org/pub/scm/devel/pahole/pahole.git'
+	'https://github.com/google/packetdrill.git')
+md5sums=('SKIP' 'SKIP' 'SKIP')
 
 # Download kernel from git.kernel.org.
 # If the kernel has been download into the computer, you can copy it to ${srcdir}.
@@ -24,6 +25,15 @@ build()
 {
 	build_kernel_selftests_tools
 	build_pahole
+
+	# nf_conntrack_packetdrill.sh (net/netfilter) and the standalone
+	# net/packetdrill group both exec the packetdrill binary, but it is
+	# not part of the kernel selftests build and is not packaged by any
+	# distro, so it has to be built here the same way the standalone
+	# packetdrill test suite's own PKGBUILD does.
+	cd_src_pkg_dir packetdrill/gtests/net/packetdrill
+	./configure
+	CPPFLAGS="" make
 }
 
 package()
@@ -40,4 +50,6 @@ package()
 	# install cpupower command and library
 	cd_src_pkg_dir linux/tools/power/cpupower
 	make install DESTDIR="$pkgdir"
+
+	install -Dm755 "$(get_src_pkg_dir packetdrill)/gtests/net/packetdrill/packetdrill" "$pkgdir/usr/bin/packetdrill"
 }
