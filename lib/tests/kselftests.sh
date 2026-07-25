@@ -617,7 +617,11 @@ fixup_filesystems()
 
 fixup_intel_pstate()
 {
-	echo 'timeout=900' >>$group/settings
+	# run.sh sweeps every 100MHz step from max turbo down to the minimum
+	# supported frequency; on higher-thread-count hosts total elapsed
+	# time can land within ~50s of the previous 900s timeout, so a run
+	# occasionally trips it on ordinary run-to-run jitter.
+	echo 'timeout=1200' >>$group/settings
 }
 
 fixup_x86()
