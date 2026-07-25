@@ -186,6 +186,50 @@ test_needs_zoned_nullb()
 	fi
 }
 
+# Return 0 if any test in $1 declares a log-writes requirement via
+# _require_log_writes (or its _sized/_dax_mountopt variants), so that
+# setup_logwrites_dev is called regardless of which group the tests live
+# in. generic/455 calls _require_log_writes but ALSO internally calls
+# _require_metadata_journaling, so PKGBUILD's substring-based collect()
+# sweeps it into a generic-metadata-journaling-NN split bucket alongside
+# unrelated tests; is_test_in_group "$test" "generic-log-writes" alone
+# cannot see across that split-bucket boundary.
+test_needs_logwrites_dev()
+{
+	local prefix="${1%%-*}"
+	# Computed here (not at source time) since BENCHMARK_ROOT is only
+	# exported by the caller after this file is sourced.
+	local XFSTESTS_TESTS_DIR="$BENCHMARK_ROOT/xfstests/tests"
+	local group_file="$XFSTESTS_TESTS_DIR/$1"
+
+	if [[ -f "$group_file" ]]; then
+		sed "s|.*|$XFSTESTS_TESTS_DIR/$prefix/&|" "$group_file" |
+			xargs grep -qlE '_require_log_writes' 2>/dev/null
+	else
+		grep -qlE '_require_log_writes' \
+			"$XFSTESTS_TESTS_DIR/$prefix/${1#*-}" 2>/dev/null
+	fi
+}
+
+# True if $test either belongs to a known log-writes group, or its own
+# underlying test script requires log-writes support (see the note above
+# test_needs_logwrites_dev for why the group-name check alone is not enough).
+requires_logwrites_dev()
+{
+	is_test_in_group "$test" "btrfs-log-writes" "generic-log-writes" ||
+		test_needs_logwrites_dev "$test"
+}
+
+# True if $test's xfs mkfs should default to reflink=1: either it belongs
+# to a generic-group-NN batch, or it has enough partitions and belongs to
+# a log-writes group.
+requires_reflink_mkfs()
+{
+	is_test_in_group "$test" "generic-group-[0-9]*" && return
+
+	[[ "$nr_partitions" -ge 3 ]] && is_test_in_group "$test" "btrfs-log-writes" "generic-log-writes"
+}
+
 setup_mkfs_options()
 {
 	local mkfs_options=""
@@ -204,9 +248,7 @@ setup_mkfs_options()
 			# new version of mkfs.xfs set reflink=1 as default and conflict with DAX mount
 			# need to set reflink=0 manually
 			mkfs_options="-mreflink=0"
-		elif is_test_in_group "$test" "generic-group-[0-9]*" || {
-			[[ "$nr_partitions" -ge 3 ]] && is_test_in_group "$test" "btrfs-log-writes" "generic-log-writes"
-		}; then
+		elif requires_reflink_mkfs; then
 			mkfs_options="-mreflink=1"
 		else
 			# this doesn't apply to xfs-realtime-scratch-reflink
@@ -391,7 +433,7 @@ setup_fs_config()
 	setup_logdev_config
 
 	# need at least 3 partitions for TEST_DEV, SCRATCH_DEV and LOGWRITES_DEV
-	if is_test_in_group "$test" "btrfs-log-writes" "generic-log-writes" && [[ "$nr_partitions" -ge 3 ]]; then
+	if requires_logwrites_dev && [[ "$nr_partitions" -ge 3 ]]; then
 		setup_logwrites_dev
 
 		[[ "$fs" == "btrfs" ]] && [[ -n "$SCRATCH_DEV_POOL" ]] && {
