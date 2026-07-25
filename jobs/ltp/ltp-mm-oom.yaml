@@ -10,4 +10,11 @@ oom-killer:
 ltp:
   test:
     - mm-min_free_kbytes
+
+---
+# oom02 requires 2 real NUMA memory nodes
+need_node: 2
+
+ltp:
+  test:
     - mm-oom
