@@ -142,9 +142,6 @@ need_kconfig:
 - TUN: m
 - VETH: m
 
-% elsif ___.test == "net_stress.ipsec_dccp"
-- IPV6_VTI: m
-
 % elsif ___.test == "sched"
 - CFS_BANDWIDTH: y
 - SYSCTL: y

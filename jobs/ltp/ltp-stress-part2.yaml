@@ -15,7 +15,6 @@ ltp:
     # 6 hours 39 mins
     - net_stress.interface
     # more than 8 hours
-    - net_stress.ipsec_dccp
     - net_stress.ipsec_sctp
     # Stress test groups, all cases fail or CONF, or fail to get test results
     # - ltp-aio-stress
