@@ -14,7 +14,7 @@ build()
 {
   # running oltp by sysbench may get "Illegal instruction"
   # error on some arches so avoid it by --without-gcc-arch
-  make_src_pkg --prefix=/usr --without-gcc-arch --without-mysql
+  make_src_pkg --prefix=/usr --without-gcc-arch
 }
 
 package()

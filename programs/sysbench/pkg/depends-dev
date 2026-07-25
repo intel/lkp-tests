@@ -1,4 +1,5 @@
 libaio-dev
 libmariadb-dev
+libmariadb-dev-compat
 libpq-dev
 libssl-dev

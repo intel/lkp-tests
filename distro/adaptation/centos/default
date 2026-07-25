@@ -242,6 +242,7 @@ liblzo2-2: lzo
 liblzo2-dev: lzo-devel
 libmagic-mgc: file
 libmagic1:
+libmariadb-dev-compat:
 libmariadb-dev: mysql-devel
 libmariadb3: mariadb-connector-c
 libmbedtls-dev: mbedtls-devel

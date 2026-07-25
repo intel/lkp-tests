@@ -181,6 +181,7 @@ libldap: openldap2-devel
 liblz4-dev: liblz4-devel
 liblzma-dev: xz-devel
 liblzo2-dev: lzo-devel
+libmariadb-dev-compat:
 libmariadb-dev: libmariadb-devel
 libmbedtls-dev: mbedtls-devel
 libmnl-dev: libmnl-devel

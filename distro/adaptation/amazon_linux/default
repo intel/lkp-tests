@@ -200,6 +200,7 @@ liblzma-dev: xz-devel
 liblzma5:
 liblzo2-2: lzo
 liblzo2-dev: lzo-devel
+libmariadb-dev-compat:
 libmariadb-dev: mariadb105-devel
 libmnl-dev: libmnl-devel
 libmount-dev: libmount-devel

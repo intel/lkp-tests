@@ -211,6 +211,7 @@ liblzma-dev: xz-devel
 liblzma5:
 liblzo2-2: lzo
 liblzo2-dev: lzo-devel
+libmariadb-dev-compat:
 libmariadb-dev: mysql-devel
 libmariadb3: mariadb-connector-c
 libmbedtls-dev: mbedtls-devel
