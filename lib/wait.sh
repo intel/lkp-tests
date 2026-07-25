@@ -106,7 +106,7 @@ check_oom()
 	# that one test, which kirk already records as failed and moves
 	# past, so it must not abort the whole job.
 	if ! echo "$dmesg_out" | grep -q -F -e 'Out of memory' -e ': page allocation failure: order:'; then
-		echo "$dmesg_out" | grep -q -E 'oom-kill:constraint=CONSTRAINT_MEMCG,oom_memcg=/ltp/test-[0-9]+,' && return
+		echo "$dmesg_out" | grep -q -E 'oom-kill:constraint=CONSTRAINT_MEMCG,.*oom_memcg=/ltp/test-[0-9]+,' && return 1
 	fi
 
 	touch $TMP/OOM
