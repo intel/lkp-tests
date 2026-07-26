@@ -36,7 +36,7 @@ prepare_kselftests_dir()
 	linux_selftests_dir=$(realpath "${_linux_selftests_dirs[0]}")
 	if [[ $linux_selftests_dir ]]; then
 		# when reproduce bug reported by kernel test robot, the downloaded linux-headers file is stored at /usr/src/linux-headers
-		linux_headers_dir=$(get_linux_headers_dir "linux-headers*")
+		linux_headers_dir=$(get_linux_src_dir "linux-headers*")
 
 		[[ -n "$linux_headers_dir" ]] || die "failed to find linux-headers package"
 		echo "KERNEL SELFTESTS: linux_headers_dir is $linux_headers_dir"
@@ -50,10 +50,6 @@ prepare_kselftests_dir()
 
 		local build_link="/lib/modules/$(uname -r)/build"
 		[[ "$linux_selftests_dir" != "$build_link" ]] && ln -snf "$linux_selftests_dir" "$build_link"
-
-		linux_headers_bpf_dir=$(get_linux_headers_dir "linux-headers*-bpf")
-		[[ -n "$linux_headers_bpf_dir" ]] || die "failed to find linux-headers-bpf package"
-		cp -af $linux_headers_bpf_dir/* $linux_selftests_dir/
 
 		get_kconfig $linux_selftests_dir/.config
 	elif [ -d "/tmp/build-kselftests/linux" ]; then
@@ -91,22 +87,20 @@ prepare_for_bpf()
 		# make sure the test_bpf.ko path for bpf test is right
 		log_cmd mount --bind $modules_dir/kernel/lib $linux_selftests_dir/lib || die
 
-		# required by build bpf_testmod.ko
-		linux_headers_mod_dirs=$(get_linux_headers_dir "linux-headers*-bpf")
-		[[ -n "$linux_headers_mod_dirs" ]] || die "fail to find linux_headers_mod_dirs"
+		# required by build bpf_testmod.ko; the gcc-plugins/genksyms/
+		# generated-include build artifacts needed for out-of-tree module
+		# builds are already baked directly into the perf_selftests
+		# package (see create_linux_perf_selftests_initrd() in
+		# lib/kbuild.sh), so KDIR can just point at linux_selftests_dir.
+		export KDIR=$linux_selftests_dir
 
-		linux_headers_mod_dirs=$(realpath "$linux_headers_mod_dirs")
-		export KDIR=$linux_headers_mod_dirs
-
-		cp /sys/kernel/btf/vmlinux "$linux_headers_mod_dirs"
+		cp /sys/kernel/btf/vmlinux "$linux_selftests_dir"
 
 		(
 			#  CLNG-BPF [test_maps] bpf_iter_task_vma.o
 			# /bin/sh: 1: ./tools/bpf/resolve_btfids/resolve_btfids: not found
 			cd $linux_selftests_dir &&
-				make -j${nr_cpu} -C tools/bpf/resolve_btfids 2>&1 &&
-				mkdir -p $linux_headers_mod_dirs/tools/bpf/resolve_btfids &&
-				cp tools/bpf/resolve_btfids/resolve_btfids $linux_headers_mod_dirs/tools/bpf/resolve_btfids/
+				make -j${nr_cpu} -C tools/bpf/resolve_btfids 2>&1
 		)
 	fi
 }

@@ -13,10 +13,10 @@
 setup_wait
 
 local_run || {
-	linux_headers_dir=$(ls -d /usr/src/linux-headers*-bpf)
-	[ -z "$linux_headers_dir" ] && die "failed to find linux-headers package"
+	linux_modbuild_dir=$(ls -d /usr/src/linux-modbuild-*)
+	[ -z "$linux_modbuild_dir" ] && die "failed to find linux-modbuild package"
 	build_link="/lib/modules/$(uname -r)/build"
-	ln -sf "$linux_headers_dir" "$build_link"
+	ln -sf "$linux_modbuild_dir" "$build_link"
 }
 
 tools_dirs="/usr/share/bcc/tools/ /lkp/$LKP_USER/download/"

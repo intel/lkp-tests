@@ -7,12 +7,12 @@
 
 fixup_kdir()
 {
-	# link /lib/modulers/`uname -r`/build to linux_headers_dir
-	local linux_headers_dir=$(get_linux_headers_dir "linux-headers*-bpf")
-	[ -z "$linux_headers_dir" ] && return
+	# link /lib/modulers/`uname -r`/build to linux_modbuild_dir
+	local linux_modbuild_dir=$(get_linux_src_dir "linux-modbuild-*")
+	[ -z "$linux_modbuild_dir" ] && return
 
 	kdir="/lib/modules/$(uname -r)/build"
-	[ "$linux_headers_dir" != "$kdir" ] && ln -snvf "$linux_headers_dir" "$kdir"
+	[ "$linux_modbuild_dir" != "$kdir" ] && ln -snvf "$linux_modbuild_dir" "$kdir"
 }
 
 build_module()
