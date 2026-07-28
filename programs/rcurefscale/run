@@ -18,6 +18,14 @@ args=""
 [[ -n "$readdelay" ]] && args="$args readdelay=$readdelay"
 [[ -n "$nruns" ]] && args="$args nruns=$nruns"
 
+# refscale.c's shutdown_secs param is meant to default to 0 (disabled) when
+# built as a module, but its IS_MODULE() check tests a Kconfig symbol that
+# does not exist, so it always defaults to 300 regardless of build type.
+# That spawns a kthread which force powers off the box via
+# kernel_power_off() once 300s elapse, whether or not the requested nruns
+# have finished -- pass shutdown_secs=0 explicitly to keep this disabled.
+args="$args shutdown_secs=0"
+
 # since we will pass nr_thread to the test, so the test duration
 # depends on the cpu number. It's known that:
 # 144 cpus cost 329 seconds
