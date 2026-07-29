@@ -284,6 +284,25 @@ def unite_to(stats, matrix_root, max_cols = nil, delete: false)
   matrix
 end
 
+# Undo unite_to's append for one rt: unite_to has no way to know in
+# advance that a run will later be isolated as bad (e.g. the failure
+# surfaces only after matrix.json was already saved), so a run whose
+# unite ultimately fails still needs its column retracted here.
+def remove_rt_from_matrix(result_root, matrix_root)
+  matrix_file = "#{matrix_root}/matrix.json"
+
+  matrix = load_matrix_file(matrix_file)
+  return unless matrix && matrix[STATS_SOURCE_KEY]
+
+  col = matrix[STATS_SOURCE_KEY].index "#{result_root}/stats.json"
+  return unless col
+
+  matrix_delete_col(matrix, col)
+  matrix = unite_remove_empty_stats(matrix)
+
+  save_json(matrix, matrix_file)
+end
+
 # serves as locate db
 def save_paths(result_root, user)
   date_glob = Time.now.strftime('%F')
