@@ -147,7 +147,7 @@ module Git
 
       def linux_next_version
         show('localversion-next').first.sub(/^-/, '')
-      rescue Git::GitExecuteError
+      rescue Git::Error
         # ignore error to return nil
         nil
       end
@@ -236,7 +236,7 @@ module Git
         # fatal: Not a valid commit name 071e7d275bd4abeb7d75844020b05bd77032ac62
         command('merge-base', '--is-ancestor', sha, branch)
         true
-      rescue Git::GitExecuteError
+      rescue Git::Error
         false
       end
 
@@ -255,7 +255,7 @@ module Git
 
         diff = begin
           command('show', sha)
-        rescue Git::GitExecuteError
+        rescue Git::Error
           ''
         end
 
