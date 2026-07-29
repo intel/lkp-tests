@@ -76,12 +76,12 @@ upload_one_curl()
 		(
 			cd "$(dirname "$1")" || exit
 			dir=$(basename "$1")
-			find "$dir" -type d -exec curl -sSf -X MKCOL "http://$LKP_SERVER$dest/{}" \;
+			find "$dir" -type d -exec curl -sSf -X MKCOL "http://$LKP_SERVER$dest/{}/" \;
 			find "$dir" -type f -size +0 -exec curl -sSf -T '{}' "http://$LKP_SERVER$dest/{}" \;
 		)
 	else
 		[ -s "$src" ] || return
-		curl -sSf -T "$src" http://$LKP_SERVER$dest/
+		curl -sSf -T "$src" "http://$LKP_SERVER$dest/$(basename "$src")"
 	fi
 }
 
@@ -99,7 +99,7 @@ upload_files_curl()
 		# shellcheck disable=SC2046
 		for dir in $(echo $target_directory | tr '/' ' '); do
 			job_result_root=$job_result_root/$dir
-			curl -sSf -X MKCOL http://$LKP_SERVER$job_result_root >/dev/null
+			curl -sSf -X MKCOL "http://$LKP_SERVER$job_result_root/" >/dev/null
 		done
 	}
 
