@@ -268,7 +268,10 @@ pack_src_pkg_contents()
 		(
 			cd "$src_pkg_dir" || exit
 
-			pack_contents "$@" "$dst_dir"
+			# shellcheck disable=SC2068 # intentional: expand a caller's
+			# glob string (e.g. "phpbench-0.8.1-patched2/*") here, after
+			# the cd above, not at the PKGBUILD call site.
+			pack_contents $@ "$dst_dir"
 		)
 	fi
 }
