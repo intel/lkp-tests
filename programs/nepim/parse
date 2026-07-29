@@ -3,14 +3,19 @@
 tcp_key = %w(kbps_in kbps_out rcv_s snd_s)
 udp_key = %w(kbps_in kbps_out rcv_s snd_s loss ooo LOST)
 while (line = $stdin.gets)
-  case line.chomp!
-  when /^\s*\d\s*avg\s*\d/
-    data = line.split
+  data = line.chomp.split
+
+  # TCP report line: "<sd> avg <elapsed> <values...>"
+  # UDP report line: "<sd> <local_slot> <remote_slot> avg <elapsed> <values...>"
+  # Locate the "avg" label by field position rather than counting digit
+  # characters, since <sd>/<local_slot>/<remote_slot> may be multi-digit
+  # (e.g. on many-core hosts running dozens of nepim threads), which would
+  # otherwise be miscounted as extra fields and misclassify the line.
+  if data[1] == 'avg'
     data[3..].each_with_index do |v, i|
       puts "tcp.avg.#{tcp_key[i]}: #{v.to_f}"
     end
-  when /^\s*\d\s*\d\s*\d\s*avg\s*\d/
-    data = line.split
+  elsif data[3] == 'avg'
     data[5..].each_with_index do |v, i|
       puts "udp.avg.#{udp_key[i]}: #{v.to_f}"
     end
