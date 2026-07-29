@@ -22,7 +22,7 @@ package()
 	local avocado_data_dir="/lkp/benchmarks/avocado/data"
 	pack_avocado_vt $avocado_data_dir
 
-	pack_contents "$(get_pkg_dir $pkgname)/addon/*.cfg" "${pkgdir}$avocado_data_dir/avocado-vt/backends/qemu/cfg/"
+	pack_contents "$(get_pkg_dir $pkgname)"/addon/*.cfg "${pkgdir}$avocado_data_dir/avocado-vt/backends/qemu/cfg/"
 	pack_contents "$srcdir/lkvs/KVM" "${pkgdir}/lkp/benchmarks/lkvs"
 
 	# required by lkvs/KVM/qemu/tests/x86_cpuid.py

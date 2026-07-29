@@ -202,7 +202,7 @@ build()
 
 package()
 {
-	pack_contents "$srcdir/xfstests-dev/*" $benchmark_path
+	pack_contents "$srcdir"/xfstests-dev/* $benchmark_path
 	pack_contents "$srcdir/util-linux" "$benchmark_path"
 	# xfsprogs-dev source is required by xfs/437
 	pack_contents "$srcdir/xfsprogs-dev" "$benchmark_path/src"

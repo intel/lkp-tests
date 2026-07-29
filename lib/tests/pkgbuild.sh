@@ -194,7 +194,7 @@ build_edk2()
 
 pack_edk2()
 {
-	pack_contents "$srcdir/edk2/Build/OvmfX64/DEBUG_GCC*/FV/OVMF.fd" "${pkgdir}/lkp/benchmarks/edk2/Build/OvmfX64/DEBUG_GCC/FV"
+	pack_contents "$srcdir"/edk2/Build/OvmfX64/DEBUG_GCC*/FV/OVMF.fd "${pkgdir}/lkp/benchmarks/edk2/Build/OvmfX64/DEBUG_GCC/FV"
 }
 
 pack_avocado_vt()

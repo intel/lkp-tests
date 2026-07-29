@@ -63,8 +63,8 @@ build_hwsim_tests()
 
 package()
 {
-	pack_contents "$srcdir/wmediumd/*" $benchmark_path
-	pack_contents "$srcdir/hostap/*" $benchmark_path
+	pack_contents "$srcdir"/wmediumd/* $benchmark_path
+	pack_contents "$srcdir"/hostap/* $benchmark_path
 
 	# binary will be installed into /usr/bin/wmediumd
 	cd_src_pkg_dir wmediumd
