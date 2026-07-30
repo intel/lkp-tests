@@ -195,4 +195,35 @@ describe ResultPath do
       end
     end
   end
+
+  describe '.with_release_tag' do
+    before do
+      stub_const 'GIT_WORK_TREE', File.join(git_root_dir, 'linux')
+      stub_const 'GIT_DIR', "#{GIT_WORK_TREE}/.git"
+      stub_const 'GIT', "git --work-tree=#{GIT_WORK_TREE} --git-dir=#{GIT_DIR}"
+    end
+
+    # commit 64291f7db5bd8150a74ad2036f1037e6a0428df2 is tagged v4.2
+    it 'substitutes the commit segment with its Linus release tag when found' do
+      result_root = '/result/testcase/tbox/rootfs/kconfig/compiler/64291f7db5bd8150a74ad2036f1037e6a0428df2/0'
+      expect(described_class.with_release_tag(result_root))
+        .to eq '/result/testcase/tbox/rootfs/kconfig/compiler/v4.2/0'
+    end
+
+    # regression test: a result_root whose path has one extra segment past
+    # the commit (e.g. a raw file path instead of the result-root
+    # directory) makes this extract a run number like "0" instead of a
+    # real commit. That used to crash with a Bash::BashCallError from the
+    # underlying `git log ... "0"` call; it must now fail soft and return
+    # the path unchanged, same as the original bash implementation did.
+    it 'returns the path unchanged, without raising, when the commit segment is not a real ref' do
+      result_root = '/result/testcase/tbox/rootfs/kconfig/compiler/0/1'
+      expect { described_class.with_release_tag(result_root) }.not_to raise_error
+      expect(described_class.with_release_tag(result_root)).to eq result_root
+    end
+
+    it 'returns the path unchanged for paths outside /result/' do
+      expect(described_class.with_release_tag('/other/path')).to eq '/other/path'
+    end
+  end
 end

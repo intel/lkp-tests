@@ -154,6 +154,20 @@ class ResultPath < Hash
       cmdline = "grep -he '#{pattern}' #{KTEST_PATHS_DIR}/*/????-??-??-* | sed -e 's#[0-9]\\+/$##' | sort | uniq"
       Bash.safe_grep(cmdline)
     end
+
+    # substitute a /result/-rooted path's commit sha with its Linus release
+    # tag (e.g. v6.10-rc1) when one applies, so paths for the same tagged
+    # release group together regardless of which commit under it was tested
+    def with_release_tag(result_root)
+      return result_root unless result_root.start_with?('/result/')
+
+      commit = File.basename(File.dirname(result_root))
+      tag = linus_release_tag(commit)
+
+      tag ? result_root.sub(commit, tag) : result_root
+    rescue Bash::BashCallError
+      result_root
+    end
   end
 end
 
