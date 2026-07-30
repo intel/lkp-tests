@@ -67,8 +67,8 @@ Spectre_v2_mitigation
 ^dmesg\.BUG_TestSlub_.*
 ^dmesg\.calltrace
 ^dmesg\.drm:intel_acpi_device_id_update.*
-^dmesg\.inconsistent\{HARDIRQ\-ON\-W\}\-
-^dmesg\.inconsistent\{IN\-HARDIRQ\-W\}\-
+^dmesg\.inconsistent[{]HARDIRQ\-ON\-W[}]\-
+^dmesg\.inconsistent[{]IN\-HARDIRQ\-W[}]\-
 ^dmesg\.INFO:NMI_handler.*took_too_long_to_run:
 ^dmesg\.INFO:Slab0x\(____ptrval____\)objects=#used=#fp=0x\((null|____ptrval____)\)flags=
 ^dmesg\.INFO:Stall_ended_before_state_dump_start

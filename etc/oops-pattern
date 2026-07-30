@@ -27,7 +27,7 @@ failed to enable IOPF feature
 genirq: Flags mismatch irq .*
 getblk\(\): invalid block size [0-9]+ requested
 GUP no longer grows the stack
-inconsistent \{.*\} -> \{.*\} usage\.
+inconsistent [{].*[}] -> [{].*[}] usage\.
 INFO: .* cpu=.*
 INFO: .*detected stall.*
 INFO: 0x.*. First byte 0x.*

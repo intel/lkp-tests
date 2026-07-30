@@ -2,7 +2,7 @@ BUG: KASAN: .* \[kasan_test\]
 BUG: KFENCE: .* \[kfence_test\]
 INFO: NMI handler .* took too long to run
 INFO: Stall ended before state dump start
-Killed process [0-9]+ \(
+Killed process [0-9]+ [(]
 Out of memory: .*trinity
 Spectre V2 : WARNING: Unprivileged eBPF is enabled with eIBRS on, data leaks possible via Spectre v2 BHB attacks
 trinity.*: page allocation failure

@@ -1,6 +1,6 @@
 ^/dev/mapper/control: open failed: No such device
 ^kmsg\.sanitizer
-^stderr\.BPF_MOV64_IMM\(BPF_REG_0,#
+^stderr\.BPF_MOV64_IMM[(]BPF_REG_0,#
 ^stderr\.disk_r(r|w)\(\):No_space_left_on_device
 ^stderr\.mkfs.xfs:pwrite_failed:Invalid_argument
 ^stderr\.modprobe:ERROR:could_not_insert'btrfs':Key_was_rejected_by_service

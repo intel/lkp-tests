@@ -1,4 +1,4 @@
 mkfs.ocfs2 .*
 umount: /mnt/ocfs2: target is busy
-\s+use the device is found by lsof\([0-9]\) or fuser\([0-9]\)\.\)
-\s+\(In some cases useful info about processes that
+\s+use the device is found by lsof[(][0-9][)] or fuser[(][0-9][)]\.[)]
+\s+[(]In some cases useful info about processes that

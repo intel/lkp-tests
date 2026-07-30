@@ -1,4 +1,4 @@
 In file included from .*
 scripts\/kconfig\/confdata\.c:.*
-\s+sprintf\(.*
+\s+sprintf[(].*
 \s+\^~*
