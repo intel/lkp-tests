@@ -21,6 +21,7 @@ libfuse3
 libgdbm-compat4
 libgdbm6
 libicu
+libinih1
 libiscsi
 liblzo2-2
 libreadline5

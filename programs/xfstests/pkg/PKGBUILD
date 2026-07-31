@@ -41,6 +41,17 @@ build_install_btrfs_progs()
 	make install DESTDIR="${pkgdir}"
 }
 
+# The distro-packaged xfsprogs lags upstream (e.g. mkfs.xfs's realtime
+# zoned-device support, needed by xfs/651-653), so build the same source
+# already cloned for xfs/437 and let it override the distro binaries.
+build_install_xfsprogs()
+{
+	cd_src_pkg_dir xfsprogs-dev
+
+	make
+	make install DESTDIR="${pkgdir}"
+}
+
 build_install_bcachefs_tools()
 {
 	export CARGO_HOME=$pkgdir/cargo
@@ -190,6 +201,7 @@ build()
 	build_util_linux
 	build_install_f2fs_tools
 	build_install_btrfs_progs
+	build_install_xfsprogs
 
 	build_install_e2fuzz
 
