@@ -23,10 +23,13 @@ module Git
     # is explicitly marked safe. A caller whose own account differs from
     # the repository owner (e.g. a daemon running as a service account
     # against a checkout owned by a different account) hits this even
-    # though the checkout itself is perfectly valid; callers that know
-    # they run this way should call this explicitly at startup, scoped
-    # to only the directories they actually need (or '*' when the caller
-    # cannot know its exact set of repos up front).
+    # though the checkout itself is perfectly valid. Git.open/Git.init
+    # already call this automatically for their own working_dir, so most
+    # callers never need to call it directly; call it explicitly only
+    # when working with a repo through some other path (raw `git`/`Git.bare`
+    # shellouts, a second repo not opened via Git.open) that needs the
+    # same treatment, scoped to only the directories actually needed (or
+    # '*' when the caller cannot know its exact set of repos up front).
     #
     # example
     #    Git.mark_safe_directory(GIT_ROOT_DIR)
@@ -57,6 +60,8 @@ module Git
 
       working_dir = options[:working_dir] || "#{GIT_ROOT_DIR}/#{options[:project]}"
 
+      mark_safe_directory(working_dir)
+
       Git.orig_init(working_dir, options)
     end
 
@@ -70,6 +75,11 @@ module Git
       working_dir = options[:working_dir] || "#{GIT_ROOT_DIR}/#{options[:project]}"
 
       return if options[:may_not_exist] && !Dir.exist?(working_dir)
+
+      # Any caller may run as an account that doesn't own $GIT_ROOT_DIR's
+      # checkout, which git >=2.35.2 refuses to touch
+      # unless marked safe -- see comment on mark_safe_directory above.
+      mark_safe_directory(working_dir)
 
       Git.orig_open(working_dir, options)
     end
