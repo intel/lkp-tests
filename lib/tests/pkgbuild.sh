@@ -471,6 +471,55 @@ build_kernel_selftests_tools()
 	make
 }
 
+# Kernel-source-relative paths that must be packaged verbatim for
+# kselftests to build but aren't reachable by walking
+# tools/testing/selftests/** for symlinks (selftests_symlink_target_dirs()
+# below) -- either because they're plain directory-wide copies (tools,
+# include, ...), or because the selftest reaches them via a Makefile
+# variable (arch/arm64/tools, pulled in by kvm's Makefile.kvm ARCH=arm64
+# branch) or a C #include of a relative path that was never a symlink
+# (drivers/iommu/iommufd/iommufd_test.h, mm/gup_test.h,
+# Documentation/netlink's ynl spec files) rather than a symlinked file.
+# install_kernel_selftests() below and kernel-tests'
+# create_linux_perf_selftests_initrd() (which sources this file) both pack
+# this same list, instead of maintaining separate copies.
+selftests_static_target_dirs()
+{
+	echo arch/x86 arch/arm64/tools Documentation/netlink scripts kernel/bpf \
+		samples Makefile tools include lib \
+		drivers/iommu/iommufd/iommufd_test.h mm/gup_test.h
+}
+
+# tools/testing/selftests/** contains symlinks that point outside tools/
+# into other parts of the kernel tree -- e.g. vfio's DSA/IOAT driver
+# helpers resolve into drivers/dma/idxd/ and drivers/dma/ioat/. Resolve
+# every such symlink and print the distinct target directories not already
+# covered by selftests_static_target_dirs(), so a future selftests symlink
+# pointing somewhere new is picked up automatically instead of needing
+# another hand-added directory entry. Must be run with $PWD at the kernel
+# source root.
+selftests_symlink_target_dirs()
+{
+	local -a covered
+	read -r -a covered <<<"tools/testing/selftests $(selftests_static_target_dirs)"
+
+	local link target rel dir excl is_covered
+	while IFS= read -r link; do
+		target=$(readlink -f "$link") || continue
+		rel=${target#"$PWD"/}
+		[[ $rel != "$target" ]] || continue # resolves outside the source tree
+
+		dir=$(dirname "$rel")
+		is_covered=
+		for excl in "${covered[@]}"; do
+			[[ $dir == "$excl" || $dir == "$excl"/* ]] || continue
+			is_covered=1
+			break
+		done
+		[[ $is_covered ]] || echo "$dir"
+	done < <(find tools/testing/selftests -type l 2>/dev/null) | sort -u
+}
+
 install_kernel_selftests()
 {
 	cd_src_pkg_dir linux
@@ -484,7 +533,7 @@ install_kernel_selftests()
 	pack_contents "${header_dir}/include/asm" "${benchmark_path}/tools/include/uapi"
 
 	local dir
-	for dir in arch/x86 scripts kernel/bpf samples Makefile tools include lib; do
+	for dir in $(selftests_static_target_dirs) $(selftests_symlink_target_dirs); do
 		pack_contents $dir "$(dirname "${benchmark_path}/$dir")"
 	done
 }
