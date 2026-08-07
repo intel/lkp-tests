@@ -242,7 +242,19 @@ setup_mkfs_options()
 		mkfs_options="-f"
 		;;
 	xfs)
-		if is_test_in_group "$test" "xfs-projid16bit"; then
+		if is_test_in_group "xfs-016" "$test"; then
+			# xfs/016's _init() requires logsunit==0 from the mkfs
+			# it runs internally, else it _notruns with "Cannot run
+			# this test using log MKFS_OPTIONS specified". On a
+			# device whose reported physical sector size is above
+			# 512 bytes, mkfs.xfs defaults an internal v2 log with
+			# no data stripe alignment to logsunit=1, not 0 (see
+			# calc_stripe_factors() in xfsprogs' mkfs/xfs_mkfs.c).
+			# Forcing the sector size to 512 keeps mkfs.xfs's log
+			# sector size at the XLOG_HEADER_SIZE boundary, so that
+			# fallback is never taken and logsunit stays 0.
+			mkfs_options="-dsectsize=512"
+		elif is_test_in_group "$test" "xfs-projid16bit"; then
 			mkfs_options="-mcrc=0"
 		elif is_test_in_group "$test" "generic-dax"; then
 			# new version of mkfs.xfs set reflink=1 as default and conflict with DAX mount
