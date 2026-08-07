@@ -8,65 +8,72 @@ require "#{LKP_SRC}/lib/ftrace"
 require "#{LKP_SRC}/lib/statistics"
 require "#{LKP_SRC}/lib/yaml"
 
-$options = {
-  in_file: $stdin,
-  out_file_name: 'ftrace-matrix.json',
-  fmt_dir: 'ftrace_events',
-  keys: []
-}
+class FtraceEventToMatrix
+  def initialize
+    @options = {
+      in_file: $stdin,
+      out_file_name: 'ftrace-matrix.json',
+      fmt_dir: 'ftrace_events',
+      keys: []
+    }
+    @keys_set = Set.new @options[:keys]
+    @matrix = {}
+  end
 
-$keys_set = Set.new $options[:keys]
+  def run
+    parse_options
+    parse
+    save
+  end
 
-$option_parser = OptionParser.new do |opts|
-  opts.banner = "Usage:
+  private
+
+  def parse_options
+    option_parser = OptionParser.new do |opts|
+      opts.banner = "Usage:
      ftrace-event-to-matrix -i <input-file> -o <output-file> [-k <key-fields>]"
 
-  opts.on('-i IN_FILE', '--input IN_FILE', 'input file name') { |in_file| $options[:in_file] = File.new in_file }
+      opts.on('-i IN_FILE', '--input IN_FILE', 'input file name') { |in_file| @options[:in_file] = File.new in_file }
 
-  opts.on('-o OUT_FILE', '--output OUT_FILE', 'output file name') { |out_file| $options[:out_file_name] = out_file }
+      opts.on('-o OUT_FILE', '--output OUT_FILE', 'output file name') { |out_file| @options[:out_file_name] = out_file }
 
-  opts.on('-k KEYS', '--keys KEYS', 'key fields') do |keys|
-    $options[:keys] = keys.split(',').map(&:intern)
-    $keys_set = Set.new $options[:keys]
+      opts.on('-k KEYS', '--keys KEYS', 'key fields') do |keys|
+        @options[:keys] = keys.split(',').map(&:intern)
+        @keys_set = Set.new @options[:keys]
+      end
+
+      opts.on('-f FMT_DIR', '--fmt FMT_DIR', 'ftrace event format files directory') do |fmt_dir|
+        @options[:fmt_dir] = fmt_dir
+      end
+    end
+    option_parser.parse!
   end
 
-  opts.on('-f FMT_DIR', '--fmt FMT_DIR', 'ftrace event format files directory') do |fmt_dir|
-    $options[:fmt_dir] = fmt_dir
+  def sample_key(sample)
+    ks = [sample.type] + @options[:keys].map { |k| sample[k] }
+    ks.join '.'
   end
-end
 
-$matrix = {}
+  def parse
+    tp_trace = TPTrace.new @options[:in_file], @options[:fmt_dir]
+    tp_trace.each do |sample|
+      kpfx = sample_key sample
+      ktime = "#{kpfx}.time"
+      @matrix[ktime] ||= []
+      @matrix[ktime] << sample.timestamp
+      sample.data.each do |k, v|
+        next if @keys_set.include? k
 
-def sample_key(sample)
-  ks = [sample.type] + $options[:keys].map { |k| sample[k] }
-  ks.join '.'
-end
-
-def parse
-  tp_trace = TPTrace.new $options[:in_file], $options[:fmt_dir]
-  tp_trace.each do |sample|
-    kpfx = sample_key sample
-    ktime = "#{kpfx}.time"
-    $matrix[ktime] ||= []
-    $matrix[ktime] << sample.timestamp
-    sample.data.each do |k, v|
-      next if $keys_set.include? k
-
-      key = "#{kpfx}.#{k}"
-      $matrix[key] ||= []
-      $matrix[key] << v
+        key = "#{kpfx}.#{k}"
+        @matrix[key] ||= []
+        @matrix[key] << v
+      end
     end
   end
+
+  def save
+    save_json(@matrix, @options[:out_file_name])
+  end
 end
 
-def save
-  save_json($matrix, $options[:out_file_name])
-end
-
-def main
-  $option_parser.parse!
-  parse
-  save
-end
-
-main
+FtraceEventToMatrix.new.run

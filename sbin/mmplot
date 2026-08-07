@@ -10,7 +10,7 @@ require "#{LKP_SRC}/lib/statistics"
 require "#{LKP_SRC}/lib/stats"
 require "#{LKP_SRC}/lib/yaml"
 
-$options = {}
+options = {}
 
 opt_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: mmplot matrix1.json matrix2.json [stat_fields...] [OPTION...]'
@@ -24,19 +24,19 @@ opt_parser = OptionParser.new do |opts|
   opts.separator ''
   opts.separator 'options:'
 
-  opts.on('-d N', '--distance N', 'threshold of changes') { |n| $options['distance'] = n.to_i }
+  opts.on('-d N', '--distance N', 'threshold of changes') { |n| options['distance'] = n.to_i }
 
-  opts.on('-p', '--perf', 'show performance changes only') { $options['perf'] = true }
+  opts.on('-p', '--perf', 'show performance changes only') { options['perf'] = true }
 
-  opts.on('-c', '--concise', 'skip non-important changes') { $options['concise'] = true }
+  opts.on('-c', '--concise', 'skip non-important changes') { options['concise'] = true }
 
-  opts.on('-r N', '--resize N', 'resize first matrix') { |n| $options['resize'] = n.to_i }
+  opts.on('-r N', '--resize N', 'resize first matrix') { |n| options['resize'] = n.to_i }
 
-  opts.on('-v N', '--variance N', 'show variance changes larger than N times') { |n| $options['variance'] = n.to_i }
+  opts.on('-v N', '--variance N', 'show variance changes larger than N times') { |n| options['variance'] = n.to_i }
 
   opts.on('-o DIR', '--output DIR', 'output dir') do |dir|
     Dir.mkdir dir unless File.directory? dir
-    $opt_output_path = dir
+    options[:output_path] = dir
   end
 
   opts.on_tail('-h', '--help', 'show help message') do
@@ -69,10 +69,10 @@ exit if matrix2.nil?
 if ARGV[0]
   changed_fields = ARGV
 else
-  changed_stats = get_changed_stats path1, path2, $options
+  changed_stats = get_changed_stats path1, path2, options
   exit unless changed_stats && !changed_stats.empty?
   changed_fields = changed_stats.keys
 end
 
-changed_fields.reject! { |stat| function_stat?(stat) || !bisectable_stat?(stat) } if $options['concise']
-mmplot(matrix1, matrix2, changed_fields)
+changed_fields.reject! { |stat| StatClassifier.function_stat?(stat) || !StatClassifier.bisectable_stat?(stat) } if options['concise']
+mmplot(matrix1, matrix2, changed_fields, output_path: options[:output_path])

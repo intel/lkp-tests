@@ -1,7 +1,11 @@
 require 'spec_helper'
 
 describe 'require order' do
-  files = Dir.glob("#{LKP_SRC}/**/*.rb").reject { |f| f.include?('/vendor/') || f.include?('/web/backend/spec/') || f.end_with?('lib/time.rb') } +
+  # A file opts out of the alphabetical check by including a
+  # 'require-order-exempt:' comment explaining why (e.g. a load-time
+  # dependency between two of its own requires) -- keeps the reason
+  # colocated with the file it applies to, instead of hardcoded here.
+  files = Dir.glob("#{LKP_SRC}/**/*.rb").reject { |f| f.include?('/vendor/') || f.include?('/web/backend/spec/') || f.end_with?('lib/time.rb') || File.read(f) =~ /^# require-order-exempt:/ } +
           Dir.glob("#{LKP_SRC}/{bin,sbin,tools,programs,filters,lkp-exec}/*").select { |f| File.file?(f) && File.read(f, 100) =~ /ruby/ }
 
   files.each do |file_path|

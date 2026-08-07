@@ -471,33 +471,31 @@ build_kernel_selftests_tools()
 	make
 }
 
-# Kernel-source-relative paths that must be packaged verbatim for
-# kselftests to build but aren't reachable by walking
-# tools/testing/selftests/** for symlinks (selftests_symlink_target_dirs()
-# below) -- either because they're plain directory-wide copies (tools,
-# include, ...), or because the selftest reaches them via a Makefile
-# variable (arch/arm64/tools, pulled in by kvm's Makefile.kvm ARCH=arm64
-# branch) or a C #include of a relative path that was never a symlink
-# (drivers/iommu/iommufd/iommufd_test.h, mm/gup_test.h,
-# Documentation/netlink's ynl spec files) rather than a symlinked file.
-# install_kernel_selftests() below and kernel-tests'
-# create_linux_perf_selftests_initrd() (which sources this file) both pack
-# this same list, instead of maintaining separate copies.
+# Kernel-source-relative paths needed to build kselftests but not
+# reachable by walking tools/testing/selftests/** for symlinks (see
+# selftests_symlink_target_dirs() below). Shared by
+# install_kernel_selftests() and other scripts that source this file
+# to build a kselftests initrd.
 selftests_static_target_dirs()
 {
-	echo arch/x86 arch/arm64/tools Documentation/netlink scripts kernel/bpf \
-		samples Makefile tools include lib \
-		drivers/iommu/iommufd/iommufd_test.h mm/gup_test.h
+	echo arch/arm64/tools
+	echo arch/x86
+	echo Documentation/netlink
+	echo drivers/iommu/iommufd/iommufd_test.h
+	echo include
+	echo kernel/bpf
+	echo lib
+	echo Makefile
+	echo mm/gup_test.h
+	echo samples
+	echo scripts
+	echo tools
 }
 
-# tools/testing/selftests/** contains symlinks that point outside tools/
-# into other parts of the kernel tree -- e.g. vfio's DSA/IOAT driver
-# helpers resolve into drivers/dma/idxd/ and drivers/dma/ioat/. Resolve
-# every such symlink and print the distinct target directories not already
-# covered by selftests_static_target_dirs(), so a future selftests symlink
-# pointing somewhere new is picked up automatically instead of needing
-# another hand-added directory entry. Must be run with $PWD at the kernel
-# source root.
+# Resolve tools/testing/selftests/** symlinks pointing outside tools/
+# (e.g. vfio's DSA/IOAT helpers into drivers/dma/), and print target
+# directories not already covered by selftests_static_target_dirs().
+# Must be run with $PWD at the kernel source root.
 selftests_symlink_target_dirs()
 {
 	local -a covered

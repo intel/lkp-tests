@@ -10,15 +10,17 @@ require "#{LKP_SRC}/lib/job"
 require "#{LKP_SRC}/lib/log"
 require "#{LKP_SRC}/lib/result_root"
 
+options = {}
+
 opt_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: merge-remote-result [-r REMOTE] RESULT_ROOT'
 
   opts.separator ''
   opts.separator 'options:'
 
-  opts.on('-r [REMOTE]', '--remote [REMOTE]', 'remote host name') { |remote| $opt_remote = remote }
+  opts.on('-r [REMOTE]', '--remote [REMOTE]', 'remote host name') { |remote| options[:remote] = remote }
 
-  opts.on('-f', '--force', 'force to overwrite') { $opt_force = true }
+  opts.on('-f', '--force', 'force to overwrite') { options[:force] = true }
 
   opts.on_tail('-h', '--help', 'Show this message') do
     puts opts
@@ -40,9 +42,9 @@ unless result_root_dir
 end
 
 tmp_dir = ''
-if $opt_remote
+if options[:remote]
   tmp_dir = Dir.mktmpdir
-  sync_cmd = "rsync -azh --info=progress2 --delete #{$opt_remote}:#{result_root_dir}/ #{tmp_dir}"
+  sync_cmd = "rsync -azh --info=progress2 --delete #{options[:remote]}:#{result_root_dir}/ #{tmp_dir}"
   puts sync_cmd
   system(sync_cmd)
   unless $CHILD_STATUS.success?
@@ -68,7 +70,7 @@ begin
     target = job._result_root
     unless source.sub(/\/$/, '') == target.sub(/\/$/, '')
       if Dir.exist?(target)
-        unless $opt_force
+        unless options[:force]
           log_warn "Stop merging: #{target} exists in local, please run with '--force'"
           ret = 1
           break

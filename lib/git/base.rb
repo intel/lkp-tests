@@ -3,6 +3,7 @@
 LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__, 2)
 
 require 'git'
+require "#{LKP_SRC}/lib/repo_spec"
 
 module Git
   class Base
@@ -17,9 +18,11 @@ module Git
     end
 
     def project_spec
-      $remotes ||= load_remotes
-
-      $remotes[@remote] || $remotes["internal-#{@remote}"]
+      if RepoSpec.exist?(@remote)
+        RepoSpec.new(@remote)
+      elsif RepoSpec.exist?("internal-#{@remote}")
+        RepoSpec.new("internal-#{@remote}")
+      end
     end
 
     alias rev_parse revparse

@@ -57,7 +57,7 @@ PERF_MEM_EVENT = %w(loads stores).freeze
 
 weight = Hash.new(0)
 samples = Hash.new(0)
-$event_list = []
+event_list = []
 event_name = nil
 
 def get_event_name(str)
@@ -85,7 +85,7 @@ def output_result(event_name, weight, samples)
     overall_avg_weight = total_weight.to_f / total_samples
     puts "#{event_name}.overall_avg_#{unit}: #{overall_avg_weight}"
   end
-  $event_list.push event_name
+  event_name
 end
 
 $stdin.each_line do |line|
@@ -94,7 +94,7 @@ $stdin.each_line do |line|
   # Samples: 25  of event 'cpu/mem-loads,ldlat=50/P'
   when /^#\s+Samples:\s+(\d+)\S?+\s+of\s+event\s+'(.+)'/
     if event_name && !weight.empty?
-      output_result(event_name, weight, samples)
+      event_list << output_result(event_name, weight, samples)
       weight.clear
       samples.clear
     end
@@ -111,4 +111,4 @@ $stdin.each_line do |line|
   end
 end
 
-output_result(event_name, weight, samples) if $event_list.index(event_name).nil? && !weight.empty?
+event_list << output_result(event_name, weight, samples) if event_list.index(event_name).nil? && !weight.empty?

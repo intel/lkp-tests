@@ -3,299 +3,309 @@ LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 3)
 
 require "#{LKP_SRC}/lib/string"
 
-$results_sum = Hash.new(0)
-$results_nr = Hash.new(0)
-$interval_results_sum = Hash.new(0)
-$interval_results_nr = Hash.new(0)
-$interval_metrics_val = Hash.new(0)
-$interval_nr = 0
-$run_time = 0
+class PerfStatParser
+  def initialize
+    @results_sum = Hash.new(0)
+    @results_nr = Hash.new(0)
+    @interval_results_sum = Hash.new(0)
+    @interval_results_nr = Hash.new(0)
+    @interval_metrics_val = Hash.new(0)
+    @interval_nr = 0
+    @run_time = 0
 
-$stats_begin_time = ENV['stats_part_begin'].to_f
-$stats_end_time = ENV['stats_part_end'].to_f
+    @stats_begin_time = ENV['stats_part_begin'].to_f
+    @stats_end_time = ENV['stats_part_end'].to_f
 
-$latency_prev = Hash.new(0)
+    @latency_prev = Hash.new(0)
+  end
 
-def calc_addon_keys(results_sum, results_nr, interval, interval_nr, prefix)
-  results_sum.each do |key, value|
+  def run
+    exit 1 unless parse
+
+    @results_sum.each do |key, value|
+      # output per-second value
+      puts "ps.#{key}: #{value / @run_time}"
+    end
+
+    instructions = @results_sum['instructions']
+    unless instructions.zero?
+      # to calc path-length
+      puts "total.instructions: #{instructions}"
+    end
+
+    calc_addon_keys(@results_sum, @results_nr, @run_time, @interval_nr, 'overall.')
+  end
+
+  private
+
+  def calc_addon_keys(results_sum, results_nr, interval, interval_nr, prefix)
+    results_sum.each do |key, value|
+      case key
+      when /(.*)-misses/
+        calc_miss_rate($1, results_sum, value, prefix)
+        next if value.zero?
+
+        calc_misses(results_sum, key, value, prefix)
+      when /(.*)UNC_M_(.*)_INSERTS/
+        stem = "#{$1}UNC_M_#{$2}"
+        calc_latency(stem, $1, results_sum, value, results_nr, interval, interval_nr, prefix)
+        calc_throughput(stem, value, interval, prefix)
+      when /(.*)cpu-cycles/
+        calc_cpu_cycles($1, results_sum, value, prefix)
+      end
+    end
+  end
+
+  def calc_miss_rate(stem, results_sum, value, prefix)
+    ['s', '-references', '-instructions'].each do |pfx|
+      avalue = results_sum[stem + pfx]
+      next if avalue.zero?
+
+      total = if pfx == 's'
+                avalue + value
+              else
+                avalue
+              end
+      puts "#{prefix}#{stem}-miss-rate%: #{value * 100.0 / total}"
+      break
+    end
+  end
+
+  def calc_misses(results_sum, key, value, prefix)
     case key
-    when /(.*)-misses/
-      calc_miss_rate($1, results_sum, value, prefix)
-      next if value.zero?
-
-      calc_misses(results_sum, key, value, prefix)
-    when /(.*)UNC_M_(.*)_INSERTS/
-      stem = "#{$1}UNC_M_#{$2}"
-      calc_latency(stem, $1, results_sum, value, results_nr, interval, interval_nr, prefix)
-      calc_throughput(stem, value, interval, prefix)
-    when /(.*)cpu-cycles/
-      calc_cpu_cycles($1, results_sum, value, prefix)
+    when /(.*)iTLB-load-misses/
+      stem = $1
+      instructions = results_sum["#{stem}instructions"]
+      puts "#{prefix}#{stem}instructions-per-iTLB-miss: #{instructions / value}" unless instructions.zero?
+    when /(.*)cache-misses/
+      stem = $1
+      cycles = results_sum["#{stem}cpu-cycles"]
+      puts "#{prefix}#{stem}cycles-between-cache-misses: #{cycles / value}" unless cycles.zero?
+      instructions = results_sum["#{stem}instructions"]
+      puts "#{prefix}#{stem}MPKI: #{value / instructions * 1000}" unless instructions.zero?
     end
   end
-end
 
-def calc_miss_rate(stem, results_sum, value, prefix)
-  ['s', '-references', '-instructions'].each do |pfx|
-    avalue = results_sum[stem + pfx]
-    next if avalue.zero?
+  def calc_latency(stem, stem1, results_sum, value, results_nr, interval, interval_nr, prefix)
+    occupancy_key = "#{stem}_OCCUPANCY"
+    occupancy = results_sum[occupancy_key]
+    ticks_key = "#{stem1}UNC_M_CLOCKTICKS"
+    ticks_sum = results_sum[ticks_key]
+    ticks_nr = results_nr[ticks_key].to_f
 
-    total = if pfx == 's'
-              avalue + value
-            else
-              avalue
-            end
-    puts "#{prefix}#{stem}-miss-rate%: #{value * 100.0 / total}"
-    break
+    return unless results_sum.key?(occupancy_key) && ticks_sum != 0
+
+    # Need to deal with _INSERTSS == 0
+    latency_key = "#{prefix}#{stem}_latency_ns"
+    latency = if value.zero?
+                @latency_prev[latency_key]
+              else
+                occupancy / value / (ticks_sum / (ticks_nr / interval_nr)) * 1e+9 * interval
+              end
+    @latency_prev[latency_key] = latency
+    puts "#{latency_key}: #{latency}"
   end
-end
 
-def calc_misses(results_sum, key, value, prefix)
-  case key
-  when /(.*)iTLB-load-misses/
-    stem = $1
+  def calc_throughput(stem, value, interval, prefix)
+    puts "#{prefix}#{stem}_throughput_MBps: #{value.to_f * 64 / 1024 / 1024 / interval}"
+  end
+
+  def calc_cpu_cycles(stem, results_sum, value, prefix)
     instructions = results_sum["#{stem}instructions"]
-    puts "#{prefix}#{stem}instructions-per-iTLB-miss: #{instructions / value}" unless instructions.zero?
-  when /(.*)cache-misses/
-    stem = $1
-    cycles = results_sum["#{stem}cpu-cycles"]
-    puts "#{prefix}#{stem}cycles-between-cache-misses: #{cycles / value}" unless cycles.zero?
-    instructions = results_sum["#{stem}instructions"]
-    puts "#{prefix}#{stem}MPKI: #{value / instructions * 1000}" unless instructions.zero?
+
+    return if instructions.zero?
+
+    puts "#{prefix}#{stem}ipc: #{instructions / value}"
+    puts "#{prefix}#{stem}cpi: #{value / instructions}"
   end
-end
 
-def calc_latency(stem, stem1, results_sum, value, results_nr, interval, interval_nr, prefix)
-  occupancy_key = "#{stem}_OCCUPANCY"
-  occupancy = results_sum[occupancy_key]
-  ticks_key = "#{stem1}UNC_M_CLOCKTICKS"
-  ticks_sum = results_sum[ticks_key]
-  ticks_nr = results_nr[ticks_key].to_f
+  def output_interval(prev_time, time)
+    return if @interval_results_sum.empty?
 
-  return unless results_sum.key?(occupancy_key) && ticks_sum != 0
+    update_interval(prev_time, time)
 
-  # Need to deal with _INSERTSS == 0
-  latency_key = "#{prefix}#{stem}_latency_ns"
-  latency = if value.zero?
-              $latency_prev[latency_key]
-            else
-              occupancy / value / (ticks_sum / (ticks_nr / interval_nr)) * 1e+9 * interval
-            end
-  $latency_prev[latency_key] = latency
-  puts "#{latency_key}: #{latency}"
-end
-
-def calc_throughput(stem, value, interval, prefix)
-  puts "#{prefix}#{stem}_throughput_MBps: #{value.to_f * 64 / 1024 / 1024 / interval}"
-end
-
-def calc_cpu_cycles(stem, results_sum, value, prefix)
-  instructions = results_sum["#{stem}instructions"]
-
-  return if instructions.zero?
-
-  puts "#{prefix}#{stem}ipc: #{instructions / value}"
-  puts "#{prefix}#{stem}cpi: #{value / instructions}"
-end
-
-def output_interval(prev_time, time)
-  return if $interval_results_sum.empty?
-
-  update_interval(prev_time, time)
-
-  unless $interval_metrics_val.empty?
-    $interval_metrics_val.each do |key, value|
-      puts "i.#{key}: #{value}"
+    unless @interval_metrics_val.empty?
+      @interval_metrics_val.each do |key, value|
+        puts "i.#{key}: #{value}"
+      end
     end
-  end
 
-  unless ignore_result?(prev_time, time)
-    $interval_results_sum.each do |key, value|
-      $results_sum[key] += value
-      $results_nr[key] += $interval_results_nr[key]
+    unless ignore_result?(prev_time, time)
+      @interval_results_sum.each do |key, value|
+        @results_sum[key] += value
+        @results_nr[key] += @interval_results_nr[key]
+      end
+      @interval_nr += 1
     end
-    $interval_nr += 1
+
+    @interval_results_sum.clear
+    @interval_results_nr.clear
+    @interval_metrics_val.clear unless @interval_metrics_val.empty?
   end
 
-  $interval_results_sum.clear
-  $interval_results_nr.clear
-  $interval_metrics_val.clear unless $interval_metrics_val.empty?
-end
-
-def update_interval(prev_time, time)
-  interval = time - prev_time
-  puts "time: #{time}"
-  $interval_results_sum.each do |key, value|
-    puts "i.#{key}: #{value / interval}"
+  def update_interval(prev_time, time)
+    interval = time - prev_time
+    puts "time: #{time}"
+    @interval_results_sum.each do |key, value|
+      puts "i.#{key}: #{value / interval}"
+    end
+    calc_addon_keys(@interval_results_sum, @interval_results_nr,
+                    interval, 1, 'i.')
   end
-  calc_addon_keys($interval_results_sum, $interval_results_nr,
-                  interval, 1, 'i.')
-end
 
-def ignore_result?(prev_time, time)
-  return true if time <= $stats_begin_time
+  def ignore_result?(prev_time, time)
+    return true if time <= @stats_begin_time
 
-  $stats_begin_time = prev_time if prev_time <= $stats_begin_time
+    @stats_begin_time = prev_time if prev_time <= @stats_begin_time
 
-  if $stats_end_time != 0 && time > $stats_end_time
-    $stats_end_time = prev_time if prev_time <= $stats_end_time
-    true
-  else
-    false
-  end
-end
-
-# Example output
-#     1.000679357,S0,12,170516599,,l1d_pend_miss.pending,8004582139,66.65,80.5,Load_Miss_Real_Latency
-#     1.000679357,S0,12,1202404,,mem_load_retired.l1_miss,8004582139,66.65,,
-#     1.000679357,S0,12,915585,,mem_load_retired.fb_hit,8004582139,66.65,,
-#     1.000679357,S0,12,66085859,,inst_retired.any,8009729165,66.69,7.3,CPI
-#     1.000679357,S0,12,481531770,,cycles,8009729165,66.69,,
-#     1.000679357,S0,12,478629457,,cpu-cycles,8005866225,66.66,,
-#     1.000679357,S0,12,65320043,,instructions,8005866225,66.66,0.14,insn per cycle
-
-#     5.000739365,163913433,,l1d_pend_miss.pending,8001787549,66.67,81.0,Load_Miss_Real_Latency
-#     5.000739365,1197996,,mem_load_retired.l1_miss,8001787549,66.67,,
-#     5.000739365,862693,,mem_load_retired.fb_hit,8001787549,66.67,,
-#     5.000739365,66368209,,inst_retired.any,8000697756,66.66,7.3,CPI
-#     5.000739365,478274162,,cycles,8000697756,66.66,,
-#     5.000739365,478535457,,cpu-cycles,8001495219,66.67,,
-#     5.000739365,69598766,,instructions,8001495219,66.67,0.14,insn per cycle
-
-def parse
-  prev_prev_time = 0
-  prev_time = 0
-  time = 0
-  metric_val = 0
-  events = []
-
-  $stdin.each_line do |line|
-    # /lkp/benchmarks/perf/perf stat -a --scale -I 1000 -x , -e {cpu-cycles,instructions,cache-references,cache-misses,branch-instructions,branch-misses},{dTLB-loads,dTLB-load-misses},{dTLB-stores,dTLB-store-misses},{node-loads,node-load-misses},{node-stores,node-store-misses},cpu-clock,task-clock,page-faults,context-switches,cpu-migrations,minor-faults,major-faults --log-fd 1 -D 0 -- /lkp/lkp/src/bin/event/wait post-test
-    # /usr/bin/perf stat -a --scale -I 1000 -x , -e {cpu-cycles,instructions,cache-references,cache-misses,branch-instructions,branch-misses},{dTLB-loads,dTLB-load-misses},{dTLB-stores,dTLB-store-misses},{iTLB-loads,iTLB-load-misses},{node-loads,node-load-misses},{node-stores,node-store-misses},cpu-clock,task-clock,page-faults,context-switches,cpu-migrations,minor-faults,major-faults --log-fd 1 -D 0 -- /lkp/lkp/src/bin/event/wait post-test
-    events = $1.remove(/[{}]/).split(',') if line =~ /perf stat .+ -e ([^ ]+) /
-
-    next unless line =~ /^\s*\d+\.\d+\W+/
-
-    if line.include? ','
-      stime, *fields = line.split(',')
-      # 139.478674756,146633.37,msec,task-clock,146633365406,100.00,146.633,CPUs utilized
-      # 139.478674756,
-      next if fields.size < 7
+    if @stats_end_time != 0 && time > @stats_end_time
+      @stats_end_time = prev_time if prev_time <= @stats_end_time
+      true
     else
-      stime, *fields = line.split
+      false
     end
-
-    if fields[2].include? '/'
-      # 282075081,,cpu_atom/cpu-cycles/,4046709442,100.00,,
-      # 282075081,,cpu-cycles,4046709442,100.00,,
-      fields[2] = fields[2][/.*\/(.*)\//, 1]
-    end
-
-    return false unless fields.intersect?(events)
-
-    prev_time = time
-    time = stime.to_f
-    # time different > 10ms, new output
-    if time - prev_time > 0.01
-      output_interval(prev_prev_time, prev_time)
-      prev_prev_time = prev_time
-    end
-
-    # per-socket mode
-    socket = parse_per_socket_mode(fields)
-
-    # for unit
-    unit = parse_unit(fields)
-
-    remove_extra_comma(fields, line)
-
-    # for metrics
-    metric_key = parse_metric_key(fields, socket)
-    metric_val = update_metric_val(fields, metric_key, metric_val)
-
-    # 777209 mem_load_uops_l3_miss_retired_remote_dram 89128748143 100.00
-    value, key = fields
-    value = value.to_f
-
-    key, socket_key = update_keys(unit, key, socket)
-
-    update_interval_results(key, value, socket_key, metric_key, metric_val)
   end
 
-  # total time
-  end_time = $stats_end_time == 0 ? prev_time : $stats_end_time
-  $run_time = end_time - $stats_begin_time
+  # Example output
+  #     1.000679357,S0,12,170516599,,l1d_pend_miss.pending,8004582139,66.65,80.5,Load_Miss_Real_Latency
+  #     1.000679357,S0,12,1202404,,mem_load_retired.l1_miss,8004582139,66.65,,
+  #     1.000679357,S0,12,915585,,mem_load_retired.fb_hit,8004582139,66.65,,
+  #     1.000679357,S0,12,66085859,,inst_retired.any,8009729165,66.69,7.3,CPI
+  #     1.000679357,S0,12,481531770,,cycles,8009729165,66.69,,
+  #     1.000679357,S0,12,478629457,,cpu-cycles,8005866225,66.66,,
+  #     1.000679357,S0,12,65320043,,instructions,8005866225,66.66,0.14,insn per cycle
 
-  # skip the last record, because the interval hasn't run out
-end
+  #     5.000739365,163913433,,l1d_pend_miss.pending,8001787549,66.67,81.0,Load_Miss_Real_Latency
+  #     5.000739365,1197996,,mem_load_retired.l1_miss,8001787549,66.67,,
+  #     5.000739365,862693,,mem_load_retired.fb_hit,8001787549,66.67,,
+  #     5.000739365,66368209,,inst_retired.any,8000697756,66.66,7.3,CPI
+  #     5.000739365,478274162,,cycles,8000697756,66.66,,
+  #     5.000739365,478535457,,cpu-cycles,8001495219,66.67,,
+  #     5.000739365,69598766,,instructions,8001495219,66.67,0.14,insn per cycle
 
-def parse_per_socket_mode(fields)
-  # S0,12,1202404,,mem_load_retired.l1_miss,8004582139,66.65,,
-  return unless fields[0][0] == 'S'
+  def parse
+    prev_prev_time = 0
+    prev_time = 0
+    time = 0
+    metric_val = 0
+    events = []
 
-  socket = fields[0]
-  fields.delete_at 1
-  fields.delete_at 0
+    $stdin.each_line do |line|
+      # /lkp/benchmarks/perf/perf stat -a --scale -I 1000 -x , -e {cpu-cycles,instructions,cache-references,cache-misses,branch-instructions,branch-misses},{dTLB-loads,dTLB-load-misses},{dTLB-stores,dTLB-store-misses},{node-loads,node-load-misses},{node-stores,node-store-misses},cpu-clock,task-clock,page-faults,context-switches,cpu-migrations,minor-faults,major-faults --log-fd 1 -D 0 -- /lkp/lkp/src/bin/event/wait post-test
+      # /usr/bin/perf stat -a --scale -I 1000 -x , -e {cpu-cycles,instructions,cache-references,cache-misses,branch-instructions,branch-misses},{dTLB-loads,dTLB-load-misses},{dTLB-stores,dTLB-store-misses},{iTLB-loads,iTLB-load-misses},{node-loads,node-load-misses},{node-stores,node-store-misses},cpu-clock,task-clock,page-faults,context-switches,cpu-migrations,minor-faults,major-faults --log-fd 1 -D 0 -- /lkp/lkp/src/bin/event/wait post-test
+      events = $1.remove(/[{}]/).split(',') if line =~ /perf stat .+ -e ([^ ]+) /
 
-  socket
-end
+      next unless line =~ /^\s*\d+\.\d+\W+/
 
-def parse_unit(fields)
-  # 7928832,Bytes,llc_misses.mem_read,8005538025,100.00,,
-  fields[1] if fields[1] == 'Bytes'
-end
+      if line.include? ','
+        stime, *fields = line.split(',')
+        # 139.478674756,146633.37,msec,task-clock,146633365406,100.00,146.633,CPUs utilized
+        # 139.478674756,
+        next if fields.size < 7
+      else
+        stime, *fields = line.split
+      end
 
-def remove_extra_comma(fields, line)
-  # 10.072447351 43181  context-switches 16105112423 100.00 0.003 M/sec
-  # 1.017184940,8778,,context-switches,16689586072,100.00,0.526,K/sec
-  fields.delete_at 1 if line.include? ','
-end
+      if fields[2].include? '/'
+        # 282075081,,cpu_atom/cpu-cycles/,4046709442,100.00,,
+        # 282075081,,cpu-cycles,4046709442,100.00,,
+        fields[2] = fields[2][/.*\/(.*)\//, 1]
+      end
 
-def parse_metric_key(fields, socket)
-  return unless !fields[5].nil? && (fields[5] =~ /^[A-Z][^ ]+$/)
+      return false unless fields.intersect?(events)
 
-  metric_key = "metric.#{fields[5].chomp}"
-  metric_key = "#{socket}.#{metric_key}" if socket
+      prev_time = time
+      time = stime.to_f
+      # time different > 10ms, new output
+      if time - prev_time > 0.01
+        output_interval(prev_prev_time, prev_time)
+        prev_prev_time = prev_time
+      end
 
-  metric_key
-end
+      # per-socket mode
+      socket = parse_per_socket_mode(fields)
 
-def update_metric_val(fields, metric_key, metric_val)
-  return metric_val unless metric_key
+      # for unit
+      unit = parse_unit(fields)
 
-  fields[4].to_f
-end
+      remove_extra_comma(fields, line)
 
-def update_keys(unit, key, socket)
-  i_imc = key.index '_IMC'
-  key = key[0, i_imc] if i_imc
+      # for metrics
+      metric_key = parse_metric_key(fields, socket)
+      metric_val = update_metric_val(fields, metric_key, metric_val)
 
-  key = "#{key}_#{unit}" if unit
-  socket_key = "#{socket}.#{key}" if socket
+      # 777209 mem_load_uops_l3_miss_retired_remote_dram 89128748143 100.00
+      value, key = fields
+      value = value.to_f
 
-  [key, socket_key]
-end
+      key, socket_key = update_keys(unit, key, socket)
 
-def update_interval_results(key, value, socket_key, metric_key, metric_val)
-  $interval_results_sum[key] += value
-  $interval_results_nr[key] += 1
-  if socket_key
-    $interval_results_sum[socket_key] += value
-    $interval_results_nr[socket_key] += 1
+      update_interval_results(key, value, socket_key, metric_key, metric_val)
+    end
+
+    # total time
+    end_time = @stats_end_time.zero? ? prev_time : @stats_end_time
+    @run_time = end_time - @stats_begin_time
+
+    # skip the last record, because the interval hasn't run out
   end
-  $interval_metrics_val[metric_key] += metric_val if metric_key
+
+  def parse_per_socket_mode(fields)
+    # S0,12,1202404,,mem_load_retired.l1_miss,8004582139,66.65,,
+    return unless fields[0][0] == 'S'
+
+    socket = fields[0]
+    fields.delete_at 1
+    fields.delete_at 0
+
+    socket
+  end
+
+  def parse_unit(fields)
+    # 7928832,Bytes,llc_misses.mem_read,8005538025,100.00,,
+    fields[1] if fields[1] == 'Bytes'
+  end
+
+  def remove_extra_comma(fields, line)
+    # 10.072447351 43181  context-switches 16105112423 100.00 0.003 M/sec
+    # 1.017184940,8778,,context-switches,16689586072,100.00,0.526,K/sec
+    fields.delete_at 1 if line.include? ','
+  end
+
+  def parse_metric_key(fields, socket)
+    return unless !fields[5].nil? && (fields[5] =~ /^[A-Z][^ ]+$/)
+
+    metric_key = "metric.#{fields[5].chomp}"
+    metric_key = "#{socket}.#{metric_key}" if socket
+
+    metric_key
+  end
+
+  def update_metric_val(fields, metric_key, metric_val)
+    return metric_val unless metric_key
+
+    fields[4].to_f
+  end
+
+  def update_keys(unit, key, socket)
+    i_imc = key.index '_IMC'
+    key = key[0, i_imc] if i_imc
+
+    key = "#{key}_#{unit}" if unit
+    socket_key = "#{socket}.#{key}" if socket
+
+    [key, socket_key]
+  end
+
+  def update_interval_results(key, value, socket_key, metric_key, metric_val)
+    @interval_results_sum[key] += value
+    @interval_results_nr[key] += 1
+    if socket_key
+      @interval_results_sum[socket_key] += value
+      @interval_results_nr[socket_key] += 1
+    end
+    @interval_metrics_val[metric_key] += metric_val if metric_key
+  end
 end
 
-exit 1 unless parse
-
-$results_sum.each do |key, value|
-  # output per-second value
-  puts "ps.#{key}: #{value / $run_time}"
-end
-
-instructions = $results_sum['instructions']
-unless instructions.zero?
-  # to calc path-length
-  puts "total.instructions: #{instructions}"
-end
-
-calc_addon_keys($results_sum, $results_nr, $run_time, $interval_nr, 'overall.')
+PerfStatParser.new.run

@@ -5,9 +5,25 @@ LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
 require 'English'
 require 'fileutils'
 require 'json'
-require 'yaml'
+require 'psych'
+unless defined?(YAML)
+  # Exclude our own dir from $LOAD_PATH before requiring 'yaml', so under
+  # rspec (which adds 'lib' to $LOAD_PATH) this doesn't resolve back to
+  # this same file. Requiring it (rather than skipping it) marks 'yaml' as
+  # loaded, so a later bare require 'yaml' elsewhere (e.g. activesupport)
+  # doesn't re-run stdlib yaml.rb's unconditional YAML = Psych and warn.
+  own_dir = File.expand_path(__dir__)
+  saved_load_path = $LOAD_PATH.dup
+  $LOAD_PATH.reject! { |p| File.expand_path(p) == own_dir }
+  begin
+    require 'yaml'
+  ensure
+    $LOAD_PATH.replace(saved_load_path)
+  end
+end
 require "#{LKP_SRC}/lib/assert"
 require "#{LKP_SRC}/lib/bash"
+require "#{LKP_SRC}/lib/cache"
 require "#{LKP_SRC}/lib/common"
 require "#{LKP_SRC}/lib/erb"
 require "#{LKP_SRC}/lib/log"
@@ -225,43 +241,52 @@ def save_yaml_with_flock(object, file, timeout = nil, compress: false)
   end
 end
 
-$json_cache = {}
-$json_mtime = {}
+class << JSON
+  include Cacheable
 
-def load_json(file, cache: false)
-  file += '.gz' if file =~ /.json$/ && File.exist?("#{file}.gz")
-  if file =~ /.json(\.gz)?$/ && File.exist?(file)
-    begin
-      mtime = File.mtime(file)
-      unless $json_cache[file] && $json_mtime[file] == mtime
-        obj = if file =~ /\.json$/
-                JSON.parse File.read(file, encoding: 'UTF-8')
-              else
-                JSON.parse Bash.run("zcat #{file}")
-              end
-        return obj unless cache
+  # cache: true keeps the parsed object around, keyed on file path + mtime,
+  # so a changed mtime naturally invalidates the entry.
+  def parse_cached(file, cache: false)
+    file += '.gz' if file =~ /.json$/ && File.exist?("#{file}.gz")
 
-        $json_cache[file] = obj
-        $json_mtime[file] = mtime
-      end
-      return $json_cache[file].freeze
-    rescue SignalException
-      raise
-    rescue StandardError
-      log_warn "Failed to load JSON file: #{file}"
-
-      tempfile = "#{file}-bad"
-      log_debug "Kept corrupted JSON file for debugging: #{tempfile}"
-      FileUtils.mv file, tempfile, force: true
-
-      raise
+    if file =~ /.json(\.gz)?$/ && File.exist?(file)
+      parse_cached_file(file, cache)
+    elsif File.exist? file.sub(/\.json(\.gz)?$/, '.yaml')
+      load_yaml file.sub(/\.json(\.gz)?$/, '.yaml')
+    else
+      log_debug "JSON/YAML file not exist: '#{file}'"
+      nil
     end
-    nil
-  elsif File.exist? file.sub(/\.json(\.gz)?$/, '.yaml')
-    load_yaml file.sub(/\.json(\.gz)?$/, '.yaml')
-  else
-    log_debug "JSON/YAML file not exist: '#{file}'"
-    nil
+  end
+
+  def parse_cached_file(file, cache)
+    mtime = File.mtime(file)
+    return parse_file_content(file) unless cache
+
+    parse_file_content_cached(file, mtime)
+  rescue SignalException
+    raise
+  rescue StandardError
+    log_warn "Failed to load JSON file: #{file}"
+
+    tempfile = "#{file}-bad"
+    log_debug "Kept corrupted JSON file for debugging: #{tempfile}"
+    FileUtils.mv file, tempfile, force: true
+
+    raise
+  end
+
+  def parse_file_content_cached(file, _mtime)
+    parse_file_content(file).freeze
+  end
+  cache_method :parse_file_content_cached
+
+  def parse_file_content(file)
+    if file =~ /\.json$/
+      JSON.parse File.read(file, encoding: 'UTF-8')
+    else
+      JSON.parse Bash.run("zcat #{file}")
+    end
   end
 end
 
@@ -278,12 +303,12 @@ end
 
 def try_load_json(path)
   if File.file? path
-    load_json(path)
+    JSON.parse_cached(path)
   elsif path =~ /.json$/
     if File.file? "#{path}.gz"
-      load_json("#{path}.gz")
+      JSON.parse_cached("#{path}.gz")
     elsif File.file? path.sub(/\.json$/, '.yaml')
-      load_json(path)
+      JSON.parse_cached(path)
     end
   end
 end

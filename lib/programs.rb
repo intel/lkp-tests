@@ -59,6 +59,15 @@ module LKP
         @all_tests_set ||= Set.new(all_tests_and_daemons).freeze
       end
 
+      # => ["tcrypt.", "hackbench.", "dd.", "xfstests.", "aim7.", ..., "oltp.", "sysbench-fileio.", "dmesg."]
+      def test_prefixes
+        @test_prefixes ||= begin
+          tests = all_stats & all_tests_and_daemons
+          tests += %w[kmsg dmesg stderr last_state]
+          tests.map { |test| "#{test}." }.freeze
+        end
+      end
+
       def all_metas
         Dir["#{PROGRAMS_ROOT}/*/meta.yaml"]
       end

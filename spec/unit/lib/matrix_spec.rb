@@ -27,7 +27,7 @@ describe 'Matrix' do
 
       remove_rt_from_matrix('/result/.../0', matrix_root)
 
-      new_matrix = load_json("#{matrix_root}/matrix.json")
+      new_matrix = JSON.parse_cached("#{matrix_root}/matrix.json")
       expect(new_matrix['stats_source']).to eq ['/result/.../1/stats.json']
       expect(new_matrix['uptime.boot']).to eq [20]
       expect(new_matrix).not_to have_key 'last_state.booting'
@@ -46,7 +46,7 @@ describe 'Matrix' do
 
       remove_rt_from_matrix('/result/.../0', matrix_root)
 
-      expect(load_json("#{matrix_root}/matrix.json")).to eq matrix
+      expect(JSON.parse_cached("#{matrix_root}/matrix.json")).to eq matrix
     end
 
     it 'does nothing when matrix.json does not exist' do

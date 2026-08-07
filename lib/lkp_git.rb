@@ -16,6 +16,7 @@ require "#{LKP_SRC}/lib/cache"
 require "#{LKP_SRC}/lib/constant"
 require "#{LKP_SRC}/lib/git"
 require "#{LKP_SRC}/lib/lkp_path"
+require "#{LKP_SRC}/lib/repo_spec"
 require "#{LKP_SRC}/lib/run_env"
 require "#{LKP_SRC}/lib/yaml"
 
@@ -191,9 +192,9 @@ end
 # => ["v3.11-rc6", "v3.11-rc5", "v3.11-rc4", "v3.11-rc3", "v3.11-rc2", "v3.11-rc1",
 #     "v3.10", "v3.10-rc7", "v3.10-rc6", ..., "v2.6.12-rc3", "v2.6.12-rc2", "v2.6.11"]
 def __linus_tags
-  $remotes ||= load_remotes
-  pattern = Regexp.new "^#{Array($remotes['linus']['release_tag_pattern']).join('$|^')}$"
-  tags = get_tags(pattern, $remotes['linus']['release_tag_committer'])
+  linus = RepoSpec.new('linus')
+  pattern = Regexp.new "^#{Array(linus['release_tag_pattern']).join('$|^')}$"
+  tags = get_tags(pattern, linus['release_tag_committer'])
   tags = sort_tags(pattern, tags)
   tags_order = {}
   tags.each_with_index do |tag, i|
@@ -211,36 +212,6 @@ def base_rc_tag(commit)
   commit += '~' if linus_commit?(commit)
   version, _is_exact_match = last_linus_release_tag commit
   version
-end
-
-def load_remotes
-  remotes = {}
-  files = Dir[LKP::Path.src('repo', '*', '*')]
-  files.each do |file|
-    remote = File.basename file
-    next if remote == 'DEFAULTS'
-
-    defaults = "#{File.dirname(file)}/DEFAULTS"
-    repo_info = load_yaml_merge [defaults, file]
-
-    project = File.basename(File.dirname(file))
-    repo_info['project'] ||= project
-    repo_info['suite'] ||= "#{project}-ci"
-    repo_info['testcase'] ||= "#{project}-ci"
-
-    repo_info['upstream'] = true if repo_info['project'] == remote
-
-    if repo_info['upstream']
-      repo_info['fetch_tags']         = true
-      repo_info['git_am_branch']    ||= 'master'
-      repo_info['maintained_files'] ||= '*'
-    end
-
-    log_warn "conflict repo name in different projects: #{remote}" if remotes[remote]
-
-    remotes[remote] = repo_info
-  end
-  remotes
 end
 
 def git_committer(commit)

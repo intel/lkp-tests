@@ -327,7 +327,7 @@ class MResultRootCollection
 end
 
 def convert_one_mresult_root(_rt)
-  mrtts = mrt_table_set
+  mrtts = MResultRootTableSet.instance
   n = mrtts.new_node(_rt.axes)
   if File.symlink?(n.path) && File.readlink(n.path) == _rt
     false
@@ -363,7 +363,7 @@ end
 
 def mrt_storage_path(_rt_path)
   _rt = MResultRoot.new(_rt_path)
-  mrtts = mrt_table_set
+  mrtts = MResultRootTableSet.instance
   n = mrtts.new_node(_rt.axes)
   n.path
 end
@@ -374,7 +374,7 @@ def convert_mrt(_rt_path)
 end
 
 def delete_mrt(_rt_path)
-  mrtts = mrt_table_set
+  mrtts = MResultRootTableSet.instance
   _rt = MResultRoot.new(_rt_path)
   n = mrtts.open_node(_rt.axes)
   n.delete if File.exist? n.path

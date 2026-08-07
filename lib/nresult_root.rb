@@ -1,5 +1,6 @@
 LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
 
+require 'singleton'
 require "#{LKP_SRC}/lib/common"
 require "#{LKP_SRC}/lib/constant"
 require "#{LKP_SRC}/lib/data_store"
@@ -33,7 +34,7 @@ class CResultRoot
 
   def dmesg_json
     fn = dmesg_json_file
-    load_json(fn) if fn
+    JSON.parse_cached(fn) if fn
   end
 
   def kmsg_json_file
@@ -43,7 +44,7 @@ class CResultRoot
 
   def kmsg_json
     fn = kmsg_json_file
-    load_json(fn) if fn
+    JSON.parse_cached(fn) if fn
   end
 
   def dmesg_file
@@ -138,7 +139,7 @@ module CMResultRoot
 
     avg_stddev = {}
     cm.each do |k, v|
-      next unless kpi_stat?(k, axes, [v])
+      next unless StatClassifier.kpi_stat?(k, axes, [v])
 
       avg_stddev[k] = [v.average, v.standard_deviation]
     end
@@ -186,7 +187,7 @@ class NMResultRoot < DataStore::Node
 
   class << self
     def from_data(data)
-      mrt_table_set.open_node data
+      MResultRootTableSet.instance.open_node data
     end
   end
 end
@@ -263,6 +264,8 @@ class << LinuxMResultRootTable
 end
 
 class MResultRootTableSet
+  include Singleton
+
   attr_reader :linux_perf_table
 
   LINUX_PERF_TABLE = 'linux_perf'.freeze
@@ -339,10 +342,6 @@ class MResultRootTableSet
   end
 end
 
-def mrt_table_set
-  $mrt_table_set ||= MResultRootTableSet.new
-end
-
 class NMResultRootCollection
   def initialize(conditions = {})
     @conditions = {}
@@ -382,10 +381,10 @@ class NMResultRootCollection
 
     testcase = @conditions[TESTCASE_AXIS_KEY]
     if testcase
-      tbl = mrt_table_set.testcase_to_table testcase
+      tbl = MResultRootTableSet.instance.testcase_to_table testcase
       table_each.call(tbl)
     else
-      mrt_table_set.tables.each do |tbl|
+      MResultRootTableSet.instance.tables.each do |tbl|
         table_each.call(tbl)
       end
     end
@@ -461,7 +460,7 @@ module ResultStddev
     FileUtils.mkdir_p dir
     path = File.join(dir, file)
     data = if File.exist? path
-             load_json(path) || {}
+             JSON.parse_cached(path) || {}
            else
              {}
            end
@@ -490,7 +489,7 @@ module ResultStddev
     path = File.join dir, file
     return unless File.exist? path
 
-    load_json path
+    JSON.parse_cached path
   end
 
   def load_values(axes)

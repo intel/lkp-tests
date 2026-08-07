@@ -4,9 +4,9 @@ RESULT_ROOT = ENV.fetch('RESULT_ROOT', nil)
 LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 2)
 
 require 'set'
-require "#{LKP_SRC}/lib/bounds"
 require "#{LKP_SRC}/lib/job"
 require "#{LKP_SRC}/lib/log"
+require "#{LKP_SRC}/lib/stat_bounds"
 require "#{LKP_SRC}/lib/statistics"
 require "#{LKP_SRC}/lib/string"
 require "#{LKP_SRC}/lib/yaml"
@@ -66,7 +66,7 @@ while (line = $stdin.gets)
   end
 
   v = v.index('.') ? v.to_f : v.to_i
-  unless valid_stats_range? k, v
+  unless StatBounds.valid? k, v
     invalid_records.push record_index
     warn_stat 'outside valid range', monitor, k, v unless %w[turbostat vmstat].include?(monitor)
 

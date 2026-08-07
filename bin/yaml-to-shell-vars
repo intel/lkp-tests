@@ -7,7 +7,7 @@ require 'ostruct'
 require 'shellwords'
 require 'yaml'
 
-$opt_name_prefix = ''
+options = { name_prefix: '' }
 
 opt_parser = OptionParser.new do |opts|
   opts.banner = "Usage: #{$PROGRAM_NAME} [options] YAML-FILE"
@@ -15,11 +15,11 @@ opt_parser = OptionParser.new do |opts|
   opts.separator ''
   opts.separator 'options:'
 
-  opts.on('--expand', 'Enable "$shell_variable" expansion') { $opt_expand_shell_variable = true }
+  opts.on('--expand', 'Enable "$shell_variable" expansion') { options[:expand_shell_variable] = true }
 
-  opts.on('--array ARRAY', 'Store values to associative array') { |array_name| $opt_assoc_array = array_name }
+  opts.on('--array ARRAY', 'Store values to associative array') { |array_name| options[:assoc_array] = array_name }
 
-  opts.on('--prefix PREFIX', 'Add prefix to variable names') { |prefix| $opt_name_prefix = prefix }
+  opts.on('--prefix PREFIX', 'Add prefix to variable names') { |prefix| options[:name_prefix] = prefix }
 
   opts.on_tail('-h', '--help', 'Show this message') do
     puts opts
@@ -51,8 +51,8 @@ def get_simple_value(v)
   end
 end
 
-def shell_escape(v)
-  if $opt_expand_shell_variable && v.index('$')
+def shell_escape(v, options)
+  if options[:expand_shell_variable] && v.index('$')
     "\"#{v}\""
   else
     Shellwords.escape(v)
@@ -71,8 +71,8 @@ ARGV.each do |file|
   vars.each do |k, v|
     next unless k.is_a?(String)
 
-    var_name = $opt_name_prefix + k.gsub(/[^a-zA-Z0-9_]/, '_').gsub(/^[^a-zA-Z]/, '_')
-    var_name = "#{$opt_assoc_array}[#{var_name}]" if $opt_assoc_array
-    $stdout.write("#{var_name}=#{shell_escape(get_simple_value(v))}\n")
+    var_name = options[:name_prefix] + k.gsub(/[^a-zA-Z0-9_]/, '_').gsub(/^[^a-zA-Z]/, '_')
+    var_name = "#{options[:assoc_array]}[#{var_name}]" if options[:assoc_array]
+    $stdout.write("#{var_name}=#{shell_escape(get_simple_value(v), options)}\n")
   end
 end

@@ -122,7 +122,7 @@ OptionParser.new do |opts|
   opts.separator ''
   opts.separator 'options:'
 
-  opts.on('-v', '--verbose') { $opt_verbose = true }
+  opts.on('-v', '--verbose') { options[:verbose] = true }
 
   opts.on('--output file', 'output path') { |f| options[:output] = f }
   opts.on('--kernel kernel', 'kernel version') { |k| options[:kernel] = k }
@@ -189,7 +189,7 @@ File.open(options[:output], 'w') do |file|
   file.puts errids.to_a.sort
 end
 
-if $opt_verbose
+if options[:verbose]
   count.sort.each do |k, v|
     puts "#{k}: #{v}"
   end

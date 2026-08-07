@@ -16,29 +16,15 @@ require "#{LKP_SRC}/lib/yaml"
 LKP_SRC_ETC ||= LKP::Path.src('etc')
 
 def event_counter?(name)
-  $event_counter_prefixes ||= File.read("#{LKP_SRC_ETC}/event-counter-prefixes").split
-  $event_counter_prefixes.each do |prefix|
-    return true if name.index(prefix)&.zero?
-  end
-  $event_counter_patterns ||= LKP::EventCounterPatterns.instance.regexp
-
-  name =~ $event_counter_patterns
+  LKP::EventCounterPrefixes.instance.contain?(name) || name =~ LKP::EventCounterPatterns.instance.regexp
 end
 
 def independent_counter?(name)
-  $independent_counter_prefixes ||= File.read("#{LKP_SRC_ETC}/independent-counter-prefixes").split
-  $independent_counter_prefixes.each do |prefix|
-    return true if name.index(prefix)&.zero?
-  end
-  false
+  LKP::IndependentCounterPrefixes.instance.contain?(name)
 end
 
 def ignore_part(name)
-  $ignore_part_prefixes ||= File.read("#{LKP_SRC_ETC}/ignore-part-prefixes").split
-  $ignore_part_prefixes.each do |prefix|
-    return true if name.start_with?(prefix)
-  end
-  false
+  LKP::IgnorePartPrefixes.instance.contain?(name)
 end
 
 def max_cols(matrix)
@@ -103,7 +89,7 @@ def create_stats_matrix(result_root)
   stats = {}
   matrix = {}
 
-  programs = create_programs_hash('programs/*/parse')
+  programs = Programs.create('programs/*/parse')
 
   monitor_files = Dir["#{result_root}/*.{json,json.gz}"]
   job = Job.open("#{result_root}/job.yaml")
@@ -128,7 +114,7 @@ def create_stats_matrix(result_root)
       next
     end
 
-    monitor_stats = load_json file
+    monitor_stats = JSON.parse_cached file
     sample_size = max_cols(monitor_stats)
 
     i_stats_part_begin = 0
@@ -183,7 +169,7 @@ end
 def load_create_stats_matrix(result_root)
   stats_file = "#{result_root}/stats.json"
   if File.exist? stats_file
-    load_json stats_file
+    JSON.parse_cached stats_file
   else
     create_stats_matrix result_root
   end
@@ -204,7 +190,7 @@ end
 def load_matrix_file(matrix_file)
   matrix = nil
   begin
-    matrix = load_json(matrix_file) if File.exist? matrix_file
+    matrix = JSON.parse_cached(matrix_file) if File.exist? matrix_file
   rescue StandardError
     return
   end

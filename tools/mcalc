@@ -8,7 +8,7 @@ require "#{LKP_SRC}/lib/statistics"
 require "#{LKP_SRC}/lib/stats"
 require "#{LKP_SRC}/lib/yaml"
 
-$opt_parser = OptionParser.new do |opts|
+opt_parser = OptionParser.new do |opts|
   opts.banner = "Usage: #{opts.program_name} <matrix.json> [<operations>]"
   opts.separator ''
   opts.separator 'Example:'
@@ -26,7 +26,7 @@ end
 
 class MatrixCalculator
   def initialize(matrix_fn)
-    @matrix = load_json matrix_fn
+    @matrix = JSON.parse_cached matrix_fn
     @nmatrix = {}
   end
 
@@ -77,15 +77,15 @@ class MatrixCalculator
   end
 end
 
-$opt_parser.parse!(ARGV)
+opt_parser.parse!(ARGV)
 
-def usage
-  puts $opt_parser
+def usage(opt_parser)
+  puts opt_parser
   exit 1
 end
 
-def main
-  usage if ARGV.length > 2 || ARGV.empty?
+def main(opt_parser)
+  usage(opt_parser) if ARGV.length > 2 || ARGV.empty?
   mc = MatrixCalculator.new(ARGV.first)
   operations = if ARGV.length > 1
                  ARGV[1]
@@ -95,4 +95,4 @@ def main
   mc.instance_eval operations
 end
 
-main
+main(opt_parser)

@@ -11,16 +11,6 @@ require "#{LKP_SRC}/lib/programs"
 require "#{LKP_SRC}/lib/result_root"
 require "#{LKP_SRC}/lib/stats"
 
-# How many components in the stat sort key
-$stat_sort_key_number = {
-  'perf-profile' => 2
-}
-
-$stat_absolute_changes = [
-  /^perf-profile/,
-  /%$/
-]
-
 class AxesGrouper
   include Property
 
@@ -99,6 +89,16 @@ module Compare
   ABS_WIDTH = 10
   REL_WIDTH = 10
   ERR_WIDTH = 6
+
+  # How many components in the stat sort key
+  STAT_SORT_KEY_NUMBER = {
+    'perf-profile' => 2
+  }.freeze
+
+  STAT_ABSOLUTE_CHANGES = [
+    /^perf-profile/,
+    /%$/
+  ].freeze
 
   STAT_KEY = :stat_key
   FAILURE = :failure
@@ -455,7 +455,7 @@ module Compare
     def include_all_failure_stat_keys
       return [] unless @comparer.include_all_failure_stat_keys
 
-      all_stat_keys.select { |stat_key| function_stat?(stat_key) }
+      all_stat_keys.select { |stat_key| StatClassifier.function_stat?(stat_key) }
     end
 
     def do_filter_testcase_stat_keys(stats)
@@ -475,7 +475,7 @@ module Compare
 
     def filter_kpi_stat_keys(stats, matrixes_in)
       stats.select do |k|
-        kpi_stat?(k, axes, matrixes_in.map { |m| m[k] })
+        StatClassifier.kpi_stat?(k, axes, matrixes_in.map { |m| m[k] })
       end
     end
 
@@ -525,7 +525,7 @@ module Compare
         cruns = 1
       end
       changed_stat_keys(ms).each do |stat_key|
-        failure = function_stat?(stat_key)
+        failure = StatClassifier.function_stat?(stat_key)
         tms = failure ? ms : cms
         truns = failure ? aruns : cruns
         stat = {
@@ -771,7 +771,7 @@ module Compare
   end
 
   def self.use_absolute_changes?(key)
-    $stat_absolute_changes.any? { |p| key =~ p }
+    STAT_ABSOLUTE_CHANGES.any? { |p| key =~ p }
   end
 
   def self.calc_perf_change(stat)
@@ -809,7 +809,7 @@ module Compare
   end
 
   def self.stat_sort_key(key, base)
-    number = $stat_sort_key_number[base]
+    number = STAT_SORT_KEY_NUMBER[base]
     if number
       key.split('.')[0, number].join '.'
     else
@@ -1076,7 +1076,7 @@ module Compare
     git = axis_key_git COMMIT_AXIS_KEY
     commits = git.sort_commits commits
     _rts = commits.map do |c|
-      DataStore::Collection.new(mrt_table_set.linux_perf_table, 'commit' => c.to_s).to_a
+      DataStore::Collection.new(MResultRootTableSet.instance.linux_perf_table, 'commit' => c.to_s).to_a
     end.flatten
     _rts.select! do |_rt|
       axes = _rt.axes
@@ -1184,7 +1184,7 @@ module Compare
       end
       _rts = job_dirs.map do |job_dir|
         each_job_in_dir(job_dir, job_name).map do |job|
-          mrt_table_set.open_node job.axes
+          MResultRootTableSet.instance.open_node job.axes
         end
       end.flatten
       _rts.select!(&:exist?)

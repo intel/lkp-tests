@@ -59,6 +59,7 @@ Metrics/ClassLength:
   Max: 250
   Exclude:
     - lib/job.rb
+    - sbin/compare
 
 Metrics/CyclomaticComplexity:
   Max: 30 # 6 by default
@@ -73,6 +74,7 @@ Metrics/MethodLength:
     - lib/job2sh.rb
     - lib/job.rb
     - lib/matrix.rb
+    - sbin/compare
 
 Metrics/ModuleLength:
   Max: 250
@@ -168,7 +170,8 @@ Style/FrozenStringLiteralComment:
   Enabled: false
 
 Style/GlobalVars:
-  Enabled: false
+  Exclude:
+    - lib/lkp_git.rb
 
 Style/MissingRespondToMissing:
   Enabled: false

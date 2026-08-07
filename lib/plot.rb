@@ -21,7 +21,7 @@ module Gnuplot
   end
 end
 
-def mmplot(matrix1, matrix2, fields, title_prefix = nil)
+def mmplot(matrix1, matrix2, fields, title_prefix = nil, output_path: nil)
   files = []
   Gnuplot.open do |gnuplot|
     fields.each do |field|
@@ -52,9 +52,9 @@ def mmplot(matrix1, matrix2, fields, title_prefix = nil)
         return nil if ds1.nil? && ds2.nil?
 
         normalized_field = field.tr('^a-zA-Z0-9_.:+=-', '_')
-        if $opt_output_path
+        if output_path
           plot.terminal 'png'
-          file = "#{$opt_output_path}/#{normalized_field}.png"
+          file = "#{output_path}/#{normalized_field}.png"
           plot.output file
           files << file
         else
@@ -77,10 +77,10 @@ def mmplot(matrix1, matrix2, fields, title_prefix = nil)
   files
 end
 
-def mmsplot(matrixes1, matrixes2, fields, title_prefix = nil)
+def mmsplot(matrixes1, matrixes2, fields, title_prefix = nil, output_path: nil)
   m1 = merge_matrixes(matrixes1)
   m2 = merge_matrixes(matrixes2)
-  mmplot(m1, m2, fields, title_prefix)
+  mmplot(m1, m2, fields, title_prefix, output_path:)
 end
 
 class MatrixPlotterBase
@@ -414,8 +414,8 @@ class << MatrixPlotter
   end
 end
 
-def mplot(matrix, stats, x_stat_key = nil)
+def mplot(matrix, stats, x_stat_key = nil, output_path: nil)
   p = MatrixPlotter.new
-  p.set_output_prefix ensure_dir($opt_output_path) if $opt_output_path
+  p.set_output_prefix ensure_dir(output_path) if output_path
   p.call(matrix, stats, x_stat_key)
 end

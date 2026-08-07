@@ -9,7 +9,7 @@ require "#{LKP_SRC}/lib/job"
 require "#{LKP_SRC}/lib/job2sh"
 require "#{LKP_SRC}/lib/log"
 
-$opt_file = $stdout
+opt_file = $stdout
 
 opt_parser = OptionParser.new do |opts|
   opts.banner = "Usage: #{$PROGRAM_NAME} [options] job.yaml"
@@ -18,7 +18,7 @@ opt_parser = OptionParser.new do |opts|
   opts.separator 'options:'
 
   opts.on('-o FILE', '--output FILE', 'save shell script to FILE (default: stdout)') do |file|
-    $opt_file = file
+    opt_file = file
   end
 
   opts.on_tail('-h', '--help', 'Show this message') do
@@ -49,10 +49,10 @@ rescue Job::ParamError => e
   exit 1
 end
 
-if $opt_file == $stdout
-  $opt_file.puts job.to_shell
+if opt_file == $stdout
+  opt_file.puts job.to_shell
 else
-  File.open($opt_file, 'w', 0o775) do |f|
+  File.open(opt_file, 'w', 0o775) do |f|
     f.puts job.to_shell
   end
 end

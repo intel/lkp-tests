@@ -29,8 +29,7 @@ ENV['TMP'] = TMP
 ENV['PATH'] = ENV.fetch('PATH', nil) + ":#{LKP_SRC}/bin"
 ENV['BENCHMARK_ROOT'] = '/lkp/benchmarks'
 
-$opt_result_root = 'result'
-$opt_set_key_value = {}
+options = { result_root: 'result', set_key_value: {} }
 
 opt_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: run-local [-o RESULT_ROOT] JOBFILE'
@@ -38,10 +37,10 @@ opt_parser = OptionParser.new do |opts|
   opts.separator ''
   opts.separator 'options:'
 
-  opts.on('-o RESULT_ROOT', '--output RESULT_ROOT', 'link to result directory') { |dir| $opt_result_root = dir }
+  opts.on('-o RESULT_ROOT', '--output RESULT_ROOT', 'link to result directory') { |dir| options[:result_root] = dir }
 
   opts.on("-s 'KEY: VALUE'", "--set 'KEY: VALUE'", 'add YAML hash to job') do |key_value|
-    $opt_set_key_value.merge!(YAML.load(key_value))
+    options[:set_key_value].merge!(YAML.load(key_value))
   end
 
   opts.on_tail('-h', '--help', 'Show this message') do
@@ -122,7 +121,7 @@ job['compiler'] = 'gcc' if job['compiler'].empty?
 job['NO_NETWORK'] = 1
 job['LKP_LOCAL_RUN'] = 1
 
-$opt_set_key_value.each do |k, v|
+options[:set_key_value].each do |k, v|
   job[k] = v
 end
 
@@ -168,5 +167,5 @@ system("#{LKP_SRC}/sbin/unite-params", result_root)
 MResultRootTableSet.create_tables_layout
 convert_mrt(_result_root)
 
-FileUtils.rm_f($opt_result_root)
-FileUtils.ln_s(result_root, $opt_result_root)
+FileUtils.rm_f(options[:result_root])
+FileUtils.ln_s(result_root, options[:result_root])

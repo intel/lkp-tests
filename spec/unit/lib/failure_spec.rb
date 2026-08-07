@@ -11,7 +11,7 @@ expects = {
 describe 'failure stat' do
   expects.each do |k, v|
     it k do
-      expect(failure_stat?(k)).to eq v
+      expect(StatClassifier.failure_stat?(k)).to eq v
     end
   end
 end

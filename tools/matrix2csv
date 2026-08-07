@@ -6,7 +6,7 @@ require "#{LKP_SRC}/lib/matrix"
 require "#{LKP_SRC}/lib/yaml"
 
 def matrix2csv(matrix_file, csv_file)
-  matrix = load_json(matrix_file)
+  matrix = JSON.parse_cached(matrix_file)
   save_matrix_to_csv_file(csv_file, matrix)
 end
 

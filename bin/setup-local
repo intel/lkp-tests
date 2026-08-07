@@ -24,8 +24,7 @@ if Process.euid != 0
   exit 1
 end
 
-$opt_hdd = []
-$opt_ssd = []
+options = { hdd: [], ssd: [] }
 
 opt_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: setup-local [options] <script>/<jobfile>'
@@ -33,9 +32,9 @@ opt_parser = OptionParser.new do |opts|
   opts.separator ''
   opts.separator 'options:'
 
-  opts.on('--hdd partition', 'HDD partition for IO tests') { |hdd| $opt_hdd << hdd }
+  opts.on('--hdd partition', 'HDD partition for IO tests') { |hdd| options[:hdd] << hdd }
 
-  opts.on('--ssd partition', 'SSD partition for IO tests') { |ssd| $opt_ssd << ssd }
+  opts.on('--ssd partition', 'SSD partition for IO tests') { |ssd| options[:ssd] << ssd }
 
   opts.on_tail('-h', '--help', 'Show this message') do
     puts opts
@@ -81,7 +80,7 @@ def create_lkp_dirs
   FileUtils.mkdir_p '/lkp/benchmarks'
 end
 
-def create_host_config
+def create_host_config(options)
   host_config = LKP_SRC + "/hosts/#{HOSTNAME}"
   if File.exist? host_config
     puts "reusing #{host_config}"
@@ -92,8 +91,8 @@ def create_host_config
     nr_cpu = Etc.nprocessors
     File.open(host_config, 'w') do |file|
       file.puts "memory: #{mem_gb}G"
-      file.puts "hdd_partitions: #{$opt_hdd.join ' '}"
-      file.puts "ssd_partitions: #{$opt_ssd.join ' '}"
+      file.puts "hdd_partitions: #{options[:hdd].join ' '}"
+      file.puts "ssd_partitions: #{options[:ssd].join ' '}"
       file.puts "nr_cpu: #{nr_cpu}"
     end
   end
@@ -123,7 +122,7 @@ end
 
 make_wakeup
 create_lkp_dirs
-create_host_config
+create_host_config(options)
 install_packages('lkp', distro)
 install_packages('makepkg', distro)
 

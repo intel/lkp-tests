@@ -10,16 +10,18 @@ require "#{LKP_SRC}/lib/statistics"
 require "#{LKP_SRC}/lib/stats"
 require "#{LKP_SRC}/lib/yaml"
 
-$opt_output_path = 'output.png'
-$x_stat_key = nil
-$x_relative = false
-$xtics = false
-$y_min = nil
-$y_relative = false
-$x_range = [nil, nil]
-$opt_diff = nil
-$opt_diff_distance = 1
-$opt_split_stat = nil
+options = {
+  output_path: 'output.png',
+  x_stat_key: nil,
+  x_relative: false,
+  xtics: false,
+  y_min: nil,
+  y_relative: false,
+  x_range: [nil, nil],
+  diff: nil,
+  diff_distance: 1,
+  split_stat: nil
+}
 
 opt_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: mplot matrix.json stat_field [matrix.json stat_filed]... [OPTION...]'
@@ -31,25 +33,25 @@ opt_parser = OptionParser.new do |opts|
   opts.separator ''
   opts.separator 'options:'
 
-  opts.on('-o FILE', '--output FILE', 'output file name') { |fn| $opt_output_path = fn }
+  opts.on('-o FILE', '--output FILE', 'output file name') { |fn| options[:output_path] = fn }
 
-  opts.on('-x KEY', '--x-stat-key KEY', 'x axis stat key name') { |key| $x_stat_key = key }
+  opts.on('-x KEY', '--x-stat-key KEY', 'x axis stat key name') { |key| options[:x_stat_key] = key }
 
-  opts.on('-r', '--relative-x', 'x axis relative to the first element') { $x_relative = true }
+  opts.on('-r', '--relative-x', 'x axis relative to the first element') { options[:x_relative] = true }
 
-  opts.on('--xtics', 'draw x tics') { $xtics = true }
+  opts.on('--xtics', 'draw x tics') { options[:xtics] = true }
 
-  opts.on('--y-min YMIN', 'The y range minimum') { |ymin| $y_min = ymin }
+  opts.on('--y-min YMIN', 'The y range minimum') { |ymin| options[:y_min] = ymin }
 
-  opts.on('--relative-y', 'y axis relative to the first element') { $y_relative = true }
+  opts.on('--relative-y', 'y axis relative to the first element') { options[:y_relative] = true }
 
-  opts.on('--x-range RANGE', 'The x range') { |range| $x_range = range.split(',').map(&:to_f) }
+  opts.on('--x-range RANGE', 'The x range') { |range| options[:x_range] = range.split(',').map(&:to_f) }
 
-  opts.on('-d', '--diff', 'draw diff figure') { $opt_diff = true }
+  opts.on('-d', '--diff', 'draw diff figure') { options[:diff] = true }
 
-  opts.on('--diff-distance DISTANCE', 'The diff distance') { |distance| $opt_diff_distance = distance.to_i }
+  opts.on('--diff-distance DISTANCE', 'The diff distance') { |distance| options[:diff_distance] = distance.to_i }
 
-  opts.on('--split-stat', 'split stat to real stat and title') { $opt_split_stat = true }
+  opts.on('--split-stat', 'split stat to real stat and title') { options[:split_stat] = true }
 
   opts.on_tail('-h', '--help', 'show help message') do
     puts opts
@@ -64,51 +66,69 @@ if ARGV.empty? || ARGV.length.odd?
   exit
 end
 
-def plot_it(matrix_stat_arr)
+def apply_x_relative(matrix, x_stat_key, plotter)
+  rel_x = "rel-#{x_stat_key}"
+  xs = matrix[x_stat_key]
+  x0 = xs.first
+  matrix[rel_x] = xs.map { |xi| xi - x0 }
+  plotter.set_x_stat_key(rel_x)
+end
+
+# Returns the (possibly new, matrix-augmented) stat name to plot, or nil to
+# skip this matrix/stat pair when diff/y_relative is requested but the
+# underlying series is missing.
+def apply_y_transform(matrix, stat, options)
+  if options[:diff]
+    ys = matrix[stat]
+    return unless ys
+
+    diff_distance = options[:diff_distance]
+    dstat = "diff#{diff_distance}-#{stat}"
+    dys = (diff_distance...ys.length).map { |i| ys[i] - ys[i - diff_distance] }
+    matrix[dstat] = ([0] * diff_distance) + dys
+    dstat
+  elsif options[:y_relative]
+    ys = matrix[stat]
+    return unless ys
+
+    rstat = "rel-#{stat}"
+    y0 = ys[0]
+    matrix[rstat] = ys.map { |yi| yi - y0 }
+    rstat
+  else
+    stat
+  end
+end
+
+def split_stat_titles(stat, options)
+  return [stat, stat] unless options[:split_stat]
+
+  kstat, tstat = stat.split(',')
+  [kstat, tstat || kstat]
+end
+
+def plot_it(matrix_stat_arr, options)
+  x_stat_key = options[:x_stat_key]
+
   plotter = MMatrixPlotter.new
-  plotter.set_x_stat_key($x_stat_key)
-         .set_xtics($xtics)
-         .set_y_range([$y_min, nil])
-         .set_x_range($x_range)
+  plotter.set_x_stat_key(x_stat_key)
+         .set_xtics(options[:xtics])
+         .set_y_range([options[:y_min], nil])
+         .set_x_range(options[:x_range])
   lines = []
   matrix_stat_arr.each_slice(2) do |matrix_fn, stat|
-    matrix = load_json matrix_fn
-    if $x_relative
-      rel_x = "rel-#{$x_stat_key}"
-      xs = matrix[$x_stat_key]
-      x0 = xs.first
-      matrix[rel_x] = xs.map { |xi| xi - x0 }
-      plotter.set_x_stat_key(rel_x)
-    end
-    if $opt_diff
-      dstat = "diff#{$opt_diff_distance}-#{stat}"
-      ys = matrix[stat]
-      next unless ys
+    matrix = JSON.parse_cached matrix_fn
+    apply_x_relative(matrix, x_stat_key, plotter) if options[:x_relative]
 
-      dys = ($opt_diff_distance...ys.length).map { |i| ys[i] - ys[i - $opt_diff_distance] }
-      matrix[dstat] = ([0] * $opt_diff_distance) + dys
-      stat = dstat
-    elsif $y_relative
-      rstat = "rel-#{stat}"
-      ys = matrix[stat]
-      next unless ys
+    stat = apply_y_transform(matrix, stat, options)
+    next unless stat
 
-      y0 = ys[0]
-      rys = ys.map { |yi| yi - y0 }
-      matrix[rstat] = rys
-      stat = rstat
-    end
-    if $opt_split_stat
-      kstat, tstat = stat.split(',')
-      tstat ||= kstat
-    else
-      kstat = tstat = stat
-    end
+    kstat, tstat = split_stat_titles(stat, options)
     lines << [matrix, kstat, tstat]
   end
-  plotter.set_output_file_name($opt_output_path)
+  plotter.set_output_file_name(options[:output_path])
          .set_lines(lines)
          .plot
 end
 
-plot_it(ARGV)
+plot_it(ARGV, options)

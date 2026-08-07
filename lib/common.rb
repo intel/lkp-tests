@@ -37,20 +37,6 @@ def instance_variable_sym(str)
   :"@#{str}"
 end
 
-def with_set_globals(*var_val_list)
-  var_vals = var_val_list.each_slice(2).to_a
-  ovals = var_vals.map { |var, val| eval(var.to_s) } # rubocop:disable Lint/UnusedBlockArgument
-  var_vals.each { |var, val| eval "#{var} = val" } # rubocop:disable Lint/UnusedBlockArgument, Style/HashEachMethods
-  yield
-ensure
-  if ovals
-    var_vals.zip(ovals).map do |var_val, oval| # rubocop:disable Lint/UnusedBlockArgument
-      var, _val = var_val
-      eval("#{var} = oval")
-    end
-  end
-end
-
 def ensure_array(obj)
   if obj.is_a? Array
     obj

@@ -68,6 +68,6 @@ shared_context 'mocked filesystem' do
 
   after do
     FileUtils.remove_entry tmp_lkp_src
-    $programs_cache = nil
+    Programs.singleton_class.cache_store(:create).clear
   end
 end

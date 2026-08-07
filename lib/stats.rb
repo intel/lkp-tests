@@ -4,7 +4,7 @@ LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
 
 require 'set'
 require 'timeout'
-require "#{LKP_SRC}/lib/bounds"
+require "#{LKP_SRC}/lib/cache"
 require "#{LKP_SRC}/lib/changed_stat"
 require "#{LKP_SRC}/lib/constant"
 require "#{LKP_SRC}/lib/lkp_git"
@@ -14,20 +14,25 @@ require "#{LKP_SRC}/lib/log"
 require "#{LKP_SRC}/lib/perf_metrics"
 require "#{LKP_SRC}/lib/programs"
 require "#{LKP_SRC}/lib/result"
+require "#{LKP_SRC}/lib/stat_bounds"
 require "#{LKP_SRC}/lib/statistics"
 require "#{LKP_SRC}/lib/yaml"
 
 MARGIN_SHIFT = 5
 MAX_RATIO = 5
 
-LKP_SRC_ETC ||= LKP::Path.src('etc')
+# generate LKP::MemoryStatPrefixes
+LKP::Prefixes.generate_klass(LKP::Path.src('etc', 'memory-stat-prefixes'))
 
-$metric_add_max_latency = File.read("#{LKP_SRC_ETC}/add-max-latency").split("\n")
-$metric_failure = File.read("#{LKP_SRC_ETC}/failure").split("\n")
-$metric_pass = File.read("#{LKP_SRC_ETC}/pass").split("\n")
-$perf_metrics_threshold = YAML.load_file "#{LKP_SRC_ETC}/perf-metrics-threshold.yaml"
-$index_perf = load_yaml "#{LKP_SRC_ETC}/index-perf-all.yaml"
-$index_latency = load_yaml "#{LKP_SRC_ETC}/index-latency-all.yaml"
+# generate LKP::PerfMetricsThreshold, LKP::IndexPerfAll, LKP::IndexLatencyAll, LKP::IndexPower
+{
+  'perf-metrics-threshold.yaml' => 'PerfMetricsThreshold',
+  'index-perf-all.yaml' => 'IndexPerfAll',
+  'index-latency-all.yaml' => 'IndexLatencyAll',
+  'index-power.yaml' => 'IndexPower'
+}.each do |file_name, klass_name|
+  LKP::PatternValues.generate_klass(LKP::Path.src('etc', file_name), klass_name)
+end
 
 class LinuxTestcasesTableSet
   def self.load_testcases(file_path)
@@ -51,8 +56,6 @@ def other_test?(testcase)
   LinuxTestcasesTableSet::OTHER_TESTCASES.index testcase
 end
 
-$test_prefixes = test_prefixes
-
 def perf_metric?(name)
   LKP::PerfMetrics.instance.contain? name
 end
@@ -60,8 +63,9 @@ end
 # Check whether it looks like a reasonable performance change,
 # to avoid showing unreasonable ones to humans in compare/mplot output.
 def reasonable_perf_change?(name, delta, max)
-  $perf_metrics_threshold.each do |k, v|
-    next unless name =~ %r{^#{k}$}
+  key = LKP::PerfMetricsThreshold.instance.key(name)
+  unless key.nil?
+    v = LKP::PerfMetricsThreshold.instance[key]
     return false if max < v
     return false if delta < v / 2 && v.instance_of?(Integer)
 
@@ -97,7 +101,7 @@ def stat_relevance(record)
   stat = record['stat']
   relevance = if stat[0..9] == 'lock_stat.'
                 5
-              elsif $test_prefixes.include? stat.sub(/\..*/, '.')
+              elsif LKP::Programs.test_prefixes.include? stat.sub(/\..*/, '.')
                 100
               elsif perf_metric?(stat)
                 1
@@ -116,7 +120,7 @@ def sort_stats(stat_records)
       order1 = key[0]
       order2 += key[1]
     end
-    order2 /= $stat_records[stat].size
+    order2 /= stat_records[stat].size
     - order1 - order2
   end
 end
@@ -131,211 +135,58 @@ def matrix_cols(hash_of_array)
   end
 end
 
-def load_release_matrix(matrix_file)
-  load_json matrix_file
-rescue StandardError => e
-  log_error e
-  nil
-end
+class StatClassifier
+  class << self
+    include Cacheable
 
-def vmlinuz_dir(kconfig, compiler, commit)
-  "#{KERNEL_ROOT}/#{kconfig}/#{compiler}/#{commit}"
-end
+    def function_stat?(stat)
+      return false if stat.index('.time.')
+      return false if stat.index('.timestamp:')
+      return false if stat.index('.bootstage:')
+      return true if LKP::Failure.instance.contain?(stat)
+      return true if LKP::Pass.instance.contain?(stat)
 
-def load_base_matrix_for_notag_project(git, rp, axis)
-  base_commit = git.first_sha
-  log_debug "#{git.project} doesn't have tag, use its first commit #{base_commit} as base commit"
-
-  rp[axis] = base_commit
-  base_matrix_file = "#{rp._result_root}/matrix.json"
-  unless File.exist? base_matrix_file
-    log_warn "#{base_matrix_file} doesn't exist."
-    return
-  end
-  load_release_matrix(base_matrix_file)
-end
-
-def load_base_matrix(matrix_path, head_matrix, options) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
-  matrix_path = File.realpath matrix_path
-  matrix_path = File.dirname matrix_path if File.file? matrix_path
-  log_debug "matrix_path is #{matrix_path}"
-
-  rp = ResultPath.new
-  rp.parse_result_root matrix_path
-
-  puts rp if ENV['LKP_VERBOSE']
-  project = options['bisect_project'] || 'linux'
-  axis = options['bisect_axis'] || 'commit'
-
-  commit = rp[axis]
-  matrix = {}
-  tags_merged = []
-
-  begin
-    $git ||= {}
-    axis_branch_name =
-      if axis == 'commit'
-        options['branch']
-      else
-        options[axis.sub('commit', 'branch')]
-      end
-    remote = axis_branch_name.split('/')[0] if axis_branch_name
-
-    log_debug "remote is #{remote}"
-    $git[project] ||= Git.open(project: project, remote: remote)
-    git = $git[project]
-  rescue StandardError => e
-    log_error e
-    return
-  end
-
-  return load_base_matrix_for_notag_project(git, rp, axis) if git.tag_names.empty?
-
-  begin
-    return unless git.commit_exist? commit
-
-    version = nil
-    is_exact_match = false
-    version, is_exact_match = git.gcommit(commit).last_release_tag
-    log_debug "project: #{project}, version: #{version}, is_exact_match: #{is_exact_match}"
-  rescue StandardError => e
-    log_error e
-    return
-  end
-
-  # FIXME: remove it later; or move it somewhere in future
-  if project == 'linux' && !version
-    kconfig = rp['kconfig']
-    compiler = rp['compiler']
-    context_file = "#{vmlinuz_dir(kconfig, compiler, commit)}/context.yaml"
-    version = nil
-    if File.exist? context_file
-      context = YAML.load_file context_file
-      version = context['rc_tag']
-      is_exact_match = false
+      false
     end
-    unless version
-      log_error "Cannot get base RC commit for #{commit}"
-      return
+    cache_method :function_stat?
+
+    def latency_stat?(stat)
+      LKP::IndexLatencyAll.instance.key(stat)
+      false
+    end
+    cache_method :latency_stat?
+
+    def failure_stat?(stat)
+      LKP::Failure.instance.contain?(stat)
+    end
+
+    def pass_stat?(stat)
+      LKP::Pass.instance.contain?(stat)
+    end
+
+    def memory_stat?(stat)
+      LKP::MemoryStatPrefixes.instance.contain?(stat)
+    end
+
+    def bisectable_stat?(stat)
+      return true if LKP::StatAllowlist.instance.contain?(stat)
+
+      !LKP::StatDenylist.instance.contain?(stat)
+    end
+
+    KPI_STAT_DENYLIST = Set.new(['vm-scalability.stddev', 'unixbench.incomplete_result']).freeze
+
+    def kpi_stat?(stat, _axes, _values = nil)
+      return false if KPI_STAT_DENYLIST.include?(stat)
+
+      base, _, remainder = stat.partition('.')
+      LKP::Programs.all_tests_set.include?(base) && !remainder.start_with?('time.')
     end
   end
-
-  order = git.release_tag_order(version)
-  unless order
-    # ERR unknown version v4.3 matrix
-    # b/c git repo like GIT_ROOT_DIR/linux keeps changing, it is possible
-    # that git object is cached in an older time, and v4.3 commit 6a13feb9c82803e2b815eca72fa7a9f5561d7861 appears later.
-    # - git.gcommit(6a13feb9c82803e2b815eca72fa7a9f5561d7861).last_release_tag returns [v4.3, false]
-    # - git.release_tag_order(v4.3) returns nil
-    # refresh the cache to invalidate previous git object
-    git = $git[project] = Git.open(project: project)
-    version, is_exact_match = git.gcommit(commit).last_release_tag
-    order = git.release_tag_order(version)
-
-    # FIXME: rli9 after above change, below situation is not reasonable, keep it for debugging purpose now
-    unless order
-      log_error('unknown version matrix', version:, matrix_path:, options:)
-      return
-    end
-  end
-
-  cols = 0
-  git.release_tags_with_order.each do |tag, o|
-    break if tag == 'v4.16-rc7' # kbuild doesn't support to build kernel < v4.16
-    next if o >  order
-    next if o == order && is_exact_match
-    next if is_exact_match && tag =~ /^#{version}-rc[0-9]+$/
-    break if tag =~ /\.[0-9]+$/ && tags_merged.size >= 2 && cols >= 6
-
-    rp[axis] = tag
-    base_matrix_file = "#{rp._result_root}/matrix.json"
-    unless File.exist? base_matrix_file
-      rp[axis] = git.release_tags2shas[tag]
-      next unless rp[axis]
-
-      base_matrix_file = "#{rp._result_root}/matrix.json"
-    end
-    next unless File.exist? base_matrix_file
-
-    log_debug "base_matrix_file: #{base_matrix_file}"
-    rc_matrix = load_release_matrix base_matrix_file
-    next unless rc_matrix
-
-    add_stats_to_matrix(rc_matrix, matrix)
-    tags_merged << tag
-
-    options['base_matrixes'] ||= {}
-    options['base_matrixes'][tag] = rc_matrix
-
-    cols += (rc_matrix['stats_source'] || []).size
-    break if tags_merged.size >= 3 && cols >= 9
-    break if tag =~ /-rc1$/ && cols >= 3
-  end
-
-  if matrix.empty?
-    log_debug "no release matrix was found: #{matrix_path}"
-    nil
-  elsif cols >= 3 ||
-        (cols >= 1 && functional_test?(rp['testcase'])) ||
-        head_matrix['last_state.is_incomplete_run'] ||
-        head_matrix['dmesg.boot_failures'] ||
-        head_matrix['stderr.has_stderr']
-    log_debug "compare with release matrix: #{matrix_path} #{tags_merged}"
-    options['good_commit'] = tags_merged.first
-    matrix
-  else
-    log_debug "release matrix too small: #{matrix_path} #{tags_merged}"
-    nil
-  end
-end
-
-def __function_stat?(stats_field)
-  return false if stats_field.index('.time.')
-  return false if stats_field.index('.timestamp:')
-  return false if stats_field.index('.bootstage:')
-  return true if $metric_failure.any? { |pattern| stats_field =~ %r{^#{pattern}} }
-  return true if $metric_pass.any? { |pattern| stats_field =~ %r{^#{pattern}} }
-
-  false
-end
-
-def function_stat?(stats_field)
-  $function_stats_cache ||= {}
-  if $function_stats_cache.include? stats_field
-    $function_stats_cache[stats_field]
-  else
-    $function_stats_cache[stats_field] = __function_stat?(stats_field)
-  end
-end
-
-def __latency_stat?(stats_field)
-  $index_latency.keys.any? { |i| stats_field =~ /^#{i}$/ }
-  false
-end
-
-def latency_stat?(stats_field)
-  $latency_stat_cache ||= {}
-  if $latency_stat_cache.include? stats_field
-    $latency_stat_cache[stats_field]
-  else
-    $latency_stat_cache[stats_field] = __latency_stat?(stats_field)
-  end
-end
-
-def failure_stat?(stats_field)
-  $metric_failure.any? { |pattern| stats_field =~ %r{^#{pattern}} }
-end
-
-def pass_stat?(stats_field)
-  $metric_pass.any? { |pattern| stats_field =~ %r{^#{pattern}} }
-end
-
-def memory_change?(stats_field)
-  stats_field =~ /^(boot-meminfo|boot-memory|proc-vmstat|numa-vmstat|meminfo|memmap|numa-meminfo)\./
 end
 
 def add_max_latency?(stats_field)
-  $metric_add_max_latency.any? { |pattern| stats_field =~ %r{^#{pattern}$} }
+  LKP::AddMaxLatency.instance.contain?(stats_field)
 end
 
 def sort_remove_margin(array, max_margin = nil)
@@ -373,12 +224,6 @@ def filter_incomplete_run(hash)
   end
 
   hash.delete 'last_state.is_incomplete_run'
-end
-
-def bisectable_stat?(stat)
-  return true if LKP::StatAllowlist.instance.contain?(stat)
-
-  !LKP::StatDenylist.instance.contain?(stat)
 end
 
 def samples_remove_boot_fails(matrix, samples)
@@ -427,8 +272,8 @@ class StatCompare
     @resize = options['resize']
 
     @is_force_stat = options["force_#{k}"]
-    @is_function_stat = function_stat?(k)
-    @is_latency_stat = latency_stat?(k)
+    @is_function_stat = StatClassifier.function_stat?(k)
+    @is_latency_stat = StatClassifier.latency_stat?(k)
   end
 
   def process
@@ -591,7 +436,7 @@ class StatCompare
     # virtual hosts are dynamic and noisy
     return true if options['tbox_group'] =~ /^vh-/
     # VM boxes' memory stats are still good
-    return true if options['tbox_group'] =~ /^vm-/ && !options['is_perf_test_vm'] && memory_change?(k)
+    return true if options['tbox_group'] =~ /^vm-/ && !options['is_perf_test_vm'] && StatClassifier.memory_stat?(k)
 
     false
   end
@@ -611,7 +456,7 @@ class StatCompare
     return true if a_k[-1].is_a?(String)
     return true if options['perf'] && !perf_metric?(k)
     return true if is_incomplete_run && k !~ /^(dmesg|last_state|stderr)\./
-    return true if !options['more'] && !bisectable_stat?(k) && !LKP::ReportAllowlist.instance.contain?(k)
+    return true if !options['more'] && !StatClassifier.bisectable_stat?(k) && !LKP::ReportAllowlist.instance.contain?(k)
 
     if is_function_stat
       return true if skip_function_stat?
@@ -721,7 +566,7 @@ def load_matrices_to_compare(matrix_path1, matrix_path2, options = {})
   b = if matrix_path2
         search_load_json matrix_path2
       else
-        Timeout.timeout(1800) { load_base_matrix matrix_path1, a, options }
+        Timeout.timeout(1800) { LKP::ChangedStat.load_base_matrix matrix_path1, a, options }
       end
 
   [a, b]
@@ -811,7 +656,7 @@ end
 def matrix_from_stats_files(stats_files, stats_field = nil, add_source: true)
   matrix = {}
   stats_files.each do |stats_file|
-    stats = load_json stats_file
+    stats = JSON.parse_cached stats_file
     unless stats
       log_warn "empty or non-exist stats file #{stats_file}"
       next
@@ -836,16 +681,7 @@ def stat_key_base(stat)
 end
 
 def strict_kpi_stat?(stat, _axes, _values = nil)
-  $index_perf.keys.any? { |i| stat =~ /^#{i}$/ } || $index_latency.keys.any? { |i| stat =~ /^#{i}$/ }
-end
-
-$kpi_stat_denylist = Set.new ['vm-scalability.stddev', 'unixbench.incomplete_result']
-
-def kpi_stat?(stat, _axes, _values = nil)
-  return false if $kpi_stat_denylist.include?(stat)
-
-  base, _, remainder = stat.partition('.')
-  LKP::Programs.all_tests_set.include?(base) && !remainder.start_with?('time.')
+  !LKP::IndexPerfAll.instance.key(stat).nil? || !LKP::IndexLatencyAll.instance.key(stat).nil?
 end
 
 def sort_bisect_stats(stats)
@@ -853,19 +689,19 @@ def sort_bisect_stats(stats)
   stats.sort_by do |stat|
     stat_name = stat[Compare::STAT_KEY]
     score = monitor_stats.include?(stat_name.split('.').first) ? -100 : 0
-    key = $index_perf.keys.find { |i| stat_name =~ /^#{i}$/ }
-    $index_perf[key] ? $index_perf[key].to_i + score : -255 # -255 is a error value that should be less than values in $index_perf
+    key = LKP::IndexPerfAll.instance.key(stat_name)
+    key ? LKP::IndexPerfAll.instance[key].to_i + score : -255 # -255 is a error value that should be less than values in index-perf-all
   end
 end
 
 def kpi_stat_direction(stat_name, stat_change_percentage)
   key_direction = nil
-  key = $index_perf.keys.find { |i| stat_name =~ /^#{i}$/ }
+  key = LKP::IndexPerfAll.instance.key(stat_name)
   if key
-    key_direction = $index_perf[key]
+    key_direction = LKP::IndexPerfAll.instance[key]
   else
-    key = $index_latency.keys.find { |i| stat_name =~ /^#{i}$/ }
-    key_direction = $index_latency[key] if key
+    key = LKP::IndexLatencyAll.instance.key(stat_name)
+    key_direction = LKP::IndexLatencyAll.instance[key] if key
   end
 
   if key_direction.nil?

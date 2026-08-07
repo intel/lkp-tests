@@ -29,11 +29,15 @@ describe LKP::Programs do
     FileUtils.touch("#{@lkp_src}/programs/newdaemon/daemon")
     FileUtils.chmod(0o755, "#{@lkp_src}/programs/newdaemon/daemon")
     FileUtils.chmod(0o755, "#{@lkp_src}/programs/newdaemon/daemon")
+
+    # Program with both a run and a parse script, for .test_prefixes
+    FileUtils.touch("#{@lkp_src}/programs/progtest/parse")
   end
 
   before do
     stub_const('LKP_SRC', @lkp_src)
     stub_const('LKP::Programs::PROGRAMS_ROOT', File.join(@lkp_src, 'programs'))
+    described_class.instance_variable_set(:@test_prefixes, nil)
   end
 
   after(:all) do
@@ -92,6 +96,20 @@ describe LKP::Programs do
     it 'finds an executable dynamically' do
       path = described_class.find_executable('progtest', 'tests', 'run')
       expect(path).to end_with('programs/progtest/run')
+    end
+  end
+
+  describe '.test_prefixes' do
+    it 'includes a dot-suffixed prefix for a program with both a run and a parse script' do
+      expect(described_class.test_prefixes).to include('progtest.')
+    end
+
+    it 'excludes a daemon with no parse script' do
+      expect(described_class.test_prefixes).not_to include('newdaemon.')
+    end
+
+    it 'always includes the hardcoded kmsg/dmesg/stderr/last_state prefixes' do
+      expect(described_class.test_prefixes).to include('kmsg.', 'dmesg.', 'stderr.', 'last_state.')
     end
   end
 end

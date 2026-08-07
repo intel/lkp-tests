@@ -11,12 +11,7 @@ require "#{LKP_SRC}/lib/result"
 require "#{LKP_SRC}/lib/stats"
 require "#{LKP_SRC}/lib/yaml"
 
-$opt_group = '_rt'
-$opt_kernel = ''
-$opt_field = 'time.elapsed_time'
-$opt_pattern = ''
-
-options = {}
+options = { group: '_rt', kernel: '', field: 'time.elapsed_time', pattern: '' }
 
 opt_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: lkp stat [options]'
@@ -24,18 +19,18 @@ opt_parser = OptionParser.new do |opts|
   opts.separator ''
   opts.separator 'options:'
 
-  opts.on('-g GROUP', '--group-by GROUP', 'group by GROUP') { |group| $opt_group = group.gsub '/', " + '/' + " }
+  opts.on('-g GROUP', '--group-by GROUP', 'group by GROUP') { |group| options[:group] = group.gsub '/', " + '/' + " }
 
-  opts.on('-k KERNEL', '--kernel KERNEL', 'kernel branch/commit') { |kernel| $opt_kernel = kernel }
+  opts.on('-k KERNEL', '--kernel KERNEL', 'kernel branch/commit') { |kernel| options[:kernel] = kernel }
 
   opts.on('-p PATTERN', '--pattern PATTERN', 'grep RESULT_ROOT with PATTERN') do |pattern|
-    $opt_pattern << " #{pattern}"
+    options[:pattern] << " #{pattern}"
   end
 
   opts.on('-d DATE', '--date DATE', "search latest DATE days's RESULT_ROOT") do |date|
     case date
     when /[0-9]+m$/, /[0-9]+w$/, /[0-9]+d$/, /[0-9]+$/
-      $opt_pattern = "  -d #{date}" + $opt_pattern
+      options[:pattern] = "  -d #{date}" + options[:pattern]
     else
       log_warn "-d #{date}: parameter is unsuitable."
       puts opts
@@ -43,11 +38,11 @@ opt_parser = OptionParser.new do |opts|
     end
   end
 
-  opts.on('-f FIELD', '--field FIELD', 'stats field name') { |field| $opt_field = field }
+  opts.on('-f FIELD', '--field FIELD', 'stats field name') { |field| options[:field] = field }
 
-  opts.on('-r', '--raw-samples', 'show raw samples') { $opt_raw = true }
+  opts.on('-r', '--raw-samples', 'show raw samples') { options[:raw] = true }
 
-  opts.on('-q queue', '--queue queue', 'queue') { |queue| $opt_pattern = " -q #{queue}" + $opt_pattern }
+  opts.on('-q queue', '--queue queue', 'queue') { |queue| options[:pattern] = " -q #{queue}" + options[:pattern] }
 
   opts.on('-s', '--sort', 'sort by average value') { options[:sort] = true }
 
@@ -59,16 +54,16 @@ end
 
 opt_parser.parse!(ARGV)
 
-unless $opt_kernel.empty?
-  unless Git.sha1_40?($opt_kernel)
+unless options[:kernel].empty?
+  unless Git.sha1_40?(options[:kernel])
     git = Git.open
-    $opt_kernel = git.gcommit($opt_kernel).sha
+    options[:kernel] = git.gcommit(options[:kernel]).sha
   end
 
-  $opt_pattern << " #{$opt_kernel}"
+  options[:pattern] << " #{options[:kernel]}"
 end
 
-_result_roots = Bash.run("#{LKP_SRC}/lkp-exec/_rt #{$opt_pattern}").split
+_result_roots = Bash.run("#{LKP_SRC}/lkp-exec/_rt #{options[:pattern]}").split
 groups = {}
 _result_roots.each do |_rt|
   __rt = File.dirname _rt
@@ -76,10 +71,10 @@ _result_roots.each do |_rt|
   matrix_path = "#{_rt}/matrix.json"
   next unless File.size? matrix_path
 
-  matrix = load_json matrix_path
+  matrix = JSON.parse_cached matrix_path
   next unless matrix
 
-  next if $opt_field !~ /last_state/ && matrix['last_state.is_incomplete_run'] && matrix['last_state.is_incomplete_run'].sum == matrix_cols(matrix)
+  next if options[:field] !~ /last_state/ && matrix['last_state.is_incomplete_run'] && matrix['last_state.is_incomplete_run'].sum == matrix_cols(matrix)
 
   result_path = ResultPath.new
   result_path.parse_result_root(_rt)
@@ -87,15 +82,15 @@ _result_roots.each do |_rt|
   result_path['__rt'] = __rt
   result_path['test'] = result_path.test_desc(/commit/, true)
 
-  group = result_path[$opt_group]
+  group = result_path[options[:group]]
   groups[group] ||= []
 
-  groups[group].concat samples_fill_missing_zeros(matrix, $opt_field)
+  groups[group].concat samples_fill_missing_zeros(matrix, options[:field])
 end
 
 printf "%8s %16s %16s %6s%%  %s\n", 'runs', 'sum', 'average', 'stddev', 'case'
 
-if $opt_raw
+if options[:raw]
   groups.each { |k, v| puts "#{k}: #{v}" }
 else
   groups = groups.reject { |_k, v| v.sum.zero? }
@@ -103,7 +98,7 @@ else
   groups = groups.sort_by { |_k, v| v.reject(&:zero?).average.to_i } if options[:sort]
 
   groups.each do |k, v|
-    v = v.reject(&:zero?) unless $opt_field =~ /last_state/
+    v = v.reject(&:zero?) unless options[:field] =~ /last_state/
     next if v.empty?
 
     total = v.sum

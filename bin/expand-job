@@ -6,8 +6,8 @@ require 'yaml'
 require "#{LKP_SRC}/lib/constant"
 require "#{LKP_SRC}/lib/job"
 
-$testcase = YAML.unsafe_load_file(ARGV[0])
-# pp $testcase
+testcase = YAML.unsafe_load_file(ARGV[0])
+# pp testcase
 
 def add_keyval(ah, k, v)
   if ah.instance_of?(Hash)
@@ -19,10 +19,10 @@ def add_keyval(ah, k, v)
   end
 end
 
-add_keyval($testcase, 'kconfig', DEVEL_HOURLY_KCONFIGS[0])
+add_keyval(testcase, 'kconfig', DEVEL_HOURLY_KCONFIGS[0])
 
-def expand_one
-  for_each($testcase) do |k, v|
+def expand_one(testcase)
+  for_each(testcase) do |k, v|
     next unless k == 'params'
 
     last_item = ''
@@ -33,15 +33,15 @@ def expand_one
         for_each(copy) do |kkk, _vvv|
           restore(vv, copy)
           vv.keep_if { |a, _b| a == kkk }
-          expand_one
+          expand_one(testcase)
         end
         restore(vv, copy)
         break
       elsif kk == last_item
-        puts $testcase.to_yaml
+        puts testcase.to_yaml
       end
     end
   end
 end
 
-expand_one
+expand_one(testcase)

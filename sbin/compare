@@ -31,21 +31,6 @@ PERF_INDEX_KCONFIG = 'x86_64-rhel'.freeze
 # by absolute changes.
 ABS_CHANGE_STATS_RE = /^(perf-profile)/
 
-$opt_dimension = 'commit'
-$opt_field = nil
-$opt_grep  = []
-$opt_vgrep = []
-$options = { 'perf-profile' => 5 }
-
-$project = 'linux'
-
-$perf_indices = {}
-$base_gm = {}
-$head_gm = {}
-$nr_gm = {}
-
-$header_shown = {}
-
 def expand_possible_commit(s)
   return s unless Git.commit_name? s
 
@@ -54,6 +39,14 @@ def expand_possible_commit(s)
 
   git.gcommit(s).sha
 end
+
+options = {
+  dimension: 'commit',
+  field: nil,
+  grep: [],
+  vgrep: [],
+  compare_options: { 'perf-profile' => 5 }
+}
 
 opt_parser = OptionParser.new do |opts| # rubocop:disable Metrics/BlockLength
   opts.banner = 'Usage: compare [options] RESULT_ROOT...'
@@ -64,71 +57,71 @@ opt_parser = OptionParser.new do |opts| # rubocop:disable Metrics/BlockLength
   opts.on('-c WHEN', '--color WHEN', 'WHEN coloful: never, always, auto.') do |w|
     case w
     when 'never'
-      $colorful = false
+      options[:colorful] = false
     when 'always'
-      $colorful = true
+      options[:colorful] = true
     when 'auto'
-      $colorful = system '/usr/bin/test', '-t', '1'
+      options[:colorful] = system '/usr/bin/test', '-t', '1'
     end
   end
 
   opts.on('-d DIMENSION', '--dimension DIMENSION', 'DIMENSION to compare: commit, kconfig, fs, etc.') do |dimension|
-    $opt_dimension = dimension
+    options[:dimension] = dimension
   end
 
   opts.on('-f FIELD', '--field FIELD', 'FIELD to evaluate: vmstat.cpu.sy, iostat.sda.util, etc.') do |field|
-    $opt_field = field
+    options[:field] = field
   end
 
   opts.on('-g PATTERN', '--grep PATTERN', 'only compare result roots that match PATTERN') do |pattern|
-    $opt_grep.push Regexp.new(expand_possible_commit(pattern))
+    options[:grep].push Regexp.new(expand_possible_commit(pattern))
   end
 
   opts.on('-G PATTERN', '--invert-grep PATTERN', 'dont compare result roots that match PATTERN') do |pattern|
-    $opt_vgrep.push Regexp.new(expand_possible_commit(pattern))
+    options[:vgrep].push Regexp.new(expand_possible_commit(pattern))
   end
 
-  opts.on('-p', '--plot', 'plot bar graph') { $opt_plot = true }
+  opts.on('-p', '--plot', 'plot bar graph') { options[:plot] = true }
 
-  opts.on('-a', '--all', 'compare all') { $opt_all = true }
+  opts.on('-a', '--all', 'compare all') { options[:all] = true }
 
   opts.on('-s', '--save-changes', 'save all performance and bisectable changes to a file') do
-    $opt_save_changes = true
-    $all_changed_stats = []
+    options[:save_changes] = true
+    options[:all_changed_stats] = []
 
     # save performance and bisectable changes only to limit the change set size
-    $options['perf'] = true
-    $options['distance'] = 5
+    options[:compare_options]['perf'] = true
+    options[:compare_options]['distance'] = 5
   end
 
-  opts.on('-t', '--group-by-test', 'test-grouped output format') { $group_by_test = true }
+  opts.on('-t', '--group-by-test', 'test-grouped output format') { options[:group_by_test] = true }
 
   opts.on('-i', '--index', 'performance/power index') do
-    $opt_index  = true
-    $size_index = load_yaml "#{LKP_SRC}/etc/index-size.yaml"
-    $perf_index = load_yaml "#{LKP_SRC}/etc/index-perf-all.yaml"
-    $power_index = load_yaml "#{LKP_SRC}/etc/index-power.yaml"
-    $latency_index = load_yaml "#{LKP_SRC}/etc/index-latency.yaml"
-    $all_index = $perf_index.merge($power_index).merge($latency_index).merge($size_index)
+    options[:index] = true
+    options[:size_index] = load_yaml "#{LKP_SRC}/etc/index-size.yaml"
+    options[:perf_index] = load_yaml "#{LKP_SRC}/etc/index-perf-all.yaml"
+    options[:power_index] = load_yaml "#{LKP_SRC}/etc/index-power.yaml"
+    options[:latency_index] = load_yaml "#{LKP_SRC}/etc/index-latency.yaml"
+    options[:all_index] = options[:perf_index].merge(options[:power_index]).merge(options[:latency_index]).merge(options[:size_index])
   end
 
-  opts.on('--ignore-incomplete-run', 'ignore incomplete runs') { $options['ignore-incomplete-run'] = true }
+  opts.on('--ignore-incomplete-run', 'ignore incomplete runs') { options[:compare_options]['ignore-incomplete-run'] = true }
 
-  opts.on('--regression-only', 'show regressions only') { $options['regression-only'] = true }
+  opts.on('--regression-only', 'show regressions only') { options[:compare_options]['regression-only'] = true }
 
-  opts.on('--all-critical', 'show all critical changes') { $options['all-critical'] = true }
+  opts.on('--all-critical', 'show all critical changes') { options[:compare_options]['all-critical'] = true }
 
-  opts.on('-D N', '--distance N', 'threshold of changes') { |n| $options['distance'] = n.to_i }
+  opts.on('-D N', '--distance N', 'threshold of changes') { |n| options[:compare_options]['distance'] = n.to_i }
 
-  opts.on('-P', '--perf', 'show performance changes only') { $options['perf'] = true }
+  opts.on('-P', '--perf', 'show performance changes only') { options[:compare_options]['perf'] = true }
 
-  opts.on('-r N', '--resize N', 'resize first matrix') { |n| $options['resize'] = n.to_i }
+  opts.on('-r N', '--resize N', 'resize first matrix') { |n| options[:compare_options]['resize'] = n.to_i }
 
-  opts.on('-v N', '--variance N', 'show variance changes larger than N times') { |n| $options['variance'] = n.to_i }
+  opts.on('-v N', '--variance N', 'show variance changes larger than N times') { |n| options[:compare_options]['variance'] = n.to_i }
 
-  opts.on('-w', '--whole', 'show whole changes no matter the number of result root') { |_n| $options['whole'] = true }
+  opts.on('-w', '--whole', 'show whole changes no matter the number of result root') { |_n| options[:compare_options]['whole'] = true }
 
-  opts.on('--no-hide-noises', 'do not hide noisy results') { $opt_no_hide_noises = true }
+  opts.on('--no-hide-noises', 'do not hide noisy results') { options[:no_hide_noises] = true }
 
   opts.on_tail('-h', '--help', 'Show this message') do
     puts opts
@@ -143,730 +136,768 @@ argv = if ARGV == []
        end
 opt_parser.parse!(argv)
 
-$dim_not_a_param = $opt_dimension =~ /^(testbox|rootfs|kconfig|.*commit|run)$/
+class Compare
+  def initialize(options)
+    @opt_dimension = options[:dimension]
+    @opt_field = options[:field]
+    @opt_grep  = options[:grep]
+    @opt_vgrep = options[:vgrep]
+    @options = options[:compare_options]
+    @colorful = options[:colorful]
+    @opt_plot = options[:plot]
+    @opt_all = options[:all]
+    @opt_save_changes = options[:save_changes]
+    @all_changed_stats = options[:all_changed_stats]
+    @group_by_test = options[:group_by_test]
+    @opt_index = options[:index]
+    @size_index = options[:size_index]
+    @perf_index = options[:perf_index]
+    @power_index = options[:power_index]
+    @latency_index = options[:latency_index]
+    @all_index = options[:all_index]
+    @opt_no_hide_noises = options[:no_hide_noises]
 
-$changed_stats      = Hash.new { |hash, key| hash[key] = {} }
-$stat_records       = Hash.new { |hash, key| hash[key] = [] }
-$_result_root_tuple = Hash.new { |hash, key| hash[key] = [] }
-$_result_root_saved = Set.new
+    @project = 'linux'
 
-$dims = {}
-$cases = {}
-$tests = Set.new
-$sum = Hash.new { |hash, key| hash[key] = 0 }
-$stddev = Hash.new { |hash, key| hash[key] = 0 }
+    @perf_indices = {}
+    @base_gm = {}
+    @head_gm = {}
+    @nr_gm = {}
 
-def plot_bar(dims, cases)
-  return unless cases.empty?
+    @header_shown = {}
+  end
 
-  x = cases.keys
-  Gnuplot.open do |gp|
-    Gnuplot::Plot.new(gp) do |plot|
-      plot.style 'data histograms'
-      plot.xtics 'nomirror rotate by -45'
-      plot.terminal 'dumb nofeed'
-      dims.each do |dim, name|
-        y = []
-        cases.each_value do |value|
-          y.push value[dim] || 0
+  def run
+    @dim_not_a_param = @opt_dimension =~ /^(testbox|rootfs|kconfig|.*commit|run)$/
+
+    @changed_stats      = Hash.new { |hash, key| hash[key] = {} }
+    @stat_records       = Hash.new { |hash, key| hash[key] = [] }
+    @_result_root_tuple = Hash.new { |hash, key| hash[key] = [] }
+    @_result_root_saved = Set.new
+
+    @dims = {}
+    @cases = {}
+    @tests = Set.new
+    @sum = Hash.new { |hash, key| hash[key] = 0 }
+    @stddev = Hash.new { |hash, key| hash[key] = 0 }
+
+    if @opt_all || @opt_index
+      setup_project
+      setup_dims
+      setup_result_root_hash
+      setup_changed_stats
+
+      if @opt_save_changes
+        cs_file = "/tmp/cs-#{dim_name @opt_dims[0]}.vs.#{dim_name @opt_dims[1]}-#{ENV.fetch('USER', nil)}.yaml"
+
+        save_yaml @all_changed_stats, cs_file
+        puts "saved all changed stats to #{cs_file}"
+        exit
+      end
+
+      if @opt_index
+        show_one_index 'perf'
+        show_one_index 'power'
+        show_one_index 'latency'
+        show_one_index 'size'
+        exit unless @opt_all
+        puts
+        stats = @changed_stats.keys
+      else
+        stats = @stat_records.keys
+        sort_stats(stats)
+      end
+
+      if @group_by_test
+        @tests.each do |key|
+          show_test_group key
+          stats.each do |stat|
+            show_one_stat stat
+            show_delta stat, key
+            call_mmplot if @opt_plot
+            @cases.clear
+            @sum.clear
+            @stddev.clear
+          end
+          puts unless @tests.empty?
         end
-        plot.data << Gnuplot::DataSet.new([x, y]) do |ds|
-          ds.using = '2:xtic(1)'
-          ds.title = name
+      else
+        stats.each do |stat|
+          show_one_stat stat
+          show_delta stat, nil
+          call_mmplot if @opt_plot
+          puts unless @cases.empty?
+          @cases.clear
+          @sum.clear
+          @stddev.clear
+        end
+      end
+    else
+      unless @opt_field
+        puts 'error: no field found, please use -f/--field'
+        exit 1
+      end
+      ARGV.each { |path| add_stats path }
+      show_delta @opt_field, nil
+      plot_bar @dims, @cases if @opt_plot
+    end
+  end
+
+  private
+
+  def plot_bar(dims, cases)
+    return unless cases.empty?
+
+    x = cases.keys
+    Gnuplot.open do |gp|
+      Gnuplot::Plot.new(gp) do |plot|
+        plot.style 'data histograms'
+        plot.xtics 'nomirror rotate by -45'
+        plot.terminal 'dumb nofeed'
+        dims.each do |dim, name|
+          y = []
+          cases.each_value do |value|
+            y.push value[dim] || 0
+          end
+          plot.data << Gnuplot::DataSet.new([x, y]) do |ds|
+            ds.using = '2:xtic(1)'
+            ds.title = name
+          end
         end
       end
     end
   end
-end
 
-def dim_name(dim)
-  case $opt_dimension
-  when 'commit', /_commit$/
-    tag = Git.open(project: $project, working_dir: GIT_WORK_TREE).gcommit(dim).tag if Dir.exist?(GIT_WORK_TREE)
-    tag || dim[0..(REL_WIDTH + ABS_WIDTH + ERR_WIDTH)]
-  else
-    dim
-  end
-end
-
-def setup_project
-  return unless $opt_dimension =~ /_commit$/
-
-  $project = $opt_dimension.sub(/_.*$/, '')
-  $opt_dimension = 'commit'
-end
-
-def get_json_field(file, key, is_rt)
-  matrix = load_json file, cache: true
-
-  if is_rt
-    # convert stats.json data structure to that of matrix.json
-    nmatrix = {}
-    matrix.each do |k, v|
-      nmatrix[k] = [v]
-    end
-  else
-    nmatrix = matrix
-  end
-  samples_fill_missing_zeros(nmatrix, key)
-end
-
-def add_stats(path)
-  $opt_grep.each  { |re| return false if path !~ re }
-  $opt_vgrep.each { |re| return false if path =~ re }
-
-  is_rt = File.basename(path) =~ /^[0-9]{1,3}$/
-  stats_json = if is_rt
-                 "#{path}/stats.json"
-               else
-                 "#{path}/matrix.json"
-               end
-  unless File.exist? stats_json
-    # No need for a warning here.
-    # $stderr.puts stats_json + ' does not exist'
-    return
-  end
-
-  field_value = get_json_field(stats_json, $opt_field, is_rt)
-  if field_value.nil? || field_value == ''
-    # $stderr.puts "#{stats_json}: no such field: #{$opt_field}"
-    field_value = 0
-  end
-
-  result_path = ResultPath.new
-  return unless result_path.parse_result_root(File.realpath(path), is_local_run: local_run?)
-
-  if $dim_not_a_param
-    dim = result_path[$opt_dimension]
-  else
-    $params ||= YAML.load_file result_path.params_file
-    return unless $params.key? $opt_dimension
-
-    path_params = result_path['path_params'].partition Regexp.new "\\b-?(#{$params[$opt_dimension].join('|')})-?\\b"
-    dim = path_params[1]
-    dim[0] = '' if dim[0] == '-'
-    dim[-1] = '' if dim[-1] == '-'
-    return unless dim
-  end
-
-  unless $dims.key?(dim)
-    $dims[dim] = dim_name(dim)
-    $first_dim ||= dim
-  end
-  if $dim_not_a_param
-    result_path[$opt_dimension] = $first_dim
-  else
-    result_path['path_params'] = path_params[0] + $first_dim + path_params[2]
-  end
-  _rt = result_path._result_root
-  if $cases.key?(_rt)
-    $cases[_rt][dim] = field_value
-  else
-    $cases[_rt] = { dim => field_value }
-  end
-end
-
-def add_result_root(result_root)
-  $opt_grep.each  { |re| return nil if result_root !~ re }
-  $opt_vgrep.each { |re| return nil if result_root =~ re }
-
-  begin
-    _result_root = File.dirname result_root
-  rescue ArgumentError
-    # ArgumentError: string contains null byte
-    return
-  end
-  return unless $_result_root_saved.add? _result_root
-
-  $longest_dims.each do |dim|
-    if dim.empty?
-      key = _result_root
-      $_result_root_tuple[key] << _result_root unless $_result_root_tuple[key].empty?
-      return nil
-    elsif _result_root.index(dim)
-      key = _result_root.sub(/-?#{dim}-?/, '')
-      $_result_root_tuple[key] << _result_root
-      return nil
-    end
-  end
-end
-
-def setup_test_group(_result_root)
-  result_path = ResultPath.new
-  result_path.parse_result_root _result_root
-  test = result_path.test_desc $opt_dimension, $dim_not_a_param
-  $tests.add test
-end
-
-def setup_result_root_hash
-  ENV['LC_ALL'] = 'C'
-  $opt_dims.each do |dim|
-    Bash.safe_grep("grep -h -r -F -e '#{dim}' #{KTEST_PATHS_DIR}").each_line do |result_root|
-      result_root.chomp!
-      result_root.chomp! '/'
-      add_result_root result_root
-    end
-  end
-  $_result_root_tuple.delete_if { |_k, v| v.size <= 1 }
-  puts "tests: #{$_result_root_tuple.size}\n"
-end
-
-def get_valid_average(matrix, key)
-  samples = matrix[key]
-  return unless samples
-  return if samples.include? 0
-  return if samples.size < matrix_cols(matrix)
-
-  avg = matrix[key].average
-  return if !$opt_no_hide_noises && matrix[key].standard_deviation > avg / 2
-
-  avg
-end
-
-def process_index_stats(k, v, matrix_file1, matrix_file2)
-  matrix1 = load_json matrix_file1, true
-  matrix2 = load_json matrix_file2, true
-  $all_index.each do |stat, weight|
-    next if stat.index('iostat\.') && k !~ /\/(dd-write)\//
-
-    avg1 = get_valid_average matrix1, stat
-    next unless avg1
-
-    avg2 = get_valid_average matrix2, stat
-    next unless avg2
-
-    $changed_stats[stat][k] = v
-    type = if $size_index[stat]
-             'size'
-           elsif $perf_index[stat]
-             'perf'
-           elsif $power_index[stat]
-             'power'
-           else
-             'latency'
-           end
-    $nr_gm[type] ||= 0
-    $base_gm[type] ||= 0
-    $head_gm[type] ||= 0
-    if weight.positive?
-      $nr_gm[type] += weight
-      $base_gm[type] += weight * Math.log(avg1)
-      $head_gm[type] += weight * Math.log(avg2)
+  def dim_name(dim)
+    case @opt_dimension
+    when 'commit', /_commit$/
+      tag = Git.open(project: @project, working_dir: GIT_WORK_TREE).gcommit(dim).tag if Dir.exist?(GIT_WORK_TREE)
+      tag || dim[0..(REL_WIDTH + ABS_WIDTH + ERR_WIDTH)]
     else
-      $nr_gm[type] -= weight
-      $base_gm[type] -= weight * Math.log(avg2)
-      $head_gm[type] -= weight * Math.log(avg1)
+      dim
     end
   end
-end
 
-def setup_changed_stats
-  $_result_root_tuple.each do |k, v|
-    matrix_file1 = "#{v[0]}/matrix.json"
-    matrix_file2 = "#{v[-1]}/matrix.json"
-    next unless File.exist? matrix_file1
-    next unless File.exist? matrix_file2
+  def setup_project
+    return unless @opt_dimension =~ /_commit$/
 
-    if $opt_index
-      process_index_stats(k, v, matrix_file1, matrix_file2)
-      next
+    @project = @opt_dimension.sub(/_.*$/, '')
+    @opt_dimension = 'commit'
+  end
+
+  def get_json_field(file, key, is_rt)
+    matrix = JSON.parse_cached file, cache: true
+
+    if is_rt
+      # convert stats.json data structure to that of matrix.json
+      nmatrix = {}
+      matrix.each do |k, v|
+        nmatrix[k] = [v]
+      end
+    else
+      nmatrix = matrix
+    end
+    samples_fill_missing_zeros(nmatrix, key)
+  end
+
+  def add_stats(path)
+    @opt_grep.each  { |re| return false if path !~ re }
+    @opt_vgrep.each { |re| return false if path =~ re }
+
+    is_rt = File.basename(path) =~ /^[0-9]{1,3}$/
+    stats_json = if is_rt
+                   "#{path}/stats.json"
+                 else
+                   "#{path}/matrix.json"
+                 end
+    unless File.exist? stats_json
+      # No need for a warning here.
+      # $stderr.puts stats_json + ' does not exist'
+      return
     end
 
-    changed_stats = get_changed_stats matrix_file2, matrix_file1, $options
-    next unless changed_stats && !changed_stats.empty?
+    field_value = get_json_field(stats_json, @opt_field, is_rt)
+    if field_value.nil? || field_value == ''
+      # $stderr.puts "#{stats_json}: no such field: #{@opt_field}"
+      field_value = 0
+    end
 
-    changed_stats.each do |stat, record|
-      next if $opt_field && stat !~ /#{$opt_field}/
+    result_path = ResultPath.new
+    return unless result_path.parse_result_root(File.realpath(path), is_local_run: local_run?)
 
-      if $opt_save_changes
-        result_root = "#{File.dirname matrix_file2}/0"
-        result_path = ResultPath.new
-        result_path.parse_result_root result_root
+    if @dim_not_a_param
+      dim = result_path[@opt_dimension]
+    else
+      @params ||= YAML.load_file result_path.params_file
+      return unless @params.key? @opt_dimension
 
-        record['result_root']  = result_root
-        record['_result_root'] = File.dirname result_root
-        record['tbox_group']   = result_path['tbox_group']
-        record['testbox']      = result_path['tbox_group']
-        record['commit']       = result_path['commit']
-        # silent get_avg_run_time warnning
-        record['run_time']     = 0
+      path_params = result_path['path_params'].partition Regexp.new "\\b-?(#{@params[@opt_dimension].join('|')})-?\\b"
+      dim = path_params[1]
+      dim[0] = '' if dim[0] == '-'
+      dim[-1] = '' if dim[-1] == '-'
+      return unless dim
+    end
 
-        $all_changed_stats.push record
+    unless @dims.key?(dim)
+      @dims[dim] = dim_name(dim)
+      @first_dim ||= dim
+    end
+    if @dim_not_a_param
+      result_path[@opt_dimension] = @first_dim
+    else
+      result_path['path_params'] = path_params[0] + @first_dim + path_params[2]
+    end
+    _rt = result_path._result_root
+    if @cases.key?(_rt)
+      @cases[_rt][dim] = field_value
+    else
+      @cases[_rt] = { dim => field_value }
+    end
+  end
+
+  def add_result_root(result_root)
+    @opt_grep.each  { |re| return nil if result_root !~ re }
+    @opt_vgrep.each { |re| return nil if result_root =~ re }
+
+    begin
+      _result_root = File.dirname result_root
+    rescue ArgumentError
+      # ArgumentError: string contains null byte
+      return
+    end
+    return unless @_result_root_saved.add? _result_root
+
+    @longest_dims.each do |dim|
+      if dim.empty?
+        key = _result_root
+        @_result_root_tuple[key] << _result_root unless @_result_root_tuple[key].empty?
+        return nil
+      elsif _result_root.index(dim)
+        key = _result_root.sub(/-?#{dim}-?/, '')
+        @_result_root_tuple[key] << _result_root
+        return nil
+      end
+    end
+  end
+
+  def setup_test_group(_result_root)
+    result_path = ResultPath.new
+    result_path.parse_result_root _result_root
+    test = result_path.test_desc @opt_dimension, @dim_not_a_param
+    @tests.add test
+  end
+
+  def setup_result_root_hash
+    ENV['LC_ALL'] = 'C'
+    @opt_dims.each do |dim|
+      Bash.safe_grep("grep -h -r -F -e '#{dim}' #{KTEST_PATHS_DIR}").each_line do |result_root|
+        result_root.chomp!
+        result_root.chomp! '/'
+        add_result_root result_root
+      end
+    end
+    @_result_root_tuple.delete_if { |_k, v| v.size <= 1 }
+    puts "tests: #{@_result_root_tuple.size}\n"
+  end
+
+  def get_valid_average(matrix, key)
+    samples = matrix[key]
+    return unless samples
+    return if samples.include? 0
+    return if samples.size < matrix_cols(matrix)
+
+    avg = matrix[key].average
+    return if !@opt_no_hide_noises && matrix[key].standard_deviation > avg / 2
+
+    avg
+  end
+
+  def process_index_stats(k, v, matrix_file1, matrix_file2)
+    matrix1 = JSON.parse_cached matrix_file1, cache: true
+    matrix2 = JSON.parse_cached matrix_file2, cache: true
+    @all_index.each do |stat, weight|
+      next if stat.index('iostat\.') && k !~ /\/(dd-write)\//
+
+      avg1 = get_valid_average matrix1, stat
+      next unless avg1
+
+      avg2 = get_valid_average matrix2, stat
+      next unless avg2
+
+      @changed_stats[stat][k] = v
+      type = if @size_index[stat]
+               'size'
+             elsif @perf_index[stat]
+               'perf'
+             elsif @power_index[stat]
+               'power'
+             else
+               'latency'
+             end
+      @nr_gm[type] ||= 0
+      @base_gm[type] ||= 0
+      @head_gm[type] ||= 0
+      if weight.positive?
+        @nr_gm[type] += weight
+        @base_gm[type] += weight * Math.log(avg1)
+        @head_gm[type] += weight * Math.log(avg2)
+      else
+        @nr_gm[type] -= weight
+        @base_gm[type] -= weight * Math.log(avg2)
+        @head_gm[type] -= weight * Math.log(avg1)
+      end
+    end
+  end
+
+  def setup_changed_stats
+    @_result_root_tuple.each do |k, v|
+      matrix_file1 = "#{v[0]}/matrix.json"
+      matrix_file2 = "#{v[-1]}/matrix.json"
+      next unless File.exist? matrix_file1
+      next unless File.exist? matrix_file2
+
+      if @opt_index
+        process_index_stats(k, v, matrix_file1, matrix_file2)
         next
       end
-      $changed_stats[stat][k] = v
-      $stat_records[stat] << record
-    end
-    setup_test_group v[0]
-    setup_test_group v[-1]
-  end
-end
 
-def show_one_stat(stat)
-  $opt_field = stat
-  _result_root_tuple = $changed_stats[stat]
-  _result_root_tuple.each_value do |v|
-    v.each { |_result_root| add_stats _result_root }
-  end
-end
+      changed_stats = get_changed_stats matrix_file2, matrix_file1, @options
+      next unless changed_stats && !changed_stats.empty?
 
-def setup_longest_dims
-  if $opt_dimension =~ /^(.*_)?commit$/
-    git = Git.open(project: $project, working_dir: GIT_WORK_TREE) if Dir.exist?(GIT_WORK_TREE)
-    unless git
-      puts 'info: "export LKP_GIT_WORK_TREE=/path/to/project/git/repo/" to enable parsing non-sha1 commit names.' if ARGV.any? { |v| !Git.sha1_40?(v) }
-      puts 'info: "export LKP_GIT_WORK_TREE=/path/to/project/git/repo/" to enable guessing what to compare.' if ARGV.size == 1
-    end
+      changed_stats.each do |stat, record|
+        next if @opt_field && stat !~ /#{@opt_field}/
 
-    $opt_dims = ARGV.map { |v| git ? git.gcommit(v).sha : v }
-    if ARGV.size == 1 && git
-      if ARGV[0].index('/') # looks like a branch? compare its BASE_RC..HEAD
-        tag = git.gcommit($opt_dims[0]).base_rc_tag
-        $opt_dims.unshift git.gcommit(tag).sha
-      elsif Git.sha1_40?(ARGV[0]) # compare with parent commit(s)
-        # FIXME rli9 deduce project info from opt_dimensions
-        git.gcommit(ARGV[0]).parent_shas.reverse_each { |parent| $opt_dims.unshift parent }
-      elsif $opt_index
-        $opt_dims.unshift git.gcommit(PERF_INDEX_KENREL).sha
-      end
-    end
-    $longest_dims = $opt_dims
-  else
-    $opt_dims = ARGV
-    $opt_dims.unshift PERF_INDEX_KCONFIG if ARGV.size == 1 && $opt_index
-    $longest_dims = $opt_dims.sort { |a, b| b.length <=> a.length }
-  end
-end
+        if @opt_save_changes
+          result_root = "#{File.dirname matrix_file2}/0"
+          result_path = ResultPath.new
+          result_path.parse_result_root result_root
 
-def setup_dims
-  setup_longest_dims
+          record['result_root']  = result_root
+          record['_result_root'] = File.dirname result_root
+          record['tbox_group']   = result_path['tbox_group']
+          record['testbox']      = result_path['tbox_group']
+          record['commit']       = result_path['commit']
+          # silent get_avg_run_time warnning
+          record['run_time']     = 0
 
-  if $opt_save_changes
-    if $opt_dimension !~ /^(.*_)?commit$/
-      puts 'error: -s/--save-changes works only with commit comapre'
-      exit 1
-    end
-
-    if $opt_dims.size != 2
-      puts 'error: -s/--save-changes works only with 2 commits'
-      exit 1
-    end
-
-    commit_is_ancestor = false
-    [
-      [$opt_dims[0], $opt_dims[1]],
-      [$opt_dims[1], $opt_dims[0]]
-    ].each do |dim|
-      system "#{GIT} merge-base --is-ancestor #{dim[0]} #{dim[1]}"
-      next unless $CHILD_STATUS.success?
-
-      $opt_dims = dim
-      commit_is_ancestor = true
-      break
-    end
-
-    unless commit_is_ancestor
-      puts "error: #{$opt_dims[0]} and #{$opt_dims[1]} not in acestor relation; comparation between them makes no sense"
-      exit 1
-    end
-  end
-
-  $opt_dims.each do |dim|
-    if $dims[dim]
-      puts "#{dim}(#{dim_name(dim)}) already exists in compare list"
-      next
-    end
-    $dims[dim] = dim_name(dim)
-    $first_dim ||= dim
-  end
-end
-
-def show_one_diff(stat, dim, v0, v, v0_stddev, v_stddev, is_float: false, is_exp: false, is_fail: false)
-  if dim == $first_dim
-    buf = ''
-  else
-    p = if is_fail
-          100 * ((v.to_f / v_stddev) - (v0.to_f / v0_stddev))
-        elsif v0 != 0
-          100.0 * (v - v0) / v0
-        else
-          0
+          @all_changed_stats.push record
+          next
         end
-    buf = if is_fail
-            format "%#{REL_WIDTH - 2}.0f%% ", p
-          elsif stat =~ ABS_CHANGE_STATS_RE
-            format "%#{REL_WIDTH - 1}.0g ", v - v0
-          elsif p.abs < 3
-            sprintf ' ' * REL_WIDTH
-          elsif p.abs < 100_000 # rubocop:disable Lint/DuplicateBranch
-            format "%#{REL_WIDTH - 2}.0f%% ", p
-          else
-            format "%#{REL_WIDTH - 2}.0g%% ", p
-          end
-
-    buf = Term::ANSIColor.intense_red(buf) if p.abs >= 50 && $colorful
-  end
-
-  buf += if is_exp
-           if is_float == false && v.abs < 100_000_000
-             format "%#{ABS_WIDTH}d", v
-           else
-             format "%#{ABS_WIDTH}.4g", v
-           end
-         elsif is_fail
-           if v.zero?
-             format "%#{ABS_WIDTH + 1}s", ' '
-           else
-             format "%#{ABS_WIDTH + 1}d", v
-           end
-         elsif is_float
-           format "%#{ABS_WIDTH}.2f", v
-         else
-           format "%#{ABS_WIDTH}d", v
-         end
-
-  buf += format_stddev(v, v_stddev, is_fail)
-
-  printf '%s  ', buf
-end
-
-def format_stddev(v, v_stddev, is_fail)
-  if v_stddev
-    if is_fail
-      format ":%-#{ERR_WIDTH - 2}d", v_stddev
-    else
-      v_stddev = 100 * v_stddev / v if v != 0
-      if v_stddev > 3
-        format " ±%#{ERR_WIDTH - 3}d%%", v_stddev
-      else
-        ' ' * ERR_WIDTH
+        @changed_stats[stat][k] = v
+        @stat_records[stat] << record
       end
+      setup_test_group v[0]
+      setup_test_group v[-1]
     end
-  else
-    ' ' * ERR_WIDTH
-  end
-end
-
-def show_test_group(key)
-  rtp = ResultPath.new
-  printf "#{rtp.test_desc_keys($opt_dimension, $dim_not_a_param).join '/'}: "
-  puts key
-  puts
-
-  $dims.each do |dim, name|
-    width = (dim == $first_dim ? ABS_WIDTH + ERR_WIDTH : REL_WIDTH + ABS_WIDTH + ERR_WIDTH)
-    printf "%#{width}s  ", name[0..(width - 1)]
   end
 
-  puts
-  $dims.each_key do |dim|
-    width = (dim == $first_dim ? ABS_WIDTH + ERR_WIDTH : REL_WIDTH + ABS_WIDTH + ERR_WIDTH)
-    printf "#{'-' * width}  "
+  def show_one_stat(stat)
+    @opt_field = stat
+    _result_root_tuple = @changed_stats[stat]
+    _result_root_tuple.each_value do |v|
+      v.each { |_result_root| add_stats _result_root }
+    end
   end
-  puts
-end
 
-def get_v_and_stddev(value, dim, is_fail)
-  v = value[dim] || 0
+  def setup_longest_dims
+    if @opt_dimension =~ /^(.*_)?commit$/
+      git = Git.open(project: @project, working_dir: GIT_WORK_TREE) if Dir.exist?(GIT_WORK_TREE)
+      unless git
+        puts 'info: "export LKP_GIT_WORK_TREE=/path/to/project/git/repo/" to enable parsing non-sha1 commit names.' if ARGV.any? { |v| !Git.sha1_40?(v) }
+        puts 'info: "export LKP_GIT_WORK_TREE=/path/to/project/git/repo/" to enable guessing what to compare.' if ARGV.size == 1
+      end
 
-  v_stddev = nil
-  if v.is_a?(Array)
-    if is_fail
-      v_stddev = v.length
-      v = v.sum
+      @opt_dims = ARGV.map { |v| git ? git.gcommit(v).sha : v }
+      if ARGV.size == 1 && git
+        if ARGV[0].index('/') # looks like a branch? compare its BASE_RC..HEAD
+          tag = git.gcommit(@opt_dims[0]).base_rc_tag
+          @opt_dims.unshift git.gcommit(tag).sha
+        elsif Git.sha1_40?(ARGV[0]) # compare with parent commit(s)
+          # FIXME rli9 deduce project info from opt_dimensions
+          git.gcommit(ARGV[0]).parent_shas.reverse_each { |parent| @opt_dims.unshift parent }
+        elsif @opt_index
+          @opt_dims.unshift git.gcommit(PERF_INDEX_KENREL).sha
+        end
+      end
+      @longest_dims = @opt_dims
     else
-      v_stddev = v.standard_deviation if v.many?
-      v = v.average
+      @opt_dims = ARGV
+      @opt_dims.unshift PERF_INDEX_KCONFIG if ARGV.size == 1 && @opt_index
+      @longest_dims = @opt_dims.sort { |a, b| b.length <=> a.length }
     end
-  elsif is_fail
-    v_stddev = 1
   end
 
-  [v, v_stddev]
-end
+  def setup_dims
+    setup_longest_dims
 
-def show_header(is_fail)
-  puts '---------------------------' unless $group_by_test
-  nr_headers = $dims.length - 1
-  if is_fail
-    # (ABS_WIDTH + ERR_WIDTH)   (2 + REL_WIDTH + ABS_WIDTH + ERR_WIDTH)
-    #      |<-------------->|   |<--------------------------->|
-    printf "       fail:runs#{'  %%reproduction    fail:runs' * nr_headers}\n"
-    printf "           |    #{'         |             |    ' * nr_headers}\n"
-  else
-    printf "         %%stddev#{'      change         %%stddev' * nr_headers}\n"
-    printf "             \\  #{'        |                \  ' * nr_headers}\n"
-  end
-  $header_shown[is_fail] = true
-end
+    if @opt_save_changes
+      if @opt_dimension !~ /^(.*_)?commit$/
+        puts 'error: -s/--save-changes works only with commit comapre'
+        exit 1
+      end
 
-def filter_cases(is_fail, is_latency)
-  dims = []
-  $cases.each_value { |v| dims += v.keys }
-  if dims.uniq.size == 1
-    puts "error: same dim #{dims.first} used, please use -d/--dimension"
-    exit 1
-  end
+      if @opt_dims.size != 2
+        puts 'error: -s/--save-changes works only with 2 commits'
+        exit 1
+      end
 
-  $cases.delete_if do |_rt, value|
-    next true if value.size < 2
-    next false if is_fail
-    next false if is_latency
-    next false if $opt_no_hide_noises
+      commit_is_ancestor = false
+      [
+        [@opt_dims[0], @opt_dims[1]],
+        [@opt_dims[1], @opt_dims[0]]
+      ].each do |dim|
+        system "#{GIT} merge-base --is-ancestor #{dim[0]} #{dim[1]}"
+        next unless $CHILD_STATUS.success?
 
-    noisy = false
-    value.each_value do |v|
-      next unless v.is_a?(Array) && v.many?
-
-      if v.standard_deviation.abs > v.average.abs / 2 || v.average.negative?
-        noisy = true
+        @opt_dims = dim
+        commit_is_ancestor = true
         break
       end
-    end
-    noisy
-  end
-end
 
-def calculate_number_formats
-  is_float = false
-  is_exp   = false
-  $cases.each_value do |value|
-    value.each_value do |v|
-      case v
-      when Array
-        is_float = v.any? { |vv| is_float = true if vv.abs < 100 && vv != 0 && vv.is_a?(Float) }
-        is_exp = v.any? { |vv| vv.abs >= 100_000_000 }
-      else
-        is_float = true if v.abs < 100 && v != 0 && v.is_a?(Float)
-        is_exp = true if v.abs >= 100_000_000
+      unless commit_is_ancestor
+        puts "error: #{@opt_dims[0]} and #{@opt_dims[1]} not in acestor relation; comparation between them makes no sense"
+        exit 1
       end
+    end
+
+    @opt_dims.each do |dim|
+      if @dims[dim]
+        puts "#{dim}(#{dim_name(dim)}) already exists in compare list"
+        next
+      end
+      @dims[dim] = dim_name(dim)
+      @first_dim ||= dim
     end
   end
-end
 
-def show_delta_rows(key_g, stat, is_fail, is_float, is_exp)
-  $cases.each do |_rt, value|
-    result_path = ResultPath.new
-    result_path.parse_result_root(_rt)
-    test = result_path.test_desc $opt_dimension, $dim_not_a_param
-
-    next if $group_by_test && test != key_g
-
-    show_header(is_fail) unless $header_shown[is_fail]
-
-    v0, v0_stddev = get_v_and_stddev value, $first_dim, is_fail
-    $dims.each_key do |dim|
-      v, v_stddev = get_v_and_stddev value, dim, is_fail
-
-      show_one_diff stat, dim, v0, v, v0_stddev, v_stddev, is_float: is_float, is_exp: is_exp, is_fail: is_fail
-      if is_fail
-        $sum[dim] += v
-      elsif v.positive?
-        $sum[dim] += Math.log(v)
-      end
-
-      if v_stddev && is_fail
-        $stddev[dim] += v_stddev if $stddev[dim]
-      else
-        $stddev[dim] = nil
-      end
-    end
-    if $group_by_test
-      puts $opt_field
+  def show_one_diff(stat, dim, v0, v, v0_stddev, v_stddev, is_float: false, is_exp: false, is_fail: false)
+    if dim == @first_dim
+      buf = ''
     else
-      if Dir.exist?(GIT_WORK_TREE)
-        git = Git.open(project: $project, working_dir: GIT_WORK_TREE)
-        result_path['commit'] = git.gcommit(result_path['commit']).name if $opt_dimension !~ /^(.*_)?commit$/
+      p = if is_fail
+            100 * ((v.to_f / v_stddev) - (v0.to_f / v0_stddev))
+          elsif v0 != 0
+            100.0 * (v - v0) / v0
+          else
+            0
+          end
+      buf = if is_fail
+              format "%#{REL_WIDTH - 2}.0f%% ", p
+            elsif stat =~ ABS_CHANGE_STATS_RE
+              format "%#{REL_WIDTH - 1}.0g ", v - v0
+            elsif p.abs < 3
+              sprintf ' ' * REL_WIDTH
+            elsif p.abs < 100_000 # rubocop:disable Lint/DuplicateBranch
+              format "%#{REL_WIDTH - 2}.0f%% ", p
+            else
+              format "%#{REL_WIDTH - 2}.0g%% ", p
+            end
+
+      buf = Term::ANSIColor.intense_red(buf) if p.abs >= 50 && @colorful
+    end
+
+    buf += if is_exp
+             if is_float == false && v.abs < 100_000_000
+               format "%#{ABS_WIDTH}d", v
+             else
+               format "%#{ABS_WIDTH}.4g", v
+             end
+           elsif is_fail
+             if v.zero?
+               format "%#{ABS_WIDTH + 1}s", ' '
+             else
+               format "%#{ABS_WIDTH + 1}d", v
+             end
+           elsif is_float
+             format "%#{ABS_WIDTH}.2f", v
+           else
+             format "%#{ABS_WIDTH}d", v
+           end
+
+    buf += format_stddev(v, v_stddev, is_fail)
+
+    printf '%s  ', buf
+  end
+
+  def format_stddev(v, v_stddev, is_fail)
+    if v_stddev
+      if is_fail
+        format ":%-#{ERR_WIDTH - 2}d", v_stddev
+      else
+        v_stddev = 100 * v_stddev / v if v != 0
+        if v_stddev > 3
+          format " ±%#{ERR_WIDTH - 3}d%%", v_stddev
+        else
+          ' ' * ERR_WIDTH
+        end
       end
-      test = result_path.test_desc $opt_dimension, $dim_not_a_param
-      puts test
+    else
+      ' ' * ERR_WIDTH
     end
   end
-end
 
-def show_delta(stat, key_g)
-  is_fail = function_stat?(stat)
-  is_latency = latency_stat?(stat)
+  def show_test_group(key)
+    rtp = ResultPath.new
+    printf "#{rtp.test_desc_keys(@opt_dimension, @dim_not_a_param).join '/'}: "
+    puts key
+    puts
 
-  filter_cases(is_fail, is_latency)
-  return if $cases.empty?
-
-  $cases = $cases.sort.to_h
-
-  unless $group_by_test
-    $dims.each do |dim, name|
-      width = (dim == $first_dim ? ABS_WIDTH + ERR_WIDTH : REL_WIDTH + ABS_WIDTH + ERR_WIDTH)
+    @dims.each do |dim, name|
+      width = (dim == @first_dim ? ABS_WIDTH + ERR_WIDTH : REL_WIDTH + ABS_WIDTH + ERR_WIDTH)
       printf "%#{width}s  ", name[0..(width - 1)]
     end
 
-    if $header_shown[is_fail]
-      puts
-    else
-      puts 'testcase/testparams/testbox'
-    end
-
-    $dims.each_key do |dim|
-      width = (dim == $first_dim ? ABS_WIDTH + ERR_WIDTH : REL_WIDTH + ABS_WIDTH + ERR_WIDTH)
+    puts
+    @dims.each_key do |dim|
+      width = (dim == @first_dim ? ABS_WIDTH + ERR_WIDTH : REL_WIDTH + ABS_WIDTH + ERR_WIDTH)
       printf "#{'-' * width}  "
     end
-  end
-
-  is_float, is_exp = calculate_number_formats
-
-  puts if $header_shown[is_fail] && !$group_by_test
-
-  show_delta_rows(key_g, stat, is_fail, is_float, is_exp)
-
-  unless is_fail
-    $sum.each_key do |k|
-      $sum[k] = Math.exp($sum[k] / $cases.length)
-    end
-  end
-
-  return if $group_by_test
-
-  v0 = $sum[$first_dim]
-  v0_stddev = $stddev[$first_dim]
-  $sum.each do |dim, v|
-    show_one_diff stat, dim, v0, v, v0_stddev, $stddev[dim], is_float: is_float, is_exp: is_exp, is_fail: is_fail
-  end
-  if is_fail
-    puts "TOTAL #{$opt_field}"
-  else
-    puts "GEO-MEAN #{$opt_field}"
-  end
-end
-
-def call_mmplot
-  $cases.each_key do |_rt|
-    file = "#{_rt}/matrix.json"
-    matrix1 = load_json file, true
-    matrix2 = load_json file.sub($opt_dims[0], $opt_dims[1]), true
-    mmplot(matrix2, matrix1, [$opt_field], File.dirname(_rt, 2))
-  end
-end
-
-def show_one_index(type)
-  return unless $nr_gm[type]
-
-  $base_gm[type] = Math.exp($base_gm[type] / $nr_gm[type])
-  $head_gm[type] = Math.exp($head_gm[type] / $nr_gm[type])
-  index = 100 * $head_gm[type] / $base_gm[type]
-  printf "%6d  %8s-index  %s\n", index, type, ARGV[-1]
-end
-
-def setup_stats_priority(stats)
-  all_stats = LKP::Programs.all_stats.sort
-
-  tests = LKP::Programs.all_tests.sort
-
-  tests.reverse_each do |x|
-    all_stats.unshift x if all_stats.delete x
-  end
-
-  stats_num = {}
-  stats.each do |x|
-    k = x.split('.')[0]
-    next if tests.include?(k)
-
-    stats_num[k] ||= 0
-    stats_num[k] += 1
-  end
-
-  sorted_keys = stats_num.keys.sort_by { |x| stats_num[x] }
-  sorted_keys.each do |x|
-    all_stats.push x if all_stats.delete x
-  end
-
-  # convert the array to a hash with array index as values
-  $stats_priority = all_stats.map.with_index.to_a.to_h
-end
-
-def stat_priority(stat)
-  $stats_priority[stat] || 0
-end
-
-def sort_stats(stats)
-  setup_stats_priority(stats)
-  stats.sort_by! do |x|
-    fields = x.split('.')
-
-    record = $stat_records[x].last
-
-    a = record['a'].average
-    b = record['b'].average
-    abs_change = b - a
-    rel_change = abs_change / b
-
-    if x =~ ABS_CHANGE_STATS_RE
-      [stat_priority(fields[0]), fields[1], abs_change]
-    elsif fields.size >= 3 && fields[1] !~ /^node\d+$/
-      # when a monitor can be broken into sub-groups of stats
-      # under which values can be logically compared
-      [stat_priority(fields[0]), fields[1], rel_change]
-    else
-      [stat_priority(fields[0]), '', rel_change]
-    end
-  end
-end
-
-if $opt_all || $opt_index
-  setup_project
-  setup_dims
-  setup_result_root_hash
-  setup_changed_stats
-
-  if $opt_save_changes
-    cs_file = "/tmp/cs-#{dim_name $opt_dims[0]}.vs.#{dim_name $opt_dims[1]}-#{ENV.fetch('USER', nil)}.yaml"
-
-    save_yaml $all_changed_stats, cs_file
-    puts "saved all changed stats to #{cs_file}"
-    exit
-  end
-
-  if $opt_index
-    show_one_index 'perf'
-    show_one_index 'power'
-    show_one_index 'latency'
-    show_one_index 'size'
-    exit unless $opt_all
     puts
-    stats = $changed_stats.keys
-  else
-    stats = $stat_records.keys
-    sort_stats(stats)
   end
 
-  if $group_by_test
-    $tests.each do |key|
-      show_test_group key
-      stats.each do |stat|
-        show_one_stat stat
-        show_delta stat, key
-        call_mmplot if $opt_plot
-        $cases.clear
-        $sum.clear
-        $stddev.clear
+  def get_v_and_stddev(value, dim, is_fail)
+    v = value[dim] || 0
+
+    v_stddev = nil
+    if v.is_a?(Array)
+      if is_fail
+        v_stddev = v.length
+        v = v.sum
+      else
+        v_stddev = v.standard_deviation if v.many?
+        v = v.average
       end
-      puts unless $tests.empty?
+    elsif is_fail
+      v_stddev = 1
     end
-  else
-    stats.each do |stat|
-      show_one_stat stat
-      show_delta stat, nil
-      call_mmplot if $opt_plot
-      puts unless $cases.empty?
-      $cases.clear
-      $sum.clear
-      $stddev.clear
+
+    [v, v_stddev]
+  end
+
+  def show_header(is_fail)
+    puts '---------------------------' unless @group_by_test
+    nr_headers = @dims.length - 1
+    if is_fail
+      # (ABS_WIDTH + ERR_WIDTH)   (2 + REL_WIDTH + ABS_WIDTH + ERR_WIDTH)
+      #      |<-------------->|   |<--------------------------->|
+      printf "       fail:runs#{'  %%reproduction    fail:runs' * nr_headers}\n"
+      printf "           |    #{'         |             |    ' * nr_headers}\n"
+    else
+      printf "         %%stddev#{'      change         %%stddev' * nr_headers}\n"
+      printf "             \\  #{'        |                \  ' * nr_headers}\n"
+    end
+    @header_shown[is_fail] = true
+  end
+
+  def filter_cases(is_fail, is_latency)
+    dims = []
+    @cases.each_value { |v| dims += v.keys }
+    if dims.uniq.size == 1
+      puts "error: same dim #{dims.first} used, please use -d/--dimension"
+      exit 1
+    end
+
+    @cases.delete_if do |_rt, value|
+      next true if value.size < 2
+      next false if is_fail
+      next false if is_latency
+      next false if @opt_no_hide_noises
+
+      noisy = false
+      value.each_value do |v|
+        next unless v.is_a?(Array) && v.many?
+
+        if v.standard_deviation.abs > v.average.abs / 2 || v.average.negative?
+          noisy = true
+          break
+        end
+      end
+      noisy
     end
   end
-else
-  unless $opt_field
-    puts 'error: no field found, please use -f/--field'
-    exit 1
+
+  def calculate_number_formats
+    is_float = false
+    is_exp   = false
+    @cases.each_value do |value|
+      value.each_value do |v|
+        case v
+        when Array
+          is_float = v.any? { |vv| is_float = true if vv.abs < 100 && vv != 0 && vv.is_a?(Float) }
+          is_exp = v.any? { |vv| vv.abs >= 100_000_000 }
+        else
+          is_float = true if v.abs < 100 && v != 0 && v.is_a?(Float)
+          is_exp = true if v.abs >= 100_000_000
+        end
+      end
+    end
   end
-  ARGV.each { |path| add_stats path }
-  show_delta $opt_field, nil
-  plot_bar $dims, $cases if $opt_plot
+
+  def show_delta_rows(key_g, stat, is_fail, is_float, is_exp)
+    @cases.each do |_rt, value|
+      result_path = ResultPath.new
+      result_path.parse_result_root(_rt)
+      test = result_path.test_desc @opt_dimension, @dim_not_a_param
+
+      next if @group_by_test && test != key_g
+
+      show_header(is_fail) unless @header_shown[is_fail]
+
+      v0, v0_stddev = get_v_and_stddev value, @first_dim, is_fail
+      @dims.each_key do |dim|
+        v, v_stddev = get_v_and_stddev value, dim, is_fail
+
+        show_one_diff stat, dim, v0, v, v0_stddev, v_stddev, is_float: is_float, is_exp: is_exp, is_fail: is_fail
+        if is_fail
+          @sum[dim] += v
+        elsif v.positive?
+          @sum[dim] += Math.log(v)
+        end
+
+        if v_stddev && is_fail
+          @stddev[dim] += v_stddev if @stddev[dim]
+        else
+          @stddev[dim] = nil
+        end
+      end
+      if @group_by_test
+        puts @opt_field
+      else
+        if Dir.exist?(GIT_WORK_TREE)
+          git = Git.open(project: @project, working_dir: GIT_WORK_TREE)
+          result_path['commit'] = git.gcommit(result_path['commit']).name if @opt_dimension !~ /^(.*_)?commit$/
+        end
+        test = result_path.test_desc @opt_dimension, @dim_not_a_param
+        puts test
+      end
+    end
+  end
+
+  def show_delta(stat, key_g)
+    is_fail = StatClassifier.function_stat?(stat)
+    is_latency = StatClassifier.latency_stat?(stat)
+
+    filter_cases(is_fail, is_latency)
+    return if @cases.empty?
+
+    @cases = @cases.sort.to_h
+
+    unless @group_by_test
+      @dims.each do |dim, name|
+        width = (dim == @first_dim ? ABS_WIDTH + ERR_WIDTH : REL_WIDTH + ABS_WIDTH + ERR_WIDTH)
+        printf "%#{width}s  ", name[0..(width - 1)]
+      end
+
+      if @header_shown[is_fail]
+        puts
+      else
+        puts 'testcase/testparams/testbox'
+      end
+
+      @dims.each_key do |dim|
+        width = (dim == @first_dim ? ABS_WIDTH + ERR_WIDTH : REL_WIDTH + ABS_WIDTH + ERR_WIDTH)
+        printf "#{'-' * width}  "
+      end
+    end
+
+    is_float, is_exp = calculate_number_formats
+
+    puts if @header_shown[is_fail] && !@group_by_test
+
+    show_delta_rows(key_g, stat, is_fail, is_float, is_exp)
+
+    unless is_fail
+      @sum.each_key do |k|
+        @sum[k] = Math.exp(@sum[k] / @cases.length)
+      end
+    end
+
+    return if @group_by_test
+
+    v0 = @sum[@first_dim]
+    v0_stddev = @stddev[@first_dim]
+    @sum.each do |dim, v|
+      show_one_diff stat, dim, v0, v, v0_stddev, @stddev[dim], is_float: is_float, is_exp: is_exp, is_fail: is_fail
+    end
+    if is_fail
+      puts "TOTAL #{@opt_field}"
+    else
+      puts "GEO-MEAN #{@opt_field}"
+    end
+  end
+
+  def call_mmplot
+    @cases.each_key do |_rt|
+      file = "#{_rt}/matrix.json"
+      matrix1 = JSON.parse_cached file, cache: true
+      matrix2 = JSON.parse_cached file.sub(@opt_dims[0], @opt_dims[1]), cache: true
+      mmplot(matrix2, matrix1, [@opt_field], File.dirname(_rt, 2))
+    end
+  end
+
+  def show_one_index(type)
+    return unless @nr_gm[type]
+
+    @base_gm[type] = Math.exp(@base_gm[type] / @nr_gm[type])
+    @head_gm[type] = Math.exp(@head_gm[type] / @nr_gm[type])
+    index = 100 * @head_gm[type] / @base_gm[type]
+    printf "%6d  %8s-index  %s\n", index, type, ARGV[-1]
+  end
+
+  def setup_stats_priority(stats)
+    all_stats = LKP::Programs.all_stats.sort
+
+    tests = LKP::Programs.all_tests.sort
+
+    tests.reverse_each do |x|
+      all_stats.unshift x if all_stats.delete x
+    end
+
+    stats_num = {}
+    stats.each do |x|
+      k = x.split('.')[0]
+      next if tests.include?(k)
+
+      stats_num[k] ||= 0
+      stats_num[k] += 1
+    end
+
+    sorted_keys = stats_num.keys.sort_by { |x| stats_num[x] }
+    sorted_keys.each do |x|
+      all_stats.push x if all_stats.delete x
+    end
+
+    # convert the array to a hash with array index as values
+    @stats_priority = all_stats.map.with_index.to_a.to_h
+  end
+
+  def stat_priority(stat)
+    @stats_priority[stat] || 0
+  end
+
+  def sort_stats(stats)
+    setup_stats_priority(stats)
+    stats.sort_by! do |x|
+      fields = x.split('.')
+
+      record = @stat_records[x].last
+
+      a = record['a'].average
+      b = record['b'].average
+      abs_change = b - a
+      rel_change = abs_change / b
+
+      if x =~ ABS_CHANGE_STATS_RE
+        [stat_priority(fields[0]), fields[1], abs_change]
+      elsif fields.size >= 3 && fields[1] !~ /^node\d+$/
+        # when a monitor can be broken into sub-groups of stats
+        # under which values can be logically compared
+        [stat_priority(fields[0]), fields[1], rel_change]
+      else
+        [stat_priority(fields[0]), '', rel_change]
+      end
+    end
+  end
 end
+
+Compare.new(options).run

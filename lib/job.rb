@@ -8,6 +8,7 @@ require 'json'
 require 'set'
 require 'yaml'
 require "#{LKP_SRC}/lib/bash"
+require "#{LKP_SRC}/lib/cache"
 require "#{LKP_SRC}/lib/common"
 require "#{LKP_SRC}/lib/constant"
 require "#{LKP_SRC}/lib/erb"
@@ -81,35 +82,35 @@ def for_each_in(ah, set, pk = nil, &block)
   end
 end
 
-# programs[script] = full/path/to/script
-def __create_programs_hash(glob, lkp_src)
-  programs = {}
-  Dir.glob("#{lkp_src}/#{glob}").each do |path|
-    next if File.directory?(path)
-    next if path =~ /\.yaml$/
-    next if path =~ /\.[0-9]+$/
+class Programs
+  class << self
+    include Cacheable
 
-    unless File.executable?(path)
-      log_warn "skip non-executable #{path}"
-      next
+    # programs[script] = full/path/to/script
+    def create(glob, lkp_src = LKP_SRC)
+      programs = {}
+      Dir.glob("#{lkp_src}/#{glob}").each do |path|
+        next if File.directory?(path)
+        next if path =~ /\.yaml$/
+        next if path =~ /\.[0-9]+$/
+
+        unless File.executable?(path)
+          log_warn "skip non-executable #{path}"
+          next
+        end
+
+        file = glob =~ /^programs\// || glob =~ /^\*\/(setup|daemon)$/ ? path.split('/')[-2] : File.basename(path)
+
+        if programs.include? file
+          log_error "Conflict names #{programs[file]} and #{path}"
+          next
+        end
+        programs[file] = path
+      end
+      programs.freeze
     end
-
-    file = glob =~ /^programs\// || glob =~ /^\*\/(setup|daemon)$/ ? path.split('/')[-2] : File.basename(path)
-
-    if programs.include? file
-      log_error "Conflict names #{programs[file]} and #{path}"
-      next
-    end
-    programs[file] = path
+    cache_method :create
   end
-  programs
-end
-
-def create_programs_hash(glob, lkp_src = LKP_SRC)
-  cache_key = [glob, lkp_src].join ':'
-  $programs_cache ||= {}
-  $programs =
-    $programs_cache[cache_key] ||= __create_programs_hash(glob, lkp_src).freeze
 end
 
 def atomic_save_yaml_json(object, file)
@@ -438,15 +439,15 @@ class Job
         }[type]
 
         programs = if script_name
-                     create_programs_hash("programs/*/#{script_name}", lkp_src)
+                     Programs.create("programs/*/#{script_name}", lkp_src)
                    else
-                     create_programs_hash("#{type}/**/*", lkp_src)
+                     Programs.create("#{type}/**/*", lkp_src)
                    end
 
         if type == :monitors
-          programs = programs.merge create_programs_hash('programs/*/no-stdout-monitor', lkp_src)
-          programs = programs.merge create_programs_hash('programs/*/one-shot-monitor', lkp_src)
-          programs = programs.merge create_programs_hash('programs/*/plain-monitor', lkp_src)
+          programs = programs.merge Programs.create('programs/*/no-stdout-monitor', lkp_src)
+          programs = programs.merge Programs.create('programs/*/one-shot-monitor', lkp_src)
+          programs = programs.merge Programs.create('programs/*/plain-monitor', lkp_src)
         end
         programs
       end
