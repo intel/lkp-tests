@@ -1,0 +1,23 @@
+suite: ltp
+testcase: ltp
+category: functional
+
+need_memory: 4G
+
+disk: 1HDD
+fs:
+  - btrfs
+  - ext4
+  - f2fs
+  - xfs
+
+# setsockopt11 (CVE-2026-53362 reproducer) calls tst_pollute_memory(0, ...),
+# which maps essentially all free host RAM with no cgroup isolation - no
+# need_memory value can satisfy it, and the resulting OOM is an expected
+# side effect of the test's own leak-detection design, not a real failure.
+oom-killer:
+  ignored: 1
+
+ltp:
+  test:
+    - setsockopt11.setsockopt11

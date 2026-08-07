@@ -2,3 +2,6 @@
 writev03 writev03
 # loop too many, can't allot on lkp-knl-f1
 fork13 fork13
+# uses tst_pollute_memory() to map nearly all free RAM; needs its own job
+# with oom-killer ignored, not batched with syscalls-rest
+setsockopt11 setsockopt11

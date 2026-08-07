@@ -34,6 +34,58 @@ build_module()
 	cp $benchmark_path/$mdir/*.ko $benchmark_path/testcases/bin/
 }
 
+# aslr01 (testcases/kernel/security/aslr/aslr01.c) TCONFs when no dynamic
+# library loaded into the test process is at least as large as the system's
+# hugepage size, and the fix it documents is `export LD_PRELOAD=...`.
+# Setting LD_PRELOAD in fixup_test() does not reach the test process though:
+# kirk, LTP's runner, forwards only an explicit allowlisted set of
+# environment variables (libkirk/ltp.py's SUPPORTED_ENV, plus LTP_/TST_
+# prefixes) when it spawns each test, and LD_PRELOAD is not in that set.
+# Instead, shadow the installed `aslr01` binary with a wrapper of the same
+# name earlier on PATH; the wrapper sets LD_PRELOAD only for the aslr01
+# process it execs, so no other test or process on the shared testbox is
+# affected.
+setup_aslr01_ld_preload()
+{
+	has_cmd gcc || {
+		echo "gcc not found, skip aslr01 LD_PRELOAD wrapper" >&2
+		return
+	}
+
+	local benchmark_path=$(get_benchmark_path)
+	local aslr01_bin="$benchmark_path/testcases/bin/aslr01"
+	[[ -f "$aslr01_bin" ]] || return
+
+	local hugepage_size=$(awk '/^Hugepagesize:/ {print $2 * 1024; exit}' /proc/meminfo)
+	[[ -z "$hugepage_size" ]] && hugepage_size=2097152
+
+	local pad_src="$TMP/aslr01-preload.c"
+	cat >"$pad_src" <<-EOF
+		static const char aslr01_preload_pad[$hugepage_size] = { 1 };
+
+		int aslr01_preload_marker(void)
+		{
+			return aslr01_preload_pad[0];
+		}
+	EOF
+
+	local pad_lib="$TMP/aslr01-preload.so"
+	log_cmd gcc -shared -fPIC -o "$pad_lib" "$pad_src" || return
+
+	mv "$aslr01_bin" "$aslr01_bin.orig"
+
+	local wrapper_dir="$TMP/aslr01-wrapper"
+	mkdir -p "$wrapper_dir"
+	cat >"$wrapper_dir/aslr01" <<-EOF
+		#!/bin/sh
+		export LD_PRELOAD=$pad_lib
+		exec $aslr01_bin.orig "\$@"
+	EOF
+	chmod +x "$wrapper_dir/aslr01"
+
+	export PATH="$wrapper_dir:$PATH"
+}
+
 is_excluded()
 {
 	test=$1
@@ -125,6 +177,7 @@ fixup_test()
 			build_module "testcases/kernel/device-drivers/uaccess"
 			build_module "testcases/kernel/firmware/fw_load_kernel"
 		}
+		setup_aslr01_ld_preload
 		;;
 	fs_readonly-0*)
 		[ -z "$fs" ] && exit
@@ -321,6 +374,10 @@ cleanup_ltp()
 		;;
 	cve-03)
 		modprobe -r scsi_debug 2>/dev/null
+		;;
+	kernel_misc)
+		local aslr01_bin="$(get_benchmark_path)/testcases/bin/aslr01"
+		[[ -f "$aslr01_bin.orig" ]] && mv "$aslr01_bin.orig" "$aslr01_bin"
 		;;
 	esac
 }
