@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 3)
+
+require "#{LKP_SRC}/lib/tests/stats"
+
+stats = LKP::Stats.new
+
+ARGF.each_line do |line|
+  if line =~ /^rust-analyzer\.(\S+):\s+(\S+)/
+    stats.add "rust-analyzer.#{$1}", $2
+  end
+end
+
+stats.dump
