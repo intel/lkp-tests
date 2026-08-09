@@ -68,7 +68,6 @@ kselftests:
     # the same kernel flavor, so it can never build
     - nci
     # - nolibc # not enabled yet
-    - nsfs
     # - ntb
     - openat2
     - perf_events
