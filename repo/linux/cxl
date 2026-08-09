@@ -5,7 +5,6 @@ git_am_branch:
 - pending
 mail_cc:
 - Alison Schofield <alison.schofield@intel.com>
-- Dan Williams <djbw@kernel.org>
 - Dave Jiang <dave.jiang@intel.com>
 - linux-cxl@vger.kernel.org
 report_to_domain_branch: preview

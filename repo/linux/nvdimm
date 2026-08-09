@@ -4,10 +4,8 @@ integration_testing_branches:
 - dax-misc
 mail_cc:
 - Alison Schofield <alison.schofield@intel.com>
-- Dan Williams <djbw@kernel.org>
 - Dave Jiang <dave.jiang@intel.com>
 - linux-nvdimm@lists.01.org
-owner: Dan Williams <djbw@kernel.org>
 subsystems:
 - pmem
 - libnvdimm

@@ -1,3 +1,0 @@
-url: https://git.kernel.org/pub/scm/linux/kernel/git/djbw/dmaengine.git
-notify_build_success_branch: test
-owner: Dan Williams <dan.j.williams@intel.com>
