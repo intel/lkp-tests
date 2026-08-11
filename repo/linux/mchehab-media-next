@@ -1,4 +1,4 @@
-url: git://linuxtv.org/mchehab/media-next.git
+url: https://git.kernel.org/pub/scm/linux/kernel/git/mchehab/media-next.git
 integration_testing_branches:
 - master
 - fixes

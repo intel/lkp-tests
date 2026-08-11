@@ -1,4 +1,4 @@
-url: git://git.samba.org/sfrench/cifs-2.6.git
+url: https://git.samba.org/sfrench/cifs-2.6.git
 integration_testing_branches: for-next
 mail_cc:
 - linux-cifs@vger.kernel.org
