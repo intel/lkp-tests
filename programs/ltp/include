@@ -120,6 +120,7 @@ need_kconfig:
 
 % elsif ___.test =~ /^mm(-\w+)?$/
 - MEMCG: y
+- PROC_MEM_ALWAYS_FORCE: y
 - SWAP: y
 
 % elsif ___.test == "net.features"
