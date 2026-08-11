@@ -198,7 +198,7 @@ describe ResultPath do
 
   describe '.with_release_tag' do
     before do
-      stub_const 'GIT_WORK_TREE', File.join(git_root_dir, 'linux')
+      stub_const 'GIT_WORK_TREE', File.join(GIT_ROOT_DIR, 'linux')
       stub_const 'GIT_DIR', "#{GIT_WORK_TREE}/.git"
       stub_const 'GIT', "git --work-tree=#{GIT_WORK_TREE} --git-dir=#{GIT_DIR}"
     end
