@@ -3,7 +3,7 @@ require "#{LKP_SRC}/lib/job2sh"
 
 describe Job2sh do
   describe '#to_shell' do
-    artifacts_dir = File.join(LKP_SRC, 'spec', 'job2sh')
+    artifacts_dir = File.join(LKP_SRC, 'spec', 'fixtures', 'job2sh')
     yaml_files = Dir.glob(File.join(artifacts_dir, '*.yaml')).reject { |f| f.include?('mock') }
 
     yaml_files.each do |yaml_file|
@@ -43,7 +43,7 @@ describe Job2sh do
       allow(Bash).to receive(:run).with(/program-options.*wrapper/).and_return('')
     end
 
-    artifacts_dir = File.join(LKP_SRC, 'spec', 'job2sh')
+    artifacts_dir = File.join(LKP_SRC, 'spec', 'fixtures', 'job2sh')
     yaml_files = Dir.glob File.join(artifacts_dir, '*.mock.yaml')
 
     yaml_files.each do |yaml_file|

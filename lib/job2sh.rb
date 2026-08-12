@@ -287,14 +287,14 @@ class Job2sh < Job
     job = (@jobx || @job).clone # a shallow copy so that delete_if won't impact @job
     job.delete_if { |key, val| parse_one([], key, val, :PASS_EXPORT_ENV) }
     out_line
-    out_line "\t[ -n \"$LKP_SRC\" ] ||"
-    out_line "\texport LKP_SRC=/lkp/${user:-lkp}/src"
-    out_line "}\n\n"
+    out_line "\t[ -n \"$LKP_SRC\" ] || export LKP_SRC=/lkp/${user:-lkp}/src"
+    out_line '}'
+    out_line
 
     out_line 'run_job()'
     out_line '{'
     out_line
-    out_line "\techo $$ > $TMP/run-job.pid"
+    out_line "\techo $$ >$TMP/run-job.pid"
     out_line
     out_line "\t. $LKP_SRC/lib/http.sh"
     out_line "\t. $LKP_SRC/lib/job.sh"
@@ -303,7 +303,8 @@ class Job2sh < Job
     out_line "\texport_top_env"
     out_line
     parse_hash [], job
-    out_line "}\n\n"
+    out_line '}'
+    out_line
 
     @cur_func = :extract_stats
     out_line 'extract_stats()'
@@ -318,7 +319,8 @@ class Job2sh < Job
     out_line
     out_line @stats_lines
     parse_hash [], YAML.load_file(LKP::Path.src('etc', 'default_stats.yaml'))
-    out_line "}\n\n"
+    out_line '}'
+    out_line
 
     out_line '"$@"'
 

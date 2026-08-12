@@ -85,8 +85,7 @@ rw'
 	export LKP_CIFS_PORT=139
 	export job_initrd='/lkp/jobs/scheduled/lkp-ivb-d04/ftq-performance-10000-100%-100000ss-add-debian-12-x86_64-20240206.cgz-ffd294d346d1-20250123-611007-2sqd4l-0.cgz'
 
-	[ -n "$LKP_SRC" ] ||
-		export LKP_SRC=/lkp/${user:-lkp}/src
+	[ -n "$LKP_SRC" ] || export LKP_SRC=/lkp/${user:-lkp}/src
 }
 
 run_job()

@@ -7,14 +7,12 @@ export_top_env()
 	export category='mock-category'
 	export job_origin='spec/job2sh/1.mock.yaml'
 
-	[ -n "$LKP_SRC" ] ||
-	export LKP_SRC=/lkp/${user:-lkp}/src
+	[ -n "$LKP_SRC" ] || export LKP_SRC=/lkp/${user:-lkp}/src
 }
-
 
 run_job()
 {
-	echo $$ > $TMP/run-job.pid
+	echo $$ >$TMP/run-job.pid
 
 	. $LKP_SRC/lib/http.sh
 	. $LKP_SRC/lib/job.sh
@@ -36,7 +34,6 @@ run_job()
 	start_daemon $LKP_SRC/bin/run-daemon mydaemon
 }
 
-
 extract_stats()
 {
 	export stats_part_begin=
@@ -51,6 +48,5 @@ extract_stats()
 
 	$LKP_SRC/bin/run-stats time myprog.time
 }
-
 
 "$@"

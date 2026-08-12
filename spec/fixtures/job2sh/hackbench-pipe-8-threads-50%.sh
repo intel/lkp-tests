@@ -17,14 +17,12 @@ export_top_env()
 	export ssd_partitions=
 	export local_run=1
 
-	[ -n "$LKP_SRC" ] ||
-	export LKP_SRC=/lkp/${user:-lkp}/src
+	[ -n "$LKP_SRC" ] || export LKP_SRC=/lkp/${user:-lkp}/src
 }
-
 
 run_job()
 {
-	echo $$ > $TMP/run-job.pid
+	echo $$ >$TMP/run-job.pid
 
 	. $LKP_SRC/lib/http.sh
 	. $LKP_SRC/lib/job.sh
@@ -62,7 +60,6 @@ run_job()
 
 	run_test mode='threads' ipc='pipe' $LKP_SRC/bin/run-test hackbench
 }
-
 
 extract_stats()
 {
@@ -102,6 +99,5 @@ extract_stats()
 	$LKP_SRC/bin/run-stats stderr
 	$LKP_SRC/bin/run-stats time
 }
-
 
 "$@"
