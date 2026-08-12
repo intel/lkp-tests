@@ -114,7 +114,11 @@ describe 'job.rb global methods' do
 
     context 'when local_run? is false' do
       before do
-        allow(self).to receive(:local_run?).and_return(false)
+        ENV[LOCAL_RUN_ENV] = '0'
+      end
+
+      after do
+        ENV.delete(LOCAL_RUN_ENV)
       end
 
       it 'returns the string as is even if it contains $' do
@@ -129,50 +133,72 @@ describe 'job.rb global methods' do
 
     context 'when local_run? is true' do
       before do
-        allow(self).to receive(:local_run?).and_return(true)
+        ENV[LOCAL_RUN_ENV] = '1'
+      end
+
+      after do
+        ENV.delete(LOCAL_RUN_ENV)
       end
 
       context 'with shell variables ($)' do
         it 'expands the variable using Bash.run' do
-          expected_cmd = 'eval echo "$VAR"'
-          allow(Bash).to receive(:run).with(env, expected_cmd).and_return("expanded_value\n")
-          expect(expand_shell_var(env, '$VAR')).to eq('expanded_value')
+          expect(expand_shell_var(env, '$HOME')).to eq(Dir.home)
         end
 
         it 'passes environment variables to Bash.run' do
           my_env = { 'VAR' => 'value' }
-          allow(Bash).to receive(:run).with(my_env, 'eval echo "$VAR"').and_return("value\n")
           expect(expand_shell_var(my_env, '$VAR')).to eq('value')
         end
       end
 
       context 'with /dev/disk/ paths' do
+        # expand_shell_var resolves each path via Dir.glob then File.realpath,
+        # which require the target to actually exist -- build a real
+        # by-label -> device symlink layout instead of stubbing Dir/File.
+        # It only takes this branch when the input contains '/dev/disk/',
+        # so by_label_dir must be nested under a real .../dev/disk/by-label/.
+        let(:disk_dir) { Dir.mktmpdir('job-spec-disk-') }
+        let(:by_label_dir) { File.join(disk_dir, 'dev', 'disk', 'by-label') }
+
+        before do
+          FileUtils.mkdir_p(by_label_dir)
+        end
+
+        after do
+          FileUtils.remove_entry disk_dir
+        end
+
+        def make_device(name)
+          path = File.join(disk_dir, name)
+          FileUtils.touch(path)
+          path
+        end
+
+        def make_label(label, device_path)
+          link = File.join(by_label_dir, label)
+          File.symlink(device_path, link)
+          link
+        end
+
         it 'sorts determined disks by numeric suffix' do
-          # The function triggers if the string contains '/dev/disk/'
-          input = '/dev/disk/by-label/d1 /dev/disk/by-label/d2'
-
-          # Use specific return values for Dir.glob and File.realpath
-          allow(Dir).to receive(:glob).with('/dev/disk/by-label/d1').and_return(['/link/to/sda10'])
-          allow(Dir).to receive(:glob).with('/dev/disk/by-label/d2').and_return(['/link/to/sdb2'])
-
-          allow(File).to receive(:realpath).with('/link/to/sda10').and_return('/dev/sda10')
-          allow(File).to receive(:realpath).with('/link/to/sdb2').and_return('/dev/sdb2')
+          sda10 = make_device('sda10')
+          sdb2 = make_device('sdb2')
+          d1 = make_label('d1', sda10)
+          d2 = make_label('d2', sdb2)
 
           # Sorting logic:
-          # /dev/sdb2  -> 2
-          # /dev/sda10 -> 10
-          # Expect: "/dev/sdb2 /dev/sda10"
-
-          expect(expand_shell_var(env, input)).to eq('/dev/sdb2 /dev/sda10')
+          # sdb2  -> 2
+          # sda10 -> 10
+          # Expect: "sdb2 sda10"
+          expect(expand_shell_var(env, "#{d1} #{d2}")).to eq("#{sdb2} #{sda10}")
         end
 
         it 'handles paths resolving to same device' do
-          input = '/dev/disk/by-label/d1 /dev/disk/by-label/d1_alias'
-          allow(Dir).to receive(:glob).with('/dev/disk/by-label/d1').and_return(['/dev/sda1'])
-          allow(Dir).to receive(:glob).with('/dev/disk/by-label/d1_alias').and_return(['/dev/sda1'])
-          allow(File).to receive(:realpath).with('/dev/sda1').and_return('/dev/sda1')
+          sda1 = make_device('sda1')
+          d1 = make_label('d1', sda1)
+          d1_alias = make_label('d1_alias', sda1)
 
-          expect(expand_shell_var(env, input)).to eq('/dev/sda1')
+          expect(expand_shell_var(env, "#{d1} #{d1_alias}")).to eq(sda1)
         end
       end
 
