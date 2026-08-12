@@ -82,6 +82,22 @@ class RepoSpec
       Dir[File.join(root_dir, '*', name)].first
     end
 
+    def git_tree_owner?(branch, committer)
+      return false if branch.nil? || committer.nil?
+
+      # Whitelist
+      return true if committer.match?(/Linus Torvalds|Stephen Rothwell|Ingo Molnar|David S\. Miller|Greg Kroah-Hartman|Dave Airlie|Chris Mason|Ralf Baechle|Vinod Koul/)
+
+      remote = branch.split('/').first
+      return false unless exist?(remote)
+
+      repo_spec = new(remote)
+      owner = repo_spec['owner']
+      return false unless owner
+
+      owner.include?(committer)
+    end
+
     def all
       Dir[File.join(root_dir, '*', '*')]
         .grep_v(/DEFAULTS$/)
