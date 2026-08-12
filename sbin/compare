@@ -98,10 +98,10 @@ opt_parser = OptionParser.new do |opts| # rubocop:disable Metrics/BlockLength
 
   opts.on('-i', '--index', 'performance/power index') do
     options[:index] = true
-    options[:size_index] = load_yaml "#{LKP_SRC}/etc/index-size.yaml"
-    options[:perf_index] = load_yaml "#{LKP_SRC}/etc/index-perf-all.yaml"
-    options[:power_index] = load_yaml "#{LKP_SRC}/etc/index-power.yaml"
-    options[:latency_index] = load_yaml "#{LKP_SRC}/etc/index-latency.yaml"
+    options[:size_index] = LKP::IndexSize.instance.to_h
+    options[:perf_index] = LKP::IndexPerfAll.instance.to_h
+    options[:power_index] = LKP::IndexPower.instance.to_h
+    options[:latency_index] = LKP::IndexLatency.instance.to_h
     options[:all_index] = options[:perf_index].merge(options[:power_index]).merge(options[:latency_index]).merge(options[:size_index])
   end
 

@@ -271,9 +271,6 @@ class MResultRootTableSet
   LINUX_PERF_TABLE = 'linux_perf'.freeze
   LINUX_TABLE = 'linux'.freeze
   OTHER_TABLE = 'other'.freeze
-  LINUX_PERF_TESTCASES = LinuxTestcasesTableSet::LINUX_PERF_TESTCASES
-  LINUX_TESTCASES = LinuxTestcasesTableSet::LINUX_TESTCASES
-  OTHER_TESTCASES = LinuxTestcasesTableSet::OTHER_TESTCASES
 
   def initialize
     @linux_perf_table = LinuxMResultRootTable.open(LINUX_PERF_TABLE)
@@ -287,13 +284,13 @@ class MResultRootTableSet
     }
 
     @testcase_map = {}
-    LINUX_PERF_TESTCASES.each do |c|
+    LKP::LinuxPerfTestCases.instance.patterns.each do |c|
       @testcase_map[c] = @linux_perf_table
     end
-    LINUX_TESTCASES.each do |c|
+    LKP::LinuxTestCases.instance.patterns.each do |c|
       @testcase_map[c] = @linux_table
     end
-    OTHER_TESTCASES.each do |c|
+    LKP::OtherTestCases.instance.patterns.each do |c|
       @testcase_map[c] = @other_table
     end
   end
@@ -446,7 +443,7 @@ module ResultStddev
     return unless commit
 
     testcase = axes[TESTCASE_AXIS_KEY]
-    return unless MResultRootTableSet::LINUX_PERF_TESTCASES.index testcase
+    return unless LKP::LinuxPerfTestCases.instance.contain? testcase
 
     # Only save for release tags
     proj = 'linux'

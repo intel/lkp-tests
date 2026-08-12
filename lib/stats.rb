@@ -21,39 +21,12 @@ require "#{LKP_SRC}/lib/yaml"
 MARGIN_SHIFT = 5
 MAX_RATIO = 5
 
-# generate LKP::MemoryStatPrefixes
-LKP::Prefixes.generate_klass(LKP::Path.src('etc', 'memory-stat-prefixes'))
-
-# generate LKP::PerfMetricsThreshold, LKP::IndexPerfAll, LKP::IndexLatencyAll, LKP::IndexPower
-{
-  'perf-metrics-threshold.yaml' => 'PerfMetricsThreshold',
-  'index-perf-all.yaml' => 'IndexPerfAll',
-  'index-latency-all.yaml' => 'IndexLatencyAll',
-  'index-power.yaml' => 'IndexPower'
-}.each do |file_name, klass_name|
-  LKP::PatternValues.generate_klass(LKP::Path.src('etc', file_name), klass_name)
-end
-
-class LinuxTestcasesTableSet
-  def self.load_testcases(file_path)
-    if File.exist?(file_path)
-      File.readlines(file_path).map(&:strip).reject(&:empty?)
-    else
-      log_warn "File not found: #{file_path}"
-    end
-  end
-
-  LINUX_PERF_TESTCASES = load_testcases("#{LKP_SRC}/etc/linux-perf-test-cases").freeze
-  LINUX_TESTCASES = load_testcases("#{LKP_SRC}/etc/linux-test-cases").freeze
-  OTHER_TESTCASES = load_testcases("#{LKP_SRC}/etc/other-test-cases").freeze
-end
-
 def functional_test?(testcase)
-  LinuxTestcasesTableSet::LINUX_TESTCASES.index testcase
+  LKP::LinuxTestCases.instance.contain? testcase
 end
 
 def other_test?(testcase)
-  LinuxTestcasesTableSet::OTHER_TESTCASES.index testcase
+  LKP::OtherTestCases.instance.contain? testcase
 end
 
 def perf_metric?(name)

@@ -16,7 +16,7 @@ module LKP
     include Singleton
 
     def initialize
-      prefixes = File.read("#{LKP_SRC_ETC}/perf-metrics-prefixes").split
+      prefixes = LKP::PerfMetricsPrefixes.instance.prefixes
 
       additional_prefixes = LKP::Programs.test_prefixes.reject do |test|
         test_name = test[0..-2]

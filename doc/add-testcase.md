@@ -324,8 +324,8 @@ Give an example to explain how to add one testcase, take hwsim as example:
 4) add one job file
 	jobs/hwsim.yaml
 
-5) add hwsim to LinuxTestcasesTableSet
-	lib/stats.rb
+5) add hwsim to the linux test cases list
+	etc/linux-test-cases
 
 6) commands to debug the new test case
 	cd lkp-tests
