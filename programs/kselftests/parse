@@ -109,7 +109,7 @@ class Stater
          /^(?:# )+\s*\[?RUN\]?\s(.+)/, # # # [RUN] test_prot_read
          /^# Running (.+)/i, # # Running kernel configuration test 1 -- rare
          /^# # Testing (.+):/ # # # Testing allocation and importing:
-      curr_test.parts = [test_name($1, $2)]
+      start_test(test_name($1, $2))
     when /: recipe for target.+failed$/,
          /^make(?:\[1\])?: \*\*\* .*\/tools\/testing\/selftests\/.* (Error \d+|Stop\.)$/,
          /Cannot find a vmlinux for VMLINUX_BTF/
@@ -126,6 +126,12 @@ class Stater
 
   def curr_test
     @tests[test_level]
+  end
+
+  # start a new test at the current level, replacing any parts recorded
+  # so far (e.g. from a "TEST SECTION:"-style header line)
+  def start_test(name)
+    curr_test.parts = [name]
   end
 
   # rli9 FIXME is uniq a must
@@ -226,7 +232,7 @@ class NetStater < Stater
          /^# ((Single|Multipath|Single|Admin|Local|Single|FIB|IPv4|IPv6|Basic|Legacy|Routing) (.*))/,
          /(Use cases)/,
          /(Run time tests - ipv4)/
-      curr_test.parts = [$1]
+      start_test($1)
     when /^# TEST SUBSECTION: (.*)/
       curr_test.parts << $1
     when /^# (No VRF|With VRF|TCP reset|ICMP unreachable|Device enslaved to bridge|Ping LLA with multiple interfaces)/,
@@ -290,7 +296,7 @@ class NetUdpgsoStater < NetStater
   def stat(line)
     case line
     when /^# (ipv\d [^:]+)$/i
-      curr_test.parts = [$1]
+      start_test($1)
     when /^# (ipv\d)/i
       # ignore
     else
@@ -318,7 +324,7 @@ class MmStater < Stater
       # running hugepage-shm
       # running ./va_128TBswitch
       # running: gup_test -u # get_user_pages_fast() benchmark
-      curr_test.parts = [$1.sub(/^\.\//, '')]
+      start_test($1.sub(/^\.\//, ''))
     when /^(?:# )+(?<test_parts>.*)\[(?<result>PASS|FAIL|SKIP)\]/
       parse_test_result(Regexp.last_match)
 
@@ -356,7 +362,7 @@ class FutexStater < Stater
       # # futex_requeue_pi: Test requeue functionality
       # # 	Arguments: broadcast=0 locked=0 owner=0 timeout=0ns
       # ok 1 futex-requeue-pi
-      curr_test.parts = [$1]
+      start_test($1)
     else
       super
 
@@ -443,7 +449,7 @@ class CapabilitiesStater < Stater
     case line
     when /^# # \[RUN\].*(Tests with uid .*) +++/
       # # # [RUN] +++ Tests with uid != 0 +++
-      curr_test.parts = [$1]
+      start_test($1)
     when /^# # \[RUN\]\s+(.+)/
       # # # [RUN]       Root => ep
       curr_test.parts[1] = $1
@@ -473,7 +479,7 @@ class NetfilterStater < NetStater
   def stat(line)
     case line
     when /^# TEST: (.+)/ # # TEST: reported issues
-      curr_test.parts = [$1]
+      start_test($1)
     else
       super
     end
@@ -520,7 +526,7 @@ class BpfStater < Stater
          /^# (?<test_parts>.*)(?<result>PASS|FAIL|Pass)$/
       parse_test_result(Regexp.last_match)
     when /^# starting ((?:egress|ingress)\s.*)/
-      curr_test.parts = [$1]
+      start_test($1)
     else
       # not ok 6 selftests: bpf: test_progs # exit=1
       super
