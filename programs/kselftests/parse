@@ -628,6 +628,14 @@ end
 
 stats = LKP::Stats.new
 
+# Each "# selftests: <group>: <script>" header line picks the Stater
+# subclass to hand subsequent lines to, purely by naming convention:
+# CamelCase(group) + "Stater" (e.g. group "kmod" -> KmodStater, group
+# "net/mptcp" -> its 2nd path segment "mptcp" -> MptcpStater). A group
+# with no matching subclass defined above falls back to the base
+# Stater. There is no explicit group -> class table to keep in sync
+# when adding a new suite's Stater; naming the class correctly is
+# what wires it up.
 while (line = $stdin.gets)
   line = line.resolve_invalid_bytes.chomp
 
