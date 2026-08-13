@@ -46,6 +46,18 @@ parameters:
   ramp_time: if set, fio will run the specified workload for this amount of time before logging any
                performance numbers.
   stonewall: wait for preceding jobs of a group to exit, before starting new reporting group.
+  hipri: a boolean parameter, only applies when ioengine is io_uring/io_uring_cmd; if true,
+               use polled IO completions instead of interrupt-driven ones.
+  sqthread_poll: a boolean parameter, only applies when ioengine is io_uring/io_uring_cmd; if true,
+               offload submission/completion polling to a kernel-side SQ poll thread instead of
+               issuing io_uring_enter() from the fio thread itself.
+  sqthread_poll_cpu: only applies when sqthread_poll is set; pin the SQ poll thread to this CPU.
+  fixedbufs: a boolean parameter, only applies when ioengine is io_uring/io_uring_cmd; if true,
+               pre-map and reuse IO buffers via io_uring's registered-buffer mechanism instead of
+               mapping/unmapping a fresh buffer for every IO.
+  registerfiles: a boolean parameter, only applies when ioengine is io_uring/io_uring_cmd; if true,
+               register target files with io_uring so submissions reference them by a fixed index
+               instead of by file descriptor.
 
 results:
   fio.write_bw_MBps: average write bandwidth

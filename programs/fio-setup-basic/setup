@@ -35,6 +35,11 @@
 # - exitall
 # - ramp_time
 # - stonewall
+# - hipri
+# - sqthread_poll
+# - sqthread_poll_cpu
+# - fixedbufs
+# - registerfiles
 
 . "$LKP_SRC"/lib/reproduce-log.sh
 . "$LKP_SRC"/lib/common.sh
@@ -210,6 +215,40 @@ if parse_bool -q "$stonewall"; then
 $create_task
 stonewall
 "
+fi
+
+if [ "$ioengine" = "io_uring" ] || [ "$ioengine" = "io_uring_cmd" ]; then
+	if parse_bool -q "$hipri"; then
+		create_task="
+$create_task
+hipri
+"
+	fi
+
+	if parse_bool -q "$sqthread_poll"; then
+		create_task="
+$create_task
+sqthread_poll=1
+"
+		[ -n "$sqthread_poll_cpu" ] && create_task="
+$create_task
+sqthread_poll_cpu=$sqthread_poll_cpu
+"
+	fi
+
+	if parse_bool -q "$fixedbufs"; then
+		create_task="
+$create_task
+fixedbufs
+"
+	fi
+
+	if parse_bool -q "$registerfiles"; then
+		create_task="
+$create_task
+registerfiles
+"
+	fi
 fi
 
 [ -n "$rwmixread" ] && rwmixread_setup="rwmixread=$rwmixread"
