@@ -6,7 +6,10 @@ class Exception
   end
 
   def formatted_body
-    backtrace[1..].map { |m| "\tfrom #{m}" }
+    # a literal tab here (instead of leading spaces) makes libyaml refuse to
+    # emit call_stack as a readable literal block scalar, forcing an
+    # escaped/quoted one-liner instead
+    backtrace[1..].map { |m| "  from #{m}" }
   end
 
   def call_stack
