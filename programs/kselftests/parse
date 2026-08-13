@@ -416,7 +416,7 @@ end
 class DmaStater < Stater
   def stat(line)
     case line
-    when /^# average (map|unmap) latency\(us\):(.*) standard deviation:(.*)/
+    when /^# average (map|unmap) latency\(us\):(\d+\.\d+) standard deviation:(\d+\.\d+)/
       # average unmap latency(us):0.6 standard deviation:1.1
       # average map latency(us):0.8 standard deviation:1.2
       stats.add test_name(test_prefix, "average_#{$1}_latency"), $2.to_f
