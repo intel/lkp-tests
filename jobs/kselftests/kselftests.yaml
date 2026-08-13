@@ -137,13 +137,6 @@ kselftests:
 ---
 kselftests:
   group:
-    - resctrl
-
-kernel_cmdline: "rdt=cmt,mbmtotal,mbmlocal,l3cat,l3cdp,l2cat,l2cdp,mba,smba,bmec"
-
----
-kselftests:
-  group:
     - pstore
 
 # never register ERST as pstore backend

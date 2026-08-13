@@ -44,3 +44,16 @@ kselftests:
     - filesystems
   test:
     - file_stressor
+
+---
+# resctrl's MBM/MBA/CAT/CMT cases measure real cache-occupancy and
+# memory-bandwidth numbers (see the ResctrlStater in the kselftests
+# parse script), not just pass/fail, so it belongs here rather than in
+# kselftests.yaml's functional set. "make run_tests" for this group
+# always runs the same fixed set of tests regardless of category, so
+# keeping it in both files would just run the identical binary twice.
+kselftests:
+  group:
+    - resctrl
+
+kernel_cmdline: "rdt=cmt,mbmtotal,mbmlocal,l3cat,l3cdp,l2cat,l2cdp,mba,smba,bmec"
