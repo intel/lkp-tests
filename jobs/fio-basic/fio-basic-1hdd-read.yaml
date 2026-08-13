@@ -1,0 +1,29 @@
+suite: fio-basic
+testcase: fio-basic
+category: benchmark
+
+runtime: 300s
+
+disk: 1HDD
+fs:
+  - btrfs
+  - ext4
+  - xfs
+
+nr_task:
+  - 1
+  - 100%
+
+test_size: 128G
+
+fio-setup-basic:
+  rw:
+    - randread
+    - read
+  bs: 4k
+  ioengine:
+    - io_uring
+    - libaio
+    - sync
+
+fio:

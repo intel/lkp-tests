@@ -11,7 +11,10 @@ test_size: 1024M
 fio-setup-basic:
   rw: read
   bs: 128k
-  ioengine: libaio
+  ioengine:
+    - io_uring
+    - libaio
+    - sync
   direct: 1
   buffered: 0
   invalidate: 1

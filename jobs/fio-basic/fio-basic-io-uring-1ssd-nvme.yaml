@@ -1,0 +1,87 @@
+suite: fio-basic
+testcase: fio-basic
+category: benchmark
+
+disk: 1SSD
+fs:
+  - ext4
+  - xfs
+
+runtime: 300s
+nr_task: 8
+
+# The other fio-basic-1ssd-nvme-*.yaml jobs only ever use io_uring as a
+# drop-in replacement for libaio/sync with default settings, so they never
+# exercise the completion/submission modes that differentiate io_uring
+# from the older AIO engines. This job sweeps those modes individually
+# (sqthread_poll, fixedbufs, registerfiles, hipri) and combined, so a
+# regression specific to one of them isn't masked by the others still
+# working.
+fio-setup-basic:
+  rw:
+    - randread
+    - randwrite
+  bs: 4k
+  ioengine: io_uring
+  iodepth: 128
+  test_size: 176G
+
+fio:
+
+---
+fio-setup-basic:
+  rw:
+    - randread
+    - randwrite
+  bs: 4k
+  ioengine: io_uring
+  iodepth: 128
+  test_size: 176G
+  hipri: 1
+
+---
+fio-setup-basic:
+  rw:
+    - randread
+    - randwrite
+  bs: 4k
+  ioengine: io_uring
+  iodepth: 128
+  test_size: 176G
+  sqthread_poll: 1
+
+---
+fio-setup-basic:
+  rw:
+    - randread
+    - randwrite
+  bs: 4k
+  ioengine: io_uring
+  iodepth: 128
+  test_size: 176G
+  fixedbufs: 1
+
+---
+fio-setup-basic:
+  rw:
+    - randread
+    - randwrite
+  bs: 4k
+  ioengine: io_uring
+  iodepth: 128
+  test_size: 176G
+  registerfiles: 1
+
+---
+fio-setup-basic:
+  rw:
+    - randread
+    - randwrite
+  bs: 4k
+  ioengine: io_uring
+  iodepth: 128
+  test_size: 176G
+  hipri: 1
+  sqthread_poll: 1
+  fixedbufs: 1
+  registerfiles: 1
