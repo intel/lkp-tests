@@ -1,0 +1,5 @@
+mm.test_vmalloc.sh.stress.pass: 1
+mm.test_vmalloc.sh.stress.worker0.fix_size_alloc_test.usec_per_loop: 27875396
+mm.test_vmalloc.sh.stress.worker0.fix_size_alloc_test.pass: 1
+mm.test_vmalloc.sh.stress.worker0.align_shift_alloc_test.fail: 1
+mm.test_vmalloc.sh.stress.worker0.no_block_alloc_test.fail: 1

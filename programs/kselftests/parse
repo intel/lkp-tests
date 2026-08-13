@@ -548,19 +548,26 @@ class VmallocStater < Stater
     case line
     when /(Check the kernel ring buffer to see the summary|Check the kernel message buffer to see the summary)/
       stats.add @test_dir, 'pass'
-    when /Summary: (.+) passed: (.+) failed: (.+) repeat: (.+) loops: (.+) avg: (.+) usec/
+    when /Summary: (\S+) passed: (\d+) failed: (\d+)(?: xfailed: (\d+))? repeat: \d+ loops: \d+ avg: (\d+) usec/
       # vmalloc test stat: (stress test worker number = nr_threads)
       # [  223.093027] Summary: fix_size_alloc_test passed: 1 failed: 0 repeat: 1 loops: 1000000 avg: 5861476 usec
       # [  223.176299] Summary: kvfree_rcu_1_arg_vmalloc_test passed: 1 failed: 0 repeat: 1 loops: 1000000 avg: 6248522 usec
       # [  223.187358] Summary: kvfree_rcu_2_arg_vmalloc_test passed: 1 failed: 0 repeat: 1 loops: 1000000 avg: 6333619 usec
       # [  223.198414] All test took worker0=441656368064 cycles
+      #
+      # newer kernels add an xfailed count between failed and repeat, e.g.:
+      # Summary: align_shift_alloc_test passed: 0 failed: 0 xfailed: 1 repeat: 1 loops: 1000000 avg: 444556 usec
+      test_name = $1
+      failed = $3.to_i
+      xfailed = $4.to_i
+      avg = $5.to_i
       result = 'fail'
-      if $3.to_i.zero?
-        @tmp_stats["#{$1}.usec_per_loop"] = $6.to_i
+      if failed.zero? && xfailed.zero?
+        @tmp_stats["#{test_name}.usec_per_loop"] = avg
         result = 'pass'
       end
 
-      @tmp_stats[$1] = result
+      @tmp_stats[test_name] = result
     when /All test took (.+)=(.+) cycles/
       raise "unexpected summary: #{@test_dir}: #{line}" if @tmp_stats.empty?
 

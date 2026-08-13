@@ -1,0 +1,10 @@
+2024-06-01 10:00:00 mm/test_vmalloc.sh stress
+Run stability tests. In order to stress vmalloc subsystem all
+available test cases are run by NUM_CPUS workers simultaneously.
+It will take time, so be patient.
+Done.
+Check the kernel ring buffer to see the summary.
+[  100.000000] Summary: fix_size_alloc_test passed: 1 failed: 0 repeat: 1 loops: 1000000 avg: 27875396 usec
+[  100.010000] Summary: align_shift_alloc_test passed: 0 failed: 0 xfailed: 1 repeat: 1 loops: 1000000 avg: 444556 usec
+[  100.020000] Summary: no_block_alloc_test passed: 0 failed: 1 xfailed: 0 repeat: 1 loops: 1000000 avg: 123456 usec
+[  100.030000] All test took worker0=1639371298015 cycles
