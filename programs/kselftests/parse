@@ -580,6 +580,39 @@ class SyncStater < Stater
   end
 end
 
+class ResctrlStater < Stater
+  # # avg_diff_per: 0%
+  # # avg_bw_imc: 11674
+  # # avg_bw_resc: 11597
+  # # Percent diff=116
+  # # Number of bits: 6
+  # # Average LLC val: 212775
+  # # Cache span (lines): 98304
+  # # Span (MB): 250
+  METRIC_PATTERN = /^# (avg_diff_per|avg_bw_imc|avg_bw_resc|Percent diff|Number of bits|Average LLC val|Cache span \(\w+\)|Span \(\w+\))[:=]\s*(-?\d+)%?\s*$/
+
+  def initialize(*args)
+    super
+
+    @metrics = {}
+  end
+
+  def stat(line)
+    @metrics[$1] = $2.to_i if line =~ METRIC_PATTERN
+
+    super
+  end
+
+  private
+
+  def add_test_result(m, test_name)
+    super
+
+    @metrics.each { |label, value| stats.add "#{test_name}.#{label}", value }
+    @metrics = {}
+  end
+end
+
 stats = LKP::Stats.new
 
 while (line = $stdin.gets)

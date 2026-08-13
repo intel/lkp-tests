@@ -1,4 +1,15 @@
 resctrl.make.pass: 1
 resctrl.MBM_bw_change.pass: 1
+resctrl.MBM_bw_change.avg_diff_per: 0
+resctrl.MBM_bw_change.Span_MB: 250
+resctrl.MBM_bw_change.avg_bw_imc: 11674
+resctrl.MBM_bw_change.avg_bw_resc: 11597
 resctrl.MBA_schemata_change.pass: 1
+resctrl.MBA_schemata_change.avg_diff_per: 2
+resctrl.MBA_schemata_change.avg_bw_imc: 850
+resctrl.MBA_schemata_change.avg_bw_resc: 827
 resctrl.CAT_test.fail: 1
+resctrl.CAT_test.Percent_diff: 116
+resctrl.CAT_test.Number_of_bits: 6
+resctrl.CAT_test.Average_LLC_val: 212775
+resctrl.CAT_test.Cache_span_lines: 98304
