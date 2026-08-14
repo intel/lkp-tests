@@ -16,15 +16,15 @@ module LKP
       @klass_2_path ||= {}
     end
 
-    def generate_klass(file_path, klass_name = nil)
+    def generate_klass(file_path, klass_name = nil, **new_args)
       klass_name ||= File.basename(file_path).underscore.camelize
       return if klass_2_path.key?(klass_name)
 
       klass = Class.new(self) do
         include Singleton
 
-        def initialize
-          super(self.class.superclass.klass_2_path[self.class.name])
+        define_method(:initialize) do
+          super(self.class.superclass.klass_2_path[self.class.name], **new_args)
         end
       end
 
@@ -34,11 +34,21 @@ module LKP
     end
   end
 
+  # Combines each non-empty, non-comment line of file into one regex,
+  # substring-matched against content by default. anchor: controls where
+  # that match is required to land:
+  # - :none (default): anywhere in content, e.g. etc/stat-denylist
+  # - :start: start of content, e.g. etc/failure's "dmesg.*" matching
+  #   "dmesg.INFO:..." but not "notdmesg.foo"
+  # - :full: the entire content, e.g. etc/add-max-latency's
+  #   "numa-meminfo.node[0-9].AnonPages" matching that stat exactly but
+  #   not "numa-meminfo.node0.AnonPagesExtra"
   class Pattern
     attr_reader :file
 
-    def initialize(file)
+    def initialize(file, anchor: :none)
       @file = file
+      @anchor = anchor
     end
 
     def contain?(content)
@@ -51,7 +61,10 @@ module LKP
       return @regexp if @regexp
       return unless File.size?(file)
 
-      @regexp = Regexp.new "(#{patterns.join('|')})"
+      combined = "(#{patterns.join('|')})"
+      combined = "^#{combined}" if @anchor == :start || @anchor == :full
+      combined = "#{combined}$" if @anchor == :full
+      @regexp = Regexp.new combined
     end
 
     def patterns
@@ -71,37 +84,6 @@ module LKP
             .reject(&:empty?)
             .reject { |line| line.start_with?('#') }
       end
-    end
-  end
-
-  # Like Pattern, but each line is anchored to the start of content, e.g.
-  # etc/failure's "dmesg.*" matching "dmesg.INFO:..." but not "notdmesg.foo".
-  class StartAnchoredPattern < Pattern
-    def regexp
-      return @regexp if @regexp
-      return unless File.size?(file)
-
-      @regexp = Regexp.new "^(#{patterns.join('|')})"
-    end
-
-    class << self
-      include KlassGenerator
-    end
-  end
-
-  # Like StartAnchoredPattern, but each line must match content fully, e.g.
-  # etc/add-max-latency's "numa-meminfo.node[0-9].AnonPages" matching that
-  # stat exactly but not "numa-meminfo.node0.AnonPagesExtra".
-  class FullyAnchoredPattern < Pattern
-    def regexp
-      return @regexp if @regexp
-      return unless File.size?(file)
-
-      @regexp = Regexp.new "^(#{patterns.join('|')})$"
-    end
-
-    class << self
-      include KlassGenerator
     end
   end
 
@@ -212,11 +194,11 @@ module LKP
 
   # generate LKP::Failure, LKP::Pass
   %w[failure pass].each do |file_name|
-    LKP::StartAnchoredPattern.generate_klass(LKP::Path.src('etc', file_name))
+    LKP::Pattern.generate_klass(LKP::Path.src('etc', file_name), anchor: :start)
   end
 
   # generate LKP::AddMaxLatency
-  LKP::FullyAnchoredPattern.generate_klass(LKP::Path.src('etc', 'add-max-latency'))
+  LKP::Pattern.generate_klass(LKP::Path.src('etc', 'add-max-latency'), anchor: :full)
 
   # generate LKP::HistorySummary, LKP::PatchApply, LKP::ScheduleGcovTest
   {
@@ -244,7 +226,7 @@ module LKP
 
   # generate LKP::LinuxPerfTestCases, LKP::LinuxTestCases, LKP::OtherTestCases
   %w[linux-perf-test-cases linux-test-cases other-test-cases].each do |file_name|
-    LKP::FullyAnchoredPattern.generate_klass(LKP::Path.src('etc', file_name))
+    LKP::Pattern.generate_klass(LKP::Path.src('etc', file_name), anchor: :full)
   end
 
   # generate LKP::PerfMetricsPrefixes

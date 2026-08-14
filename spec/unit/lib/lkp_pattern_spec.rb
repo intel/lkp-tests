@@ -58,6 +58,69 @@ describe LKP::PatternValues do
   end
 end
 
+describe LKP::Pattern do
+  around do |example|
+    Dir.mktmpdir do |dir|
+      @file = File.join(dir, 'patterns')
+      File.write(@file, <<~PATTERNS)
+        cpuidle\\.
+        # a comment line, not a pattern
+        time\\.user_time
+      PATTERNS
+
+      example.run
+    end
+  end
+
+  describe 'anchor: :none (default)' do
+    let(:pattern) { described_class.new(@file) }
+
+    it 'matches content containing a pattern anywhere' do
+      expect(pattern.contain?('xcpuidle.C1')).to be true
+    end
+
+    it 'ignores comment lines' do
+      expect(pattern.contain?('# a comment line, not a pattern')).to be false
+    end
+
+    it 'returns false for unrelated content' do
+      expect(pattern.contain?('unrelated.stat')).to be false
+    end
+  end
+
+  describe 'anchor: :start' do
+    let(:pattern) { described_class.new(@file, anchor: :start) }
+
+    it 'matches a name that starts with one of the patterns' do
+      expect(pattern.contain?('cpuidle.C1')).to be true
+    end
+
+    it 'matches a pattern with no trailing separator as a start match' do
+      expect(pattern.contain?('time.user_time')).to be true
+    end
+
+    it 'returns false for a name that only contains a pattern as a substring' do
+      expect(pattern.contain?('xcpuidle.C1')).to be false
+    end
+
+    it 'returns false for an unrelated name' do
+      expect(pattern.contain?('unrelated.stat')).to be false
+    end
+  end
+
+  describe 'anchor: :full' do
+    let(:pattern) { described_class.new(@file, anchor: :full) }
+
+    it 'matches content that fully equals a pattern' do
+      expect(pattern.contain?('time.user_time')).to be true
+    end
+
+    it 'returns false when content only starts with a pattern' do
+      expect(pattern.contain?('time.user_time_extra')).to be false
+    end
+  end
+end
+
 describe LKP::Prefixes do
   around do |example|
     Dir.mktmpdir do |dir|
