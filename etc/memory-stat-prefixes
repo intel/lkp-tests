@@ -1,7 +1,7 @@
-boot-meminfo.
-boot-memory.
-meminfo.
-memmap.
-numa-meminfo.
-numa-vmstat.
-proc-vmstat.
+boot-meminfo\.
+boot-memory\.
+meminfo\.
+memmap\.
+numa-meminfo\.
+numa-vmstat\.
+proc-vmstat\.

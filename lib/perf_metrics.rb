@@ -16,14 +16,15 @@ module LKP
     include Singleton
 
     def initialize
-      prefixes = LKP::PerfMetricsPrefixes.instance.prefixes
+      prefix_patterns = LKP::PerfMetricsPrefixes.instance.patterns
 
       additional_prefixes = LKP::Programs.test_prefixes.reject do |test|
         test_name = test[0..-2]
         functional_test?(test_name) || other_test?(test_name) || %w(kmsg dmesg stderr last_state).include?(test_name)
       end
 
-      @prefixes = prefixes + additional_prefixes
+      patterns = prefix_patterns + additional_prefixes.map { |prefix| Regexp.escape(prefix) }
+      @regexp = Regexp.new "^(#{patterns.join('|')})"
     end
 
     def contain?(name)
@@ -31,7 +32,7 @@ module LKP
 
       return @cache[name] if @cache.key? name
 
-      @cache[name] = LKP::PerfMetricsPatterns.instance.contain?(name) || @prefixes.any? { |prefix| name.start_with?(prefix) }
+      @cache[name] = LKP::PerfMetricsPatterns.instance.contain?(name) || @regexp.match?(name)
     end
   end
 end

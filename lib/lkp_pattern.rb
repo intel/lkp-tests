@@ -131,37 +131,6 @@ module LKP
     end
   end
 
-  # Caches a newline-separated file of literal prefixes, e.g. "cpuidle." in
-  # etc/event-counter-prefixes - unlike Pattern, whose lines are combined
-  # into one regex and substring-matched, each line here is checked as a
-  # literal String#start_with? prefix.
-  class Prefixes
-    attr_reader :file
-
-    def initialize(file)
-      @file = file
-    end
-
-    def contain?(content)
-      prefixes.any? { |prefix| content.start_with?(prefix) }
-    end
-
-    def prefixes
-      @prefixes ||= self.class.lines(file)
-    end
-
-    class << self
-      include KlassGenerator
-
-      def lines(file)
-        File.readlines(file)
-            .map(&:chomp)
-            .reject(&:empty?)
-            .reject { |line| line.start_with?('#') }
-      end
-    end
-  end
-
   class KeysPatterns
     def initialize(file)
       @keys_patterns = YAML.load_file file
@@ -189,7 +158,7 @@ module LKP
 
   # generate class like LKP::EventCounterPrefixes
   %w[event-counter-prefixes independent-counter-prefixes ignore-part-prefixes].each do |file_name|
-    LKP::Prefixes.generate_klass(LKP::Path.src('etc', file_name))
+    LKP::Pattern.generate_klass(LKP::Path.src('etc', file_name), anchor: :start)
   end
 
   # generate LKP::Failure, LKP::Pass
@@ -210,7 +179,7 @@ module LKP
   end
 
   # generate LKP::MemoryStatPrefixes
-  LKP::Prefixes.generate_klass(LKP::Path.src('etc', 'memory-stat-prefixes'))
+  LKP::Pattern.generate_klass(LKP::Path.src('etc', 'memory-stat-prefixes'), anchor: :start)
 
   # generate LKP::PerfMetricsThreshold, LKP::IndexPerfAll, LKP::IndexLatencyAll, LKP::IndexPower, LKP::IndexSize, LKP::IndexLatency
   {
@@ -230,5 +199,5 @@ module LKP
   end
 
   # generate LKP::PerfMetricsPrefixes
-  LKP::Prefixes.generate_klass(LKP::Path.src('etc', 'perf-metrics-prefixes'))
+  LKP::Pattern.generate_klass(LKP::Path.src('etc', 'perf-metrics-prefixes'), anchor: :start)
 end
