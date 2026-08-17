@@ -5,6 +5,8 @@
 # - nr_task
 # - no_affinity
 # - smt
+# - numactl
+# - numa_node
 
 . $LKP_SRC/lib/debug.sh
 . $LKP_SRC/lib/env.sh
@@ -47,7 +49,16 @@ fi
 
 [[ -n "$no_affinity" ]] || no_affinity=0
 
+# Confine both the tasks' memory to $numa_node, so that the results are
+# not perturbed by remote memory accesses.
+numactl_prefix=
+if [[ "$numactl" = true ]]; then
+	has_cmd numactl || die "numactl is not found in $PATH"
+	[[ -n "$numa_node" ]] || numa_node=0
+	numactl_prefix="numactl --membind=$numa_node --"
+fi
+
 ulimit -n 65536
 
 has_cmd python3 || die "python3 is not found in $PATH"
-log_cmd python3 ./runtest.py $test $duration $mode $no_affinity $smt $threads_to_iterate
+log_cmd $numactl_prefix python3 ./runtest.py $test $duration $mode $no_affinity $smt $threads_to_iterate

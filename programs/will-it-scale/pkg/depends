@@ -1,3 +1,4 @@
 libhwloc5
 linux-perf
+numactl
 python-minimal
