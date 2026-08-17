@@ -19,6 +19,10 @@ description: |
   warmup period before which an average is taken. The averaging period can be
   changed with the -s option, which by default is 5 seconds.
 
+  numactl is a boolean parameter, if true, confine the tasks and their memory to
+  a single node (numa_node, 0 by default) so that the results are not perturbed
+  by remote memory accesses. Default to false.
+
 homepage: https://github.com/antonblanchard/will-it-scale
 
 parameters:
@@ -27,6 +31,8 @@ parameters:
   mode: [process, thread, both]
   nr_task:
   smt: [0, 1]
+  numactl:
+  numa_node:
 
 results:
   will-it-scale.scalability:
