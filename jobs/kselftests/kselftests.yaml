@@ -69,7 +69,6 @@ kselftests:
     - nci
     # - nolibc # not enabled yet
     # - ntb
-    - openat2
     - perf_events
     - pid_namespace
     - pidfd
