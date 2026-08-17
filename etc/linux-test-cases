@@ -5,7 +5,7 @@ boot
 cat
 cgroup2-test
 cpu-hotplug
-ext4-frag
+ext4-frags
 ftq
 ftrace-onoff
 fwq
@@ -36,12 +36,14 @@ nvml
 ocfs2test
 otc-ddt
 packetdrill
+perf-fuzzer
 perf-sanity-tests
 perf-stat-tests
 perf-test
 piglit
 pm-qa
 qa
+qat
 qemu
 rcuscale
 rcutorture

@@ -33,6 +33,7 @@ jsbenchmark
 kbuild
 kernbench
 ku-latency
+lc0_lkp
 lib-micro
 linkbench
 linpack
@@ -48,6 +49,7 @@ mytest
 nepim
 netperf
 netpipe
+nfsiozone
 nuttcp
 octane
 oltp
@@ -55,8 +57,11 @@ openarena
 openssl-speed
 pbzip2
 perf-bench-futex
+perf-bench-mem
 perf-bench-numa-mem
+perf-bench-sched-messaging
 perf-bench-sched-pipe
+perf-bench-syscall
 perf-event-tests
 pft
 pgbench

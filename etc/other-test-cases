@@ -3,9 +3,11 @@ btest
 bust-shm-exit
 convert-lkpdoc-to-html
 convert-lkpdoc-to-html-css
+debootstrap
 debug
 deploy-clang
 dpdk-dts
+generate-md
 health-stats
 hwinfo
 ipmi-setup
@@ -13,11 +15,14 @@ kmemleak-test
 kunit
 lkp-install-run
 lkp-qemu
+lkp-serial-server
 lkp-services
 lkp-src
 makepkg
 makepkg-deps
+mbtest
 pack
 pack-deps
+pmeter-server
 rsync-rootfs
 upgrade-trinity
