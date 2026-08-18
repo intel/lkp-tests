@@ -346,7 +346,7 @@ need_kconfig:
 - DIBS: y
 - DIBS_LO: y
 
-% elsif ___.group == "drivers"
+% elsif ___.group =~ /^drivers/
 # drivers/net
 - DEBUG_INFO_BTF: y, x86_64
 - DEBUG_INFO_BTF_MODULES: n

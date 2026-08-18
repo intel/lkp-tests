@@ -504,8 +504,21 @@ fixup_kvm()
 prepare_for_selftest_mfs()
 {
 	# kvm Makefile doesn't include lib.mk
-	if [[ "$group" =~ ^net || "$group" = kvm ]]; then
+	# drivers/net has its own subdirectories (bonding, team, ...) that are
+	# separate job groups, so it must stay non-recursive like net/* or
+	# those subdirectories' tests would run twice.
+	if [[ "$group" =~ ^net || "$group" = kvm || "$group" = "drivers/net" ]]; then
 		selftest_mfs=$(ls -d $group/Makefile)
+	elif [[ "$group" = drivers ]]; then
+		# drivers/net, drivers/net/bonding, drivers/net/hw, and
+		# drivers/net/netdevsim run long enough to have their own job
+		# group; skip them here so they aren't run a second time.
+		selftest_mfs=$(find $group -name Makefile \
+			-not -path 'drivers/net/Makefile' \
+			-not -path 'drivers/net/bonding/Makefile' \
+			-not -path 'drivers/net/hw/Makefile' \
+			-not -path 'drivers/net/netdevsim/Makefile')
+		selftest_mfs=$(echo "$selftest_mfs" | xargs -P"$(nproc)" -r grep -l '/lib.mk')
 	else
 		selftest_mfs=$(find $group -name Makefile)
 		# assume the Makefile is a valid make TARGETS if including lib.mk
