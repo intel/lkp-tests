@@ -1,1 +1,3 @@
 url: https://github.com/CirrusLogic/linux-drivers
+owner: Fred Treven <fred.treven@cirrus.com>
+branch_denylist: v6.12-cs40l26
