@@ -1,3 +1,5 @@
+#!/bin/sh
+
 . $LKP_SRC/lib/upload.sh
 
 mount_cgroup()
@@ -9,14 +11,13 @@ mount_cgroup()
 		return 1
 	}
 
-	awk 'NR > 1 {print "\\s\\+" $1 "\\."}' /proc/cgroups > $TMP/availble-cgroup_subsys
-	[ -f "$job" ] && cgroup_subsys=$(grep -o -f $TMP/availble-cgroup_subsys $job| sort | uniq)
+	awk 'NR > 1 {print "\\s\\+" $1 "\\."}' /proc/cgroups >$TMP/availble-cgroup_subsys
+	[ -f "$job" ] && cgroup_subsys=$(grep -o -f $TMP/availble-cgroup_subsys $job | sort | uniq)
 	[ -n "$cgroup_subsys" ] || return
 	cgroup_subsys=$(echo $cgroup_subsys | sed -e 's/\. / /g' -e 's/\.$/ /')
 	log_cmd mkdir -p $CGROUP_MNT
 	#Bind each subsystem to an individual hierachy
-	for item in $cgroup_subsys
-	do
+	for item in $cgroup_subsys; do
 		log_cmd mkdir -p $CGROUP_MNT/$item
 		log_cmd mount -t cgroup -o $item $item $CGROUP_MNT/$item
 	done
@@ -53,8 +54,8 @@ setup_result_service()
 	[ -n "$NO_NETWORK" ] && return 1
 
 	supports_raw_upload && result_service=raw_upload && return
-	supports_netfs 'nfs'	&& result_service=$LKP_SERVER:/result	&& return
-	supports_netfs 'cifs'	&& result_service=//$LKP_SERVER/result	&& return
+	supports_netfs 'nfs' && result_service=$LKP_SERVER:/result && return
+	supports_netfs 'cifs' && result_service=//$LKP_SERVER/result && return
 
 	return 1
 }
@@ -65,54 +66,53 @@ mount_result_root()
 	is_mount_point $RESULT_MNT && return 0
 
 	case $result_service in
-		tmpfs)
-			result_fs=tmpfs
-			mount -t tmpfs result $RESULT_MNT || return
-			# result_service=tmpfs, RESULT_MNT=/10.239.97.5/result, RESULT_ROOT=/10.239.97.5/result/boot/1/lkp-hsw-d02/debian-x86_64-20180403.cgz/x86_64-rhel-7.6/gcc-7/1c163f4c7b3f621efff9b28a47abb36f7378d783/16
-			mkdir -p $RESULT_ROOT
-			;;
-		raw_upload)
-			# it means previous RESULT_ROOT is not a mount point, even
-			# it may does not exist, but the later code will try to access $RESULT_ROOT.
-			# To avoid the access problem, make it be same with TMP_RESLT_ROOT.
-			export RESULT_ROOT=$TMP_RESULT_ROOT
-			export result_fs=raw_upload # so that post-run can read it
-			return
-			;;
-		*:*)
-			local repeat=10
-			result_fs=nfs
-			for i in $(seq $repeat)
-			do
-				echo "mount.nfs: try $i time... mount.nfs -o vers=3 $result_service $RESULT_MNT"
-				mount.nfs -o vers=3 $result_service $RESULT_MNT && return
-				sleep 3
-			done
-			echo "mount nfs for $result_service failed"
-			return 1
-			;;
-		//*/*)
-			result_fs=cifs
-			modprobe cifs 2>/dev/null
-			local cifs_mount_option='-o guest'
-			[ -n "$LKP_CIFS_PORT" ] && cifs_mount_option="$cifs_mount_option,port=$LKP_CIFS_PORT"
-			mount.cifs $cifs_mount_option $result_service $RESULT_MNT || return
-			;;
-		9p/*)
-			result_fs=virtfs
-			mkdir -p -m 02775 $RESULT_ROOT
-			export RESULT_MNT=$RESULT_ROOT
-			export TMP_RESULT_ROOT=$RESULT_ROOT
-			mkdir -p $TMP
-			echo "mount -t 9p -o trans=virtio $result_service $RESULT_MNT -oversion=9p2000.L,posixacl,cache=loose"
-			mount -t 9p -o trans=virtio $result_service $RESULT_MNT -oversion=9p2000.L,posixacl,cache=loose
-			# for embedded rootfs(yocto) which cannot support 9p filesystem when use lkp-qemu
-			[ $? -ne 0 ] && [ "$LKP_LOCAL_RUN" = "1" ] && return 0
-			;;
-		*)
-			echo "unknown result_service $result_service" >&2
-			return 1
-			;;
+	tmpfs)
+		result_fs=tmpfs
+		mount -t tmpfs result $RESULT_MNT || return
+		# result_service=tmpfs, RESULT_MNT=/10.239.97.5/result, RESULT_ROOT=/10.239.97.5/result/boot/1/lkp-hsw-d02/debian-x86_64-20180403.cgz/x86_64-rhel-7.6/gcc-7/1c163f4c7b3f621efff9b28a47abb36f7378d783/16
+		mkdir -p $RESULT_ROOT
+		;;
+	raw_upload)
+		# it means previous RESULT_ROOT is not a mount point, even
+		# it may does not exist, but the later code will try to access $RESULT_ROOT.
+		# To avoid the access problem, make it be same with TMP_RESLT_ROOT.
+		export RESULT_ROOT=$TMP_RESULT_ROOT
+		export result_fs=raw_upload # so that post-run can read it
+		return
+		;;
+	*:*)
+		local repeat=10
+		result_fs=nfs
+		for i in $(seq $repeat); do
+			echo "mount.nfs: try $i time... mount.nfs -o vers=3 $result_service $RESULT_MNT"
+			mount.nfs -o vers=3 $result_service $RESULT_MNT && return
+			sleep 3
+		done
+		echo "mount nfs for $result_service failed"
+		return 1
+		;;
+	//*/*)
+		result_fs=cifs
+		modprobe cifs 2>/dev/null
+		local cifs_mount_option='-o guest'
+		[ -n "$LKP_CIFS_PORT" ] && cifs_mount_option="$cifs_mount_option,port=$LKP_CIFS_PORT"
+		mount.cifs $cifs_mount_option $result_service $RESULT_MNT || return
+		;;
+	9p/*)
+		result_fs=virtfs
+		mkdir -p "$RESULT_ROOT" && chmod 02775 "$RESULT_ROOT"
+		export RESULT_MNT=$RESULT_ROOT
+		export TMP_RESULT_ROOT=$RESULT_ROOT
+		mkdir -p $TMP
+		echo "mount -t 9p -o trans=virtio $result_service $RESULT_MNT -oversion=9p2000.L,posixacl,cache=loose"
+		mount -t 9p -o trans=virtio $result_service $RESULT_MNT -oversion=9p2000.L,posixacl,cache=loose
+		# for embedded rootfs(yocto) which cannot support 9p filesystem when use lkp-qemu
+		[ $? -ne 0 ] && [ "$LKP_LOCAL_RUN" = "1" ] && return 0
+		;;
+	*)
+		echo "unknown result_service $result_service" >&2
+		return 1
+		;;
 	esac
 
 	is_mount_point "$RESULT_MNT"
@@ -155,8 +155,8 @@ setup_result_root()
 
 	# check emptiness except for files: dmesg pre-dmesg
 	if [ "$result_fs" != "tmpfs" ]; then
-		ls $RESULT_ROOT | grep -v -q -F dmesg &&
-		echo "RESULT_ROOT not empty: $(ls -l $RESULT_ROOT)" >&2
+		find "$RESULT_ROOT" -mindepth 1 ! -name '*dmesg*' | grep -q . &&
+			echo "RESULT_ROOT not empty: $(ls -l "$RESULT_ROOT")" >&2
 	fi
 
 	return 0
@@ -171,8 +171,7 @@ wait_on_manual_check()
 		sleep $wait_debug_on_fail
 	}
 
-	for i in $(seq 600)
-	do
+	for i in $(seq 600); do
 		if [ -f $TMP/disturbed ]; then
 			:
 		elif ! has_cmd 'users'; then
@@ -190,11 +189,12 @@ wait_on_manual_check()
 clean_job_resource()
 {
 	test -f /tmp/pid-tail || return
-	kill $(cat /tmp/pid-tail)
+	kill "$(cat /tmp/pid-tail)"
 	rm /tmp/pid-tail
 }
 
-job_done() {
+job_done()
+{
 	$LKP_SRC/bin/event/wakeup job-finished
 	touch $TMP/job-finished
 	clean_job_resource
@@ -223,8 +223,8 @@ job_redirect_one()
 	local file=$1
 	shift
 
-	tail -n 0 -f $* > $file &
-	echo $! >> /tmp/pid-tail
+	tail -n 0 -f "$@" >$file &
+	echo $! >>/tmp/pid-tail
 }
 
 job_redirect_stdout_stderr()
