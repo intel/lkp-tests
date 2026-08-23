@@ -120,3 +120,29 @@ describe LKP::Pattern do
     end
   end
 end
+
+describe LKP::KlassGenerator do
+  describe '.fresh' do
+    around do |example|
+      Dir.mktmpdir do |dir|
+        @file = File.join(dir, 'weight.yaml')
+        File.write(@file, "dmesg.*(BUG|PANIC): 50\n")
+
+        example.run
+      end
+    end
+
+    it 'returns a plain, working instance built directly from the file' do
+      expect(LKP::PatternValues.fresh(@file).value('dmesg.BUG: kernel oops')).to eq 50
+    end
+
+    it 're-reads the file on every call, unlike generate_klass+.instance' do
+      first = LKP::PatternValues.fresh(@file)
+      File.write(@file, "dmesg.*(BUG|PANIC): 99\n")
+      second = LKP::PatternValues.fresh(@file)
+
+      expect(first.value('dmesg.BUG: kernel oops')).to eq 50
+      expect(second.value('dmesg.BUG: kernel oops')).to eq 99
+    end
+  end
+end

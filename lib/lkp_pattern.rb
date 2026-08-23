@@ -32,6 +32,19 @@ module LKP
 
       klass_2_path[klass.name] = file_path
     end
+
+    # Builds a plain instance straight from file_path, bypassing
+    # generate_klass/Singleton entirely -- every call re-reads file_path
+    # from disk. Use this instead of generate_klass+.instance for a file a
+    # long-running daemon should pick up on its very next check, without a
+    # restart (e.g. a denylist/allowlist a human edits mid-incident).
+    # Reserve it for files checked at most a few times per unit of work
+    # (once per patch/job); a hot per-stat loop should keep using
+    # generate_klass+.instance, since re-reading and re-parsing the file on
+    # every check would be a real cost there.
+    def fresh(file_path, **new_args)
+      new(file_path, **new_args)
+    end
   end
 
   # Combines each non-empty, non-comment line of file into one regex,
