@@ -10,7 +10,7 @@ RESULT_ROOT = ENV.fetch('RESULT_ROOT', nil)
 TIME_DELTA  = YAML.unsafe_load_file("#{RESULT_ROOT}/job.yaml")['time_delta'].to_f
 FMT_DIR     = "#{RESULT_ROOT}/trace_event/".freeze
 
-KEY_PREFIX_MAPPING = YAML.load_file(LKP::Path.src('etc', 'ftrace_key_prefix'))
+KEY_PREFIX_MAPPING = YAML.load_file(LKP::Path.etc('ftrace_key_prefix'))
 BDI_DEV_MAPPING = YAML.load_file("#{RESULT_ROOT}/bdi_dev_mapping") if File.exist? "#{RESULT_ROOT}/bdi_dev_mapping"
 
 # A hash to make sure we record one event data only

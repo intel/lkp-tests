@@ -318,7 +318,7 @@ class Job2sh < Job
     parse_hash [], job
     out_line
     out_line @stats_lines
-    parse_hash [], YAML.load_file(LKP::Path.src('etc', 'default_stats.yaml'))
+    parse_hash [], YAML.load_file(LKP::Path.etc('default_stats.yaml'))
     out_line '}'
     out_line
 

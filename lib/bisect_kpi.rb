@@ -13,8 +13,8 @@ module LKP
     attr_reader :patterns
 
     def initialize(options = {})
-      @patterns = load_yaml LKP::Path.src('etc', 'index-perf-all.yaml')
-      @patterns = @patterns.merge(load_yaml(LKP::Path.src('etc', 'index-latency-all.yaml')))
+      @patterns = load_yaml LKP::Path.etc('index-perf-all.yaml')
+      @patterns = @patterns.merge(load_yaml(LKP::Path.etc('index-latency-all.yaml')))
 
       @patterns = @patterns.reject { |k, _v| k =~ options[:deny_pattern] } if options[:deny_pattern]
       # pattern: "will-it-scale\\..+_ops", 1

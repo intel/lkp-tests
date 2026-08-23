@@ -8,7 +8,7 @@ require "#{LKP_SRC}/lib/string"
 
 error_ids = {}
 
-LKP_SRC_ETC ||= LKP::Path.src('etc')
+LKP_SRC_ETC ||= LKP::Path.etc
 
 @ignore_patterns = []
 Dir["#{LKP_SRC_ETC}/ignore-stderr/*"].each do |f|

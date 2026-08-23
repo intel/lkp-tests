@@ -37,7 +37,7 @@ class KernelTag
 
   class << self
     def kconfigs_yaml
-      LKP::Path.src('etc', 'kconfigs.yaml')
+      LKP::Path.etc('kconfigs.yaml')
     end
   end
 end

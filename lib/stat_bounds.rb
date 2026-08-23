@@ -26,7 +26,7 @@ class StatBounds
     end
 
     def range_for(monitor)
-      range_file = LKP::Path.src('etc', "valid-range-#{monitor}.yaml")
+      range_file = LKP::Path.etc("valid-range-#{monitor}.yaml")
       File.exist?(range_file) ? JSON.parse_cached(range_file) : nil
     end
     cache_method :range_for, cache_nil: true

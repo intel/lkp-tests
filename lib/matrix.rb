@@ -14,7 +14,7 @@ require "#{LKP_SRC}/lib/run_env"
 require "#{LKP_SRC}/lib/stats"
 require "#{LKP_SRC}/lib/yaml"
 
-LKP_SRC_ETC ||= LKP::Path.src('etc')
+LKP_SRC_ETC ||= LKP::Path.etc
 
 def event_counter?(name)
   LKP::EventCounterPrefixes.instance.contain?(name) || name =~ LKP::EventCounterPatterns.instance.regexp

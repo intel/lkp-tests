@@ -14,7 +14,7 @@ require "#{LKP_SRC}/lib/string"
 require "#{LKP_SRC}/lib/tests/stats"
 require "#{LKP_SRC}/lib/yaml"
 
-LKP_SRC_ETC ||= LKP::Path.src('etc')
+LKP_SRC_ETC ||= LKP::Path.etc
 
 # /c/linux% git grep '"[a-z][a-z_]\+%d"'|grep -o '"[a-z_]\+'|cut -c2-|sort -u
 LINUX_DEVICE_NAMES = File.read("#{LKP_SRC_ETC}/linux-device-names").split("\n")

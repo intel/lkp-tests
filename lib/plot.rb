@@ -11,7 +11,7 @@ PLOT_SIZE_X = 80
 PLOT_SIZE_Y = 20
 NR_PLOT = 1
 
-LKP_SRC_ETC ||= LKP::Path.src('etc')
+LKP_SRC_ETC ||= LKP::Path.etc
 
 module Gnuplot
   # fallback to v2.4.1 to avoid circular dependency and potential dead lock

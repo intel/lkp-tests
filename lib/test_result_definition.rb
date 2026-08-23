@@ -6,7 +6,7 @@ require "#{LKP_SRC}/lib/lkp_path"
 
 class TestResultDefinition
   def initialize(definitions = nil)
-    definitions ||= LKP::Path.src('etc', 'test-result-definition.yml')
+    definitions ||= LKP::Path.etc('test-result-definition.yml')
 
     # {"pass"=>{"*"=>"pass"}, "fail"=>{"*"=>"fail failed", "xfstests"=>"crash crashed warn"}, "skip"=>{"*"=>"skip block", "xfstests"=>"inconsistent_fs"}}
     @definitions = definitions.instance_of?(Hash) ? definitions : YAML.load_file(definitions)

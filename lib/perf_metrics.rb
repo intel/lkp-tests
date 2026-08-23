@@ -9,7 +9,7 @@ require "#{LKP_SRC}/lib/log"
 require "#{LKP_SRC}/lib/programs"
 require "#{LKP_SRC}/lib/yaml"
 
-LKP_SRC_ETC ||= LKP::Path.src('etc')
+LKP_SRC_ETC ||= LKP::Path.etc
 
 module LKP
   class PerfMetrics

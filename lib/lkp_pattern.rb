@@ -166,21 +166,21 @@ module LKP
 
   # generate class like LKP::StatDenylist
   %w[event-counter-patterns dmesg-kill-pattern report-allowlist stat-allowlist stat-denylist oops-pattern perf-metrics-patterns].each do |file_name|
-    LKP::Pattern.generate_klass(LKP::Path.src('etc', file_name))
+    LKP::Pattern.generate_klass(LKP::Path.etc(file_name))
   end
 
   # generate class like LKP::EventCounterPrefixes
   %w[event-counter-prefixes independent-counter-prefixes ignore-part-prefixes].each do |file_name|
-    LKP::Pattern.generate_klass(LKP::Path.src('etc', file_name), anchor: :start)
+    LKP::Pattern.generate_klass(LKP::Path.etc(file_name), anchor: :start)
   end
 
   # generate LKP::Failure, LKP::Pass
   %w[failure pass].each do |file_name|
-    LKP::Pattern.generate_klass(LKP::Path.src('etc', file_name), anchor: :start)
+    LKP::Pattern.generate_klass(LKP::Path.etc(file_name), anchor: :start)
   end
 
   # generate LKP::AddMaxLatency
-  LKP::Pattern.generate_klass(LKP::Path.src('etc', 'add-max-latency'), anchor: :full)
+  LKP::Pattern.generate_klass(LKP::Path.etc('add-max-latency'), anchor: :full)
 
   # generate LKP::HistorySummary, LKP::PatchApply, LKP::ScheduleGcovTest
   {
@@ -188,11 +188,11 @@ module LKP
     'patch-apply.yml' => 'PatchApply',
     'schedule-gcov-test.yml' => 'ScheduleGcovTest'
   }.each do |file_name, klass_name|
-    LKP::KeysPatterns.generate_klass(LKP::Path.src('etc', file_name), klass_name)
+    LKP::KeysPatterns.generate_klass(LKP::Path.etc(file_name), klass_name)
   end
 
   # generate LKP::MemoryStatPrefixes
-  LKP::Pattern.generate_klass(LKP::Path.src('etc', 'memory-stat-prefixes'), anchor: :start)
+  LKP::Pattern.generate_klass(LKP::Path.etc('memory-stat-prefixes'), anchor: :start)
 
   # generate LKP::PerfMetricsThreshold, LKP::IndexPerfAll, LKP::IndexLatencyAll, LKP::IndexPower, LKP::IndexSize, LKP::IndexLatency
   {
@@ -203,14 +203,14 @@ module LKP
     'index-size.yaml' => 'IndexSize',
     'index-latency.yaml' => 'IndexLatency'
   }.each do |file_name, klass_name|
-    LKP::PatternValues.generate_klass(LKP::Path.src('etc', file_name), klass_name)
+    LKP::PatternValues.generate_klass(LKP::Path.etc(file_name), klass_name)
   end
 
   # generate LKP::LinuxPerfTestCases, LKP::LinuxTestCases, LKP::OtherTestCases
   %w[linux-perf-test-cases linux-test-cases other-test-cases].each do |file_name|
-    LKP::Pattern.generate_klass(LKP::Path.src('etc', file_name), anchor: :full)
+    LKP::Pattern.generate_klass(LKP::Path.etc(file_name), anchor: :full)
   end
 
   # generate LKP::PerfMetricsPrefixes
-  LKP::Pattern.generate_klass(LKP::Path.src('etc', 'perf-metrics-prefixes'), anchor: :start)
+  LKP::Pattern.generate_klass(LKP::Path.etc('perf-metrics-prefixes'), anchor: :start)
 end
