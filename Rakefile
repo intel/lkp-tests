@@ -146,7 +146,12 @@ task :shellcheck do
     next
   end
 
-  executables = ENV['file'] || `#{scannable_executables_cmd} | xargs -P$(nproc) grep -s -l -e '^#!/.*bash$' -e '^#!/bin/sh$'`.split("\n").join(' ')
+  list_cmd =
+    if ENV['file']
+      "printf '%s\\n' #{ENV['file']}"
+    else
+      "#{scannable_executables_cmd} | xargs -P$(nproc) grep -s -l -e '^#!/.*bash$' -e '^#!/bin/sh$'"
+    end
 
   format = ENV['format'] || 'tty'
 
@@ -156,7 +161,10 @@ task :shellcheck do
   version = `shellcheck --version 2>&1`.match(/^version: (\S+)/)&.captures&.first || '?'
   puts "shellcheck (#{version}) start...".yellow
 
-  sh "#{base_cmd} #{executables}", verbose: false do |ok, res|
+  # Bound each shellcheck in batch size, time (300s) and address space (8G) so
+  # one pathological script can't exhaust memory and OOM the linting host.
+  sh %(#{list_cmd} | xargs -r -n 50 -P 1 sh -c 'ulimit -v 8388608; exec timeout 300 #{base_cmd} "$@"' _),
+     verbose: false do |ok, res|
     if ok
       puts "shellcheck (#{version}) OK".green
     else
