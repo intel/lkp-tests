@@ -26,6 +26,7 @@ upload_files_rsync()
 		rsync -a --no-owner --no-group \
 			--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r \
 			--min-size=1 \
+			--contimeout=60 --timeout=60 \
 			${target_directory%%/*} rsync://$LKP_SERVER$JOB_RESULT_ROOT/
 
 		local JOB_RESULT_ROOT=$JOB_RESULT_ROOT/$target_directory
@@ -34,9 +35,13 @@ upload_files_rsync()
 		rm -fr "$tmpdir"
 	}
 
+	# --contimeout/--timeout bound how long a stalled result-server
+	# connection can block: without them a hung daemon connection blocks
+	# this call (and the whole job) until max_uptime kills it.
 	rsync -a --no-owner --no-group \
 		--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r \
 		--min-size=1 \
+		--contimeout=60 --timeout=60 \
 		"$@" rsync://$LKP_SERVER$JOB_RESULT_ROOT/
 }
 
