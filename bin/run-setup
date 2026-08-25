@@ -1,5 +1,6 @@
 #!/bin/sh
 
+. $LKP_SRC/lib/debug.sh
 . $LKP_SRC/lib/reproduce-log.sh
 
 program=$1
@@ -10,4 +11,14 @@ program_path=$program_dir/$program
 
 shift
 
-[ -x "$program_path" ] && exec "$program_path" "$@"
+if [ -x "$program_path" ]; then
+	# an unresolvable shebang interpreter (e.g. bash missing from a
+	# minimal rootfs) would otherwise make exec fail with a bare,
+	# uncaught 127; die's exit 99 is already recognized by bin/run-stats'
+	# check_die(), which routes the result to bad.
+	interpreter=$(head -n 1 "$program_path" | sed -n 's/^#! *//p' | awk '{print $1}')
+	[ -n "$interpreter" ] && ! command -v "$interpreter" >/dev/null 2>&1 &&
+		die "run-setup: $program: interpreter $interpreter not found on this rootfs"
+
+	exec "$program_path" "$@"
+fi
