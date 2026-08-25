@@ -189,7 +189,17 @@ wait_on_manual_check()
 clean_job_resource()
 {
 	test -f /tmp/pid-tail || return
-	kill "$(cat /tmp/pid-tail)"
+
+	# job_redirect_stdout_stderr() appends one pid per job_redirect_one()
+	# call (3 calls -- stdout, stderr, output), so this file usually has
+	# multiple lines; killing the unsplit blob as one arg makes kill fail
+	# with e.g. "invalid number '391\n392\n393'" instead of killing any
+	# of them.
+	local pid
+	for pid in $(cat /tmp/pid-tail); do
+		kill "$pid"
+	done
+
 	rm /tmp/pid-tail
 }
 
