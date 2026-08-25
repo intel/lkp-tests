@@ -421,7 +421,8 @@ end
 
 def get_crash_stats(dmesg_file)
   if dmesg_file =~ /\.xz$/
-    Bash.run("xz -d -k #{dmesg_file}")
+    # -f: a stale uncompressed file may be left over from a previous run that died mid-way
+    Bash.run("xz -d -k -f #{dmesg_file}")
     uncompressed_dmesg = dmesg_file.remove(/\.xz$/)
     dmesg_file = uncompressed_dmesg
   end
@@ -452,9 +453,9 @@ def get_crash_stats(dmesg_file)
     oops_map[id] = line.split(': ')[1..].join(': ')
   end
 
-  FileUtils.rm uncompressed_dmesg if uncompressed_dmesg
-
   oops_map
+ensure
+  FileUtils.rm uncompressed_dmesg if uncompressed_dmesg
 end
 
 def get_content(dmesg_file)
