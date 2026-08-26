@@ -9,7 +9,7 @@ describe 'xfstests' do
       @benchmark_root = File.join(LKP_SRC, 'spec', 'fixtures', 'benchmark_root')
     end
 
-    def is_test_in_group(test, groups)
+    def test_in_group?(test, groups)
       groups = Array(groups).map { |group| "\"#{group}\"" }.join(' ')
 
       Bash.run <<EOF
@@ -47,7 +47,7 @@ EOF
       { test: 'xfs-realtime-scratch-rmapbt', groups: 'xfs-realtime.*' }
     ].each do |entry|
       it "#{entry[:test]} belongs to #{entry[:groups]}" do
-        expect(is_test_in_group(entry[:test], entry[:groups])).to eq('0')
+        expect(test_in_group?(entry[:test], entry[:groups])).to eq('0')
       end
     end
 
@@ -61,7 +61,7 @@ EOF
       { test: 'xfs-scratch-reflink', groups: 'xfs-scratch-reflink-scratch-rmapbt' }
     ].each do |entry|
       it "#{entry[:test]} not belongs to #{entry[:groups]}" do
-        expect(is_test_in_group(entry[:test], entry[:groups])).to eq('1')
+        expect(test_in_group?(entry[:test], entry[:groups])).to eq('1')
       end
     end
   end
