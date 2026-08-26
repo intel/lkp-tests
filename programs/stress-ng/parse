@@ -8,7 +8,7 @@ require "#{LKP_SRC}/lib/tests/stats"
 
 class StressorStater
   def stat(line)
-    if line =~ /stress-ng: (info|metrc):.*\((average|geometr?ic mean|harmonic mean|total)/
+    if line =~ /stress-ng: (info|metrc):.*\((average|geometr?ic mean|harmonic mean|total|maximum|minimum)/
       stat_miscellaneous_metrics(line)
     else
       stat_major_metrics(line)
@@ -56,7 +56,8 @@ class StressorStater
     # stress-ng: metrc: [5961] uprobe                 0.00 MB trace data per second (harmonic mean of 224 instances)
     # stress-ng: metrc: [6413] x86syscall           120.82 nanosecs per call (excluding test overhead (harmonic mean of 224 instances)
     # stress-ng: metrc: [9598] physmmap           40704.00 /dev/kmem mmaps succeed (total of 256 instances)
-    items = line.sub(/ \((average|geometr?ic mean|harmonic mean|total).*\)$/, '')
+    # stress-ng: metrc: [13626] dentry            650354.00 directory entries allocated (maximum of 224 instances)
+    items = line.sub(/ \((average|geometr?ic mean|harmonic mean|total|maximum|minimum).*\)$/, '')
                 .split
 
     # unit is "write128_MB/sec" and it has variable length

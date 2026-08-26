@@ -1,0 +1,26 @@
+2026-08-25 14:22:33 mkdir -p /mnt/stress-ng
+2026-08-25 14:22:33 mount /dev/sdb3 /mnt/stress-ng
+2026-08-25 14:22:33 stress-ng --timeout 60 --times --verify --metrics --no-rand-seed --dentry 224
+stress-ng: info:  [13626] setting to a 1 min run per stressor
+stress-ng: info:  [13626] dispatching hogs: 224 dentry
+stress-ng: metrc: [13626] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s CPU used per       RSS Max
+stress-ng: metrc: [13626]                           (secs)    (secs)    (secs)   (real time) (usr+sys time) instance (%)          (KB)
+stress-ng: metrc: [13626] dentry           460800    101.93      1.83  19870.79      4520.60          23.19        87.03          1828
+stress-ng: metrc: [13626] miscellaneous metrics:
+stress-ng: metrc: [13626] dentry             75441.84 nanosecs per file creation (harmonic mean of 224 instances)
+stress-ng: metrc: [13626] dentry              1074.78 nanosecs per file access (harmonic mean of 224 instances)
+stress-ng: metrc: [13626] dentry              2183.26 nanosecs per bogus file access (harmonic mean of 224 instances)
+stress-ng: metrc: [13626] dentry              1951.82 nanosecs per bogus file unlink (harmonic mean of 224 instances)
+stress-ng: metrc: [13626] dentry            650354.00 directory entries allocated (maximum of 224 instances)
+stress-ng: metrc: [13626] dentry              7168.00 bogus (negative) directory entries accessed (maximum of 224 instances)
+stress-ng: info:  [13626] for a 105.16s run time:
+stress-ng: info:  [13626]   23555.00s available CPU time
+stress-ng: info:  [13626]       1.82s user time   (  0.01%)
+stress-ng: info:  [13626]   19870.86s system time ( 84.36%)
+stress-ng: info:  [13626]   19872.68s total time  ( 84.37%)
+stress-ng: info:  [13626] load average: 184.30 67.00 24.24
+stress-ng: info:  [13626] skipped: 0
+stress-ng: info:  [13626] passed: 224: dentry (224)
+stress-ng: info:  [13626] failed: 0
+stress-ng: info:  [13626] metrics untrustworthy: 0
+stress-ng: info:  [13626] successful run completed in 1 min 45.16 secs

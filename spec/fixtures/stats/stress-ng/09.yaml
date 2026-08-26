@@ -1,0 +1,15 @@
+dentry.pass: 1
+dentry.ops: 460800
+dentry.ops_per_sec: 4520.60
+dentry.nanosecs_per_file_creation.pass: 1
+dentry.nanosecs_per_file_creation: 75441.84
+dentry.nanosecs_per_file_access.pass: 1
+dentry.nanosecs_per_file_access: 1074.78
+dentry.nanosecs_per_bogus_file_access.pass: 1
+dentry.nanosecs_per_bogus_file_access: 2183.26
+dentry.nanosecs_per_bogus_file_unlink.pass: 1
+dentry.nanosecs_per_bogus_file_unlink: 1951.82
+dentry.directory_entries_allocated.pass: 1
+dentry.directory_entries_allocated: 650354.00
+dentry.bogus_negative_directory_entries_accessed.pass: 1
+dentry.bogus_negative_directory_entries_accessed: 7168.00
