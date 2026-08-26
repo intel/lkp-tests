@@ -64,6 +64,34 @@ runtime_loop()
 	wait
 }
 
+# Skip a need_x GUI benchmark cleanly when the only display adapter is a
+# server BMC remote-management chip (e.g. ASPEED AST2xxx, PCI vendor
+# 1a03) -- these have no monitor attached and Xorg's VT switch always
+# fails: "(EE) xf86OpenConsole: Switching VT failed". Dies with a clear
+# message instead of letting xinit start a doomed X session that only
+# shows up later as a confusing "X connection ... broken" test failure.
+check_need_x()
+{
+	[ "$need_x" = true ] || return 0
+
+	local class_file vendor real_display=
+	for class_file in "${PCI_DEVICES_DIR:-/sys/bus/pci/devices}"/*/class; do
+		case "$(cat "$class_file" 2>/dev/null)" in
+		0x03*) ;;
+		*) continue ;;
+		esac
+
+		vendor=$(cat "${class_file%/class}/vendor" 2>/dev/null)
+		case "$vendor" in
+		0x1a03) ;; # ASPEED BMC remote-management graphics, no monitor
+		*) real_display=1 ;;
+		esac
+	done
+
+	[ -n "$real_display" ] ||
+		die "no display adapter usable for X (only a BMC remote-management graphics chip is present, no monitor attached)"
+}
+
 # Print the override for this instance from a "<param>_by_instance"
 # space-separated list, keyed by instance_id (1-based); prints nothing if
 # the list is unset or has no entry at that position. Used by a

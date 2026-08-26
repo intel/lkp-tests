@@ -13,6 +13,8 @@
 
 cd_benchmark
 
+check_need_x
+
 if [[ "$need_x" = true ]]; then
 	mkdir -p /tmp/.X11-unix
 	chmod 1777 /tmp/.X11-unix

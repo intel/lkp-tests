@@ -13,6 +13,11 @@
 ## platform available that provides an extensible framework for which new tests
 ## can be easily added.
 
+. $LKP_SRC/lib/debug.sh
+. $LKP_SRC/lib/run.sh
+
+check_need_x
+
 if [[ "$need_x" = true ]]; then
 	mkdir -p /tmp/.X11-unix
 	chmod 1777 /tmp/.X11-unix
