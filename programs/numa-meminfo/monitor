@@ -8,12 +8,7 @@ file=${file#numa-}
 . $LKP_SRC/lib/wait.sh
 setup_wait
 
-if [ $file = 'vmstat' ]; then
-	cat()
-	{
-		awk '!x[$1]++' "$@"
-	}
-fi
+override_cat_for_vmstat
 
 NODES=$(grep ^Node /proc/zoneinfo | awk '{print $2}' | sed -e 's/,//' | sort | uniq)
 while :; do

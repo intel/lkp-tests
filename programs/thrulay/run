@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # - runtime
 
 ## The program thrulay is used to measure the capacity, delay,
@@ -8,11 +8,9 @@
 . $LKP_SRC/lib/reproduce-log.sh
 . $LKP_SRC/lib/run.sh
 
-[[ -n "$runtime" ]] || runtime=300
+[ -n "$runtime" ] || runtime=300
 
-[[ -n "$direct_server_ips" ]] && server=$direct_server_ips
-[[ -z "$server" ]] && server=127.0.0.1
-server=${server%% *}
+resolve_server
 
 prepare_exec_path
 

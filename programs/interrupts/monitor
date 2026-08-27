@@ -15,13 +15,4 @@ take_snapshot()
 . $LKP_SRC/lib/wait.sh
 setup_wait
 
-if [ -n "$interval" ]; then
-	while :; do
-		take_snapshot
-		wait_timeout $interval
-	done
-else
-	take_snapshot
-	wait_post_test
-	take_snapshot
-fi
+monitor_snapshot_loop

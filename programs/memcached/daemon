@@ -10,13 +10,6 @@
 
 : "${instance_id:=1}"
 
-config_hugepage()
-{
-	if parse_bool -q "$use_hugetlbfs"; then
-		log_eval hugeadm --pool-pages-min "DEFAULT:$(to_mb "$memcached_memsize")M"
-	fi
-}
-
 run_memcached()
 {
 	preload=

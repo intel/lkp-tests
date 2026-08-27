@@ -1,4 +1,28 @@
+#!/bin/sh
+
 # nvdimm functions
+
+remove_dax_pmem_compat()
+{
+	local retries=${rmmod_retries:-10}
+
+	for i in $(seq "$retries"); do
+		log_cmd modprobe -r dax_pmem_compat && return
+		sleep 10
+	done
+	return 1
+}
+
+wait_dax_initialization()
+{
+	local timeout=${wait_initialization_timeout:-30}
+
+	for i in $(seq "$timeout"); do
+		[ -f /sys/bus/dax/drivers/device_dax/unbind ] && return
+		sleep 1
+	done
+	return 1
+}
 
 configure_namespace()
 {

@@ -18,28 +18,13 @@
 . $LKP_SRC/lib/debug.sh
 . $LKP_SRC/lib/tests/pmu-tools.sh
 
-is_virt && die "Don't run pmu-tools on virtual machine"
-
-# pmu-tools runs on top of Linux perf
-set_perf_path "$BENCHMARK_ROOT/pmu-tools/perf"
-export PATH=$BENCHMARK_ROOT/pmu-tools:$PATH
+pmu_tools_init
 
 export PERF=$perf
 toplev=$BENCHMARK_ROOT/pmu-tools/toplev.py
 [ -x "$toplev" ] || die "Can't find pmu-tools"
 
-# pmu-tools needs to download CPU map file from
-# https://download.01.org/perfmon to $XDG_HOME_CACHE/pmu-events at
-# first run. But test machine may not have external network
-# connection. So we will pre-downloaded CPU map files into
-# $BENCHMARK_ROOT and copy it to user's cache directory.
-
-[ -n "$HOME" ] || export HOME=/root
-
-[ -d "$HOME/.cache/pmu-events" ] || {
-	mkdir -p "$HOME/.cache"
-	cp -af "$BENCHMARK_ROOT/pmu-tools/pmu-events" "$HOME/.cache"
-}
+ensure_pmu_events_cache
 
 # perf may consume lots of fd
 ulimit -n 102400

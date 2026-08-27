@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # - runtime
 # - seed
 # - number
@@ -15,19 +15,12 @@
 cd_benchmark $suite/fuzzer
 
 # Check parameters
-[[ -z "$number" ]] && [[ -z "$runtime" ]] && die "number and runtime can not both be empty "
+[ -z "$number" ] && [ -z "$runtime" ] && die "number and runtime can not both be empty "
 
 # Generate seed
-[[ -z "$seed" ]] && {
+[ -z "$seed" ] && {
 	seed_source="$tbox_group/$rootfs/$kconfig"
-
-	if has_cmd cksum; then
-		seed=$(echo "$seed_source" | cksum)
-		seed=${seed%% *}
-	else
-		seed=$(echo "$seed_source" | md5sum | cut -c1-5)
-		seed=$((0x$seed))
-	fi
+	seed=$(hash_seed "$seed_source")
 
 	echo "Seeding perf-fuzzer by $seed based on $seed_source"
 }
@@ -36,14 +29,14 @@ echo "glibc version $(ldd --version | head -1)"
 
 # Run test
 opt="-r $seed"
-[[ -n "$number" ]] && opt="$opt -s $number"
+[ -n "$number" ] && opt="$opt -s $number"
 
 # Wait test finish or timeout
-if [[ -n "$runtime" ]]; then
+if [ -n "$runtime" ]; then
 	log_cmd timeout $runtime ./perf_fuzzer $opt
 	exit_status=$?
 
-	if [[ $exit_status -eq 124 ]]; then
+	if [ $exit_status -eq 124 ]; then
 		echo "perf fuzzer test is timeout"
 		exit $exit_status
 	else

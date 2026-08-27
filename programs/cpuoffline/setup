@@ -7,6 +7,14 @@
 
 . "$LKP_SRC"/lib/reproduce-log.sh
 
+# Sets online_file/cpu_id for the current $cpu_dir in a
+# `for cpu_dir in /sys/devices/system/cpu/cpu[0-9]*` loop.
+set_cpu_dir_vars()
+{
+	online_file="$cpu_dir"/online
+	cpu_id=$(basename "$cpu_dir" | sed 's/cpu//')
+}
+
 cat >>"$TMP_RESULT_ROOT/post-run.cpuoffline" <<EOF
 #!/bin/bash
 
@@ -33,8 +41,7 @@ if [ -n "$online_cpus" ]; then
 	echo Online CPUs: $online_cpus
 
 	for cpu_dir in /sys/devices/system/cpu/cpu[0-9]*; do
-		online_file="$cpu_dir"/online
-		cpu_id=$(basename $cpu_dir | sed 's/cpu//')
+		set_cpu_dir_vars
 		match_cpu=false
 
 		for i in $online_cpus; do
@@ -63,8 +70,7 @@ fi
 if [ -n "$online_cores" ]; then
 	echo Online Cores: $online_cores
 	for cpu_dir in /sys/devices/system/cpu/cpu[0-9]*; do
-		online_file="$cpu_dir"/online
-		cpu_id=$(basename $cpu_dir | sed 's/cpu//')
+		set_cpu_dir_vars
 		[ -f "$online_file" ] && [ "$(cat "$online_file")" -eq 0 ] && continue
 
 		core_id=$(cat $cpu_dir/topology/core_id)
@@ -101,8 +107,7 @@ if [ -n "$noht" ]; then
 	# We need to do this in a stupid way
 
 	for cpu_dir in /sys/devices/system/cpu/cpu[0-9]*; do
-		online_file="$cpu_dir"/online
-		cpu_id=$(basename $cpu_dir | sed 's/cpu//')
+		set_cpu_dir_vars
 		[ -f "$online_file" ] || continue
 		[ "$(cat "$online_file")" -eq 0 ] && continue
 
@@ -135,8 +140,7 @@ fi
 if [ -n "$offline_package" ]; then
 	echo Offline Package: $offline_package
 	for cpu_dir in /sys/devices/system/cpu/cpu[0-9]*; do
-		online_file="$cpu_dir"/online
-		cpu_id=$(basename $cpu_dir | sed 's/cpu//')
+		set_cpu_dir_vars
 
 		[ -f "$online_file" ] && [ "$(cat "$online_file")" -eq 0 ] && continue
 

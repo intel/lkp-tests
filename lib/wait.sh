@@ -33,6 +33,37 @@ setup_wait()
 	echo ${0##*/} >>$TMP/.name-wait-bg-procs
 }
 
+# vmstat's fields repeat the same value across most lines; shadow cat()
+# with an awk filter that keeps only the first line per leading field
+# ($1) when the monitor is reading a *_vmstat-derived file named $file.
+override_cat_for_vmstat()
+{
+	if [ "$file" = 'vmstat' ]; then
+		cat()
+		{
+			awk '!x[$1]++' "$@"
+		}
+	fi
+}
+
+# Run a monitor's take_snapshot function repeatedly every $interval
+# seconds if set, otherwise take one snapshot, wait for the test to
+# finish, then take a final snapshot. Caller must define take_snapshot
+# and source lib/wait.sh before calling.
+monitor_snapshot_loop()
+{
+	if [ -n "$interval" ]; then
+		while :; do
+			take_snapshot
+			wait_timeout "$interval"
+		done
+	else
+		take_snapshot
+		wait_post_test
+		take_snapshot
+	fi
+}
+
 explain_kill()
 {
 	local i

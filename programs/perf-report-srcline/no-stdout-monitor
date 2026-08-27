@@ -9,18 +9,7 @@
 
 set_perf_path "/lkp/benchmarks/perf/perf"
 
-default_events()
-{
-	for event in cycles:pp cycles:p; do
-		$perf record -q --freq=800 -e $event -- sleep 0.01 >/dev/null 2>&1 && {
-			echo $event
-			return
-		}
-	done
-	echo cycles
-}
-
-: "${events:=$(default_events)}"
+: "${events:=$(default_perf_events)}"
 : "${duration:=10}"
 : "${delay:=100}"
 

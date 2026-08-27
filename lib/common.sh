@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # common utility functions
 
 . $LKP_SRC/lib/debug.sh
@@ -14,6 +16,13 @@ abs_path()
 		echo $path
 	else
 		echo $PWD/$path
+	fi
+}
+
+config_hugepage()
+{
+	if parse_bool -q "$use_hugetlbfs"; then
+		log_eval hugeadm --pool-pages-min "DEFAULT:$(to_mb "$memcached_memsize")M"
 	fi
 }
 

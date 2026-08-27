@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # - memcached_memsize
 # - use_hugetlbfs
 
@@ -7,13 +7,6 @@
 . "$LKP_SRC/lib/reproduce-log.sh"
 
 : "${memcached_memsize:=$(to_mb 64m)}"
-
-config_hugepage()
-{
-	if parse_bool -q "$use_hugetlbfs"; then
-		log_eval hugeadm --pool-pages-min "DEFAULT:$(to_mb "$memcached_memsize")M"
-	fi
-}
 
 run_memcached()
 {

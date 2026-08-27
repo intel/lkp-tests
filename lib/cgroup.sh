@@ -2,6 +2,19 @@
 
 . $LKP_SRC/lib/reproduce-log.sh
 
+#Common setup/cgroup and setup/cgroup2 preamble: verify cgroups are
+#supported and default cg_count/cg_bind before clearing old mounts.
+init_cgroup_options()
+{
+	[ -e '/proc/cgroups' ] || die "dir not exist: /proc/cgroups"
+
+	: "${cg_count:=1}"
+
+	if [ -z "$cg_bind" ] && [ "$cg_count" -eq 1 ]; then
+		cg_bind=1
+	fi
+}
+
 #Clear cgroups and subsystem controllers mount point for v1 version
 clear_cgroup()
 {

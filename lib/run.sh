@@ -10,6 +10,13 @@ cd_benchmark()
 	log_cmd cd "$benchmark_path" || die "$benchmark_path does not exist"
 }
 
+resolve_server()
+{
+	[ -n "$direct_server_ips" ] && server=$direct_server_ips
+	[ -z "$server" ] && server=127.0.0.1
+	server=${server%% *}
+}
+
 get_benchmark_path()
 {
 	local suite=${1:-$suite}

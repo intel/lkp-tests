@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # - runtime
 # - seed
 # - group
@@ -11,22 +11,15 @@
 
 ## A Linux System call fuzz tester
 
-[[ -n "$seed" ]] || {
+[ -n "$seed" ] || {
 	seed_source="$tbox_group/$rootfs/$kconfig"
-
-	if has_cmd cksum; then
-		seed=$(echo "$seed_source" | cksum)
-		seed=${seed%% *}
-	else
-		seed=$(echo "$seed_source" | md5sum | cut -c1-5)
-		seed=$((0x$seed))
-	fi
+	seed=$(hash_seed "$seed_source")
 
 	echo "Seeding trinity by $seed based on $seed_source"
 }
 
-[[ -n "$number" ]] || {
-	if [[ -n "$runtime" ]]; then
+[ -n "$number" ] || {
+	if [ -n "$runtime" ]; then
 		number=999999999
 	else
 		number=99999
@@ -34,7 +27,7 @@
 }
 
 has_cmd trinity || {
-	[[ -x /lkp/benchmarks/trinity/bin/trinity ]] && {
+	[ -x /lkp/benchmarks/trinity/bin/trinity ] && {
 		ln -sf /lkp/benchmarks/trinity/bin/trinity /bin/trinity
 		ln -sf /lkp/benchmarks/trinity/bin/trinity /usr/bin/trinity
 	}
@@ -43,12 +36,12 @@ has_cmd trinity || {
 has_cmd trinity || die "trinity is not installed"
 
 # group format: group-05
-if [[ -n "$group" ]]; then
-	if [[ "${group#*sys_}" != "$group" ]]; then
+if [ -n "$group" ]; then
+	if [ "${group#*sys_}" != "$group" ]; then
 		# stress test for single syscall
 		cmd="trinity -q -q -l off -s $seed -N $number -c ${group#*sys_}"
 	else
-		[[ -n "$nr_groups" ]] || die "miss nr_groups when group is $group"
+		[ -n "$nr_groups" ] || die "miss nr_groups when group is $group"
 
 		targets=
 		# trinity -L
@@ -60,7 +53,7 @@ if [[ -n "$group" ]]; then
 			echo "$syscall" | grep -qE "^[a-z0-9_]*$" || continue
 			num=$(echo "$syscall" | md5sum | cut -c1-2)
 			num=$((0x$num))
-			[[ group-0$((seed % num % nr_groups)) = "$group" ]] && targets="$targets -c $syscall"
+			[ group-0$((seed % num % nr_groups)) = "$group" ] && targets="$targets -c $syscall"
 		done
 
 		cmd="trinity -q -q -l off -s $seed -N $number $targets"
@@ -83,7 +76,7 @@ fi
 
 pid=$!
 
-if [[ -n "$runtime" ]]; then
+if [ -n "$runtime" ]; then
 	sleep $runtime
 	kill -9 $pid
 else
@@ -101,4 +94,4 @@ end_time=$(date +%s)
 
 # $ date -d @68764814
 # Tue Mar  7 05:20:14 CST 1972
-[[ "$end_time" -lt "$start_time" ]] && log_cmd hwclock --hctosys
+[ "$end_time" -lt "$start_time" ] && log_cmd hwclock --hctosys

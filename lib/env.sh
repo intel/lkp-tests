@@ -84,6 +84,19 @@ set_perf_path()
 	fi
 }
 
+# Pick the cheapest precise-cycles event $perf can actually record on
+# this CPU, falling back to the always-available "cycles".
+default_perf_events()
+{
+	for event in cycles:pp cycles:p; do
+		$perf record -q --freq=800 -e $event -- sleep 0.01 >/dev/null 2>&1 && {
+			echo $event
+			return
+		}
+	done
+	echo cycles
+}
+
 set_iptables_path()
 {
 	for iptables_bin in iptables ip6tables; do
@@ -99,6 +112,24 @@ set_iptables_path()
 			fi
 		}
 	done
+}
+
+# Derive a numeric seed from an arbitrary string (e.g. tbox_group/rootfs/
+# kconfig), preferring cksum and falling back to md5sum when unavailable.
+hash_seed()
+{
+	local seed_source="$1"
+	local seed
+
+	if has_cmd cksum; then
+		seed=$(echo "$seed_source" | cksum)
+		seed=${seed%% *}
+	else
+		seed=$(echo "$seed_source" | md5sum | cut -c1-5)
+		seed=$((0x$seed))
+	fi
+
+	echo "$seed"
 }
 
 disable_nmi_watchdog()
@@ -133,16 +164,16 @@ is_docker()
 get_kconfig()
 {
 	local config_file="$1"
-	if [[ -e "/proc/config.gz" ]]; then
+	if [ -e "/proc/config.gz" ]; then
 		gzip -dc "/proc/config.gz" >"$config_file"
-	elif [[ -e "/boot/config-$(uname -r)" ]]; then
+	elif [ -e "/boot/config-$(uname -r)" ]; then
 		cat "/boot/config-$(uname -r)" >"$config_file"
-	elif [[ -e "/boot/config" ]]; then
+	elif [ -e "/boot/config" ]; then
 		cat "/boot/config" >"$config_file"
 	else
 		echo "Failed to get current kernel config"
 		return 1
 	fi
 
-	[[ -s "$config_file" ]]
+	[ -s "$config_file" ]
 }

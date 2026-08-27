@@ -33,12 +33,7 @@ fi
 . $LKP_SRC/lib/wait.sh
 setup_wait
 
-if [ $file = 'vmstat' ]; then
-	cat()
-	{
-		awk '!x[$1]++' "$@"
-	}
-fi
+override_cat_for_vmstat
 
 while :; do
 	echo time: "$(date +%s)"

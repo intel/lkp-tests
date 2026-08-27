@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # - runtime
 
 ## nuttcp is a network performance measurement tool intended for use
@@ -10,10 +10,8 @@
 
 cd_benchmark
 
-[[ -n "$runtime" ]] || runtime=300
+[ -n "$runtime" ] || runtime=300
 
-[[ -n "$direct_server_ips" ]] && server=$direct_server_ips
-[[ -z "$server" ]] && server=127.0.0.1
-server=${server%% *}
+resolve_server
 
 log_cmd ./nuttcp -T $runtime $server

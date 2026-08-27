@@ -24,14 +24,4 @@ file=$(basename "$(dirname "$0")")
 . $LKP_SRC/lib/wait.sh
 setup_wait
 
-if [ -z "$interval" ]; then
-	take_snapshot
-	wait_post_test
-	take_snapshot
-	exit
-fi
-
-while :; do
-	take_snapshot
-	wait_timeout $interval
-done
+monitor_snapshot_loop

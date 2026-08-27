@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # - node_size
 
 #
@@ -11,27 +11,6 @@
 . "$LKP_SRC"/lib/reproduce-log.sh
 . "$LKP_SRC"/lib/nvdimm.sh
 . $LKP_SRC/lib/debug.sh
-
-rmmod_retries=10
-wait_initialization_timeout=30
-
-remove_dax_pmem_compat()
-{
-	for i in $(seq $rmmod_retries); do
-		log_cmd modprobe -r dax_pmem_compat && return
-		sleep 10
-	done
-	return 1
-}
-
-wait_initialization()
-{
-	for i in $(seq $wait_initialization_timeout); do
-		[ -f /sys/bus/dax/drivers/device_dax/unbind ] && return
-		sleep 1
-	done
-	return 1
-}
 
 if [ -n "$node_size" ]; then
 
@@ -51,7 +30,7 @@ log_cmd modprobe dax_pmem
 log_cmd modprobe device_dax
 log_cmd modprobe kmem
 
-wait_initialization || die "DAX initialization timeout"
+wait_dax_initialization || die "DAX initialization timeout"
 
 for n in 0 1; do
 	[ -e /dev/dax"$n".0 ] || continue

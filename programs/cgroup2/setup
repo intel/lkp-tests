@@ -19,13 +19,7 @@
 
 CGROUP2_MNT=/cgroup2
 
-[ -e '/proc/cgroups' ] || die "dir not exist: /proc/cgroups"
-
-: "${cg_count:=1}"
-
-if [ -z "$cg_bind" ] && [ "$cg_count" -eq 1 ]; then
-	cg_bind=1
-fi
+init_cgroup_options
 
 # Clear cgroups and subsystem controllers mount point for v1 version
 clear_cgroup
