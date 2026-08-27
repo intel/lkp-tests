@@ -13,7 +13,7 @@ for dev in $partitions; do
 
 	[ "${dev#/dev/md}" != "$dev" ] ||
 		[ "${dev#/dev/ram}" != "$dev" ] ||
-		[ "${dev#/dev/nvme}" != "$dev" ] && dev=$(echo "$dev" | sed 's/p.*//') ||
+		[ "${dev#/dev/nvme}" != "$dev" ] && dev=${dev%%p*} ||
 		dev=$(echo "$dev" | tr -d '0-9')
 	bdi=$(ls -l $dev | sed 's/,[[:space:]]*/:/' | awk '{print $5}')
 	echo "'$bdi': ${dev#/dev/}"

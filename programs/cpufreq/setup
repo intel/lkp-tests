@@ -8,7 +8,7 @@ for cpu_dir in /sys/devices/system/cpu/cpu[0-9]*
 do
 	# Skip offlined CPUs
 	online_file="$cpu_dir"/online
-        [ -f "$online_file" ] && [ "$(cat "$online_file")" -eq 0 ] && continue
+	[ -f "$online_file" ] && [ "$(cat "$online_file")" -eq 0 ] && continue
 
 	[ ${scaling_max_freq%%%} != $scaling_max_freq ] && {
 		cpuinfo_max_freq=$(cat $cpu_dir/cpufreq/cpuinfo_max_freq)

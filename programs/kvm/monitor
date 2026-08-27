@@ -8,7 +8,7 @@ setup_wait
 while :; do
 	echo time: "$(date +%s.%N)"
 
-	grep . * | sed 's/:/: /'
+	grep . -- * | sed 's/:/: /'
 
 	wait_timeout $interval
 done

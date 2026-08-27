@@ -10,11 +10,12 @@ take_snapshot()
 	for dir in /sys/devices/system/cpu/cpu*/cpuidle/state*/; do
 		cpu=${dir#/sys/devices/system/cpu/}
 		cpu=${cpu%%/*}
-		cat $dir/name | sed 's/ /-/g' | read -r state_name
-		read -r state_time <$dir/time
-		read -r state_usage <$dir/usage
-		echo $cpu.${state_name}.time: ${state_time}
-		echo $cpu.${state_name}.usage: ${state_usage}
+		read -r state_name <"$dir"/name
+		state_name=$(echo "$state_name" | sed 's/ /-/g')
+		read -r state_time <"$dir"/time
+		read -r state_usage <"$dir"/usage
+		echo "$cpu"."${state_name}".time: "${state_time}"
+		echo "$cpu"."${state_name}".usage: "${state_usage}"
 	done
 }
 

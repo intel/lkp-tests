@@ -80,7 +80,7 @@ minor-faults,major-faults"
 fi
 
 [ -n "$events" ] && opt_events="-e $(echo $events | sed 's/ / -e /g')"
-[ -n "$metrics" ] && opt_metrics="-M $(echo $metrics)"
+[ -n "$metrics" ] && opt_metrics="-M $metrics"
 
 . $LKP_SRC/lib/wait.sh
 

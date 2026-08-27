@@ -59,7 +59,7 @@ query_var_from_yaml()
 	local yaml_file=${2:--}
 	[ $# -ge 1 ] || die "Invalid parmeters: $*"
 
-	sed -ne "1,\$s/^$key[[:space:]]*:[[:space:]]*\\(.*\\)[[:space:]]*\$/\\1/p" "$yaml_file"
+	sed -ne "1,\$s/^${key}[[:space:]]*:[[:space:]]*\\(.*\\)[[:space:]]*\$/\\1/p" "$yaml_file"
 }
 
 # the followings are false, otherwise true
@@ -71,17 +71,33 @@ query_var_from_yaml()
 parse_bool()
 {
 	if [ "$1" != "-q" ]; then
-		echo_bool=echo
+		echo_bool='echo'
 	else
 		echo_bool=true
 		shift
 	fi
-	[ -z "$1" ] && { $echo_bool 0; return 1; }
-	[ "${1#0}" != "$1" ] && { $echo_bool 0; return 1; }
-	[ "${1#no}" != "$1" ] && { $echo_bool 0; return 1; }
-	[ "${1#false}" != "$1" ] && { $echo_bool 0; return 1; }
-	[ "${1#n}" != "$1" ] && { $echo_bool 0; return 1; }
-	$echo_bool 1; return 0
+	[ -z "$1" ] && {
+		$echo_bool 0
+		return 1
+	}
+	[ "${1#0}" != "$1" ] && {
+		$echo_bool 0
+		return 1
+	}
+	[ "${1#no}" != "$1" ] && {
+		$echo_bool 0
+		return 1
+	}
+	[ "${1#false}" != "$1" ] && {
+		$echo_bool 0
+		return 1
+	}
+	[ "${1#n}" != "$1" ] && {
+		$echo_bool 0
+		return 1
+	}
+	$echo_bool 1
+	return 0
 }
 
 expand_cpu_list()
@@ -89,7 +105,8 @@ expand_cpu_list()
 	cpu_list=$1
 	for pair in $(echo "$cpu_list" | tr ',' ' '); do
 		if [ "${pair%%-*}" != "$pair" ]; then
-			seq $(echo "$pair" | tr '-' ' ')
+			IFS='-' read -r start end <<<"$pair"
+			seq "$start" "$end"
 		else
 			echo "$pair"
 		fi
@@ -106,7 +123,7 @@ cpu_list_ref()
 {
 	cpu_list=$1
 	n=$2
-	echo $cpu_list | cut -d ' ' -f $((n+1))
+	echo $cpu_list | cut -d ' ' -f $((n + 1))
 }
 
 # if str starts with prefix, output remaining part, otherwise output empty string

@@ -1,8 +1,10 @@
+#!/bin/bash
+
 . $LKP_SRC/lib/detect-system.sh
 
 detect_system
 
-if (( $_system_version >= 8 )); then
+if (($_system_version >= 8)); then
 	package_manager=dnf
 
 	# use --allowerasing to resolve issue on centos 9
@@ -18,4 +20,4 @@ if ! rpm -q epel-release >/dev/null; then
 	${package_manager} makecache
 fi
 
-${package_manager} install -y "$extra_option" $*
+${package_manager} install -y "$extra_option" "$@"

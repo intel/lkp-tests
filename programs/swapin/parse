@@ -5,4 +5,4 @@ if [ ! -f $RESULT_ROOT/swapin-setup ]; then
 	exit 0
 fi
 
-cat $RESULT_ROOT/swapin-setup | $LKP_SRC/programs/vm-scalability/parse
+"$LKP_SRC"/programs/vm-scalability/parse <"$RESULT_ROOT"/swapin-setup

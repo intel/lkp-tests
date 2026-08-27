@@ -31,10 +31,10 @@
 [ -n "$dev" ] || exit 0
 
 if [ -n "$int_coalescence" ]; then
-  # Some NICs(X710 series) require to disable the
-  # adaptive rx/tx before changing any values.
-  ethtool -C $dev adaptive-rx off
-  ethtool -C $dev adaptive-tx off
+	# Some NICs(X710 series) require to disable the
+	# adaptive rx/tx before changing any values.
+	ethtool -C $dev adaptive-rx off
+	ethtool -C $dev adaptive-tx off
 fi
 
 [ -n "$rx_usec" ] && [ "$rx_usec" != 0 ] && ethtool -C $dev rx-usecs $rx_usec
@@ -46,28 +46,28 @@ fi
 [ -n "$tx_framesz" ] && [ "$tx_framesz" != 0 ] && ethtool -C $dev tx-framesz $tx_framesz
 
 if [ -n "$int_coalescence" ]; then
-  ethtool -C $dev adaptive-rx on
-  ethtool -C $dev adaptive-tx on
+	ethtool -C $dev adaptive-rx on
+	ethtool -C $dev adaptive-tx on
 fi
 
 if [ -n "$flow_control" ]; then
-  ethtool -A $dev rx on
-  ethtool -A $dev tx on
+	ethtool -A $dev rx on
+	ethtool -A $dev tx on
 fi
 
 if [ -n "$rx_backlog" ] && [ "$rx_backlog" != 0 ]; then
-  echo $rx_backlog > /proc/sys/net/core/netdev_max_backlog
+	echo $rx_backlog > /proc/sys/net/core/netdev_max_backlog
 fi
 
 if [ -n "$rx_ringbuf" ] && [ "$rx_ringbuf" != 0 ] &&
-   [ -n "$tx_ringbuf" ] && [ "$tx_ringbuf" != 0 ]; then
-    ethtool -G $dev rx $rx_ringbuf tx $tx_ringbuf
+	[ -n "$tx_ringbuf" ] && [ "$tx_ringbuf" != 0 ]; then
+	ethtool -G $dev rx $rx_ringbuf tx $tx_ringbuf
 fi
 
 if [ -n "$tso" ]; then
-  ethtool -K $dev tso on
+	ethtool -K $dev tso on
 fi
 
 if [ -n "$maxconn" ] && [ "$maxconn" != 0 ]; then
-  echo $maxconn > /proc/sys/net/core/somaxconn
+	echo $maxconn > /proc/sys/net/core/somaxconn
 fi

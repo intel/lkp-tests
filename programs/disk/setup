@@ -18,14 +18,16 @@
 check_nr_partitions()
 {
 	if [ -n "$ssd_partitions" ]; then
-		# shellcheck disable=SC2012
+		# ssd_partitions is a shell glob/word-list to expand on the test box
+		# shellcheck disable=SC2012,SC2086
 		max_ssd=$(ls $ssd_partitions 2>/dev/null | wc -l)
 	else
 		max_ssd=0
 	fi
 
 	if [ -n "$hdd_partitions" ]; then
-		# shellcheck disable=SC2012
+		# hdd_partitions is a shell glob/word-list to expand on the test box
+		# shellcheck disable=SC2012,SC2086
 		max_hdd=$(ls $hdd_partitions 2>/dev/null | wc -l)
 	else
 		max_hdd=0

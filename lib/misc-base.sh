@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Some misc-functions
 
 . $LKP_SRC/lib/lkp_path.sh

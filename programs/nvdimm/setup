@@ -87,7 +87,7 @@ probe_parts()
 	fi
 
 	# normalize whitespace
-	# shellcheck disable=SC2116
+	# shellcheck disable=SC2116,SC2086
 	parts=$(echo $rparts)
 }
 

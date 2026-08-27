@@ -1,6 +1,8 @@
+#!/bin/sh
+
 if ! rpm -q epel-release >/dev/null; then
 	yum install -y epel-release
 	yum makecache fast
 fi
 
-yum install -y $*
+yum install -y "$@"
