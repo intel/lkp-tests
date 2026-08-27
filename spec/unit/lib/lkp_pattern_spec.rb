@@ -72,6 +72,43 @@ describe LKP::Pattern do
     end
   end
 
+  describe '.lines' do
+    around do |example|
+      Dir.mktmpdir do |dir|
+        @dir = dir
+        example.run
+      end
+    end
+
+    def write_pattern_file(name, content)
+      file = File.join(@dir, name)
+      File.write(file, content)
+      file
+    end
+
+    it 'drops blank and comment lines, flattening across files in argument order' do
+      build_errors = write_pattern_file('build-errors', <<~PATTERN)
+        # a comment
+        error: foo
+
+        error: bar
+      PATTERN
+      clang_build_errors = write_pattern_file('clang-build-errors', <<~PATTERN)
+        error: baz
+      PATTERN
+
+      expect(described_class.lines(build_errors, clang_build_errors)).to eq(['error: foo', 'error: bar', 'error: baz'])
+    end
+
+    it 'skips a missing pattern file instead of raising' do
+      missing_file = File.join(@dir, 'does-not-exist')
+
+      result = nil
+      expect { result = described_class.lines(missing_file) }.not_to raise_error
+      expect(result).to eq([])
+    end
+  end
+
   describe 'anchor: :none (default)' do
     let(:pattern) { described_class.new(@file) }
 

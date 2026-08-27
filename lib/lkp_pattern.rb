@@ -91,11 +91,21 @@ module LKP
     class << self
       include KlassGenerator
 
-      def lines(file)
-        File.readlines(file)
-            .map(&:chomp)
-            .reject(&:empty?)
-            .reject { |line| line.start_with?('#') }
+      # Flattens the lines of one or more pattern files together, in
+      # argument order, dropping blank and comment lines and skipping
+      # (with a warning) any file that doesn't exist.
+      def lines(*files)
+        files.flat_map do |file|
+          unless File.file?(file)
+            warn "#{file} doesn't exist"
+            next []
+          end
+
+          File.readlines(file)
+              .map(&:chomp)
+              .reject(&:empty?)
+              .reject { |line| line.start_with?('#') }
+        end
       end
     end
   end
