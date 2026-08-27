@@ -188,7 +188,17 @@ run_test
 if [[ -d "/mnt/$test" ]]; then
 	for result_dir in "/mnt/$test"/*/; do
 		[[ -d "$result_dir" ]] || continue
-		upload_files -t results "$result_dir"*
+
+		result_files=()
+		for result_file in "$result_dir"*; do
+			# "img" is the raw file-backed namespace image blktests
+			# creates for nvmet tests (tests/nvme/rc); it is not a
+			# log and can be several GB, so never upload it.
+			[[ "$(basename "$result_file")" == img ]] && continue
+
+			result_files+=("$result_file")
+		done
+		((${#result_files[@]})) && upload_files -t results "${result_files[@]}"
 	done
 fi
 
