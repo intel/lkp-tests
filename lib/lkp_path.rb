@@ -8,6 +8,10 @@ module LKP
       def src(*strs)
         File.join([LKP_SRC] + strs)
       end
+
+      def etc(*strs)
+        src('etc', *strs)
+      end
     end
   end
 end

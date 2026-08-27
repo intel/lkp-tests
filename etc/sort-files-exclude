@@ -1,0 +1,3 @@
+etc/makepkg.conf
+lib/time.rb
+vendor/

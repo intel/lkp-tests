@@ -19,14 +19,14 @@ def filtered_files(path, filter)
   Dir.glob("#{path}/**/*")
      .select { |f| File.file?(f) }
      .reject { |f| f =~ /\.(sh|rb|yml|py|txt)$/ || File.symlink?(f) || with_shebang?(f) }
-     .select { |f| filter.nil? || filter.call(File.basename(f)) }
+     .select { |f| filter.nil? || filter.call(f) }
 end
 
 describe 'Directory File Sorting' do
   directories = {
     'adaptation' => {
       path: "#{LKP_SRC}/distro/adaptation",
-      filter: ->(filename) { filename != 'README.md' }
+      filter: ->(file) { File.basename(file) != 'README.md' }
     },
 
     'adaptation_pkg' => {
@@ -35,12 +35,12 @@ describe 'Directory File Sorting' do
 
     'programs' => {
       path: "#{LKP_SRC}/programs",
-      filter: ->(filename) { filename.start_with?('depends') }
+      filter: ->(file) { File.basename(file).start_with?('depends') }
     },
 
     'etc' => {
       path: "#{LKP_SRC}/etc",
-      filter: ->(filename) { filename != 'makepkg.conf' }
+      filter: ->(file) { !path_excluded?(file) }
     }
   }
 

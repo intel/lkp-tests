@@ -4,6 +4,18 @@
 
 echo "LKP_SRC=$LKP_SRC"
 
+# etc/sort-files-exclude is the single shared exclusion list, kept in sync
+# with spec/unit/lib/file_sorting_spec.rb and spec/unit/require_order_spec.rb
+# so the check and this tool never drift apart on what "sortable" means.
+etc_exclude_args=()
+while IFS= read -r entry; do
+	if [[ $entry == */ ]]; then
+		etc_exclude_args+=(! -path "$LKP_SRC/${entry%/}/*")
+	else
+		etc_exclude_args+=(! -path "$LKP_SRC/$entry")
+	fi
+done < <(grep -v '^[[:space:]]*#\|^[[:space:]]*$' "$LKP_SRC/etc/sort-files-exclude")
+
 (
 	echo $LKP_SRC/.gitignore
 
@@ -12,7 +24,7 @@ echo "LKP_SRC=$LKP_SRC"
 	echo $LKP_SRC/distro/keep-deb
 
 	find $LKP_SRC/programs -type f -name depends\*
-	find $LKP_SRC/etc -type f ! -name makepkg.conf ! -name \*.yml
+	find "$LKP_SRC/etc" -type f ! -name \*.yml "${etc_exclude_args[@]}"
 ) | while read -r f; do
 	LC_ALL=C sort -f $f | uniq >$f.tmp && mv $f.tmp $f
 done
