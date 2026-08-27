@@ -105,4 +105,4 @@ pid=$!
 
 $WAIT_POST_TEST_CMD $wait_opts
 
-kill $pid
+kill "$pid" 2>/dev/null
