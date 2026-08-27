@@ -57,6 +57,13 @@ RSpec::Core::RakeTask.new do |t|
   t.rspec_opts = "--example '#{ENV['example']}'" if ENV['example']
 end
 
+desc 'Run option-list quoting check'
+RSpec::Core::RakeTask.new(:quoting) do |t|
+  ENV['LKP_SRC'] ||= File.expand_path File.dirname(__FILE__).to_s
+
+  t.pattern = 'spec/unit/option_list_quoting_spec.rb'
+end
+
 if ENV['GENERATE_REPORTS'] == 'true'
   require 'ci/reporter/rake/rspec'
   task spec: 'ci:setup:rspec'
@@ -234,7 +241,7 @@ task :pylint do
 end
 
 desc 'Run code check'
-task code: %i[syntax yamllint shellcode rubocop ruff pylint]
+task code: %i[syntax yamllint shellcode rubocop ruff pylint quoting]
 
 namespace :docker do
   desc 'Build docker image'

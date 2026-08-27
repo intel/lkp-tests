@@ -21,6 +21,10 @@ describe 'require order' do
             [1, line]
           elsif line.include?('LKP_CORE_SRC')
             [2, line]
+          elsif line =~ /#\{[A-Z_]+\}/
+            # any other interpolated all-caps root constant (e.g. a
+            # suite-local *_ROOT) sorts after LKP_SRC/LKP_CORE_SRC too
+            [3, line]
           else
             [0, line]
           end

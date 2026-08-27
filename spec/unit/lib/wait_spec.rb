@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'tmpdir'
+require 'fileutils'
 require "#{LKP_SRC}/lib/bash"
 
 describe 'check_oom' do
@@ -78,5 +79,73 @@ describe 'check_oom' do
     dmesg = '[    1.234567] Linux version 7.2.0-rc2'
 
     expect(oom_detected?(dmesg)).to be false
+  end
+end
+
+describe 'WAIT_POST_TEST_CMD/WAIT_JOB_FINISHED_CMD word-splitting' do
+  # lib/wait.sh sets these to a two-word string ("<path>/wait post-test");
+  # the wait_* wrappers below rely on the var staying UNQUOTED so the shell
+  # re-splits it into [path, subcommand]. Quoting it collapses both words
+  # into one nonexistent argv[0] and exec fails with "No such file or
+  # directory" -- option_list_quoting_spec.rb statically guards this, but
+  # this proves the real, current source still behaves correctly, rather
+  # than trusting that static guard alone.
+  #
+  # $LKP_SRC/bin/event/wait itself is stubbed by pointing LKP_SRC at a temp
+  # root (with the real lib/ symlinked in) so wait.sh's own hardcoded
+  # "$LKP_SRC/bin/event/wait post-test" assignment resolves to our stub
+  # instead of the real binary.
+  def stub_wait_argv
+    Dir.mktmpdir('wait-spec-') do |tmp|
+      FileUtils.mkdir_p("#{tmp}/bin/event")
+      File.write("#{tmp}/bin/event/wait", <<~STUB)
+        #!/bin/sh
+        printf '%s\\n' "$@" >#{tmp}/argv
+      STUB
+      FileUtils.chmod('+x', "#{tmp}/bin/event/wait")
+
+      yield tmp
+
+      File.exist?("#{tmp}/argv") ? File.read("#{tmp}/argv").lines(chomp: true) : nil
+    end
+  end
+
+  it 'invokes wait_post_test with the path and subcommand as separate argv' do
+    argv = stub_wait_argv do |tmp|
+      Bash.run(<<~SCRIPT)
+        export TMP=#{tmp}
+        export LKP_SRC=#{tmp}
+        source #{LKP_SRC}/lib/wait.sh
+        wait_post_test --timeout 3
+      SCRIPT
+    end
+
+    expect(argv).to eq(%w[post-test --timeout 3])
+  end
+
+  it 'invokes wait_timeout with the path and subcommand as separate argv' do
+    argv = stub_wait_argv do |tmp|
+      Bash.run(<<~SCRIPT)
+        export TMP=#{tmp}
+        export LKP_SRC=#{tmp}
+        source #{LKP_SRC}/lib/wait.sh
+        wait_timeout 5
+      SCRIPT
+    end
+
+    expect(argv).to eq(%w[post-test --timeout 5])
+  end
+
+  it 'invokes wait_job_finished with the path and subcommand as separate argv' do
+    argv = stub_wait_argv do |tmp|
+      Bash.run(<<~SCRIPT)
+        export TMP=#{tmp}
+        export LKP_SRC=#{tmp}
+        source #{LKP_SRC}/lib/wait.sh
+        wait_job_finished --timeout 3
+      SCRIPT
+    end
+
+    expect(argv).to eq(%w[job-finished --timeout 3])
   end
 end
