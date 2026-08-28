@@ -1,6 +1,5 @@
 #!/bin/sh
 
-. "$LKP_SRC"/lib/result.sh
 . "$LKP_SRC"/lib/host.sh
 
 set_tbox_group "$(get_hostname)"

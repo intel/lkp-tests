@@ -6,7 +6,10 @@
 
 is_abs_path()
 {
-	[[ "${1:0:1}" = "/" ]]
+	case "$1" in
+	/*) true ;;
+	*) false ;;
+	esac
 }
 
 abs_path()
@@ -114,8 +117,7 @@ expand_cpu_list()
 	cpu_list=$1
 	for pair in $(echo "$cpu_list" | tr ',' ' '); do
 		if [ "${pair%%-*}" != "$pair" ]; then
-			IFS='-' read -r start end <<<"$pair"
-			seq "$start" "$end"
+			seq "${pair%-*}" "${pair#*-}"
 		else
 			echo "$pair"
 		fi
@@ -148,8 +150,8 @@ remove_prefix()
 is_rt()
 {
 	local path=$1
-	local bn=$(basename "$path")
-	local dn=$(dirname "$path")
+	local bn="$(basename "$path")"
+	local dn="$(dirname "$path")"
 	[[ $bn =~ ^[0-9]{1,5}$ ]] &&
 		[[ -f "$path/job.yaml" ]] &&
 		[[ -f "$dn/stddev.json" ]]
