@@ -75,8 +75,8 @@ is_supported_compiler_option()
 		-e "unrecognized command.line option" \
 		-e "no option" \
 		-e "unknown warning option" \
-		-e "unknown argument" \
-		&& return 1
+		-e "unknown argument" &&
+		return 1
 
 	return 0
 }
