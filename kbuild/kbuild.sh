@@ -90,8 +90,7 @@ add_kcflag()
 add_kbuild_kcflags()
 {
 	local kcflags_file=$1
-	while read flag
-	do
+	while read flag; do
 		add_kcflag "$flag"
 	done < <(grep -v -e "^#" -e "^$" $kcflags_file)
 }
@@ -110,7 +109,7 @@ is_llvm_equal_one_supported()
 
 	if [[ $ARCH = "s390" ]]; then
 		# [v6.9-rc2] 978fa00eb035 ("Documentation/llvm: Note s390 LLVM=1 support with LLVM 18.1.0 and newer")
-		(( clang_version < 18 )) && return 1
+		((clang_version < 18)) && return 1
 	elif [[ $ARCH = sparc64 ]]; then
 		# [v6.13-rc1] f6dee26d26e3 ("sparc/build: Add SPARC target flags for compiling with clang")
 		#    * - sparc (sparc64 only)
@@ -151,20 +150,27 @@ src_arch()
 	local ARCH=$1
 
 	case $ARCH in
-		i386|x86_64)
-			echo x86;;
-		sparc32|sparc64)
-			echo sparc;;
-		parisc|parisc64)
-			echo parisc;;
-		sh64)
-			echo sh;;
-		tilepro|tilegx)
-			echo tile;;
-		powerpc64)
-			echo powerpc;;
-		*)
-			echo $ARCH;;
+	i386 | x86_64)
+		echo x86
+		;;
+	sparc32 | sparc64)
+		echo sparc
+		;;
+	parisc | parisc64)
+		echo parisc
+		;;
+	sh64)
+		echo sh
+		;;
+	tilepro | tilegx)
+		echo tile
+		;;
+	powerpc64)
+		echo powerpc
+		;;
+	*)
+		echo $ARCH
+		;;
 	esac
 }
 
@@ -219,98 +225,98 @@ is_config_enabled()
 setup_cross_vars()
 {
 	case $ARCH in
-		arm)
-			cross_pkg=arm-linux-gnueabi
-			# cross_gcc=arm-linux-gnueabihf-gcc
-			crosstool=arm-linux-gnueabi
-			;;
-		arm64)
-			cross_pkg=aarch64-linux-gnu
-			crosstool=aarch64-linux
-			;;
-		mips)
-			if is_config_enabled CONFIG_64BIT; then
-				cross_pkg=mips64-linux-gnuabi64
-				crosstool=mips64-linux
-			else
-				cross_pkg=mips-linux-gnu
-				crosstool=mips-linux
-			fi
-			;;
-		powerpc|powerpc64)
-			if is_config_enabled CONFIG_PPC64; then
-				cross_pkg=powerpc64-linux-gnu
-				crosstool=powerpc64-linux
-			else
-				cross_pkg=powerpc-linux-gnu
-				crosstool=powerpc-linux
-			fi
-			;;
-		sh)
-			cross_pkg=sh4-linux-gnu
-			crosstool=sh4-linux
-			;;
-		alpha)
-			cross_pkg=alpha-linux-gnu
-			crosstool=alpha-linux
-			;;
-		sparc64)
+	arm)
+		cross_pkg=arm-linux-gnueabi
+		# cross_gcc=arm-linux-gnueabihf-gcc
+		crosstool=arm-linux-gnueabi
+		;;
+	arm64)
+		cross_pkg=aarch64-linux-gnu
+		crosstool=aarch64-linux
+		;;
+	mips)
+		if is_config_enabled CONFIG_64BIT; then
+			cross_pkg=mips64-linux-gnuabi64
+			crosstool=mips64-linux
+		else
+			cross_pkg=mips-linux-gnu
+			crosstool=mips-linux
+		fi
+		;;
+	powerpc | powerpc64)
+		if is_config_enabled CONFIG_PPC64; then
+			cross_pkg=powerpc64-linux-gnu
+			crosstool=powerpc64-linux
+		else
+			cross_pkg=powerpc-linux-gnu
+			crosstool=powerpc-linux
+		fi
+		;;
+	sh)
+		cross_pkg=sh4-linux-gnu
+		crosstool=sh4-linux
+		;;
+	alpha)
+		cross_pkg=alpha-linux-gnu
+		crosstool=alpha-linux
+		;;
+	sparc64)
+		cross_pkg=sparc64-linux-gnu
+		crosstool=sparc64-linux
+		;;
+	sparc)
+		if is_config_enabled CONFIG_64BIT; then
 			cross_pkg=sparc64-linux-gnu
 			crosstool=sparc64-linux
-			;;
-		sparc)
-			if is_config_enabled CONFIG_64BIT; then
-				cross_pkg=sparc64-linux-gnu
-				crosstool=sparc64-linux
-			else
-				crosstool=sparc-linux
-			fi
-			;;
-		parisc)
-			if is_config_enabled CONFIG_64BIT; then
-				cross_pkg=hppa64-linux-gnu
-				crosstool=hppa64-linux
-			else
-				cross_pkg=hppa-linux-gnu
-				crosstool=hppa-linux
-			fi
-			;;
-		parisc64)
+		else
+			crosstool=sparc-linux
+		fi
+		;;
+	parisc)
+		if is_config_enabled CONFIG_64BIT; then
 			cross_pkg=hppa64-linux-gnu
 			crosstool=hppa64-linux
-			;;
-		openrisc)
-			crosstool=or1k-linux
-			;;
-		s390)
-			cross_pkg=s390x-linux-gnu
-			crosstool=s390-linux
-			;;
-		m68k)
-			cross_pkg=m68k-linux-gnu
-			crosstool=m68k-linux
-			;;
-		c6x)
-			crosstool=c6x-elf
-			;;
-		riscv)
-			if is_config_enabled CONFIG_64BIT; then
-				cross_pkg=riscv64-linux-gnu
-				crosstool=riscv64-linux
-			elif is_config_enabled CONFIG_32BIT; then
-				crosstool=riscv32-linux
-			else
-				cross_pkg=riscv64-linux-gnu
-				crosstool=riscv64-linux
-			fi
-			;;
-		loongarch)
-			crosstool=loongarch64-linux
-			;;
-		*)
-			# arc, xtensa
-			crosstool=$ARCH-linux
-			;;
+		else
+			cross_pkg=hppa-linux-gnu
+			crosstool=hppa-linux
+		fi
+		;;
+	parisc64)
+		cross_pkg=hppa64-linux-gnu
+		crosstool=hppa64-linux
+		;;
+	openrisc)
+		crosstool=or1k-linux
+		;;
+	s390)
+		cross_pkg=s390x-linux-gnu
+		crosstool=s390-linux
+		;;
+	m68k)
+		cross_pkg=m68k-linux-gnu
+		crosstool=m68k-linux
+		;;
+	c6x)
+		crosstool=c6x-elf
+		;;
+	riscv)
+		if is_config_enabled CONFIG_64BIT; then
+			cross_pkg=riscv64-linux-gnu
+			crosstool=riscv64-linux
+		elif is_config_enabled CONFIG_32BIT; then
+			crosstool=riscv32-linux
+		else
+			cross_pkg=riscv64-linux-gnu
+			crosstool=riscv64-linux
+		fi
+		;;
+	loongarch)
+		crosstool=loongarch64-linux
+		;;
+	*)
+		# arc, xtensa
+		crosstool=$ARCH-linux
+		;;
 	esac
 }
 
@@ -331,16 +337,19 @@ is_kernel_version()
 	local other_kernel_version_major=${other%.*}
 	local other_kernel_version_minor=${other#*.}
 
-	local lhs=$(( kernel_version_major * 100 + kernel_version_minor ))
-	local rhs=$(( other_kernel_version_major * 100 + other_kernel_version_minor ))
+	local lhs=$((kernel_version_major * 100 + kernel_version_minor))
+	local rhs=$((other_kernel_version_major * 100 + other_kernel_version_minor))
 
 	case "$operator" in
-		'==') (( lhs == rhs )) ;;
-		'!=') (( lhs != rhs )) ;;
-		'<')  (( lhs < rhs ))  ;;
-		'>')  (( lhs > rhs ))  ;;
-		'<=') (( lhs <= rhs )) ;;
-		'>=') (( lhs >= rhs )) ;;
-		*)    echo "is_kernel_version: unknown operator '$operator'" >&2; return 1 ;;
+	'==') ((lhs == rhs)) ;;
+	'!=') ((lhs != rhs)) ;;
+	'<') ((lhs < rhs)) ;;
+	'>') ((lhs > rhs)) ;;
+	'<=') ((lhs <= rhs)) ;;
+	'>=') ((lhs >= rhs)) ;;
+	*)
+		echo "is_kernel_version: unknown operator '$operator'" >&2
+		return 1
+		;;
 	esac
 }

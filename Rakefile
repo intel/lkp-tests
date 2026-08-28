@@ -118,7 +118,6 @@ task :shfmt do
                 else
                   dir = ENV['dir'] || '.'
                   find_opts = '-type f -executable ' \
-                              '! -path "*/kbuild/kbuild.sh" ' \
                               '! -path "*/node_modules/*" ' \
                               '! -path "*/sbin/makepkg" ' \
                               '! -path "*/sbin/pacman-LKP" ' \
