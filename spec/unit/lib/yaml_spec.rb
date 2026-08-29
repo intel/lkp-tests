@@ -50,6 +50,22 @@ describe 'save_yaml_with_flock' do
   end
 end
 
+describe 'compress_file' do
+  after do
+    FileUtils.rm_f TEST_YAML_FILE
+    FileUtils.rm_f "#{TEST_YAML_FILE}.gz"
+  end
+
+  it 'overwrites a pre-existing .gz instead of refusing' do
+    File.write(TEST_YAML_FILE, 'fresh content')
+    File.write("#{TEST_YAML_FILE}.gz", 'stale gz left by a racing writer')
+
+    expect(compress_file(TEST_YAML_FILE)).to be true
+    expect(File.exist?(TEST_YAML_FILE)).to be false
+    expect(File.exist?("#{TEST_YAML_FILE}.gz")).to be true
+  end
+end
+
 describe 'yaml_merge_included_files' do
   yaml_merge_spec = <<EOF
 contents: &borrow-1d

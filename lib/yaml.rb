@@ -29,7 +29,8 @@ require "#{LKP_SRC}/lib/erb"
 require "#{LKP_SRC}/lib/log"
 
 def compress_file(file)
-  system "gzip #{file} < /dev/null"
+  # -f: callers always intend to overwrite, and a racing writer can recreate "#{file}.gz" after their own rm.
+  system "gzip -f #{file} < /dev/null"
 end
 
 def expand_yaml_template(yaml, file, context_hash = {})
