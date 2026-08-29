@@ -15,8 +15,9 @@ $stdin.each_line do |line|
   case line
 
   # /proc/meminfo is replaced as 'test_klp_atomic_replace: this has been live patched'
-  # from time to time in kselftests/livepatch testing. ignore them.
-  when /^(test_klp_atomic_replace:|entries)/
+  # from time to time in kselftests/livepatch testing, or clobbered by
+  # /proc/net/sockstat content during syscall fuzzing (e.g. trinity). ignore them.
+  when /^(test_klp_atomic_replace:|entries|sockets:|TCP:|UDP:|UDPLITE:|RAW:|FRAG:)/
     next
   when /^time:/
     puts line

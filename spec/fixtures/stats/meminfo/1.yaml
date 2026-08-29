@@ -1,0 +1,11 @@
+time: 100
+MemTotal: 1000
+MemFree: 800
+Memused: 200
+max_used_kB: 200
+time: 101
+time: 102
+MemTotal: 1000
+MemFree: 700
+Memused: 300
+max_used_kB: 300

@@ -1,0 +1,13 @@
+time: 100
+MemTotal:       1000 kB
+MemFree:        800 kB
+time: 101
+sockets: used 73
+TCP: inuse 0 orphan 0 tw 0 alloc 2 mem 0
+UDP: inuse 2 mem 0
+UDPLITE: inuse 1
+RAW: inuse 9
+FRAG: inuse 0 memory 0
+time: 102
+MemTotal:       1000 kB
+MemFree:        700 kB
