@@ -19,5 +19,29 @@ fs:
 xfstests:
   test:
     - generic-074 # runtime > 1h on 4HDD-udf/lkp-skl-d01
-    - generic-299 # runtime > 40m on 4HDD-ext4/lkp-skl-d02
     - generic-387 # runtime > 2h on 4HDD-xfs/lkp-skl-d01
+
+---
+suite: xfstests
+testcase: xfstests
+category: functional
+
+need_memory: 1G
+
+disk: 4HDD
+
+# btrfs is excluded here: generic/299 is permanently excluded for btrfs in
+# run_fs_tests() (lib/tests/xfstests.sh), so scheduling it here would only
+# ever produce a meaningless "Passed all 0 tests" run.
+fs:
+  - ext2
+  - ext4
+  - f2fs
+  - udf
+  - xfs
+  # - bcachefs
+  # - ocfs2 # mount.ocfs2 known bug
+
+xfstests:
+  test:
+    - generic-299 # runtime > 40m on 4HDD-ext4/lkp-skl-d02

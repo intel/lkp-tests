@@ -556,6 +556,13 @@ run_fs_tests()
 		} >>tests/exclude/xfs
 	fi
 
+	# generic/299 sizes its test file to the whole scratch device and
+	# repeatedly falloc/truncates it while AIO/DIO fio runs concurrently;
+	# on btrfs this COW-heavy fallocate pattern is far slower than on
+	# ext2/ext4/xfs/f2fs/udf and reliably blows even the 4x soft-timeout
+	# retry budget.
+	[[ "$fs" == "btrfs" ]] && echo "generic/299" >>tests/exclude/btrfs
+
 	[[ -s tests/exclude/$fs ]] && exclude_file="-E tests/exclude/$fs"
 	log_cmd ./check $exclude_file $all_tests
 }
