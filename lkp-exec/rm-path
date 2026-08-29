@@ -88,7 +88,12 @@ revert_unite_rt()
 	done
 
 	for path; do
+		local retry=0
 		while is_rt "$path" && check_rt "$path" && ! is_local_run "$path"; do
+			((++retry <= 30)) || {
+				echo "revert_unite_rt: gave up waiting for $path to leave its matrix after 5m" >&2
+				break
+			}
 			sleep 10
 		done
 	done
