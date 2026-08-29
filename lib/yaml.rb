@@ -6,6 +6,7 @@ require 'English'
 require 'fileutils'
 require 'json'
 require 'psych'
+require 'zlib'
 unless defined?(YAML)
   # Exclude our own dir from $LOAD_PATH before requiring 'yaml', so under
   # rspec (which adds 'lib' to $LOAD_PATH) this doesn't resolve back to
@@ -29,8 +30,14 @@ require "#{LKP_SRC}/lib/erb"
 require "#{LKP_SRC}/lib/log"
 
 def compress_file(file)
-  # -f: callers always intend to overwrite, and a racing writer can recreate "#{file}.gz" after their own rm.
-  system "gzip -f #{file} < /dev/null"
+  # GzipWriter.open truncates/creates its target directly, so a racing
+  # writer's "#{file}.gz" is always overwritten with no existence check
+  # (unlike shelling out to the gzip CLI, which refuses to overwrite).
+  Zlib::GzipWriter.open("#{file}.gz") { |gz| gz.write(File.binread(file)) }
+  FileUtils.rm(file)
+  true
+rescue StandardError
+  false
 end
 
 def expand_yaml_template(yaml, file, context_hash = {})

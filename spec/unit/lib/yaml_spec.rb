@@ -63,6 +63,11 @@ describe 'compress_file' do
     expect(compress_file(TEST_YAML_FILE)).to be true
     expect(File.exist?(TEST_YAML_FILE)).to be false
     expect(File.exist?("#{TEST_YAML_FILE}.gz")).to be true
+    expect(Zlib::GzipReader.open("#{TEST_YAML_FILE}.gz", &:read)).to eq 'fresh content'
+  end
+
+  it 'returns false instead of raising when the source file is missing' do
+    expect(compress_file(TEST_YAML_FILE)).to be false
   end
 end
 
