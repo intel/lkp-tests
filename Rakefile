@@ -86,6 +86,11 @@ RuboCop::RakeTask.new(:rubocop) do |t|
   puts "rubocop.options = #{t.options}"
 end
 
+desc 'Sort etc/ lists and other sortable files'
+task :sort do
+  sh "#{__dir__}/tools/sort-files"
+end
+
 desc 'Run syntax check'
 task :syntax do
   puts 'syntax start...'.yellow
