@@ -88,6 +88,8 @@ end
 
 desc 'Sort etc/ lists and other sortable files'
 task :sort do
+  ENV['SORT_FILES_KCONFIG_FALLBACK'] ||= 'ruby'
+
   sh "#{__dir__}/tools/sort-files"
 end
 

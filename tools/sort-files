@@ -1,30 +1,338 @@
-#!/bin/bash
+#!/usr/bin/env ruby
 
-[[ -n "$LKP_SRC" ]] || LKP_SRC="$(dirname "$(dirname "$(readlink -e -v "$0")")")"
+LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 2)
 
-echo "LKP_SRC=$LKP_SRC"
+require 'fileutils'
+require 'find'
+require 'open3'
+require "#{LKP_SRC}/lib/lkp_path"
+require "#{LKP_SRC}/lib/lkp_pattern"
 
 # etc/sort-files-exclude is the single shared exclusion list, kept in sync
 # with spec/unit/lib/file_sorting_spec.rb and spec/unit/require_order_spec.rb
-# so the check and this tool never drift apart on what "sortable" means.
-etc_exclude_args=()
-while IFS= read -r entry; do
-	if [[ $entry == */ ]]; then
-		etc_exclude_args+=(! -path "$LKP_SRC/${entry%/}/*")
-	else
-		etc_exclude_args+=(! -path "$LKP_SRC/$entry")
-	fi
-done < <(grep -v '^[[:space:]]*#\|^[[:space:]]*$' "$LKP_SRC/etc/sort-files-exclude")
+# so this tool and those checks never drift on what's exempt. A trailing /
+# marks a directory (matched anywhere under it); anything else is an exact
+# repo-root-relative file path. Each repo keeps its own copy of this file.
+SORT_EXCLUDE_ENTRIES = LKP::Pattern.lines(LKP::Path.etc('sort-files-exclude')).freeze
 
-(
-	echo $LKP_SRC/.gitignore
+def path_excluded?(file)
+  relative = file.delete_prefix("#{LKP_SRC}/")
 
-	find $LKP_SRC/distro/adaptation -type f ! -name README.md
-	find $LKP_SRC/distro/adaptation-pkg -type f
-	echo $LKP_SRC/distro/keep-deb
+  SORT_EXCLUDE_ENTRIES.any? do |entry|
+    entry.end_with?('/') ? relative.include?("/#{entry}") || relative.start_with?(entry) : relative == entry
+  end
+end
 
-	find $LKP_SRC/programs -type f -name depends\*
-	find "$LKP_SRC/etc" -type f ! -name \*.yml "${etc_exclude_args[@]}"
-) | while read -r f; do
-	LC_ALL=C sort -f $f | uniq >$f.tmp && mv $f.tmp $f
-done
+RUBY_SHEBANG_DIRS = %w[bin sbin tools programs filters lkp-exec].freeze
+ETC_EXCLUDED_EXTS = %w[.yml .rb .sh .py .txt].freeze
+
+def kconfig_include_file?(file)
+  File.basename(file) == 'include' &&
+    File.dirname(file, 2) == "#{LKP_CORE_SRC}/programs"
+end
+
+def ruby_shebang?(file)
+  File.open(file, 'rb') { |f| f.read(100) }.to_s.include?('ruby')
+end
+
+def ruby_file?(file)
+  return false if path_excluded?(file)
+  return true if file.end_with?('.rb')
+
+  RUBY_SHEBANG_DIRS.any? { |dir| file.start_with?("#{LKP_CORE_SRC}/#{dir}/") } &&
+    File.file?(file) && ruby_shebang?(file)
+end
+
+# Reorder only the `require '...'` lines in place, leaving every other
+# line (method bodies, class definitions, etc) untouched -- a blind
+# whole-file sort would otherwise scramble the rest of the file. Mirrors
+# the 4-tier ordering rule enforced by spec/unit/require_order_spec.rb:
+# plain requires first (with 'spec_helper' sorting ahead of the rest of
+# that tier -- see below), then requires mentioning LKP_SRC, then
+# LKP_CORE_SRC, then any other interpolated all-caps root constant (e.g.
+# a suite-local *_ROOT), alphabetical within each tier. A file opts out
+# entirely via an etc/sort-files-exclude entry.
+def sort_ruby_requires(file, check: false)
+  lines = File.readlines(file)
+  indices = lines.each_index.select { |i| lines[i] =~ /^require / }
+  return true if indices.empty?
+
+  require_lines = indices.map { |i| lines[i] }
+  sorted_lines = require_lines.sort_by do |line|
+    if line.include?('LKP_SRC')
+      [1, line]
+    elsif line.include?('LKP_CORE_SRC')
+      [2, line]
+    elsif line =~ /#\{[A-Z_]+\}/
+      [3, line]
+    elsif line == "require 'spec_helper'\n"
+      # A bare require that runs before spec_helper's $LOAD_PATH cleanup
+      # can silently resolve to this repo's own same-named lib/*.rb
+      # wrapper instead of the intended stdlib/gem (e.g. 'json' -- the
+      # merged lkp-src runtime tree layers the paired infrastructure
+      # repo's lib/ on top of lkp-tests', so lib/json.rb exists there even
+      # though it doesn't in this repo's own checkout), dragging in this
+      # repo's require chain
+      # before activesupport has finished installing its core extensions.
+      # Sort spec_helper ahead of every other plain require so that can't
+      # happen, regardless of what collides alphabetically.
+      [0, '']
+    else
+      [0, line]
+    end
+  end
+
+  return true if require_lines == sorted_lines
+
+  if check
+    puts "would sort require statements: #{file}"
+    return false
+  end
+
+  indices.each_with_index { |idx, j| lines[idx] = sorted_lines[j] }
+  File.write(file, lines.join)
+  true
+end
+
+# ASCII-only case-fold key, matching `LC_ALL=C sort -f`: only a-z/A-Z are
+# folded, everything else compares by raw byte value.
+def c_fold_key(line)
+  line.bytes.map { |b| b.between?(97, 122) ? b - 32 : b }
+end
+
+def sort_plain_file(file, check: false)
+  original = File.readlines(file)
+  sorted = original.sort_by { |line| c_fold_key(line) }
+  deduped = sorted.each_with_object([]) { |line, acc| acc << line unless acc.last == line }
+
+  return true if deduped == original
+
+  if check
+    puts "would sort: #{file}"
+    return false
+  end
+
+  tmp = "#{file}.tmp"
+  File.write(tmp, deduped.join)
+  FileUtils.mv(tmp, file)
+  true
+end
+
+# programs/<suite>/include mixes YAML keys, %if/%elsif ERB group blocks,
+# and comment-delimited sort barriers under need_kconfig: -- a blind
+# whole-file sort would scramble the header and the ERB block structure.
+# Only the contiguous `- SYMBOL` entry lines within each barrier-delimited
+# run get reordered relative to each other; a blank line, a `#`-comment,
+# or a %if/%elsif/%end marker starts a new run and every non-entry line
+# stays exactly where it is. Mirrors the entry_runs parsing in
+# spec/unit/kconfig_group_blocks_spec.rb.
+#
+# This pure-Ruby sorter is the fallback used when
+# SORT_FILES_KCONFIG_FALLBACK=ruby is set (a standalone lkp-tests checkout
+# never ships tools/ktest/kconfig-block-tool -- see sort_kconfig_include
+# below for the default, tool-delegating path used everywhere else).
+KCONFIG_ENTRY_RE = /^-\s+([A-Za-z0-9_][\w.+-]*)/
+
+def sort_kconfig_region(region)
+  result = region.dup
+  run_start = nil
+
+  flush = lambda do |run_end|
+    next if run_start.nil?
+
+    # Sort by the extracted symbol name only, not the whole line -- a
+    # byte-wise full-line compare would put e.g. CRYPTO_MANAGER2 before
+    # CRYPTO_MANAGER (':' sorts after '2'), whereas plain string
+    # comparison of the bare names correctly treats a strict prefix as
+    # sorting first.
+    keys = (run_start...run_end).map { |i| c_fold_key(KCONFIG_ENTRY_RE.match(result[i])[1]) }
+    order = (run_start...run_end).sort_by { |i| keys[i - run_start] }
+    sorted_lines = order.map { |i| result[i] }
+    (run_start...run_end).each { |i| result[i] = sorted_lines[i - run_start] }
+    run_start = nil
+  end
+
+  region.each_index do |i|
+    if KCONFIG_ENTRY_RE.match?(region[i])
+      run_start ||= i
+    else
+      flush.call(i)
+    end
+  end
+  flush.call(region.length)
+
+  result
+end
+
+def sort_kconfig_content(content)
+  lines = content.lines
+  scan_start = nil
+  lines.each_with_index { |line, i| scan_start = i + 1 if line.strip == 'need_kconfig:' }
+  return content if scan_start.nil?
+
+  sorted_region = sort_kconfig_region(lines[scan_start..])
+  (lines[0...scan_start] + sorted_region).join
+end
+
+def sort_kconfig_via_ruby(file, check:)
+  original = File.read(file)
+  sorted = sort_kconfig_content(original)
+  return true if sorted == original
+
+  if check
+    puts "would sort: #{file}"
+    return false
+  end
+
+  File.write(file, sorted)
+  true
+end
+
+# Delegates to tools/ktest/kconfig-block-tool, which only reorders entries
+# within each block/comment-delimited run -- same contract as
+# sort_kconfig_via_ruby above, but shared with kconfig-block-tool's other
+# subcommands (analyze, block-order, diff, coverage-check, gen-block).
+# Without --apply it prints the would-be result to stdout instead of
+# writing, using the exact same reconstruction the --apply path writes to
+# disk, so comparing that output against the current content is
+# equivalent to actually applying it and diffing -- without ever touching
+# the real file.
+def sort_kconfig_via_tool(file, check:)
+  tool_args = ['python3', "#{LKP_CORE_SRC}/tools/ktest/kconfig-block-tool", 'sort-all', file]
+
+  unless check
+    # Propagate failure instead of silently no-op'ing: an unchecked
+    # python3 call here previously let a missing/broken kconfig-block-tool
+    # dependency (e.g. an image build that doesn't ship the right path)
+    # exit 0 with the file left unsorted and no visible error.
+    _stdout, stderr, status = Open3.capture3(*tool_args, '--apply')
+    # kconfig-block-tool's "no % if/elsif ___.group blocks ..." notice is
+    # expected on most suite include files and always exits 0 -- only
+    # surface stderr for a real failure, or it drowns out actual errors
+    # across the hundreds of files this runs against.
+    warn stderr unless stderr.empty? || status.success?
+    return status.success?
+  end
+
+  original = File.read(file)
+  sorted_output, stderr, status = Open3.capture3(*tool_args)
+  unless status.success?
+    warn stderr unless stderr.empty?
+    return false
+  end
+  return true if sorted_output == original
+
+  puts "would sort: #{file}"
+  false
+end
+
+# LKP_CORE_SRC is expected to always ship tools/ktest/kconfig-block-tool
+# when it points at a full merged lkp-src tree -- a tree that claims to
+# be one but is missing it is a deploy bug, not something to silently
+# paper over (see spec/unit/tools/sort_files_kconfig_spec.rb in the
+# paired infrastructure repo). A standalone lkp-tests checkout never
+# ships that tool at all, so it opts into the pure-Ruby sorter explicitly via
+# SORT_FILES_KCONFIG_FALLBACK=ruby (set by lkp-tests' own Rakefile).
+def sort_kconfig_include(file, check: false)
+  return sort_kconfig_via_ruby(file, check: check) if ENV['SORT_FILES_KCONFIG_FALLBACK'] == 'ruby'
+
+  sort_kconfig_via_tool(file, check: check)
+end
+
+def sort_file(file, check: false)
+  return sort_kconfig_include(file, check: check) if kconfig_include_file?(file)
+  return sort_ruby_requires(file, check: check) if ruby_file?(file)
+
+  sort_plain_file(file, check: check)
+end
+
+# Matches GNU find's default (physical/lstat-based) `-type f`: a symlink
+# is never treated as a regular file, even if it points at one -- unlike
+# File.file?, which follows symlinks.
+def regular_file?(path)
+  File.file?(path) && !File.symlink?(path)
+end
+
+def find_files(root)
+  return [] unless Dir.exist?(root)
+
+  files = []
+  Find.find(root) do |path|
+    if path != root && File.basename(path).start_with?('.')
+      Find.prune
+    elsif regular_file?(path)
+      files << path
+    end
+  end
+  files
+end
+
+def distro_files
+  files = find_files("#{LKP_CORE_SRC}/distro/adaptation").reject { |path| File.basename(path) == 'README.md' }
+  files + find_files("#{LKP_CORE_SRC}/distro/adaptation-pkg")
+end
+
+def depends_files
+  find_files("#{LKP_CORE_SRC}/programs").select { |path| File.basename(path).start_with?('depends') }
+end
+
+def suite_include_files
+  Dir.glob("#{LKP_CORE_SRC}/programs/*/include").select { |path| regular_file?(path) }
+end
+
+def etc_files
+  find_files("#{LKP_CORE_SRC}/etc").reject do |path|
+    ETC_EXCLUDED_EXTS.include?(File.extname(path)) || path_excluded?(path)
+  end
+end
+
+def all_ruby_files
+  find_files(LKP_CORE_SRC).select { |path| path.end_with?('.rb') && !path_excluded?(path) }
+end
+
+def shebang_ruby_files
+  RUBY_SHEBANG_DIRS.each_with_object([]) do |dir, files|
+    dir_path = "#{LKP_CORE_SRC}/#{dir}"
+    next unless Dir.exist?(dir_path)
+
+    Dir.children(dir_path).each do |name|
+      path = "#{dir_path}/#{name}"
+      files << path if regular_file?(path) && ruby_shebang?(path)
+    end
+  end
+end
+
+# Only lkp-tests' own .gitignore is actually maintained as a flat sorted
+# list (the paired infrastructure repo's mixes commented-out sections, so
+# it's excluded via its own etc/sort-files-exclude instead of being
+# special-cased here).
+def top_level_files
+  ["#{LKP_CORE_SRC}/.gitignore", "#{LKP_CORE_SRC}/distro/keep-deb"].select { |path| regular_file?(path) && !path_excluded?(path) }
+end
+
+def target_files
+  top_level_files + distro_files + depends_files + suite_include_files + etc_files + all_ruby_files + shebang_ruby_files
+end
+
+# --check reports (without writing) whether any file needs sorting,
+# mirroring the rake rubocop task's default-check/fix=1-to-apply split.
+check = !ARGV.delete('--check').nil?
+
+if ARGV[0]
+  target = begin
+    File.realpath(ARGV[0])
+  rescue Errno::ENOENT
+    exit 0
+  end
+
+  exit 0 unless target_files.include?(target)
+
+  exit(sort_file(target, check: check) ? 0 : 1)
+end
+
+status = 0
+target_files.each do |f|
+  status = 1 unless sort_file(f, check: check)
+end
+puts "sort-files: #{target_files.size} files, #{status.zero? ? 'OK' : 'need sorting (see above)'}"
+exit status

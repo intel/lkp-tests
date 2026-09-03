@@ -186,10 +186,11 @@ describe 'option-list variable quoting' do
     'programs/energy/monitor' => ['WAIT_POST_TEST_CMD']
   }.freeze
 
-  # Known shfmt (v3.10.0) parser limitations, confirmed as valid bash via
-  # `bash -n` -- not a defect in the script itself. Read from lkp-core's
-  # etc/ file (this repo has none of its own yet, hence the ENOENT rescue)
-  # so `rake shfmt` and this check share one list instead of two.
+  # Known shfmt parser limitations, confirmed as valid bash via
+  # `bash -n` -- not a defect in the script itself. Read from the paired
+  # infrastructure repo's etc/ file (this repo has none of its own yet,
+  # hence the ENOENT rescue) so `rake shfmt` and this check share one
+  # list instead of two.
   unparseable_by_shfmt = begin
     YAML.load_file(LKP::Path.src('etc/shfmt-unparseable.yml'))
   rescue Errno::ENOENT

@@ -80,6 +80,53 @@ describe 'kconfig %if/%elsif blocks' do
       [blocks, all_fields(marker_lines)]
     end
 
+    # Line-range version of condition_blocks, needed to slice out each
+    # block's own entry lines (condition_blocks only keeps the parsed
+    # condition, not where its body starts/ends).
+    def block_ranges(content)
+      lines = content.lines.map(&:chomp)
+      scan_start = 0
+      lines.each_with_index { |line, i| scan_start = i + 1 if line.strip == 'need_kconfig:' }
+
+      ranges = []
+      marker_idx = nil
+      name = nil
+      (scan_start...lines.length).each do |i|
+        stripped = lines[i].strip
+        if stripped.start_with?('% if', '% elsif')
+          ranges << [name, marker_idx + 1, i] if marker_idx
+          marker_idx = i
+          cond = extract_condition(stripped.sub(/^%\s*(?:if|elsif)\s+/, ''))
+          name = cond&.name
+        elsif stripped == '% end'
+          ranges << [name, marker_idx + 1, i] if marker_idx
+          marker_idx = nil
+          name = nil
+        end
+      end
+      [lines, ranges]
+    end
+
+    # A blank line or `#`-comment line inside a block is a sort barrier,
+    # same semantics as kconfig-block-tool's sort_body: entries only need
+    # to be alphabetical within each barrier-delimited run, not across the
+    # whole block.
+    def entry_runs(lines, start_i, end_i)
+      runs = []
+      run = []
+      lines[start_i...end_i].each do |line|
+        m = /^-\s+([A-Za-z0-9_]+)\b/.match(line)
+        if m
+          run << m[1]
+        elsif !run.empty?
+          runs << run
+          run = []
+        end
+      end
+      runs << run unless run.empty?
+      runs
+    end
+
     def build_context(fields)
       dunder = {}
       top = {}
@@ -106,6 +153,20 @@ describe 'kconfig %if/%elsif blocks' do
         runs = blocks.slice_when { |a, b| a.compound || b.compound }
                      .map { |r| r.reject(&:compound).map(&:name) }
         expect(runs).to all(satisfy('be sorted') { |run| run == run.sort })
+      end
+
+      # Block ORDER (checked above) is separate from entry order WITHIN
+      # each block -- a batch of symbols appended out of order inside one
+      # %if/%elsif branch (e.g. kselftests, kselftests-bpf, kunit) is not
+      # caught by the block-order check at all.
+      lines, ranges = block_ranges(content)
+      ranges.each do |name, start_i, end_i|
+        next if name.nil?
+
+        runs = entry_runs(lines, start_i, end_i)
+        it "keeps '#{name}' block entries in alphabetical order" do
+          expect(runs).to all(satisfy('be sorted') { |run| run == run.sort })
+        end
       end
 
       blocks.each do |block|

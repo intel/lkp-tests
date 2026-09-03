@@ -12,6 +12,11 @@ describe 'require order' do
       it 'has sorted require statements' do
         require_lines = lines.grep(/^require /)
 
+        # spec_helper always sorts first among plain requires, ahead of
+        # plain alphabetical order: a bare require that runs before
+        # spec_helper's $LOAD_PATH cleanup can silently resolve to this
+        # repo's own same-named lib/*.rb wrapper instead of the intended
+        # stdlib/gem.
         sorted_lines = require_lines.sort_by do |line|
           if line.include?('LKP_SRC')
             [1, line]
@@ -21,6 +26,8 @@ describe 'require order' do
             # any other interpolated all-caps root constant (e.g. a
             # suite-local *_ROOT) sorts after LKP_SRC/LKP_CORE_SRC too
             [3, line]
+          elsif line == "require 'spec_helper'\n"
+            [0, '']
           else
             [0, line]
           end
