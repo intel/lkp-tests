@@ -115,9 +115,9 @@ class RepoSpec
 
     def urls_to_specs
       all.select { |repo_spec| repo_spec['url'] }
-         .reject { |repo_spec| repo_spec['name'] =~ /^(linux-review|internal-linux-review|linux-devel|internal-devel|linux)$/ } # linux duplicates to linus
+         .reject { |repo_spec| repo_spec['name'] =~ /^(linux-review|internal-linux-review|internal-devel|linux)$/ } # linux duplicates to linus
          .to_h { |repo_spec| [normalize_url(repo_spec['url']), repo_spec] }
-         .merge('internal_merge_and_test_tree' => all.find { |repo_spec| repo_spec['name'] == 'linux-devel' })
+         .merge('internal_merge_and_test_tree' => all.find { |repo_spec| repo_spec['name'] == 'internal-devel' })
     end
 
     def remotes_to_specs

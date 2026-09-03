@@ -1,7 +1,0 @@
-url: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-fetch_tags: true
-owner: 0day robot <lkp@intel.com>
-priority: high
-belongs_to: 0day
-no_merge_branch: .*
-branch_denylist: master|revert-.*
