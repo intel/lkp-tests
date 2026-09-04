@@ -62,7 +62,13 @@ end
 ARGV.each do |file|
   next if file.nil? || file.empty? || !File.exist?(file)
 
-  vars = YAML.unsafe_load_file file
+  begin
+    vars = YAML.unsafe_load_file file
+  rescue Psych::Exception => e
+    warn "fail to parse file #{file} as YAML: #{e.message}"
+    next
+  end
+
   unless vars
     warn "fail to load file #{file} which results in #{vars.inspect}"
     next
