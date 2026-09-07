@@ -1,5 +1,5 @@
-require 'fileutils'
 require 'spec_helper'
+require 'fileutils'
 require 'tmpdir'
 require 'yaml'
 require "#{LKP_SRC}/lib/bash"

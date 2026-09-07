@@ -1,6 +1,6 @@
 require 'spec_helper'
-require 'tmpdir'
 require 'fileutils'
+require 'tmpdir'
 require "#{LKP_SRC}/lib/bash"
 
 describe 'check_oom' do

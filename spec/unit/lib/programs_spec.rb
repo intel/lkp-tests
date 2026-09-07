@@ -1,5 +1,5 @@
-require 'fileutils'
 require 'spec_helper'
+require 'fileutils'
 require "#{LKP_SRC}/lib/lkp_tmpdir"
 require "#{LKP_SRC}/lib/programs"
 

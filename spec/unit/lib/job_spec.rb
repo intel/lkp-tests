@@ -1,6 +1,6 @@
+require 'spec_helper'
 require 'fileutils'
 require 'pathname'
-require 'spec_helper'
 require 'tmpdir'
 require 'yaml'
 require "#{LKP_SRC}/lib/job"

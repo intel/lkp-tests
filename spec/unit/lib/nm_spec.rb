@@ -1,5 +1,5 @@
-require 'set'
 require 'spec_helper'
+require 'set'
 require "#{LKP_SRC}/lib/nm"
 
 describe 'add_sign' do

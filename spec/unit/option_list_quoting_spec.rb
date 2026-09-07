@@ -1,6 +1,6 @@
-require 'spec_helper'
 require 'json'
 require 'open3'
+require 'spec_helper'
 require 'yaml'
 require "#{LKP_SRC}/lib/lkp_path"
 
