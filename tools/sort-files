@@ -28,7 +28,7 @@ ETC_EXCLUDED_EXTS = %w[.yml .rb .sh .py .txt].freeze
 
 def kconfig_include_file?(file)
   File.basename(file) == 'include' &&
-    File.dirname(file, 2) == "#{LKP_CORE_SRC}/programs"
+    File.dirname(file, 2) == "#{LKP_SRC}/programs"
 end
 
 def ruby_shebang?(file)
@@ -39,7 +39,7 @@ def ruby_file?(file)
   return false if path_excluded?(file)
   return true if file.end_with?('.rb')
 
-  RUBY_SHEBANG_DIRS.any? { |dir| file.start_with?("#{LKP_CORE_SRC}/#{dir}/") } &&
+  RUBY_SHEBANG_DIRS.any? { |dir| file.start_with?("#{LKP_SRC}/#{dir}/") } &&
     File.file?(file) && ruby_shebang?(file)
 end
 
@@ -198,7 +198,7 @@ end
 # equivalent to actually applying it and diffing -- without ever touching
 # the real file.
 def sort_kconfig_via_tool(file, check:)
-  tool_args = ['python3', "#{LKP_CORE_SRC}/tools/ktest/kconfig-block-tool", 'sort-all', file]
+  tool_args = ['python3', "#{LKP_SRC}/tools/ktest/kconfig-block-tool", 'sort-all', file]
 
   unless check
     # Propagate failure instead of silently no-op'ing: an unchecked
@@ -226,12 +226,12 @@ def sort_kconfig_via_tool(file, check:)
   false
 end
 
-# LKP_CORE_SRC is expected to always ship tools/ktest/kconfig-block-tool
-# when it points at a full merged lkp-src tree -- a tree that claims to
-# be one but is missing it is a deploy bug, not something to silently
-# paper over (see spec/unit/tools/sort_files_kconfig_spec.rb in the
-# paired infrastructure repo). A standalone lkp-tests checkout never
-# ships that tool at all, so it opts into the pure-Ruby sorter explicitly via
+# LKP_SRC is expected to always ship tools/ktest/kconfig-block-tool when
+# it points at a full merged lkp-src tree -- a tree that claims to be one
+# but is missing it is a deploy bug, not something to silently paper over
+# (see spec/unit/tools/sort_files_kconfig_spec.rb in the paired
+# infrastructure repo). A standalone lkp-tests checkout never ships that
+# tool at all, so it opts into the pure-Ruby sorter explicitly via
 # SORT_FILES_KCONFIG_FALLBACK=ruby (set by lkp-tests' own Rakefile).
 def sort_kconfig_include(file, check: false)
   return sort_kconfig_via_ruby(file, check: check) if ENV['SORT_FILES_KCONFIG_FALLBACK'] == 'ruby'
@@ -268,31 +268,31 @@ def find_files(root)
 end
 
 def distro_files
-  files = find_files("#{LKP_CORE_SRC}/distro/adaptation").reject { |path| File.basename(path) == 'README.md' }
-  files + find_files("#{LKP_CORE_SRC}/distro/adaptation-pkg")
+  files = find_files("#{LKP_SRC}/distro/adaptation").reject { |path| File.basename(path) == 'README.md' }
+  files + find_files("#{LKP_SRC}/distro/adaptation-pkg")
 end
 
 def depends_files
-  find_files("#{LKP_CORE_SRC}/programs").select { |path| File.basename(path).start_with?('depends') }
+  find_files("#{LKP_SRC}/programs").select { |path| File.basename(path).start_with?('depends') }
 end
 
 def suite_include_files
-  Dir.glob("#{LKP_CORE_SRC}/programs/*/include").select { |path| regular_file?(path) }
+  Dir.glob("#{LKP_SRC}/programs/*/include").select { |path| regular_file?(path) }
 end
 
 def etc_files
-  find_files("#{LKP_CORE_SRC}/etc").reject do |path|
+  find_files("#{LKP_SRC}/etc").reject do |path|
     ETC_EXCLUDED_EXTS.include?(File.extname(path)) || path_excluded?(path)
   end
 end
 
 def all_ruby_files
-  find_files(LKP_CORE_SRC).select { |path| path.end_with?('.rb') && !path_excluded?(path) }
+  find_files(LKP_SRC).select { |path| path.end_with?('.rb') && !path_excluded?(path) }
 end
 
 def shebang_ruby_files
   RUBY_SHEBANG_DIRS.each_with_object([]) do |dir, files|
-    dir_path = "#{LKP_CORE_SRC}/#{dir}"
+    dir_path = "#{LKP_SRC}/#{dir}"
     next unless Dir.exist?(dir_path)
 
     Dir.children(dir_path).each do |name|
@@ -307,7 +307,7 @@ end
 # it's excluded via its own etc/sort-files-exclude instead of being
 # special-cased here).
 def top_level_files
-  ["#{LKP_CORE_SRC}/.gitignore", "#{LKP_CORE_SRC}/distro/keep-deb"].select { |path| regular_file?(path) && !path_excluded?(path) }
+  ["#{LKP_SRC}/.gitignore", "#{LKP_SRC}/distro/keep-deb"].select { |path| regular_file?(path) && !path_excluded?(path) }
 end
 
 def target_files
