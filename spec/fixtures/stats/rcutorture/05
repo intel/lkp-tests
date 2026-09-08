@@ -1,0 +1,4 @@
+2021-05-04 05:07:21 modprobe rcutorture torture_type=tasks
+modprobe: ERROR: could not insert 'rcutorture': Device or resource busy
+[   12.345678] torture_init_begin: tasks-torture: Refusing to start multiple torture tests concurrently
+tasks-torture: Busy

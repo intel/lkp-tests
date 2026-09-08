@@ -9,6 +9,15 @@
 . $LKP_SRC/lib/debug.sh
 . $LKP_SRC/lib/reproduce-log.sh
 
+# a built-in torture self-test (e.g. CONFIG_HAZPTR_TORTURE_TEST=y with
+# shutdown_secs=0) can hold the kernel's shared "one torture test at a
+# time" lock for the whole boot, permanently blocking our modprobe --
+# report that distinctly instead of dying and losing the run to /result/bad.
+torture_busy_conflict()
+{
+	dmesg | grep -q "torture_init_begin:.*Refusing"
+}
+
 args=""
 
 case "$test" in
@@ -30,14 +39,27 @@ esac
 log_cmd depmod
 log=$(log_cmd modprobe rcutorture $args 2>&1) || {
 	echo "$log"
-	echo "$log" | grep -q "Invalid argument" ||
-		die "failed to load rcutorture module, try to enable CONFIG_RCU_TORTURE_TEST as module and build rcutorture.ko"
-	echo "$torture_type-torture: Skip"
-	exit
+
+	echo "$log" | grep -q "Invalid argument" && {
+		echo "$torture_type-torture: Skip"
+		exit
+	}
+
+	torture_busy_conflict && {
+		echo "$torture_type-torture: Busy"
+		exit
+	}
+
+	die "failed to load rcutorture module, try to enable CONFIG_RCU_TORTURE_TEST as module and build rcutorture.ko"
 }
 
 log_cmd sleep $runtime
 
 log_cmd rmmod rcutorture 2>/dev/null
+
+torture_busy_conflict && {
+	echo "$torture_type-torture: Busy"
+	exit
+}
 
 dmesg | grep torture:
