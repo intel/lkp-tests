@@ -4,6 +4,7 @@
 
 source $LKP_SRC/lib/result.sh
 source $LKP_SRC/lib/constant.sh
+source $LKP_SRC/lib/opt-date.sh
 
 shopt -s nullglob
 
@@ -43,9 +44,7 @@ shift $((OPTIND - 1))
 
 [[ $opt_test_dir ]] && KTEST_PATHS_DIR=$opt_test_dir
 
-[[ $opt_date =~ [0-9]+d$ ]] && opt_date=${opt_date%d}
-[[ $opt_date =~ [0-9]+w$ ]] && opt_date=$((${opt_date%w} * 7))
-[[ $opt_date =~ [0-9]+m$ ]] && opt_date=$((${opt_date%m} * 30))
+opt_date=$(opt_date_to_days "$opt_date")
 
 opt_queue="$opt_queue*"
 
