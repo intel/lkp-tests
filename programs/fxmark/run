@@ -4,7 +4,7 @@
 # - directio
 # - test
 # - duration
-# - thread_nr
+# - nr_threads
 # - blksize
 # - blkcount
 
@@ -17,7 +17,7 @@ cd_benchmark
 : "${duration:=50}"
 : "${blksize:=100M}"
 : "${blkcount:=10}"
-: "${thread_nr:=*}"
+: "${nr_threads:=*}"
 
 loopdev=$(losetup -f)
 
@@ -79,7 +79,7 @@ setup_config()
 	# fxmark's core-count matrix matches this host; otherwise thread counts above
 	# the build host's core count expand to zero test configs and the run produces
 	# no results.
-	./bin/cpu-sequences < /proc/cpuinfo | ./bin/gen_corepolicy py > ./bin/cpupol.py ||
+	./bin/cpu-sequences </proc/cpuinfo | ./bin/gen_corepolicy py >./bin/cpupol.py ||
 		return
 
 	# some tests create testfiles on host's device, e.g when we run test
@@ -102,7 +102,7 @@ setup_config()
 	sed -i "/    confirm_media_path()/i\\
     Runner.HDDDEV = \"$partition\"\n\
     Runner.SSDDEV = \"$partition\"\n\
-    run_config = [(Runner.CORE_COARSE_GRAIN, PerfMon.LEVEL_LOW, (\"$media\", \"$fstype\", \"$test\", \"$thread_nr\", \"$directio\")),]" bin/run-fxmark.py
+    run_config = [(Runner.CORE_COARSE_GRAIN, PerfMon.LEVEL_LOW, (\"$media\", \"$fstype\", \"$test\", \"$nr_threads\", \"$directio\")),]" bin/run-fxmark.py
 
 	sed -i "/    (opts, args) = parser.parse_args()/i\\
     parser.add_option(\"--directio\", help=\"directio\")" bin/run-*bench.py

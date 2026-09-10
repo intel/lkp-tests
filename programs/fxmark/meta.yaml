@@ -15,7 +15,7 @@ parameters:
   test:
   fstype: [ext4, ext4_no_jnl, xfs, btrfs, f2fs]
   directio: [bufferedio, directio]
-  thread_nr: "*"
+  nr_threads: "*"
   blksize: 100M
   blkcount: 1
 

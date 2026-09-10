@@ -4,6 +4,11 @@ suite: fxmark
 testcase: fxmark
 category: benchmark
 
+nr_threads:
+  - 4
+  - 2c
+  - 3c
+
 disk: 1HDD
 media: hdd
 
@@ -40,11 +45,3 @@ fxmark:
   directio:
     - bufferedio
     - directio
-  thread_nr:
-    # - 1
-    # - 2
-    - 4
-    - 18
-    # - 36 # may have disk space contention issue
-    - 54
-    # - 72
