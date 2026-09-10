@@ -36,9 +36,11 @@ create_host_config()
 		local mem_kb="$(grep MemTotal /proc/meminfo | awk '{print $2}')"
 		local mem_gb="$(((mem_kb) / 1024 / 1024))"
 		local nr_cpu="$(nproc)"
+		local nr_core_per_chip="$(lscpu | awk -F: '/^Core\(s\) per socket:/ { gsub(/ /, "", $2); print $2 }')"
 
 		cat <<EOT >>$host_config
 nr_cpu: $nr_cpu
+nr_core_per_chip: $nr_core_per_chip
 memory: ${mem_gb}G
 hdd_partitions: $hdd_partitions
 ssd_partitions: $ssd_partitions

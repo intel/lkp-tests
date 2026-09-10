@@ -90,6 +90,12 @@ Let's describe step by step with an example: ebizzy.
 		  duration: 10s   <= parameter, be parsed by test script self
 ```
 
+ `nr_threads` (and the identical `nr_task`/`nr_processes` params) also accept
+ a `c` suffix meaning "multiples of `nr_core_per_chip`" (the host's physical
+ core count per socket), e.g. `nr_threads: 1c` runs one chip's worth of
+ threads and `nr_threads: 2c` runs two chips' worth -- analogous to how `%`
+ means multiples of `nr_cpu`.
+
 - Write the test case result parser.
 
  While after running, the benchmark will generate result, and we should know

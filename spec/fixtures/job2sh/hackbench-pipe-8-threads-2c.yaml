@@ -1,0 +1,54 @@
+---
+
+#! jobs/hackbench.yaml
+suite: hackbench
+testcase: hackbench
+category: benchmark
+nr_threads: 2c
+iterations: 8
+hackbench:
+  mode: threads
+  ipc: pipe
+job_origin: jobs/hackbench.yaml
+testbox: lkp-docker
+arch: x86_64
+tbox_group: lkp-docker
+
+#! hosts/lkp-docker
+nr_cpu: 36
+nr_core_per_chip: 12
+memory: 62G
+hdd_partitions: 
+ssd_partitions: 
+local_run: 1
+
+#! include/category/benchmark
+kmsg: 
+boot-time: 
+uptime: 
+iostat: 
+heartbeat: 
+vmstat: 
+numa-numastat: 
+numa-vmstat: 
+numa-meminfo: 
+proc-vmstat: 
+proc-stat: 
+meminfo: 
+slabinfo: 
+interrupts: 
+lock_stat: 
+perf-sched:
+  lite_mode: 1
+softirqs: 
+bdi_dev_mapping: 
+diskstats: 
+nfsstat: 
+cpuidle: 
+cpufreq-stats: 
+turbostat: 
+sched_debug: 
+perf-stat: 
+mpstat: 
+perf-profile:
+  debug_mode: 0

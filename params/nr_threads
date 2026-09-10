@@ -1,2 +1,3 @@
 /(\d+(?:\.\d+)?)%$/      ($1.to_f * nr_cpu / 100).to_i
+/(\d+(?:\.\d+)?)c$/      ($1.to_f * nr_core_per_chip).to_i
 /(\d+)[a-z]+$/	$1.to_i
