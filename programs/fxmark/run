@@ -74,6 +74,14 @@ setup_config()
 	partition="${partitions%% *}"
 	[ "$partition" ] || return
 
+	# cpupol.py is generated from /proc/cpuinfo when the package is built, so it
+	# describes the build host, not the machine under test. Regenerate it here so
+	# fxmark's core-count matrix matches this host; otherwise thread counts above
+	# the build host's core count expand to zero test configs and the run produces
+	# no results.
+	./bin/cpu-sequences < /proc/cpuinfo | ./bin/gen_corepolicy py > ./bin/cpupol.py ||
+		return
+
 	# some tests create testfiles on host's device, e.g when we run test
 	# DWTL on ivb44, DWTL creates 24 testfiles on /dev/sdb1, each testfile
 	# is 16G. DWTL need a lot of time to finish, it always timeout.
