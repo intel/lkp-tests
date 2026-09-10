@@ -310,13 +310,6 @@ fixup_test()
 			[[ -f "$local_path" ]] && export IMA_KEXEC_IMAGE="$local_path"
 		fi
 		;;
-	net_stress.appl-dns)
-		# dig -n is not a valid option in modern BIND9; the test script
-		# dns-stress02-rmt.sh uses it for IPv6 reverse lookups but it causes dig
-		# to fail.  Replace with -6, the correct flag for IPv6-only transport.
-		# LTP installs scripts under testcases/bin/, not the source-tree path.
-		sed -i 's/opt="-n"/opt="-6"/' testcases/bin/dns-stress02-rmt.sh
-		;;
 	net_stress.appl-http)
 		# HTTP_DOWNLOAD_DIR defaults to /var/www/html (set by tst_net.sh).
 		# apache2 is installed (pkg/depends) so the directory exists and setup

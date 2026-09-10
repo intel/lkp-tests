@@ -118,11 +118,11 @@ split_tests()
 	hide cve
 
 	# net_stress.appl
+	# dns4-stress/dns6-stress were dropped upstream, so no dns bucket here
 	grep "ssh" net_stress.appl > net_stress.appl-ssh
-	grep "dns" net_stress.appl > net_stress.appl-dns
 	grep "http" net_stress.appl > net_stress.appl-http
 	grep "ftp" net_stress.appl > net_stress.appl-ftp
-	grep -v -e ^# -e ^$ -e ssh -e dns -e http -e ftp net_stress.appl && return 1
+	grep -v -e ^# -e ^$ -e ssh -e http -e ftp net_stress.appl && return 1
 	hide net_stress.appl
 
 	# syscalls-ipc
