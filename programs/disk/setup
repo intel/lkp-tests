@@ -15,50 +15,54 @@
 
 [ -n "$wait_disks_timeout" ] || wait_disks_timeout=300
 
-check_nr_partitions()
+# partitions is a shell glob/word-list to expand on the test box
+count_real_partitions()
 {
-	if [ -n "$ssd_partitions" ]; then
-		# ssd_partitions is a shell glob/word-list to expand on the test box
+	if [ -n "$1" ]; then
 		# shellcheck disable=SC2012,SC2086
-		max_ssd=$(ls $ssd_partitions 2>/dev/null | wc -l)
+		ls $1 2>/dev/null | wc -l
 	else
-		max_ssd=0
+		echo 0
+	fi
+}
+
+# Validate one disk class (ssd/hdd), but only if this job actually asked
+# for it (nr_request, from the job's own disk: request) -- a job that
+# only needs HDD must not fail because the host's hosts-file SSD entry
+# is stale or the SSD itself is undetected, and vice versa.
+check_disk_class()
+{
+	local nr_request="$1"
+	local class_label="$2"
+	local partitions="$3"
+	local nr_partitions="$4"
+	local max="$5"
+
+	[ "${nr_request:-0}" -gt 0 ] || return 0
+
+	if [ -n "$partitions" ] && [ "$nr_partitions" != "$max" ]; then
+		echo "disk number $nr_partitions mismatch with $max real disks: $partitions" >&2
+		return 1
 	fi
 
-	if [ -n "$hdd_partitions" ]; then
-		# hdd_partitions is a shell glob/word-list to expand on the test box
-		# shellcheck disable=SC2012,SC2086
-		max_hdd=$(ls $hdd_partitions 2>/dev/null | wc -l)
-	else
-		max_hdd=0
+	if [ "$nr_partitions" -gt 0 ] && [ -z "$partitions" ]; then
+		echo "Invalid $class_label disk configuration, please check host file!" >&2
+		return 1
 	fi
+
+	return 0
+}
+
+check_nr_partitions()
+{
+	max_ssd=$(count_real_partitions "$ssd_partitions")
+	max_hdd=$(count_real_partitions "$hdd_partitions")
 
 	nr_ssd_partitions=${nr_ssd_partitions:-$(echo $ssd_partitions | wc -w)}
 	nr_hdd_partitions=${nr_hdd_partitions:-$(echo $hdd_partitions | wc -w)}
 
-	# Only validate the disk class this job actually asked for (nr_ssd/
-	# nr_hdd, from the job's own disk: request) -- a job that only needs
-	# HDD must not fail because the host's hosts-file SSD entry is stale
-	# or the SSD itself is undetected, and vice versa.
-	[ "${nr_ssd:-0}" -gt 0 ] && [ "$ssd_partitions" ] && [ "$nr_ssd_partitions" != "$max_ssd" ] && {
-		echo "disk number $nr_ssd_partitions mismatch with $max_ssd real disks: $ssd_partitions" >&2
-		return 1
-	}
-
-	[ "${nr_hdd:-0}" -gt 0 ] && [ "$hdd_partitions" ] && [ "$nr_hdd_partitions" != "$max_hdd" ] && {
-		echo "disk number $nr_hdd_partitions mismatch with $max_hdd real disks: $hdd_partitions" >&2
-		return 1
-	}
-
-	[ "${nr_hdd:-0}" -gt 0 ] && [ "$nr_hdd_partitions" -gt 0 ] && [ -z "$hdd_partitions" ] && {
-		echo "Invalid hdd disk configuration, please check host file!" >&2
-		return 1
-	}
-
-	[ "${nr_ssd:-0}" -gt 0 ] && [ "$nr_ssd_partitions" -gt 0 ] && [ -z "$ssd_partitions" ] && {
-		echo "Invalid ssd disk configuration, please check host file!" >&2
-		return 1
-	}
+	check_disk_class "$nr_ssd" ssd "$ssd_partitions" "$nr_ssd_partitions" "$max_ssd" || return 1
+	check_disk_class "$nr_hdd" hdd "$hdd_partitions" "$nr_hdd_partitions" "$max_hdd" || return 1
 
 	return 0
 }
