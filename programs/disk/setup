@@ -36,22 +36,26 @@ check_nr_partitions()
 	nr_ssd_partitions=${nr_ssd_partitions:-$(echo $ssd_partitions | wc -w)}
 	nr_hdd_partitions=${nr_hdd_partitions:-$(echo $hdd_partitions | wc -w)}
 
-	[ "$ssd_partitions" ] && [ "$nr_ssd_partitions" != "$max_ssd" ] && {
+	# Only validate the disk class this job actually asked for (nr_ssd/
+	# nr_hdd, from the job's own disk: request) -- a job that only needs
+	# HDD must not fail because the host's hosts-file SSD entry is stale
+	# or the SSD itself is undetected, and vice versa.
+	[ "${nr_ssd:-0}" -gt 0 ] && [ "$ssd_partitions" ] && [ "$nr_ssd_partitions" != "$max_ssd" ] && {
 		echo "disk number $nr_ssd_partitions mismatch with $max_ssd real disks: $ssd_partitions" >&2
 		return 1
 	}
 
-	[ "$hdd_partitions" ] && [ "$nr_hdd_partitions" != "$max_hdd" ] && {
+	[ "${nr_hdd:-0}" -gt 0 ] && [ "$hdd_partitions" ] && [ "$nr_hdd_partitions" != "$max_hdd" ] && {
 		echo "disk number $nr_hdd_partitions mismatch with $max_hdd real disks: $hdd_partitions" >&2
 		return 1
 	}
 
-	[ "$nr_hdd_partitions" -gt 0 ] && [ -z "$hdd_partitions" ] && {
+	[ "${nr_hdd:-0}" -gt 0 ] && [ "$nr_hdd_partitions" -gt 0 ] && [ -z "$hdd_partitions" ] && {
 		echo "Invalid hdd disk configuration, please check host file!" >&2
 		return 1
 	}
 
-	[ "$nr_ssd_partitions" -gt 0 ] && [ -z "$ssd_partitions" ] && {
+	[ "${nr_ssd:-0}" -gt 0 ] && [ "$nr_ssd_partitions" -gt 0 ] && [ -z "$ssd_partitions" ] && {
 		echo "Invalid ssd disk configuration, please check host file!" >&2
 		return 1
 	}

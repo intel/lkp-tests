@@ -183,7 +183,8 @@ describe 'option-list variable quoting' do
   # as ONE positional argument to a locally-defined shell function, not
   # exec'd directly -- the function's own body expands it unquoted instead.
   safe_quoted_uses = {
-    'programs/energy/monitor' => ['WAIT_POST_TEST_CMD']
+    'programs/energy/monitor' => ['WAIT_POST_TEST_CMD'],
+    'programs/disk/setup' => %w[ssd_partitions hdd_partitions]
   }.freeze
 
   # Known shfmt parser limitations, confirmed as valid bash via
