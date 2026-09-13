@@ -6,6 +6,9 @@
 . $LKP_SRC/lib/debug.sh
 . $LKP_SRC/lib/wait.sh
 . $LKP_SRC/lib/run-env.sh
+. $LKP_SRC/lib/tests/fixup.sh
+
+fixup_python
 
 : "${tool:=$1}"
 [ -z "$tool" ] && die "No tool specified"
