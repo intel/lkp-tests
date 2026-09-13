@@ -212,7 +212,12 @@ class PerfStatParser
         fields[2] = fields[2][/.*\/(.*)\//, 1]
       end
 
-      return false unless fields.intersect?(events)
+      # events stays empty when the raw log never echoed a recognizable
+      # "perf stat ... -e ..." command line (e.g. programs/pmu-tools/parse
+      # is a symlink to this script, but its monitor invokes ocperf.py
+      # without echoing the command) -- in that case we have no expected
+      # event list to cross-check against, so don't reject every line.
+      return false unless events.empty? || fields.intersect?(events)
 
       prev_time = time
       time = stime.to_f
