@@ -17,7 +17,7 @@ ensure_pmu_events_cache
 
 if [ -n "$list_pmu_events" ]; then
 	create_links
-	python "$BENCHMARK_ROOT/pmu-tools/list-events.py" >"$TMP_RESULT_ROOT/pmu-events-list"
+	python3 "$BENCHMARK_ROOT/pmu-tools/list-events.py" >"$TMP_RESULT_ROOT/pmu-events-list"
 fi
 
 # perf may consume lots of fd
