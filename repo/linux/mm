@@ -1,1 +1,11 @@
 url: https://git.kernel.org/pub/scm/linux/kernel/git/mm/linux.git
+notify_build_success_branch: for-next-fixes|for-next|for-test
+mail_to: David Hildenbrand <david@kernel.org>
+mail_cc:
+- David Hildenbrand <david@kernel.org>
+prioritized_branch: for-test
+tests:
+  - branch: for-test
+    parameters:
+      mail_to:
+        - philip.li@intel.com
