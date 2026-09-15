@@ -115,6 +115,7 @@ job['rootfs'] ||= if File.exist? '/etc/os-release'
                     distro
                   end
 job['nr_cpu'] ||= Etc.nprocessors
+job['nr_node'] ||= Dir.glob('/sys/devices/system/node/node[0-9]*').size
 job['memory'] ||= (Bash.safe_grep("grep -w '^memory:' #{LKP_SRC}/hosts/#{HOSTNAME}").split[1] || '').chomp
 job['compiler'] ||= File.realpath('/usr/bin/gcc').match(/gcc.*/).to_s
 job['compiler'] = 'gcc' if job['compiler'].empty?
@@ -132,9 +133,14 @@ ENV['RESULT_ROOT'] = result_root
 ENV['TMP_RESULT_ROOT'] = result_root
 
 jobx = Job2sh.new(job.to_hash)
-unless jobx.expand_params
-  log_error 'Failed to expand params!'
-  exit
+begin
+  unless jobx.expand_params
+    log_error 'Failed to expand params!'
+    exit 1
+  end
+rescue Job::ParamError => e
+  log_error e.message
+  exit 1
 end
 
 FileUtils.rm_rf TMP
@@ -150,7 +156,11 @@ save_paths(result_root, user)
 
 system 'killall', '-q', "#{LKP_SRC}/bin/event/wakeup"
 
-with_thp_enabled { system job_script, 'run_job' }
+run_job_status = 0
+with_thp_enabled do
+  system job_script, 'run_job'
+  run_job_status = $?.exitstatus
+end
 
 system "#{LKP_SRC}/bin/run-with-job", job_script, "#{LKP_SRC}/bin/post-run"
 system "#{LKP_SRC}/bin/event/wakeup", 'job-finished'
@@ -169,3 +179,5 @@ convert_mrt(_result_root)
 
 FileUtils.rm_f(options[:result_root])
 FileUtils.ln_s(result_root, options[:result_root])
+
+exit run_job_status unless run_job_status.zero?
