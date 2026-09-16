@@ -1,5 +1,5 @@
 model: qemu-system-x86_64 -enable-kvm -cpu SandyBridge
-nr_cpu: 2
+nr_cpu: 4
 memory: 16G
 ssh_base_port: 23032
 kernel_cmdline_hw: watchdog_thresh=240 rcuperf.shutdown=0 rcuscale.shutdown=0 refscale.shutdown=0 audit=0 kunit.enable=0 ia32_emulation=on
