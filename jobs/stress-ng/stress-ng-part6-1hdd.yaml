@@ -25,6 +25,7 @@ stress-ng:
     - chown
     - copy-file
     - dentry
+    - dentrycache
     - dir
     - dirdeep
     - dirmany

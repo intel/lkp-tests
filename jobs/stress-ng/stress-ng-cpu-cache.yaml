@@ -32,6 +32,7 @@ stress-ng:
     - shellsort
     - skiplist
     - sparsematrix
+    - spec-rollback
     - str
     - stream
     - tree

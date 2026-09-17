@@ -55,6 +55,7 @@ stress-ng:
     - softlockup
     - sparsematrix
     - spawn
+    - spec-rollback
     - splice
     - stack
     - stackmmap

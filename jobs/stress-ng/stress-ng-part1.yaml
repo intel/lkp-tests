@@ -22,6 +22,7 @@ stress-ng:
     - binderfs
     - bitonicsort
     - bitops
+    - bpf
     - branch
     - brk
     - cache
@@ -53,6 +54,7 @@ stress-ng:
     - enosys
     - env
     - epoll
+    - epollmany
     - eth-sniff
     - exec
     - exit-group
@@ -73,6 +75,7 @@ stress-ng:
     - fp
     - fp-error
     - fp-misc
+    - fp-subnormal
     - full
     - funccall
     - funcret

@@ -18,6 +18,7 @@ stress-ng:
     - heapsort
     - hrtimers
     - hsearch
+    - hugepage
     - hyperbolic
     - icache
     - icmp-flood
