@@ -1,0 +1,20 @@
+#!/bin/bash
+
+. "$LKP_SRC/lib/env.sh"    # LKP environment variables (BENCHMARK_ROOT, TMP_RESULT_ROOT).
+. "$LKP_SRC/lib/upload.sh" # upload_files
+
+set -euxo pipefail
+
+linux_src="$BENCHMARK_ROOT/rust-analyzer/linux" # Conventional kbuild-style staging.
+[ -d "$linux_src" ] || die "linux source not found: $linux_src"
+
+rust_project_diff="$TMP_RESULT_ROOT/rust-project.diff"
+
+args=(
+	"--linux-src" "$linux_src"
+	"--rust-project-diff" "$rust_project_diff"
+)
+
+python3 "$LKP_SRC/programs/rust-analyzer/main.py" "${args[@]}"
+
+upload_files -t results "$rust_project_diff"
