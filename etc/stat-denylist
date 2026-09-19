@@ -252,6 +252,8 @@ Spectre_v2_mitigation
 ^lkvs\..*\.na
 ^lock_stat\.
 ^ltp\..*\.broken
+^ltp\.connect02\.fail
+^ltp\.cve-2018-9568\.fail
 ^max_iostat\.
 ^meminfo\.
 ^mpstat\.
