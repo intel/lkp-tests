@@ -556,7 +556,9 @@ def stat_unittest(lines)
       # Testing event system initcall: OK
       test_case = $1
       test_case = "#{test_along_with_function_tracer}.#{test_case}" if test_along_with_function_tracer
-      stats.add(test_case, :pass)
+      # the unreliable serial console (see verify_serial_log) occasionally
+      # duplicates a line verbatim, so allow re-adding the same test_case
+      stats.add(test_case, :pass, overwrite: true)
 
       test_along_with_function_tracer = nil if line =~ /Testing ftrace filter: OK/
     when /Testing (.+): (PASSED)/

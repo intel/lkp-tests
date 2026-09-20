@@ -82,6 +82,7 @@
 [  101.370130][    T1] Running tests again, along with the function tracer
 [  101.376960][    T1] Running tests on trace events:
 [  101.381916][    T1] Testing event initcall_finish: OK
+[  101.381916][    T1] Testing event initcall_finish: OK
 [  101.445000][    T1] Testing event initcall_start: OK
 [  101.511851][    T1] Testing event initcall_level: OK
 [  184.102867][    T1] Running tests on all trace events:
