@@ -16,7 +16,6 @@ ltp:
     - hugetlb
     - hyperthreading
     - input
-    - irq
     - kvm
 
 ---
