@@ -50,7 +50,7 @@ describe 'lkp-split-job' do
       Bash.run("LKP_SRC=#{@tmp_src_dir} #{@tmp_src_dir}/bin/lkp split-job --compatible -o #{@tmp_dir} spec/fixtures/split-job/compatible.yaml")
       new_yaml = 'compatible-test_1.yaml'
       # delete machine specific settings
-      %w[testbox tbox_group local_run memory nr_cpu ssd_partitions hdd_partitions model].each { |s| Bash.run("sed -i '/#{s}:/d' #{@tmp_dir.path(new_yaml)}") }
+      %w[testbox tbox_group local_run memory nr_cpu nr_core_per_chip ssd_partitions hdd_partitions model].each { |s| Bash.run("sed -i '/#{s}:/d' #{@tmp_dir.path(new_yaml)}") }
       actual = YAML.load_file(@tmp_dir.path(new_yaml))
       expected = YAML.load_file("#{LKP_SRC}/spec/fixtures/split-job/#{new_yaml}")
 
