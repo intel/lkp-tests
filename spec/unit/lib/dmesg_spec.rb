@@ -66,4 +66,38 @@ describe 'Dmesg' do
       end
     end
   end
+
+  describe 'get_content' do
+    # A kernel that floods printk (e.g. a runaway OOM-killer loop) can
+    # produce a kmsg/dmesg capture orders of magnitude larger than any
+    # real crash needs. Loading the whole file with File.read then risks
+    # exhausting memory in the stats-extraction step itself, turning one
+    # runaway kernel log into a "fail to extract stats" failure. Verify
+    # get_content caps how much of an oversized file it reads, using a
+    # small custom max_size so the spec doesn't need a huge fixture.
+    it 'reads the whole file when it is within the size limit' do
+      Tempfile.create('dmesg-small') do |f|
+        f.write("head-marker#{'x' * 20}tail-marker")
+        f.flush
+
+        content = get_content(f.path, 1024)
+
+        expect(content).to include('head-marker')
+        expect(content).to include('tail-marker')
+      end
+    end
+
+    it 'reads only the tail of a file larger than the size limit' do
+      Tempfile.create('dmesg-large') do |f|
+        f.write("head-marker#{'x' * 200}tail-marker")
+        f.flush
+
+        content = get_content(f.path, 50)
+
+        expect(content).not_to include('head-marker')
+        expect(content).to include('tail-marker')
+        expect(content.bytesize).to eq 50
+      end
+    end
+  end
 end

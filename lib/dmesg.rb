@@ -458,11 +458,28 @@ ensure
   FileUtils.rm uncompressed_dmesg if uncompressed_dmesg
 end
 
-def get_content(dmesg_file)
+# A kernel that floods printk (e.g. a runaway OOM-killer loop that never
+# reclaims) can produce a kmsg/dmesg capture orders of magnitude larger
+# than any real crash needs. Loading the whole file with File.read then
+# risks exhausting memory in the stats-extraction step itself, turning
+# one runaway kernel log into a "fail to extract stats" failure that
+# hides whatever crash info triggered the flood in the first place. Cap
+# how much of an oversized file gets read, keeping only the tail, which
+# is where the still-live calltrace/oops context lives.
+MAX_DMESG_CONTENT_SIZE = 200 * 1024 * 1024 # 200MB
+def get_content(dmesg_file, max_size = MAX_DMESG_CONTENT_SIZE)
   if dmesg_file =~ /\.xz$/
     Bash.run("xz -d -k #{dmesg_file} --stdout")
   else
-    File.read(dmesg_file)
+    size = File.size(dmesg_file)
+    if size > max_size
+      File.open(dmesg_file, 'rb') do |f|
+        f.seek(-max_size, IO::SEEK_END)
+        f.read
+      end
+    else
+      File.read(dmesg_file)
+    end
   end
 end
 
