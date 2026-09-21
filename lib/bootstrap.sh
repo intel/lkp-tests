@@ -424,13 +424,15 @@ mount_debugfs()
 	check_mount debug /sys/kernel/debug -t debugfs
 }
 
-# cache pkg for only one week to avoid "no space left" issue
+# check /opt/rootfs usage on every boot and delete cache older than
+# $delday days until usage drops below 80%; do not gate this behind a
+# once-per-week stamp (removed) -- the disk_usage check below already
+# makes repeated boots cheap when cleanup isn't needed, and a stamp
+# that skips the check for the rest of the week let /opt/rootfs stay
+# full once usage crossed 80% between stamp refreshes
 cleanup_pkg_cache()
 {
 	local pkg_cache=$1
-	local cleanup_stamp="$pkg_cache/cleanup_stamp/$(date +%U)"
-	[ -d "$cleanup_stamp" ] && return
-	mkdir "$cleanup_stamp" -p
 
 	for delday in $(seq 14 -1 0); do
 		# df /dev/sda1
