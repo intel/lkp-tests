@@ -48,6 +48,13 @@ check_nr_cpu()
 		return 0
 	}
 
+	# TODO: remove once vm-meta/vm-snb hosts config deploy has fully
+	# propagated and nr_cpu no longer drifts from the live guest vCPU count.
+	echo "$testbox" | grep -q "^vm-" && {
+		echo "check_nr_cpu: ignore the mismatch for $testbox"
+		return 0
+	}
+
 	ls -lrt /boot/config-*
 	config=/boot/config-$(uname -r)
 	[ -f "$config" ] && grep SMP $config
