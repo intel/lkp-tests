@@ -81,6 +81,18 @@ describe RepoSpec do
       expect(spec['maintained_files']).to eq '*'
     end
 
+    it 'uses default_branch for the upstream default branch when set' do
+      File.write("#{@lkp_src}/repo/linux/default-branch-main", <<~YAML)
+        url: https://git.example.com/default-branch-main.git
+        default_branch: main
+      YAML
+
+      spec = described_class.new('default-branch-main')
+      expect(spec['default_branch']).to eq 'main'
+      expect(spec.default_branch).to eq 'main'
+      FileUtils.rm_f("#{@lkp_src}/repo/linux/default-branch-main")
+    end
+
     it 'does not mark a non-matching name as upstream' do
       expect(described_class.new('acpi')['upstream']).to be_nil
     end

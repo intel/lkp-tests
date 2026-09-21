@@ -1,5 +1,6 @@
 url: https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git
 git_am_branch: main
+default_branch: main
 owner:
 - Johannes Berg <johannes@sipsolutions.net>
 mail_cc:

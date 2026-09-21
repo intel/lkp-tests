@@ -59,10 +59,15 @@ class RepoSpec
     if spec['upstream']
       spec['fetch_tags'] = true
       spec['git_am_branch'] ||= 'master'
+      spec['default_branch'] ||= 'master'
       spec['maintained_files'] ||= '*'
     end
 
     spec
+  end
+
+  def default_branch
+    self['default_branch'] || 'master'
   end
 
   def git_am_branches
