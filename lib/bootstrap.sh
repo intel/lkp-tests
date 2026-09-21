@@ -443,6 +443,20 @@ cleanup_pkg_cache()
 
 		find "$pkg_cache" \( -type f -mtime +${delday} -delete \) -or \( -type d -ctime +${delday} -empty -delete \)
 	done
+
+	# the day-granularity pass above only ever reaches "older than
+	# ~24h" (-mtime +0); on a host whose cache still fills up faster
+	# than that, escalate further in 4h steps down to "almost
+	# everything" instead of giving up at 24h
+	for delhour in $(seq 20 -4 0); do
+		disk_usage=$(df "$rootfs_partition" | grep "/opt/rootfs" | awk '{print $(NF-1)}' | awk -F'%' '{print $1}')
+		[ "$disk_usage" -lt 80 ] && break
+
+		local delmin=$((delhour * 60))
+		find "$pkg_cache" \( -type f -mmin +${delmin} -delete \) -or \( -type d -cmin +${delmin} -empty -delete \)
+	done
+
+	disk_usage=$(df "$rootfs_partition" | grep "/opt/rootfs" | awk '{print $(NF-1)}' | awk -F'%' '{print $1}')
 	echo "After clean up pkg cache, $rootfs_partition disk usage is $disk_usage%"
 }
 
