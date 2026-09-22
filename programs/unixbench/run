@@ -20,7 +20,8 @@ if [[ "$need_x" = true ]]; then
 	chmod 1777 /tmp/.X11-unix
 	chown root:root /tmp/.X11-unix
 
-	xinit $LKP_SRC/programs/unixbench/xinitrc 2>&1
+	xinit $LKP_SRC/programs/unixbench/xinitrc -- \
+		-config $LKP_SRC/programs/unixbench/xorg-headless.conf 2>&1
 	exit_status=$?
 
 	xinitrc_exit_status_file=/tmp/unixbench.xinitrc.exit-status
