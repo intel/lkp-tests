@@ -1,5 +1,10 @@
 boot_failures: 1
 
+# WARNING:.* at .* __free_reserved_area+0x
+WARNING:at_mm/memblock.c:#__free_reserved_area: 1
+message:WARNING:at_mm/memblock.c:#__free_reserved_area: kern  :warn  : [    3.078160] [      T0] WARNING: mm/memblock.c:904 at __free_reserved_area+0xd3/0xf0, CPU#0: swapper/0/0
+pattern:WARNING:at_mm/memblock.c:#__free_reserved_area: WARNING:.* at .* __free_reserved_area+0x
+
 # RIP: __free_reserved_area+0x
 RIP:__free_reserved_area: 1
 message:RIP:__free_reserved_area: kern  :warn  : [    3.078160] [      T0] RIP: 0010:__free_reserved_area+0xd3/0xf0
@@ -16,6 +21,7 @@ message:RIP:cpuidle_enter_state: kern  :warn  : [  445.811069] [     C15] RIP: 0
 pattern:RIP:cpuidle_enter_state: RIP: cpuidle_enter_state+0x
 
 timestamp:last: 446.035467
+timestamp:WARNING:at_mm/memblock.c:#__free_reserved_area: 3.078160
 timestamp:RIP:__free_reserved_area: 3.078160
 timestamp:irq#:nobody_cared: 445.803550
 timestamp:RIP:cpuidle_enter_state: 445.811069

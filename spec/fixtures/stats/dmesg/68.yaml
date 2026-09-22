@@ -5,10 +5,10 @@ related_general_protection_fault: 1
 message:related_general_protection_fault: [18444175627.134970] segment-related general protection fault: 206c [#2] PTI
 pattern:related_general_protection_fault: related general protection fault:
 
-# RIP: LC16+0x
+# RIP: .LC16+0x
 RIP:.LC16: 1
 message:RIP:.LC16: [18444175627.139181] RIP: 0010:.LC16+0x30d/0x7a7
-pattern:RIP:.LC16: RIP: LC16+0x
+pattern:RIP:.LC16: RIP: .LC16+0x
 
 # RIP: __nr_to_section+0x
 RIP:__nr_to_section: 1

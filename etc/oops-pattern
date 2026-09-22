@@ -79,6 +79,7 @@ unknown saturation event
 WARNING: .* detected$
 WARNING: .* lock.*
 WARNING: .*!$
+WARNING: \S+:\d+ at \S+\+0x[0-9a-f]+/0x[0-9a-f]+, CPU#\d+:
 WARNING: at .*
 WARNING: bad lookup idx: .*
 WARNING: chain_key collision
