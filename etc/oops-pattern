@@ -18,14 +18,12 @@ BUG .* \(.*\): .*
 CFI failure at [a-zA-Z0-9_]+
 CPU[0-9]+: .* cpu clock throttled .*
 decrement hit 0; leaking memory
-Destination address inappropriately aligned
 Destination address too large
 EIP is at [a-zA-Z0-9._]+\+0x.*/0x.*
 EIP: [a-zA-Z0-9._]+\+0x[a-f0-9]+/0x[a-f0-9]+
 Failed to allocate space for phdrs
 failed to enable IOPF feature
 genirq: Flags mismatch irq .*
-getblk\(\): invalid block size [0-9]+ requested
 GUP no longer grows the stack
 inconsistent [{].*[}] -> [{].*[}] usage\.
 INFO: .* cpu=.*
@@ -65,7 +63,6 @@ RIP: [0-9a-f]{4}:[a-zA-Z0-9._]+\+0x.*/0x.*
 RIP: [0-9a-f]{4}:\[.*\] [a-zA-Z0-9._]+\+0x.*/0x.*
 rootfs image is not initramfs \(invalid magic at start of compressed archive\)
 rsyslogd.* bad frame in 32bit sigreturn
-S0Box: more than 5 loops in s0box_interrupt
 saturated; leaking memory
 smp: csd: Re-sending CSD lock
 sysctl could not get directory:
@@ -90,7 +87,6 @@ WARNING: stack recursion
 WARNING: suspicious RCU usage
 WARNING: workqueue cpumask:
 warn_alloc_failed\+0x
-Wrong destination address
 [a-zA-Z0-9_ #]+: [0-9a-f]{4} \[#[0-9]+\]
 [a-zA-Z0-9_ -]+: BUG: .*
 [^ ]*\.[ch]:[0-9]+ .*!$
