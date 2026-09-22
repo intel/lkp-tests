@@ -53,6 +53,38 @@ describe 'Dmesg' do
         expect(line).to eq expected
       end
     end
+
+    it 'normalizes the newer file:line-before-"at" WARNING format to the same id as the older ordering' do
+      old_line = '[   11.858566][    T1] WARNING: CPU: 0 PID: 11 at kernel/locking/lockdep.c:3536 lock_release+0x179/0x3b7'
+      new_line = '[   11.858566][    T1] WARNING: kernel/locking/lockdep.c:3536 at lock_release+0x179/0x3b7, CPU#0: swapper/0/11'
+
+      old_id, old_bisect = analyze_error_id old_line
+      new_id, new_bisect = analyze_error_id new_line
+
+      expect(new_id).to eq old_id
+      expect(new_bisect).to eq old_bisect
+      expect(new_id).to eq 'WARNING:at_kernel/locking/lockdep.c:#lock_release'
+    end
+
+    it 'keeps the full function name of a .cold-suffixed WARNING in the new format (was truncated to "cold")' do
+      line = '[  141.464494][    T0] WARNING: kernel/trace/trace_events.c:420 at ' \
+             'test_double_dereference.cold+0x39/0x49, CPU#0: swapper/0/0'
+
+      id, bisect = analyze_error_id line
+
+      expect(id).to include('test_double_dereference.cold')
+      expect(bisect).to eq 'WARNING:.* at .* test_double_dereference.cold+0x'
+    end
+
+    it 'does not truncate a .cold-suffixed function name at the dot in the generic fallback path' do
+      # BUG: unable to handle kernel NULL pointer dereference falls through
+      # to oops_to_bisect_pattern's word scan rather than a dedicated
+      # handle_* branch -- confirm its function-name capture keeps the dot
+      # too, not just the WARNING-specific branch above.
+      line = 'some_other_bug_marker at print_circular_bug.cold+0x119/0x121'
+
+      expect(oops_to_bisect_pattern(line)).to include('print_circular_bug.cold+0x')
+    end
   end
 
   describe 'get_crash_calltraces' do

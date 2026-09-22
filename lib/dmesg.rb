@@ -214,7 +214,7 @@ def oops_to_bisect_pattern(line)
   words.each do |w|
     case w
     when /([a-zA-Z0-9_]+)\.(isra|constprop|part)\.[0-9]+\+0x/,
-         /([a-zA-Z0-9_]+\+0x)/,
+         /([a-zA-Z.0-9_]+\+0x)/,
          /([a-zA-Z0-9_]+=)/
       patterns << $1
       break
@@ -313,6 +313,18 @@ def handle_complex_patterns(line)
     bug_to_bisect = "WARNING:.* at .* #{$1.sub(/\.(isra|constprop|part)\.[0-9]+\+0x/, '')}"
     line =~ /(at .*)/
     line = "WARNING: #{$1}"
+  when %r{WARNING: (\S+:\d+) at ([a-zA-Z.0-9_]+\+0x[0-9a-f]+(?:/0x[0-9a-f]+)?)}
+    # newer kernels (v6.19+) moved file:line ahead of "at" and the
+    # func+offset right after it, instead of the older "at file:line
+    # func+offset" order -- normalize both into the same "WARNING: at
+    # file:line func" shape so error_id/bug_to_bisect stay identical
+    # for the same bug regardless of which kernel printed it, and a
+    # bisect spanning the format change still matches across it.
+    file_line = $1
+    func = $2
+    bisect_func = func.sub(%r{\+0x[0-9a-f]+(/0x[0-9a-f]+)?\z}, '+0x').sub(/\.(isra|constprop|part)\.[0-9]+\+0x/, '')
+    bug_to_bisect = "WARNING:.* at .* #{bisect_func}"
+    line = "WARNING: at #{file_line} #{func}"
   when /(UBSAN: .+)/,
        /(BUG: using smp_processor_id\(\) in preemptible)/,
        /^[0-9a-z]+>\] (.+)/
