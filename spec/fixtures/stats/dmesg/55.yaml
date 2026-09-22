@@ -5,6 +5,11 @@ WARNING:at_lib/list_debug.c:#__list_del_entry: 1
 message:WARNING:at_lib/list_debug.c:#__list_del_entry: [   85.102190] WARNING: CPU: 1 PID: 625 at lib/list_debug.c:59 __list_del_entry+0x82/0xd0
 pattern:WARNING:at_lib/list_debug.c:#__list_del_entry: WARNING:.* at .* __list_del_entry+0x
 
+# list_del corruption
+list_del_corruption: 1
+message:list_del_corruption: [   85.103449] list_del corruption. prev->next should be ffff880014bfe018, but was 2f30363030617369
+pattern:list_del_corruption: list_del corruption
+
 # SyS_reboot+0x
 calltrace:SyS_reboot: 1
 message:calltrace:SyS_reboot: [   85.105621]  [<ffffffff810b5af3>] SyS_reboot+0x113/0x220
@@ -12,4 +17,5 @@ pattern:calltrace:SyS_reboot: SyS_reboot+0x
 
 timestamp:last: 85.105621
 timestamp:WARNING:at_lib/list_debug.c:#__list_del_entry: 85.102190
+timestamp:list_del_corruption: 85.103449
 timestamp:calltrace:SyS_reboot: 85.105621

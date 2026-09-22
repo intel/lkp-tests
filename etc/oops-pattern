@@ -46,6 +46,7 @@ Kernel is not a valid ELF file
 Kernel panic - not syncing: .*
 KGDB: re-enter exception: ALL breakpoints killed
 kobject .*: (tried to .*|invalid kobject pointer!|must have a ktype to be initialized properly!)
+list_(add|del) corruption
 low stack detected by irq handler
 Mem-Info:
 neighbour: Destroying alive neighbour.*

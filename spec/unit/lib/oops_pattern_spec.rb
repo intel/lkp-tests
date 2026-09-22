@@ -23,4 +23,27 @@ describe 'etc/oops-pattern' do
 
     expect(oops_pattern.pattern(line)).to be_nil
   end
+
+  it 'recognizes list_add/list_del corruption from lib/list_debug.c, which has no "BUG:"/"WARNING:" lead-in' do
+    [
+      '[   12.345678][    T1] list_add corruption. prev is NULL.',
+      '[   12.345678][    T1] list_add corruption. next->prev should be prev (ffff888000000000), but was ' \
+      'ffff888000000010. (next=ffff888000000020).',
+      '[   12.345678][    T1] list_del corruption, ffff888000000000->next is LIST_POISON1 (dead000000000100)',
+      '[   12.345678][    T1] list_del corruption. prev->next should be ffff888000000000, but was ' \
+      'ffff888000000010. (prev=ffff888000000020)'
+    ].each do |line|
+      expect(oops_pattern.pattern(line)).not_to be_nil
+    end
+  end
+
+  it 'still recognizes BUG:-prefixed lockdep/KCSAN/KFENCE limit-exceeded reports via the generic BUG: catch-all' do
+    [
+      '[   12.345678][    T1] BUG: MAX_LOCKDEP_KEYS too low!',
+      '[   12.345678][    T1] BUG: KCSAN: data-race in foo / bar',
+      '[   12.345678][    T1] BUG: KFENCE: out-of-bounds read in foo+0xa6/0x234'
+    ].each do |line|
+      expect(oops_pattern.pattern(line)).not_to be_nil
+    end
+  end
 end
