@@ -295,7 +295,7 @@ fi
 [[ $stat_file ]] || check_empty_json
 
 if [ -f $log.gz ]; then
-	rm $log
+	rm -f $log
 elif [ -f $log.xz ]; then
 	rm $log -f
 fi
