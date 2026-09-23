@@ -87,6 +87,50 @@ describe 'Dmesg' do
     end
   end
 
+  describe 'grep_crash_head' do
+    # mm/page_alloc.c's warn_alloc() is shared by 4 callers (page allocation
+    # failure, its own separate stall warning, mm/vmalloc.c's error,
+    # mm/sparse-vmemmap.c's failure), each printed with the triggering
+    # process's comm followed by the same "mode:...nodemask=" suffix. Two
+    # different callers hitting with the *same* gfp_mask must still end up
+    # as different stats/bisect ids -- the caller's own message is what
+    # actually distinguishes the bug, not the shared mode/nodemask suffix.
+    it 'keeps different warn_alloc() callers distinct even when they share the same gfp_mask' do
+      Tempfile.create('dmesg-warn-alloc') do |f|
+        f.puts '[   10.000000] cc1: page allocation stall for 10 secs: order:0, mode:0x2cc0(GFP_KERNEL|__GFP_ZERO), nodemask=(null)'
+        f.puts '[   20.000000] cc1: vmemmap alloc failure: order:0, mode:0x2cc0(GFP_KERNEL|__GFP_ZERO), nodemask=(null)'
+        f.flush
+
+        oops_map = grep_crash_head(f.path)
+        error_ids = oops_map.keys.map { |key| analyze_error_id(key)[0] }
+
+        expect(error_ids.uniq.size).to eq(2)
+      end
+    end
+
+    it 'recognizes the newer file:line-before-"at" WARNING format newer kernels emit' do
+      Tempfile.create('dmesg-warning-new-order') do |f|
+        f.puts '[  141.464494][    T0] WARNING: kernel/trace/trace_events.c:420 at ' \
+               'test_double_dereference.cold+0x39/0x49, CPU#0: swapper/0/0'
+        f.flush
+
+        oops_map = grep_crash_head(f.path)
+
+        expect(oops_map).not_to be_empty
+        expect(analyze_error_id(oops_map.keys.first)[0]).to include('test_double_dereference.cold')
+      end
+    end
+
+    it 'does not treat an unrelated lkp harness banner line as an oops' do
+      Tempfile.create('dmesg-banner') do |f|
+        f.puts '[   42.122603][  T246] INFO: lkp CACHE_DIR is /tmp/cache'
+        f.flush
+
+        expect(grep_crash_head(f.path)).to be_empty
+      end
+    end
+  end
+
   describe 'get_crash_calltraces' do
     files = Dir.glob "#{LKP_SRC}/spec/fixtures/dmesg/calltrace/dmesg-*"
     files.each do |file|

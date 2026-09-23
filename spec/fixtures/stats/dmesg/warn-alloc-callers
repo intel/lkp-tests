@@ -1,0 +1,3 @@
+[  111.628064] cc1: page allocation stall for 10 secs: order:0, mode:0x2cc0(GFP_KERNEL|__GFP_ZERO), nodemask=(null)
+[  115.331209] kworker/u8:1: vmalloc error: size 4096, failed to allocate pages, mode:0x2cc0(GFP_KERNEL|__GFP_ZERO), nodemask=(null)
+[  120.503812] cc1: vmemmap alloc failure: order:0, mode:0x2cc0(GFP_KERNEL|__GFP_ZERO), nodemask=(null)

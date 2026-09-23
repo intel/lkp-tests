@@ -8,6 +8,7 @@
  is trying to release lock \(.*\) at
 32-bit relocation outside of kernel!
 64-bit relocation outside of kernel!
+: .+, mode:0x[0-9a-f]+\(.*\)[, ]*nodemask=
 addition on 0; use-after-free
 Assertion failed
 assertion failed

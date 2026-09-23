@@ -1,0 +1,21 @@
+boot_failures: 1
+
+# page allocation stall for .* secs: order:.* mode:.* nodemask=
+page_allocation_stall_for#secs:order:#,mode:#(GFP_KERNEL|__GFP_ZERO),nodemask=: 1
+message:page_allocation_stall_for#secs:order:#,mode:#(GFP_KERNEL|__GFP_ZERO),nodemask=: [  111.628064] cc1: page allocation stall for 10 secs: order:0, mode:0x2cc0(GFP_KERNEL|__GFP_ZERO), nodemask=(null)
+pattern:page_allocation_stall_for#secs:order:#,mode:#(GFP_KERNEL|__GFP_ZERO),nodemask=: page allocation stall for .* secs: order:.* mode:.* nodemask=
+
+# vmalloc error: size .* failed to allocate .* mode:.* nodemask=
+vmalloc_error:size#,failed_to_allocate_pages,mode:#(GFP_KERNEL|__GFP_ZERO),nodemask=: 1
+message:vmalloc_error:size#,failed_to_allocate_pages,mode:#(GFP_KERNEL|__GFP_ZERO),nodemask=: [  115.331209] kworker/u8:1: vmalloc error: size 4096, failed to allocate pages, mode:0x2cc0(GFP_KERNEL|__GFP_ZERO), nodemask=(null)
+pattern:vmalloc_error:size#,failed_to_allocate_pages,mode:#(GFP_KERNEL|__GFP_ZERO),nodemask=: vmalloc error: size .* failed to allocate .* mode:.* nodemask=
+
+# vmemmap alloc failure: order:.* mode:.* nodemask=
+vmemmap_alloc_failure:order:#,mode:#(GFP_KERNEL|__GFP_ZERO),nodemask=: 1
+message:vmemmap_alloc_failure:order:#,mode:#(GFP_KERNEL|__GFP_ZERO),nodemask=: [  120.503812] cc1: vmemmap alloc failure: order:0, mode:0x2cc0(GFP_KERNEL|__GFP_ZERO), nodemask=(null)
+pattern:vmemmap_alloc_failure:order:#,mode:#(GFP_KERNEL|__GFP_ZERO),nodemask=: vmemmap alloc failure: order:.* mode:.* nodemask=
+
+timestamp:last: 120.503812
+timestamp:page_allocation_stall_for#secs:order:#,mode:#(GFP_KERNEL|__GFP_ZERO),nodemask=: 111.628064
+timestamp:vmalloc_error:size#,failed_to_allocate_pages,mode:#(GFP_KERNEL|__GFP_ZERO),nodemask=: 115.331209
+timestamp:vmemmap_alloc_failure:order:#,mode:#(GFP_KERNEL|__GFP_ZERO),nodemask=: 120.503812
