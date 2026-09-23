@@ -10,8 +10,15 @@ build_perf()
 	perf_dir=$(ls -d /usr/src/linux-perf-*/tools/perf 2>/dev/null | head -n 1)
 	[[ -n "$perf_dir" ]] || return 0
 
+	local capstone_args=()
+
+	# e.g. CentOS/RHEL 9 Stream ships capstone 4.0.2, too old for perf's
+	# libcapstone disassembler backend to build against; skip it rather
+	# than fail the whole perf build.
+	pkg-config --atleast-version=5 capstone 2>/dev/null || capstone_args=(NO_CAPSTONE=1)
+
 	# shellcheck disable=SC2154
-	log_cmd make -j"${nr_cpu}" ARCH= -C "$perf_dir" 2>&1 || return
+	log_cmd make -j"${nr_cpu}" ARCH= "${capstone_args[@]}" -C "$perf_dir" 2>&1 || return
 
 	[[ -f /usr/bin/perf ]] && rm -f /usr/bin/perf
 	ln -s "$perf_dir"/perf /usr/bin/perf
