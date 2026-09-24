@@ -534,4 +534,16 @@ install_kernel_selftests()
 	for dir in $(selftests_static_target_dirs) $(selftests_symlink_target_dirs); do
 		pack_contents $dir "$(dirname "${benchmark_path}/$dir")"
 	done
+
+	# Pack any missing symlink targets referenced from tools/
+	local link target rel_target
+	while IFS= read -r -d '' link; do
+		target=$(realpath "$link" 2>/dev/null || true)
+		if [[ -n "$target" && -e "$target" && "$target" == "$PWD/"* ]]; then
+			rel_target="${target#$PWD/}"
+			if [[ ! -e "${benchmark_path}/$rel_target" ]]; then
+				pack_contents "$rel_target" "$(dirname "${benchmark_path}/$rel_target")"
+			fi
+		fi
+	done < <(find tools -type l -print0)
 }
