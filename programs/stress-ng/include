@@ -8,6 +8,7 @@ need_kconfig:
 - BSD_PROCESS_ACCT: y
 
 % elsif ___.test == "module"
+- RUNTIME_TESTING_MENU: y
 - TEST_LKM: m
 
 % elsif ___.test == "ovpn"
