@@ -20,4 +20,14 @@ read_ip()
 }
 
 [ -n "$IP" ] || read_ip
+
+# define variables required by configure_networking
+if grep -wq quiet /proc/cmdline; then
+	quiet=y
+else
+	quiet=n
+fi
+
+starttime=$(cat /proc/uptime | awk '{print int($1)+1}')
+
 configure_networking
