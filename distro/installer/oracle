@@ -5,4 +5,5 @@ if ! rpm -q epel-release >/dev/null; then
 	yum makecache fast
 fi
 
-yum install -y "$@"
+# shellcheck disable=SC2048
+yum install -y $*

@@ -20,4 +20,5 @@ if ! rpm -q epel-release >/dev/null; then
 	${package_manager} makecache
 fi
 
-${package_manager} install -y "$extra_option" "$@"
+# shellcheck disable=SC2048
+${package_manager} install -y "$extra_option" $*
