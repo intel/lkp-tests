@@ -20,6 +20,7 @@ CFI failure at [a-zA-Z0-9_]+
 CPU[0-9]+: .* cpu clock throttled .*
 decrement hit 0; leaking memory
 Destination address too large
+EDAC MC[0-9]+: [0-9]+ (CE|UE)\b
 EIP is at [a-zA-Z0-9._]+\+0x.*/0x.*
 EIP: [a-zA-Z0-9._]+\+0x[a-f0-9]+/0x[a-f0-9]+
 Failed to allocate space for phdrs
@@ -50,6 +51,7 @@ kobject .*: (tried to .*|invalid kobject pointer!|must have a ktype to be initia
 list_(add|del) corruption
 low stack detected by irq handler
 Mem-Info:
+Memory failure: .*: recovery action for .*
 neighbour: Destroying alive neighbour.*
 no CFI hash found at.*
 Oops: .*
@@ -78,7 +80,6 @@ unknown saturation event
 WARNING: .* detected$
 WARNING: .* lock.*
 WARNING: .*!$
-WARNING: \S+:\d+ at \S+\+0x[0-9a-f]+/0x[0-9a-f]+, CPU#\d+:
 WARNING: at .*
 WARNING: bad lookup idx: .*
 WARNING: chain_key collision
@@ -88,6 +89,7 @@ WARNING: kernel stack
 WARNING: stack recursion
 WARNING: suspicious RCU usage
 WARNING: workqueue cpumask:
+WARNING: \S+:\d+ at \S+\+0x[0-9a-f]+/0x[0-9a-f]+, CPU#\d+:
 warn_alloc_failed\+0x
 [a-zA-Z0-9_ #]+: [0-9a-f]{4} \[#[0-9]+\]
 [a-zA-Z0-9_ -]+: BUG: .*
@@ -97,4 +99,5 @@ warn_alloc_failed\+0x
 \[ INFO: [^i].* \]
 \[ {0,4}[A-Z][0-9]{1,5}\] BUG: .*
 \[drm:.*\[i915\]\]
+\[Hardware Error\]: .*
 ^BUG: .*

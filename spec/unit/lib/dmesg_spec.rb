@@ -129,6 +129,46 @@ describe 'Dmesg' do
         expect(grep_crash_head(f.path)).to be_empty
       end
     end
+
+    # drivers/edac/edac_mc.c's edac_ce_error()/edac_ue_error() are the
+    # shared reporting path for every EDAC memory-controller driver
+    # (amd64_edac, skx_edac, sb_edac, ...) -- a corrected or uncorrected
+    # ECC error is real kernel-detected hardware memory corruption even
+    # when it doesn't panic the boot.
+    it 'recognizes an EDAC corrected/uncorrected memory error report' do
+      Tempfile.create('dmesg-edac') do |f|
+        f.puts '[   12.345678] EDAC MC0: 1 CE row 2, chan 1 on mc#0csrow#2channel#1 ' \
+               '(csrow:2,channel:1 page:0x38a35 offset:0x0 grain:32 syndrome:0x0)'
+        f.flush
+
+        expect(grep_crash_head(f.path)).not_to be_empty
+      end
+    end
+
+    # arch/x86/kernel/cpu/mce/core.c's __print_mce() (and drivers/edac/
+    # mce_amd.c's AMD decode chain) print every logged machine check
+    # under the shared "[Hardware Error]: " (HW_ERR) prefix, whether or
+    # not the MCE goes on to panic the kernel.
+    it 'recognizes a machine-check "[Hardware Error]:" report' do
+      Tempfile.create('dmesg-mce') do |f|
+        f.puts '[   45.123456] [Hardware Error]: CPU 3: Machine Check: 0 Bank 4: b200000000070f0f'
+        f.flush
+
+        expect(grep_crash_head(f.path)).not_to be_empty
+      end
+    end
+
+    # mm/memory-failure.c's action_result() is the shared per-event
+    # summary for every hwpoison recovery path (GHES/APEI firmware-first
+    # memory errors, MCE recovery, and deliberate hwpoison testing).
+    it 'recognizes a memory-failure recovery-action report' do
+      Tempfile.create('dmesg-memory-failure') do |f|
+        f.puts '[   67.891234] Memory failure: 0x38a35: recovery action for dirty LRU page: Recovered'
+        f.flush
+
+        expect(grep_crash_head(f.path)).not_to be_empty
+      end
+    end
   end
 
   describe 'get_crash_calltraces' do

@@ -67,6 +67,8 @@ Spectre_v2_mitigation
 ^dmesg\.BUG_TestSlub_.*
 ^dmesg\.calltrace
 ^dmesg\.drm:intel_acpi_device_id_update.*
+^dmesg\.EDAC_MC.*(CE|UE)_row
+^dmesg\.Hardware_Error\]:.*
 ^dmesg\.inconsistent[{]HARDIRQ\-ON\-W[}]\-
 ^dmesg\.inconsistent[{]IN\-HARDIRQ\-W[}]\-
 ^dmesg\.INFO:NMI_handler.*took_too_long_to_run:
@@ -84,6 +86,7 @@ Spectre_v2_mitigation
 ^dmesg\.kobject\(.+#\):tried_to_init_an_initialized_object
 ^dmesg\.kobject\(\(_+ptrval_+\)\):tried_to_init_an_initialized_object
 ^dmesg\.Mem-Info
+^dmesg\.Memory_failure:#:recovery_action_for_.*
 ^dmesg\.net/mac80211/util\.c:#RCU\-list_traversed_in_non\-reader_section
 ^dmesg\.net/netfilter/ipset/ip_set_core\.c:#RCU\-list_traversed_in_non\-reader_section
 ^dmesg\.of-unittest
