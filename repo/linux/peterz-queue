@@ -10,6 +10,7 @@ subsystems:
 integration_testing_branches:
 - sched/core
 notify_build_success_branch: .*
+prioritized_branch: .*
 clone_from_upsteam_repos:
 - tip
 belongs_to: general scheduler
