@@ -22,5 +22,7 @@ homepage: https://www.kernel.org/doc/Documentation/locking/locktorture.txt
 
 parameters:
   runtime:
+  test:
+  torture_type:
 
 results:

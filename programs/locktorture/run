@@ -1,6 +1,7 @@
 #!/bin/bash
 # - runtime
 # - test
+# - torture_type
 
 ## The tests periodically output status messages via printk(),
 ## which can be examined via the dmesg (perhaps grepping for "torture")
@@ -9,6 +10,14 @@
 . $LKP_SRC/lib/debug.sh
 . $LKP_SRC/lib/reproduce-log.sh
 
+# a built-in torture self-test can hold the kernel's shared "one torture
+# test at a time" lock for the whole boot, permanently blocking our
+# modprobe -- report that distinctly instead of dying and losing the run.
+torture_busy_conflict()
+{
+	dmesg | grep -q "torture_init_begin:.*Refusing"
+}
+
 args=""
 case "$test" in
 cpuhotplug)
@@ -16,9 +25,22 @@ cpuhotplug)
 	;;
 esac
 
+[[ -n "$torture_type" ]] && args="${args} torture_type=$torture_type"
+
 log_cmd depmod
-log_cmd modprobe locktorture $args || {
+log=$(log_cmd modprobe locktorture $args 2>&1) || {
 	errno=$?
+	echo "$log"
+
+	echo "$log" | grep -q "Invalid argument" && {
+		echo "$torture_type-torture: Skip"
+		exit
+	}
+
+	torture_busy_conflict && {
+		echo "$torture_type-torture: Busy"
+		exit
+	}
 
 	sleep 10
 	die "failed to load locktorture module $errno"
@@ -27,5 +49,10 @@ log_cmd modprobe locktorture $args || {
 log_cmd sleep $runtime
 
 log_cmd rmmod locktorture
+
+torture_busy_conflict && {
+	echo "$torture_type-torture: Busy"
+	exit
+}
 
 dmesg | grep torture:

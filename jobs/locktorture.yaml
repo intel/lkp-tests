@@ -10,3 +10,7 @@ locktorture:
   test:
     - cpuhotplug
     - default
+  torture_type:
+    - spin_lock
+    - mutex_lock
+    - rwsem_lock
