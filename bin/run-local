@@ -2,6 +2,7 @@
 
 LKP_SRC = ENV['LKP_SRC'] || File.dirname(File.realpath($PROGRAM_NAME), 2)
 
+require 'English'
 require 'etc'
 require 'fileutils'
 require 'optparse'
@@ -159,7 +160,7 @@ system 'killall', '-q', "#{LKP_SRC}/bin/event/wakeup"
 run_job_status = 0
 with_thp_enabled do
   system job_script, 'run_job'
-  run_job_status = $?.exitstatus
+  run_job_status = $CHILD_STATUS.exitstatus
 end
 
 system "#{LKP_SRC}/bin/run-with-job", job_script, "#{LKP_SRC}/bin/post-run"
