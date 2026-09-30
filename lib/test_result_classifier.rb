@@ -4,9 +4,9 @@ LKP_SRC ||= ENV['LKP_SRC'] || File.dirname(__dir__)
 
 require "#{LKP_SRC}/lib/lkp_path"
 
-class TestResultDefinition
+class TestResultClassifier
   def initialize(definitions = nil)
-    definitions ||= LKP::Path.etc('test-result-definition.yml')
+    definitions ||= LKP::Path.etc('test-result-classifier.yml')
 
     # {"pass"=>{"*"=>"pass"}, "fail"=>{"*"=>"fail failed", "xfstests"=>"crash crashed warn"}, "skip"=>{"*"=>"skip block", "xfstests"=>"inconsistent_fs"}}
     @definitions = definitions.instance_of?(Hash) ? definitions : YAML.load_file(definitions)

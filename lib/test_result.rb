@@ -7,7 +7,7 @@ require "#{LKP_SRC}/lib/bisect_kpi"
 require "#{LKP_SRC}/lib/dirable"
 require "#{LKP_SRC}/lib/result"
 require "#{LKP_SRC}/lib/string"
-require "#{LKP_SRC}/lib/test_result_definition"
+require "#{LKP_SRC}/lib/test_result_classifier"
 
 module LKP
   # rli9 FIXME need better name for XTestResult, results, etc
@@ -124,9 +124,9 @@ module LKP
       return {} unless test_contents
 
       test_contents.reject { |test_stat, _values| LKP::StatDenylist.instance.contain?(test_stat) }
-                   .select { |test_stat, _values| test_stat =~ /^#{self['testcase']}/ && self.class.test_result_definition.result?(test_stat) }
+                   .select { |test_stat, _values| test_stat =~ /^#{self['testcase']}/ && self.class.test_result_classifier.result?(test_stat) }
                    .to_h do |test_stat, values|
-        result = self.class.test_result_definition.type(test_stat)
+        result = self.class.test_result_classifier.type(test_stat)
 
         # "kmsg.XFS(pmem#):EXPERIMENTAL_online_scrub_feature_in_use.Use_at_your_own_risk": 1,
         #
@@ -159,7 +159,7 @@ module LKP
 
       test_results = test_contents.select { |test_stat, _values| test_stat =~ /^(#{allowed_stats.map { |s| Regexp.escape(s) }.join('|')})/ }
                                   .to_h do |test_stat, values|
-        result = self.class.test_result_definition.type(test_stat)
+        result = self.class.test_result_classifier.type(test_stat)
         values = Array(values)
 
         [test_stat, BootTestResult.new(test_stat, result => values.sum)]
@@ -205,8 +205,8 @@ module LKP
     end
 
     module ClassMethods
-      def test_result_definition
-        @test_result_definition ||= TestResultDefinition.new
+      def test_result_classifier
+        @test_result_classifier ||= TestResultClassifier.new
       end
     end
   end
