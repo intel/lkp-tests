@@ -116,11 +116,8 @@ class StatClassifier
       return false if stat.index('.time.')
       return false if stat.index('.timestamp:')
       return false if stat.index('.bootstage:')
-      return true if LKP::Failure.instance.contain?(stat)
-      return true if LKP::Pass.instance.contain?(stat)
-      return true if LKP::Skip.instance.contain?(stat)
 
-      false
+      failure_stat?(stat) || pass_stat?(stat) || skip_stat?(stat)
     end
     cache_method :function_stat?
 
