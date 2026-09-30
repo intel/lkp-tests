@@ -125,8 +125,7 @@ class StatClassifier
     cache_method :function_stat?
 
     def latency_stat?(stat)
-      LKP::IndexLatencyAll.instance.key(stat)
-      false
+      !LKP::IndexLatencyAll.instance.key(stat).nil?
     end
     cache_method :latency_stat?
 

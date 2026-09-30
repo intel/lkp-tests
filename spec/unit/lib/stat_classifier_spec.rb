@@ -23,6 +23,16 @@ describe StatClassifier do
     end
   end
 
+  describe '.latency_stat?' do
+    it 'matches an etc/index-latency-all.yaml key' do
+      expect(described_class.latency_stat?('dd.kill_time')).to be true
+    end
+
+    it 'does not match a stat outside that index' do
+      expect(described_class.latency_stat?('some.random.stat')).to be false
+    end
+  end
+
   describe '.failure_stat?' do
     it 'matches etc/failure patterns' do
       expect(described_class.failure_stat?('dmesg.INFO:task_blocked_for_more_than#seconds')).to be true
