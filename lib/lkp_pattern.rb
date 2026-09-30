@@ -184,8 +184,8 @@ module LKP
     LKP::Pattern.generate_klass(LKP::Path.etc(file_name), anchor: :start)
   end
 
-  # generate LKP::Failure, LKP::Pass
-  %w[failure pass].each do |file_name|
+  # generate LKP::Failure, LKP::Pass, LKP::Skip
+  %w[failure pass skip].each do |file_name|
     LKP::Pattern.generate_klass(LKP::Path.etc(file_name), anchor: :start)
   end
 

@@ -118,6 +118,7 @@ class StatClassifier
       return false if stat.index('.bootstage:')
       return true if LKP::Failure.instance.contain?(stat)
       return true if LKP::Pass.instance.contain?(stat)
+      return true if LKP::Skip.instance.contain?(stat)
 
       false
     end
@@ -135,6 +136,10 @@ class StatClassifier
 
     def pass_stat?(stat)
       LKP::Pass.instance.contain?(stat)
+    end
+
+    def skip_stat?(stat)
+      LKP::Skip.instance.contain?(stat)
     end
 
     def memory_stat?(stat)

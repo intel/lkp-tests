@@ -8,6 +8,10 @@ describe StatClassifier do
       expect(described_class.function_stat?('xfstests.btrfs.192.fail')).to be true
     end
 
+    it 'treats a matched skip pattern as a function stat' do
+      expect(described_class.function_stat?('kselftests.net.foo.skip')).to be true
+    end
+
     it 'does not treat an unmatched stat as a function stat' do
       expect(described_class.function_stat?('perf-profile.calltrace.cycles-pp.error_entry')).to be false
     end
@@ -30,6 +34,20 @@ describe StatClassifier do
     it 'matches an etc/pass-suffixed stat' do
       expect(described_class.pass_stat?('xfstests.generic.001.pass')).to be true
       expect(described_class.pass_stat?('xfstests.generic.001.fail')).to be false
+    end
+  end
+
+  describe '.skip_stat?' do
+    it 'matches an etc/skip-suffixed stat' do
+      expect(described_class.skip_stat?('kselftests.net.foo.skip')).to be true
+      expect(described_class.skip_stat?('kselftests.net.foo.not_installed')).to be true
+      expect(described_class.skip_stat?('kselftests.net.foo.job_skip')).to be true
+      expect(described_class.skip_stat?('kselftests.net.foo.block')).to be true
+    end
+
+    it 'does not match a pass/fail-suffixed stat' do
+      expect(described_class.skip_stat?('xfstests.generic.001.pass')).to be false
+      expect(described_class.skip_stat?('xfstests.generic.001.fail')).to be false
     end
   end
 
