@@ -10,7 +10,11 @@ module Git
   class Base
     include Cacheable
 
-    cache_method :gcommit, cache_key_prefix_generator: lambda(&:object_id)
+    # a ref that isn't already a resolved 40-char sha (HEAD, a branch, a tag,
+    # an abbreviated sha) can be re-pointed to a different commit between two
+    # calls on the same instance, so only ever cache the already-immutable
+    # sha form.
+    cache_method :gcommit, cache_key_prefix_generator: lambda(&:object_id), skip_cache: ->(ref) { !Git.sha1_40?(ref) }
   end
 end
 

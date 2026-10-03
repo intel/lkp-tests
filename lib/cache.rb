@@ -23,6 +23,14 @@ module Cacheable
     #   ->(obj) {obj.to_s} => share cache between objects who has same to_s
     #   ->(obj) {obj.object_id} => do not share cache between objects
     #
+    # skip_cache - ->(*args, **kwargs) { ... }, called with the method's own
+    #   call args/kwargs; when it returns true the call bypasses the cache
+    #   entirely (no read, no write), always invoking the real method. Use
+    #   this when some argument shapes represent a moving/mutable target
+    #   (e.g. a ref name that can be re-pointed between two calls) that must
+    #   never be cached, while other argument shapes (e.g. an already-
+    #   resolved immutable sha) are safe to cache as usual.
+    #
     def cache_method(method_name, options = {})
       # credit to rails alias_method_chain
       alias_method "#{method_name}_without_cache", method_name
@@ -60,6 +68,9 @@ module Cacheable
     end
 
     def cache_fetch(obj, method_name, *args, **kwargs)
+      skip_cache = cache_options[method_name][:skip_cache]
+      return obj.send("#{method_name}_without_cache", *args, **kwargs) if skip_cache&.call(*args, **kwargs)
+
       cache_store = cache_store(method_name)
       cache_key = cache_key(obj, method_name, *args, **kwargs)
 

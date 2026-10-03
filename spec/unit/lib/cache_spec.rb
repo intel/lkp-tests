@@ -42,4 +42,39 @@ describe 'Cacheable' do
       expect(CacheableFixture.call_count).to eq(2)
     end
   end
+
+  describe '.cache_method with skip_cache' do
+    before do
+      stub_const('SkipCacheFixture', Class.new do
+        class << self
+          include Cacheable
+
+          attr_accessor :call_count
+
+          def resolve(ref)
+            self.call_count += 1
+            "#{ref}-#{call_count}"
+          end
+          cache_method :resolve, skip_cache: ->(ref) { ref != 'stable-id' }
+        end
+      end)
+      SkipCacheFixture.call_count = 0
+    end
+
+    it 'never caches an argument for which skip_cache returns true' do
+      first = SkipCacheFixture.resolve('HEAD')
+      second = SkipCacheFixture.resolve('HEAD')
+
+      expect(second).not_to eq(first)
+      expect(SkipCacheFixture.call_count).to eq(2)
+    end
+
+    it 'still caches an argument for which skip_cache returns false' do
+      first = SkipCacheFixture.resolve('stable-id')
+      second = SkipCacheFixture.resolve('stable-id')
+
+      expect(second).to eq(first)
+      expect(SkipCacheFixture.call_count).to eq(1)
+    end
+  end
 end
