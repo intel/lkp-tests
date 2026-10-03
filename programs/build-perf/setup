@@ -17,8 +17,20 @@ build_perf()
 	# than fail the whole perf build.
 	pkg-config --atleast-version=5 capstone 2>/dev/null || capstone_args=(NO_CAPSTONE=1)
 
+	# tools/perf's own Makefile.perf does not fully serialize the
+	# pmu-events/jevents.py code-generation step across its recursive
+	# sub-makes (e.g. the perf_selftests sub-build): under very high
+	# parallelism, many sub-make branches independently decide the same
+	# generated file needs rebuilding at once, producing dozens of
+	# redundant concurrent jevents.py invocations instead of one. This
+	# is latent and harmless at ordinary core counts but turns into a
+	# many-hour (or non-converging) build storm on a host with a very
+	# high core count. Cap parallelism well below nr_cpu rather than
+	# feeding this build an unbounded job count.
 	# shellcheck disable=SC2154
-	log_cmd make -j"${nr_cpu}" ARCH= "${capstone_args[@]}" -C "$perf_dir" 2>&1 || return
+	local perf_build_jobs=$((nr_cpu < 128 ? nr_cpu : 128))
+
+	log_cmd make -j"$perf_build_jobs" ARCH= "${capstone_args[@]}" -C "$perf_dir" 2>&1 || return
 
 	[[ -f /usr/bin/perf ]] && rm -f /usr/bin/perf
 	ln -s "$perf_dir"/perf /usr/bin/perf
