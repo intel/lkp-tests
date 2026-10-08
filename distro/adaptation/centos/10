@@ -1,0 +1,37 @@
+apache2-utils: httpd-tools
+auditd: audit
+cpuid:
+cython3: python3-Cython
+dhcp-server:
+dropwatch:
+dump:
+fscrypt:
+gcc-toolset-binutils:
+gcc-toolset:
+inxi:
+isc-dhcp-client:
+libdw1: elfutils-libs
+libgles2-mesa-dev: libglvnd-devel
+libgles2: libglvnd-gles
+libinih-dev: inih-devel
+libinih1: inih
+libiscsi-devel:
+libiscsi:
+libjson-c5: json-c
+libpcre3-dev:
+libsystemd0: systemd-libs
+libusb-1.0-0-dev: libusb1-devel
+libusb-1.0-0: libusb1
+mysql-devel: mariadb-connector-c-devel
+openjdk:
+python2:
+python3-drgn: drgn
+python3-pypillowfight:
+python3-venv:
+rusers-server:
+teamd:
+tofrodos:
+udftools:
+util-linux-extra: util-linux
+x11-common:
+xinetd:

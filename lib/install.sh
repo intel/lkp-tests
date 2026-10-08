@@ -149,7 +149,7 @@ map_python_packages()
 	fedora-[3][8-9]* | fedora-41)
 		map_python2_to_python3
 		;;
-	centos-[9]*)
+	centos-[9]* | centos-10)
 		map_python2_to_python3
 		;;
 	opensuse-*)

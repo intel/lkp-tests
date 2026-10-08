@@ -361,7 +361,7 @@ enable_source_repository()
 		yum install -y yum-utils
 	fi
 
-	if [ "$_system_version" = 9 ]; then
+	if [ "$_system_version" -ge 9 ]; then
 		echo "enable source crb"
 		dnf config-manager --set-enabled crb
 	elif [ "$_system_version" = 8 ]; then
