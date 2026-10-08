@@ -38,6 +38,11 @@ describe StatClassifier do
       expect(described_class.failure_stat?('dmesg.INFO:task_blocked_for_more_than#seconds')).to be true
       expect(described_class.failure_stat?('perf-profile.calltrace.cycles-pp.error_entry')).to be false
     end
+
+    it 'matches a real locktorture/rcutorture hotplug stat' do
+      expect(described_class.failure_stat?('locktorture.spin_lock.lock_hotplug')).to be true
+      expect(described_class.failure_stat?('rcutorture.rcu_pathological.rcu_hotplug')).to be true
+    end
   end
 
   describe '.pass_stat?' do

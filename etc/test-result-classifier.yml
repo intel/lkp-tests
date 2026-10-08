@@ -10,8 +10,8 @@ fail:
   dmesg: .+
   kmsg: .+
   last_state: .+
-  rcutoture: rcu_hotplug
-  locktoture: lock_hotplug
+  rcutorture: rcu_hotplug
+  locktorture: lock_hotplug
   leaking-addresses: dmesg\.(?!R).* proc\.(?!blacklist|netlink|vmallocinfo)(?!.*:0000000)
   rcuperf: unknown
   avocado: interrupted warn

@@ -83,4 +83,15 @@ describe TestResultClassifier do
       end
     end
   end
+
+  describe '.type against the real etc/test-result-classifier.yml' do
+    before(:all) do
+      @real_classifier = described_class.new
+    end
+
+    it 'classifies a real locktorture/rcutorture hotplug stat as fail' do
+      expect(@real_classifier.type('locktorture.spin_lock.lock_hotplug')).to eq('fail')
+      expect(@real_classifier.type('rcutorture.rcu_pathological.rcu_hotplug')).to eq('fail')
+    end
+  end
 end

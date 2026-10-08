@@ -4,7 +4,7 @@ dmesg.*
 kmemleak\..+unreferenced_object\..+
 kmsg.*
 last_state.*
-locktoture\..+lock_hotplug
-rcutoture\..+rcu_hotplug
+locktorture\..+lock_hotplug
+rcutorture\..+rcu_hotplug
 stderr.*
 xfstests\..+fail$
