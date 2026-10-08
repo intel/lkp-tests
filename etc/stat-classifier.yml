@@ -1,3 +1,10 @@
+# StatClassifier#type checks pass/fail/skip in this file's top-level
+# key order and returns the first type whose pattern matches. dmesg/last_state
+# below have both a specific pass word and a blanket `fail: .+` entry for the
+# same prefix, so pass is intentionally listed before fail -- reordering
+# these three top-level keys would silently flip dmesg.boot_succeeded/
+# last_state.completed from pass to fail. See the "real
+# etc/stat-classifier.yml" spec in stat_classifier_spec.rb.
 pass:
   '*': pass
   rcuperf: completed
@@ -5,9 +12,11 @@ pass:
   dmesg: boot_succeeded
 
 fail:
-  '*': fail error timeout job_oom job_soft_timeout killed_by
+  '*': fail[^_]* error[^_]* timeout job_oom job_soft_timeout killed_by.* warn[^_]*
+  stderr: .+
   kselftests: xfailed xfail
   dmesg: .+
+  kmemleak: unreferenced_object\..+
   kmsg: .+
   last_state: .+
   rcutorture: rcu_hotplug

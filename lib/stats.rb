@@ -15,6 +15,7 @@ require "#{LKP_SRC}/lib/perf_metrics"
 require "#{LKP_SRC}/lib/programs"
 require "#{LKP_SRC}/lib/result"
 require "#{LKP_SRC}/lib/stat_bounds"
+require "#{LKP_SRC}/lib/stat_classifier"
 require "#{LKP_SRC}/lib/statistics"
 require "#{LKP_SRC}/lib/yaml"
 
@@ -105,57 +106,6 @@ def matrix_cols(hash_of_array)
     hash_of_array['stats_source'].size
   else
     [hash_of_array.values[0].size, hash_of_array.values[-1].size].max
-  end
-end
-
-class StatClassifier
-  class << self
-    include Cacheable
-
-    def function_stat?(stat)
-      return false if stat.index('.time.')
-      return false if stat.index('.timestamp:')
-      return false if stat.index('.bootstage:')
-
-      failure_stat?(stat) || pass_stat?(stat) || skip_stat?(stat)
-    end
-    cache_method :function_stat?
-
-    def latency_stat?(stat)
-      !LKP::IndexLatencyAll.instance.key(stat).nil?
-    end
-    cache_method :latency_stat?
-
-    def failure_stat?(stat)
-      LKP::Failure.instance.contain?(stat)
-    end
-
-    def pass_stat?(stat)
-      LKP::Pass.instance.contain?(stat)
-    end
-
-    def skip_stat?(stat)
-      LKP::Skip.instance.contain?(stat)
-    end
-
-    def memory_stat?(stat)
-      LKP::MemoryStatPrefixes.instance.contain?(stat)
-    end
-
-    def bisectable_stat?(stat)
-      return true if LKP::StatAllowlist.instance.contain?(stat)
-
-      !LKP::StatDenylist.instance.contain?(stat)
-    end
-
-    KPI_STAT_DENYLIST = Set.new(['vm-scalability.stddev', 'unixbench.incomplete_result']).freeze
-
-    def kpi_stat?(stat, _axes, _values = nil)
-      return false if KPI_STAT_DENYLIST.include?(stat)
-
-      base, _, remainder = stat.partition('.')
-      LKP::Programs.all_tests_set.include?(base) && !remainder.start_with?('time.')
-    end
   end
 end
 

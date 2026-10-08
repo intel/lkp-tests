@@ -51,8 +51,8 @@ module LKP
   # substring-matched against content by default. anchor: controls where
   # that match is required to land:
   # - :none (default): anywhere in content, e.g. etc/stat-denylist
-  # - :start: start of content, e.g. etc/failure's "dmesg.*" matching
-  #   "dmesg.INFO:..." but not "notdmesg.foo"
+  # - :start: start of content, e.g. etc/memory-stat-prefixes's
+  #   "meminfo\." matching "meminfo.MemFree" but not "numa-meminfo.node0"
   # - :full: the entire content, e.g. etc/add-max-latency's
   #   "numa-meminfo.node[0-9].AnonPages" matching that stat exactly but
   #   not "numa-meminfo.node0.AnonPagesExtra"
@@ -181,11 +181,6 @@ module LKP
 
   # generate class like LKP::EventCounterPrefixes
   %w[event-counter-prefixes independent-counter-prefixes ignore-part-prefixes].each do |file_name|
-    LKP::Pattern.generate_klass(LKP::Path.etc(file_name), anchor: :start)
-  end
-
-  # generate LKP::Failure, LKP::Pass, LKP::Skip
-  %w[failure pass skip].each do |file_name|
     LKP::Pattern.generate_klass(LKP::Path.etc(file_name), anchor: :start)
   end
 

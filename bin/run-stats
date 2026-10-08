@@ -87,6 +87,14 @@ check_binary_output()
 	exit 0
 }
 
+# whether every stat of program $1 is classified by a catch-all "<program>: .+"
+# rule in etc/stat-classifier.yml (e.g. dmesg, kmsg): such a program only
+# reports problems, so an empty result is the healthy outcome
+has_catch_all_stat_rule()
+{
+	grep -Fxq "  $1: .+" "$LKP_SRC_ETC/stat-classifier.yml"
+}
+
 warn_empty_stats()
 {
 	[[ -s $tmpfile ]] && return
@@ -101,8 +109,7 @@ warn_empty_stats()
 
 	[[ -s $RESULT_ROOT/time ]] || return
 	[[ -s $RESULT_ROOT/last_state ]] && return
-	grep -q "^$program\." $LKP_SRC_ETC/failure && return
-	grep -q "^$program\." $LKP_SRC_ETC/pass && return
+	has_catch_all_stat_rule "$program" && return
 
 	is_empty_stats=1
 	log_warn "$program: empty stats" "$log"
@@ -270,7 +277,7 @@ else
 	}
 fi
 
-grep -q "^$program\." <(cat $LKP_SRC_ETC/failure $LKP_SRC_ETC/pass) ||
+has_catch_all_stat_rule "$program" ||
 	check_incomplete_run $tmpfile
 
 warn_empty_stats
