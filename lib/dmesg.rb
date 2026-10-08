@@ -428,6 +428,11 @@ def generate_error_id(line)
   error_id.gsub!(/[^\/a-zA-Z0-9_]\w[0-9]+\W/, '#') # dmesg.BUG:soft_lockup-CPU##stuck_for#s![trinity-c0:#]
   error_id.gsub!(/\W\w[0-9]+[^\/a-zA-Z0-9_]/, '#') # dmesg.BUG:soft_lockup-CPU##stuck_for#s![kworker/u258:#:#]
 
+  # trinity-cN is a fuzzer worker index, not part of the bug identity (the
+  # earlier /pid removal above already ate the separator the two gsubs
+  # just above rely on, so a bare "trinity-c9" here never got collapsed)
+  error_id.gsub!(/trinity-c[0-9]+/, 'trinity-c#')
+
   error_id
 end
 

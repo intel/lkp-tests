@@ -1,0 +1,18 @@
+[   58.446794][ T3753] ======================================================
+[   58.446795][ T3753] WARNING: possible circular locking dependency detected
+[   58.446797][ T3753] 7.1.0-rc2-00091-gec9d4f1c4241 #1 Not tainted
+[   58.446799][ T3753] ------------------------------------------------------
+[   58.446801][ T3753] trinity-c9/3753 is trying to acquire lock:
+[   58.446803][ T3753] 435a974c (console_owner){-.-.}-{0:0}, at: console_lock_spinning_enable (kbuild/src/kernel/printk/printk.c:1898)
+[   58.446848][ T3753]
+[   58.446848][ T3753] but task is already holding lock:
+[   58.446850][ T3753] f54b5818 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested (kbuild/src/kernel/sched/core.c:667)
+[   61.123456][ T4821] ======================================================
+[   61.123457][ T4821] WARNING: possible circular locking dependency detected
+[   61.123458][ T4821] 7.1.0-rc2-00091-gec9d4f1c4241 #1 Not tainted
+[   61.123459][ T4821] ------------------------------------------------------
+[   61.123460][ T4821] trinity-c6/4821 is trying to acquire lock:
+[   61.123461][ T4821] 435a974c (console_owner){-.-.}-{0:0}, at: console_lock_spinning_enable (kbuild/src/kernel/printk/printk.c:1898)
+[   61.123462][ T4821]
+[   61.123462][ T4821] but task is already holding lock:
+[   61.123463][ T4821] f54b5818 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested (kbuild/src/kernel/sched/core.c:667)

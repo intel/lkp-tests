@@ -1,0 +1,15 @@
+boot_failures: 1
+
+# WARNING: possible circular locking dependency detected
+WARNING:possible_circular_locking_dependency_detected: 1
+message:WARNING:possible_circular_locking_dependency_detected: [   58.446795][ T3753] WARNING: possible circular locking dependency detected
+pattern:WARNING:possible_circular_locking_dependency_detected: WARNING: possible circular locking dependency detected
+
+# WARNING: possible circular locking dependency detected .* is trying to acquire lock: at: console_lock_spinning_enable .* but task is already holding lock: at: raw_spin_rq_lock_nested
+WARNING:possible_circular_locking_dependency_detected_trinity-c#_is_trying_to_acquire_lock:at:console_lock_spinning_enable(kbuild/src/kernel/printk/printk.c:#)but_task_is_already_holding_lock:at:raw_spin_rq_lock_nested(kbuild/src/kernel/sched/core.c:#): 1
+message:WARNING:possible_circular_locking_dependency_detected_trinity-c#_is_trying_to_acquire_lock:at:console_lock_spinning_enable(kbuild/src/kernel/printk/printk.c:#)but_task_is_already_holding_lock:at:raw_spin_rq_lock_nested(kbuild/src/kernel/sched/core.c:#): [   58.446795][ T3753] WARNING: possible circular locking dependency detected trinity-c9/3753 is trying to acquire lock: at: console_lock_spinning_enable (kbuild/src/kernel/printk/printk.c:1898) but task is already holding lock: at: raw_spin_rq_lock_nested (kbuild/src/kernel/sched/core.c:667)
+pattern:WARNING:possible_circular_locking_dependency_detected_trinity-c#_is_trying_to_acquire_lock:at:console_lock_spinning_enable(kbuild/src/kernel/printk/printk.c:#)but_task_is_already_holding_lock:at:raw_spin_rq_lock_nested(kbuild/src/kernel/sched/core.c:#): WARNING: possible circular locking dependency detected .* is trying to acquire lock: at: console_lock_spinning_enable .* but task is already holding lock: at: raw_spin_rq_lock_nested
+
+timestamp:last: 61.123463
+timestamp:WARNING:possible_circular_locking_dependency_detected: 58.446795
+timestamp:WARNING:possible_circular_locking_dependency_detected_trinity-c#_is_trying_to_acquire_lock:at:console_lock_spinning_enable(kbuild/src/kernel/printk/printk.c:#)but_task_is_already_holding_lock:at:raw_spin_rq_lock_nested(kbuild/src/kernel/sched/core.c:#): 58.446795
