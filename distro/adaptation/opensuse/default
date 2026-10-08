@@ -84,7 +84,7 @@ libc-dev:i386: glibc-devel-32bit
 libc6-dbg:
 libc6-dev-i386: glibc-devel-32bit
 libc6-dev-x32: glibc-devel
-libc6-dev: glibc-devel
+libc6-dev: glibc-devel glibc-devel-static
 libc6-dev:i386: glibc-devel-32bit
 libc6-i386: glibc-32bit
 libc6-x32:

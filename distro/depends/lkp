@@ -6,3 +6,4 @@ gzip
 which
 rsync
 numactl
+libc6-dev
