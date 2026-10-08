@@ -40,11 +40,14 @@ while (line = $stdin.gets)
   when /^.+ Benchmarks Index Score .* ([0-9.]+)$/
     score = $1.to_f
   when /Run: .+ graphics: .+ (aborting|broken)/,
-       /Caught signal .+ Server aborting/
+       /Caught signal .+ Server aborting/,
+       /^Fatal server error:$/
     # Run: "2D graphics: aa polygons": command returned status 2816; aborting
     # Run: "2D graphics: images and blits": X connection to :0 broken (explicit kill or server shutdown).
     # Run: "3D graphics: gears": X connection to :0 broken (explicit kill or server shutdown).^M; aborting
     # (EE) Caught signal 11 (Segmentation fault). Server aborting
+    # Fatal server error:
+    # (EE) xf86OpenConsole: Switching VT failed
     fail = true
   end
 end

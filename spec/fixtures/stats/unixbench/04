@@ -1,0 +1,12 @@
+1 x 2D graphics: polygons  1 2 3 4 5
+6(EE) 
+Fatal server error:
+(EE) xf86OpenConsole: Switching VT failed
+(EE) 
+(EE) 
+Please consult the The X.Org Foundation support 
+	 at http://wiki.x.org
+ for help. 
+(EE) Please also check the log file at "/var/log/Xorg.0.log" for additional information.
+(EE) Server terminated with error (1). Closing log file.
+xinit: connection to X server lost
