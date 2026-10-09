@@ -191,6 +191,12 @@ if [[ -d "/mnt/$test" ]]; then
 
 		result_files=()
 		for result_file in "$result_dir"*; do
+			# nullglob is unset, so an empty result_dir (e.g. the
+			# mkfs-created lost+found, or an already-cleaned-up
+			# tmpdir.nvme.*) leaves this literal "*" pattern
+			# unexpanded -- rsync would then fail to stat it.
+			[[ -e "$result_file" ]] || continue
+
 			# "img" is the raw file-backed namespace image blktests
 			# creates for nvmet tests (tests/nvme/rc); it is not a
 			# log and can be several GB, so never upload it.
