@@ -10,6 +10,14 @@ md5sums=('SKIP')
 
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
+build()
+{
+	# --enable-copy-only skips install_all's live systemctl/crontab
+	# registration, which fails inside the packaging sandbox and must
+	# never touch the build host anyway.
+	make_src_pkg --enable-copy-only
+}
+
 package()
 {
 	make_install_src_pkg DESTDIR=$benchmark_path
