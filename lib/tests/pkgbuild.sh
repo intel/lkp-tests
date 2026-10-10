@@ -202,6 +202,15 @@ pack_avocado_vt()
 	local avocado_data_dir=$1
 	local avocado_conf_file=/etc/avocado/avocado.conf
 
+	# avocado still does "import pkg_resources" in its own code, but that
+	# module was removed from setuptools entirely in setuptools 82.0.0.
+	# avocado-framework's own dependency on setuptools is unpinned, so an
+	# unconstrained pip3_install below would otherwise pull in the latest
+	# (pkg_resources-less) setuptools and break the "avocado" entrypoint
+	# with "ModuleNotFoundError: No module named 'pkg_resources'". Pre-install
+	# the last version that still ships it so that requirement is already
+	# satisfied and pip leaves it alone.
+	pip3_install "setuptools<82"
 	pip3_install avocado-framework
 	pip3_install git+https://github.com/avocado-framework/avocado-vt
 
