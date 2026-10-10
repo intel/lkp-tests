@@ -8,11 +8,12 @@ set -o pipefail
 check_incomplete_run()
 {
 	local file=$1
+	local what=${2:-$1}
 
 	[[ -s $file ]] && return
 	[[ -f "$LKP_SRC/programs/$program/run" ]] || return
 
-	echo -e "# missing $program $file\nis_incomplete_run: 1" >>"$RESULT_ROOT/last_state"
+	echo -e "# missing $program $what\nis_incomplete_run: 1" >>"$RESULT_ROOT/last_state"
 }
 
 check_soft_timeout()
@@ -278,7 +279,7 @@ else
 fi
 
 has_catch_all_stat_rule "$program" ||
-	check_incomplete_run $tmpfile
+	check_incomplete_run $tmpfile stats
 
 warn_empty_stats
 

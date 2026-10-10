@@ -166,6 +166,12 @@ describe 'bin/run-stats' do
         expect(last_state).to include('# missing emptyprog', 'is_incomplete_run: 1')
         expect(err).not_to include('empty stats')
       end
+
+      it 'does not leak the parser output temp file path into last_state' do
+        run_stats('emptyprog')
+
+        expect(last_state).not_to include('lkp-stats.')
+      end
     end
 
     context 'when the program has no run script' do
