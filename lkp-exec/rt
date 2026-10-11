@@ -31,11 +31,13 @@ usage()
 {
 	cat <<-EOF
 		Usage:
-			lkp $script_name [-d SPEC] [-f filename] [ -p project ] [-t test_directory] [patterns...]
+			lkp $script_name [-d SPEC] [-f filename] [ -p project ] [-t test_directory] [-x exclude_pattern] [patterns...]
 			  SPEC is a day-offset count N[dwm], or comma-joined <N/<=N/>N/>=N clauses
+			  exclude_pattern is a grep -E pattern; paths matching it are dropped
 		Example:
 			lkp $script_name -d 3d  lkp-ws02  xfstests /0/
 			lkp $script_name -d '>=4,<6'  lkp-ws02  xfstests /0/
+			lkp $script_name -d2 -x '/vm-[a-z]{3}(-i386|-riscv64)?/' result
 	EOF
 
 	exit 1
@@ -43,13 +45,14 @@ usage()
 
 [[ $# = 0 ]] && usage
 
-while getopts "f:d:p:q:t:" opt; do
+while getopts "f:d:p:q:t:x:" opt; do
 	case $opt in
 	f) opt_file="$OPTARG" ;;
 	d) opt_date="$OPTARG" ;;
 	p) opt_project="$OPTARG" ;;
 	q) opt_queue="$OPTARG" ;;
 	t) opt_test_dir="$OPTARG" ;;
+	x) opt_exclude="$OPTARG" ;;
 	?) usage >&2 ;;
 	esac
 done
@@ -111,7 +114,7 @@ all | ALL) projects=$(ls $LKP_SRC/repo/) ;;
 *) projects=$opt_project ;;
 esac
 
-patterns="$*"
+patterns=("$@")
 
 temp_file_unsort=$(mktemp /tmp/lkp-rt-unsort-XXXXXX)
 temp_file_sort=$(mktemp /tmp/lkp-rt-sort-XXXXXX)
@@ -119,24 +122,40 @@ temp_file_sort=$(mktemp /tmp/lkp-rt-sort-XXXXXX)
 # shellcheck disable=SC2064
 trap "rm -f $temp_file_unsort $temp_file_sort" EXIT
 
-[[ $patterns ]] ||
+[[ ${#patterns[@]} -gt 0 || $opt_exclude ]] ||
 	cat "${files[@]}" >>$temp_file_unsort
 
-[[ $patterns ]] && {
+[[ ${#patterns[@]} -gt 0 || $opt_exclude ]] && {
 	flag_pattern=0
-	for pattern in $patterns; do
+	for pattern in "${patterns[@]}"; do
 		# expand v3.12 etc. to commit SHA1
 		for project in $projects; do
-			pattern=$(expand_tag_to_commit $pattern $project)
+			pattern=$(expand_tag_to_commit "$pattern" "$project")
 		done
 
+		# quote so an ERE containing shell metacharacters (|, (, )) survives the later eval,
+		# and so a bracket-expression pattern (e.g. [a-z]) isn't nullglob-expanded away first
+		quoted_pattern=$(printf '%q' "$pattern")
+
 		if [[ "$flag_pattern" = "0" ]]; then
-			cmd="grep -h -E $pattern ${files[*]}"
+			cmd="grep -h -E $quoted_pattern ${files[*]}"
 			flag_pattern=1
 		else
-			cmd="$cmd | grep -E $pattern"
+			cmd="$cmd | grep -E $quoted_pattern"
 		fi
 	done
+
+	if [[ $opt_exclude ]]; then
+		quoted_exclude=$(printf '%q' "$opt_exclude")
+
+		if [[ "$flag_pattern" = "0" ]]; then
+			cmd="grep -h -v -E $quoted_exclude ${files[*]}"
+			flag_pattern=1
+		else
+			cmd="$cmd | grep -v -E $quoted_exclude"
+		fi
+	fi
+
 	eval "$cmd" >>$temp_file_unsort
 }
 
