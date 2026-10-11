@@ -4,13 +4,23 @@
 
 detect_system
 
+extra_options=()
+
 if (($_system_version >= 8)); then
 	package_manager=dnf
 
 	# use --allowerasing to resolve issue on centos 9
 	# Problem: problem with installed package libcurl-minimal-7.76.1-31.el9.x86_64
 	#  - package libcurl-minimal-7.76.1-31.el9.x86_64 from @System conflicts with libcurl(x86-64) provided by libcurl-7.76.1-31.el9.x86_64 from baseos
-	extra_option="--allowerasing"
+	extra_options+=(--allowerasing)
+
+	# tsflags=nocaps works around
+	# 	error: unpacking of archive failed on file /usr/bin/arping;6acb54a5: cpio: cap_set_file failed - Operation not supported
+	# 	error: iputils-20240905-5.el10.x86_64: install failed
+	# seen installing iputils on CentOS Stream 10: the testbox's netboot
+	# root filesystem does not support applying the security.capability
+	# xattr that iputils' packaged arping binary carries.
+	extra_options+=(--setopt=tsflags=nocaps)
 else
 	package_manager=yum
 fi
@@ -21,4 +31,4 @@ if ! rpm -q epel-release >/dev/null; then
 fi
 
 # shellcheck disable=SC2048
-${package_manager} install -y "$extra_option" $*
+${package_manager} install -y "${extra_options[@]}" $*
