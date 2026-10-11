@@ -135,6 +135,15 @@ describe StatClassifier do
     it 'allows a stat matched by neither list' do
       expect(described_class.bisectable_stat?('some.random.stat')).to be true
     end
+
+    # test suites that inject memory errors through the EDAC debugfs
+    # interface on purpose trigger these reports; the suite's own
+    # pass/fail result is what should drive a bisect, not the report
+    %w[dmesg.EDAC_MC7:#CE dmesg.EDAC_MC11:#UE dmesg.EDAC_MC0:#CE_row_#,_chan_#_on_mc#0csrow#2channel#1].each do |stat|
+      it "denies the EDAC memory error stat #{stat}" do
+        expect(described_class.bisectable_stat?(stat)).to be false
+      end
+    end
   end
 
   describe '.kpi_stat?' do
