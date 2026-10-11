@@ -1,4 +1,5 @@
 model: qemu-system-i386 -enable-kvm -cpu SandyBridge
+cpu_platform: Sandy Bridge
 nr_cpu: 4
 memory: 4G
 ssh_base_port: 23400
