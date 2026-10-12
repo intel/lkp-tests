@@ -688,7 +688,22 @@ fixup_tc_testing()
 	# upstream commit: https://git.kernel.org/netdev/net/c/ac2944abe4d7
 	sed -i 's/\[0-9\]\* tag/[0-9].* tag/g' tc-testing/tc-tests/actions/bpf.json
 
+	fixup_tc_testing_teql_eth
+
 	modprobe netdevsim
+}
+
+fixup_tc_testing_teql_eth()
+{
+	# teql.json does not use the nsPlugin, so tdc runs these tests in the
+	# host's own network namespace. Test 7734 adds a dummy device named
+	# by $ETH ("eth0") there, which fails with "RTNETLINK answers: File
+	# exists" on any host that has a real eth0. Use the per-test $DEV1
+	# name instead: nothing creates that veth device without the
+	# nsPlugin, and the name is unique to the test id. $ETH is left as is
+	# for the tests that use it inside a namespace, where eth0 is a
+	# netdevsim device.
+	sed -i 's/\$ETH\b/$DEV1/g' tc-testing/tc-tests/qdiscs/teql.json
 }
 
 fixup_non_executable_script()
