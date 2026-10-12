@@ -54,6 +54,6 @@ perl-modules-5: perl-modules-5.36
 python-setuptools: python3-setuptools
 python2:
 python3-tox: tox
-python: python3
+python: python-is-python3
 qt5-default: qtbase5-dev
 systemd-dev:
