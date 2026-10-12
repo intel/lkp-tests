@@ -790,6 +790,15 @@ make_run_tests()
 
 		cd $install_dir || return
 		./run_kselftest.sh
+	elif [[ "$group" == "kvm" ]]; then
+		# kvm/Makefile is the only kselftests group whose header search
+		# path depends on the literal $(ARCH) make variable (LINUX_TOOL_ARCH_INCLUDE
+		# picks tools/arch/<ARCH>/include, e.g. for asm/msr-index.h). $(MAKE)
+		# only auto-forwards a variable to this recursive -C kvm sub-build when
+		# it was set on our own command line, so pass ARCH explicitly here;
+		# otherwise $(ARCH) resolves empty and the include path becomes the
+		# non-existent tools/arch//include.
+		kselftests_make ARCH=$arch TARGETS=$group run_tests
 	else
 		kselftests_make TARGETS=$group run_tests
 	fi
