@@ -4,3 +4,4 @@ nr_cpu: 4
 memory: 4G
 ssh_base_port: 23400
 kernel_cmdline_hw: rcuperf.shutdown=0 rcuscale.shutdown=0 refscale.shutdown=0 audit=0 kunit.enable=0
+belongs_to: all
