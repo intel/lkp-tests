@@ -68,7 +68,7 @@ pack()
 
 	mv $downloaded_rpms $target_dir
 
-	find $target_dir | pack_to_cgz "$pack_to/${BM_NAME}_$date.cgz" --owner=root.root
+	find $target_dir | pack_to_cgz "$pack_to/${BM_NAME}_$date.cgz" --owner=root.root || return
 
 	ln -sf ${BM_NAME}_$date.cgz $pack_to/${BM_NAME}.cgz || return
 	chown .lkp $pack_to/${BM_NAME}_$date.cgz $pack_to/${BM_NAME}.cgz || return

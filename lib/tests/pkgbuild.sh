@@ -350,6 +350,15 @@ pack_to_cgz()
 	local output="$1"
 	shift
 	cpio -o -H newc --quiet "$@" | gzip -n -9 >"$output"
+	local status=("${PIPESTATUS[@]}")
+
+	# cpio/gzip can both exit 0 while producing an empty archive, e.g.
+	# when cpio itself is missing from the packaging rootfs -- gzip still
+	# "succeeds" compressing the zero bytes it receives on stdin.
+	[[ ${status[0]} -eq 0 && ${status[1]} -eq 0 ]] || {
+		echo "pack_to_cgz: failed packing $output (cpio=${status[0]} gzip=${status[1]})" >&2
+		return 1
+	}
 }
 
 # Usage:
