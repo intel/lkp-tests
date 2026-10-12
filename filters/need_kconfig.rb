@@ -63,6 +63,18 @@ def kernel_match_kconfig?(kernel_kconfigs, expected_kernel_kconfig)
   end
 end
 
+# a renamed kconfig is satisfied if the kernel enables it under its other name
+def kernel_match_kconfig_or_alias?(kernel_kconfigs, expected_kernel_kconfig, kconfig_constraints)
+  return true if kernel_match_kconfig?(kernel_kconfigs, expected_kernel_kconfig)
+
+  # kconfig=n is already satisfied when the kernel doesn't define the kconfig
+  name, type = expected_kernel_kconfig.split('=')
+  constraints = kconfig_constraints[name]
+  return false if constraints.nil? || type == 'n'
+
+  constraints.aliases.any? { |alias_name| kernel_match_kconfig?(kernel_kconfigs, "#{alias_name}=#{type}") }
+end
+
 # constraints can be
 #   - 200
 #   - [200, 'x86_64']
@@ -77,12 +89,16 @@ def split_constraints(constraints)
   kernel_versions, constraints = constraints.partition { |constraint| constraint =~ /v\d+\.\d+|DEPRECATED/ }
   archs, constraints = constraints.partition { |constraint| constraint =~ /^(i386|x86_64)$/ }
 
+  # alias:NAME means NAME is the same kconfig under another name (e.g. after an upstream rename)
+  aliases, constraints = constraints.partition { |constraint| constraint =~ /^alias:[A-Za-z0-9_]+$/ }
+  aliases = aliases.map { |constraint| constraint.delete_prefix('alias:') }
+
   types, constraints = constraints.partition { |constraint| constraint =~ /^(y|m|n|\d+|0[xX][A-Fa-f0-9]+|utf8)$/ }
   raise Job::SyntaxError, "Wrong syntax of kconfig setting: #{constraints}" if types.many?
 
   raise Job::SyntaxError, "Wrong syntax of kconfig setting: #{constraints}" unless constraints.empty?
 
-  OpenStruct.new(kernel_versions: kernel_versions, archs: archs, types: types)
+  OpenStruct.new(kernel_versions: kernel_versions, archs: archs, types: types, aliases: aliases)
 end
 
 def load_kconfig_constraints(kconfigs_yaml)
@@ -128,7 +144,7 @@ def check_all(kernel_kconfigs, needed_kconfigs)
 
     expected_kernel_kconfig = "#{config_name}=#{config_options.types.first}"
 
-    next if kernel_match_kconfig?(kernel_kconfigs, expected_kernel_kconfig)
+    next if kernel_match_kconfig_or_alias?(kernel_kconfigs, expected_kernel_kconfig, kconfig_constraints)
 
     uncompiled_kconfig = expected_kernel_kconfig
     uncompiled_kconfig += " (#{expected_kernel_versions.join(', ').delete('"')})" if expected_kernel_versions

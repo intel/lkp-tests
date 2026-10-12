@@ -48,6 +48,39 @@ need_kconfig:
     end
   end
 
+  context 'when a kconfig is renamed and declares the other name as alias' do
+    it 'does not filter the job if the alias is enabled in kernel' do
+      generate_kconfigs_yaml('NEW_NAME: alias:Z1')
+
+      job = generate_job <<-EOF
+need_kconfig:
+- NEW_NAME: m
+      EOF
+      expect { job.expand_params }.not_to raise_error
+    end
+
+    it 'filters the job if neither name is enabled in kernel' do
+      generate_kconfigs_yaml('NEW_NAME: alias:MISSING')
+
+      job = generate_job <<-EOF
+need_kconfig:
+- NEW_NAME: m
+      EOF
+      expect { job.expand_params }.to raise_error Job::ParamError
+    end
+
+    it 'keeps the version constraint working with an alias' do
+      generate_kconfigs_yaml('NEW_NAME: v6.0, alias:MISSING')
+
+      job = generate_job <<-EOF
+need_kconfig:
+- NEW_NAME: m
+      EOF
+      # kernel is v5.0-rc1, which is older than v6.0, so NEW_NAME is not checked
+      expect { job.expand_params }.not_to raise_error
+    end
+  end
+
   context 'when X is required to be n on x86_64' do
     it 'does not filter the i386 job' do
       job = generate_job <<-EOF
