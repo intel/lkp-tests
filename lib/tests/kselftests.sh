@@ -689,8 +689,23 @@ fixup_tc_testing()
 	sed -i 's/\[0-9\]\* tag/[0-9].* tag/g' tc-testing/tc-tests/actions/bpf.json
 
 	fixup_tc_testing_teql_eth
+	fixup_tc_testing_tc /usr/local/lib/iproute2/tc
 
 	modprobe netdevsim
+}
+
+fixup_tc_testing_tc()
+{
+	# tdc runs the distro's tc by a fixed default path, which can be
+	# too old for the qdiscs and options under test (it reports e.g.
+	# 'Unknown qdisc "dualpi2"'), so use the current tc built into the
+	# kselftests package when present. tdc reads tdc_config_local.py for
+	# local overrides of the command paths.
+	local tc=$1
+
+	[[ -x $tc ]] || return 0
+
+	echo "EXTRA_NAMES = {'TC': '$tc'}" >tc-testing/tdc_config_local.py
 }
 
 fixup_tc_testing_teql_eth()

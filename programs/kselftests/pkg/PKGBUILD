@@ -6,8 +6,9 @@ url="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git"
 license=('GPL')
 source=('https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git'
 	'https://git.kernel.org/pub/scm/devel/pahole/pahole.git'
-	'https://github.com/google/packetdrill.git')
-md5sums=('SKIP' 'SKIP' 'SKIP')
+	'https://github.com/google/packetdrill.git'
+	'https://git.kernel.org/pub/scm/network/iproute2/iproute2.git')
+md5sums=('SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 # Download kernel from git.kernel.org.
 # If the kernel has been download into the computer, you can copy it to ${srcdir}.
@@ -34,6 +35,15 @@ build()
 	cd_src_pkg_dir packetdrill/gtests/net/packetdrill
 	./configure
 	CPPFLAGS="" make
+
+	# tc-testing exercises qdiscs and options newer than the tc shipped by
+	# distros (e.g. dualpi2 needs iproute2 v6.17 or later; v6.15 reports
+	# 'Unknown qdisc "dualpi2"'), so build a current tc for tdc to use.
+	# It is installed outside PATH so other test groups keep using the
+	# distro's tc.
+	cd_src_pkg_dir iproute2
+	./configure
+	make -j"$(nproc)"
 }
 
 package()
@@ -52,4 +62,8 @@ package()
 	make install DESTDIR="$pkgdir"
 
 	install -Dm755 "$(get_src_pkg_dir packetdrill)/gtests/net/packetdrill/packetdrill" "$pkgdir/usr/bin/packetdrill"
+
+	install -Dm755 "$(get_src_pkg_dir iproute2)/tc/tc" "$pkgdir/usr/local/lib/iproute2/tc"
+	# netem reads its distribution tables from $(LIBDIR)/tc of the tc build
+	install -Dm644 -t "$pkgdir/usr/lib/tc" "$(get_src_pkg_dir iproute2)"/netem/*.dist
 }
