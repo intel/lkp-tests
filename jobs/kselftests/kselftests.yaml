@@ -30,7 +30,6 @@ kselftests:
     - dmabuf-heaps
     - dt
     # - efivarfs # require uefi boot machine
-    - exec
     - fchmodat2
     - filelock
     - filesystems

@@ -17,5 +17,6 @@ kselftests-bpf:
     - drivers/net/bonding
     - drivers/net/hw
     - drivers/net/netdevsim
+    - exec
     - hid
     - sched_ext

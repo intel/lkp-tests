@@ -450,6 +450,11 @@ fixup_fpu()
 fixup_exec()
 {
 	log_cmd touch ./exec/pipe
+
+	# exec/Makefile only builds binfmt_misc_bpf when bpftool is in PATH
+	grep -q binfmt_misc_bpf exec/Makefile || return 0
+
+	build_bpftool
 }
 
 fixup_kexec()

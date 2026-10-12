@@ -57,10 +57,6 @@ need_kconfig:
 - EFI: y
 - EFIVAR_FS # Depends on: EFI [: y]
 
-% elsif ___.group == "exec"
-- BLK_DEV: y
-- BLK_DEV_LOOP: y
-
 % elsif ___.group == "filesystems"
 - ANDROID_BINDERFS: y
 - ANDROID_BINDER_IPC: y

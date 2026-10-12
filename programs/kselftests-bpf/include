@@ -390,6 +390,17 @@ need_kconfig:
 - VIRTIO_DEBUG: y
 - VIRTIO_NET: y
 
+% elsif ___.group == "exec"
+- BINFMT_MISC: y
+- BINFMT_MISC_BPF: y
+- BLK_DEV: y
+- BLK_DEV_LOOP: y
+- BPF_JIT: y
+- BPF_SYSCALL: y
+- DEBUG_INFO_BTF: y, x86_64
+- DEBUG_INFO_DWARF4: y
+- DEBUG_INFO_REDUCED: n, x86_64
+
 % elsif ___.group == "ftrace"
 - BPF_SYSCALL: y
 - DEBUG_INFO_BTF: y, x86_64
