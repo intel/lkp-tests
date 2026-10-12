@@ -147,6 +147,13 @@ check_kconfig()
 		# So don't check y/m, just match kconfig name
 		# E.g. convert CONFIG_TEST_VMALLOC=m to CONFIG_TEST_VMALLOC=
 		line="${line%=*}="
+
+		# CONFIG_ENABLE_DEFAULT_TRACERS depends on !GENERIC_TRACER, so it can
+		# never be set once any other tracer (e.g. FUNCTION_TRACER) is enabled.
+		# Tracing is still available in that case, which is what the test needs.
+		[[ "$line" = "CONFIG_ENABLE_DEFAULT_TRACERS=" ]] &&
+			grep -q "^CONFIG_GENERIC_TRACER=y" $kernel_config && continue
+
 		if [[ "$line" = "CONFIG_DEBUG_PI_LIST=" ]]; then
 			grep -q $line $kernel_config || {
 				line="CONFIG_DEBUG_PLIST="
