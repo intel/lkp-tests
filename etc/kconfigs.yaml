@@ -1,3 +1,11 @@
+# Constraints of each kconfig, separated by commas:
+#   vX.Y[-rcN]    first kernel version that has the kconfig
+#   <= vX.Y       last release that has the kconfig
+#   DEPRECATED    removed from the kernel, so it is never required
+#   i386|x86_64   only supported on this arch
+#   alias:NAME    the same kconfig under another name after an upstream rename;
+#                 declare it on both names and keep both in need_kconfig, a
+#                 kernel then satisfies either name
 ACPI_NFIT: v4.8-rc1
 AMT: v5.16-rc1
 ANDROID_BINDERFS: v5.0-rc1, DEPRECATED
@@ -86,6 +94,7 @@ CRYPTO_DH_RFC7919_GROUPS: v6.1-rc1
 CRYPTO_HCTR2: v6.1-rc1
 CRYPTO_HMAC: v6.1-rc1
 CRYPTO_KPP: v4.8-rc1
+CRYPTO_LIB_SIPHASH_KUNIT_TEST: alias:SIPHASH_KUNIT_TEST
 CRYPTO_LIB_SM3: v5.18-rc1
 CRYPTO_MANAGER: v6.16-rc1
 CRYPTO_MANAGER_DISABLE_TESTS: <= v6.15
@@ -479,7 +488,7 @@ SECURITY_LOADPIN_ENABLED: v4.7-rc1, <= v4.19
 SECURITY_LOADPIN_ENFORCE: v4.20-rc1
 SECURITY_LOCKDOWN_LSM: v5.4-rc1
 SECURITY_SELINUX: v6.6-rc1
-SIPHASH_KUNIT_TEST: v6.2-rc1
+SIPHASH_KUNIT_TEST: v6.2-rc1, alias:CRYPTO_LIB_SIPHASH_KUNIT_TEST
 SLAB_FREELIST_HARDENED: v5.19-rc1
 SLOB_DEPRECATED: v6.2-rc1, <= v6.3
 SLUB: v6.8-rc1
