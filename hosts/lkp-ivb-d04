@@ -19,3 +19,4 @@ need_kconfig_hw:
 - R8169: y
 - SATA_AHCI
 - DRM_I915
+belongs_to: shz

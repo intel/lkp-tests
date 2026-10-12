@@ -16,3 +16,4 @@ need_kconfig_hw:
 - SATA_AHCI
 - DRM_I915
 ucode: "0xf0"
+belongs_to: shz

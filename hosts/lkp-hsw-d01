@@ -17,3 +17,4 @@ need_kconfig_hw:
 - ATA_BMDMA: y
 - ATA_PIIX
 - DRM_I915
+belongs_to: shz
