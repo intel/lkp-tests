@@ -36,6 +36,24 @@ describe 'lib/mount.sh check_mount' do
     expect(elapsed).to be < 15
   end
 
+  it 'bounds mount.nfs the same way' do
+    Dir.mktmpdir do |dir|
+      fake = File.join(dir, 'mount.nfs')
+      File.write(fake, "#!/bin/sh\nexec sleep 30\n")
+      File.chmod(0o755, fake)
+
+      env = { 'PATH' => "#{dir}:#{ENV.fetch('PATH')}", 'LKP_SRC' => LKP_SRC, 'MOUNT_TIMEOUT' => '1' }
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      _out, _err, status = Open3.capture3(env, 'sh', '-c', ". #{mount_sh}; mount_nfs_timeout -o vers=3 server:/result #{dir}/mnt")
+
+      elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
+
+      # 137: killed by SIGKILL after MOUNT_TIMEOUT, not merely "command not found"
+      expect(status.exitstatus).to eq(137)
+      expect(elapsed).to be_between(1, 15)
+    end
+  end
+
   it 'succeeds on a responsive network mount' do
     _err, status, = run_check_mount('server:/pkg', mount_timeout: 1, fake_mount_body: 'exit 0')
 

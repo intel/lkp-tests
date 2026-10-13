@@ -25,6 +25,18 @@ mount_timeout()
 	timeout -s KILL "${MOUNT_TIMEOUT:-120}" mount "$@"
 }
 
+# same as mount_timeout, for the mount.nfs helper used where the generic mount
+# command may lack nfs support (e.g. a minimal busybox rootfs)
+mount_nfs_timeout()
+{
+	has_cmd timeout || {
+		mount.nfs "$@"
+		return
+	}
+
+	timeout -s KILL "${MOUNT_TIMEOUT:-120}" mount.nfs "$@"
+}
+
 # "host:/path" style source, i.e. a network mount
 is_network_mount_source()
 {

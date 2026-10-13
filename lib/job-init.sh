@@ -1,5 +1,6 @@
 #!/bin/sh
 
+. $LKP_SRC/lib/mount.sh
 . $LKP_SRC/lib/upload.sh
 
 mount_cgroup()
@@ -85,7 +86,11 @@ mount_result_root()
 		result_fs=nfs
 		for i in $(seq $repeat); do
 			echo "mount.nfs: try $i time... mount.nfs -o vers=3 $result_service $RESULT_MNT"
-			mount.nfs -o vers=3 $result_service $RESULT_MNT && return
+			# bound each try, a stalled server would otherwise block the job forever
+			(
+				MOUNT_TIMEOUT=${MOUNT_TIMEOUT:-60}
+				mount_nfs_timeout -o vers=3 $result_service $RESULT_MNT
+			) && return
 			sleep 3
 		done
 		echo "mount nfs for $result_service failed"
