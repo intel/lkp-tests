@@ -11,6 +11,30 @@ is_mount_point()
 	fi
 }
 
+# A mount from a stalled network server can block in the kernel forever, which
+# would burn the whole job time budget; bound it. SIGKILL is used because the
+# blocked mount helper does not necessarily react to the default SIGTERM.
+# MOUNT_TIMEOUT is in seconds.
+mount_timeout()
+{
+	has_cmd timeout || {
+		mount "$@"
+		return
+	}
+
+	timeout -s KILL "${MOUNT_TIMEOUT:-120}" mount "$@"
+}
+
+# "host:/path" style source, i.e. a network mount
+is_network_mount_source()
+{
+	case $1 in
+	*:/*) return 0 ;;
+	esac
+
+	return 1
+}
+
 check_mount()
 {
 	local dev=$1
@@ -23,10 +47,19 @@ check_mount()
 
 	is_mount_point $2 && return
 	mkdir -p $2
-	mount "$@" && return
+
+	# only network mounts can hang on an unresponsive server; a local
+	# filesystem mount may legitimately take long (e.g. log recovery)
+	if is_network_mount_source "$dev"; then
+		mount_timeout "$@" && return
+	else
+		mount "$@" && return
+	fi
 
 	# debug mount failure
 	local exit_code=$?
+	# 137: killed by SIGKILL, i.e. mount_timeout gave up on the server
+	[ "$exit_code" -ne 137 ] || echo "mount $*: timed out after ${MOUNT_TIMEOUT:-120}s" >&2
 	echo "mount $*"
 	mount
 	cat /proc/filesystems

@@ -9,6 +9,7 @@
 
 . $LKP_SRC/lib/debug.sh
 . $LKP_SRC/lib/misc-base.sh
+. $LKP_SRC/lib/mount.sh
 . $LKP_SRC/lib/env.sh
 . $LKP_SRC/lib/reproduce-log.sh
 . $LKP_SRC/lib/lkp_path.sh
@@ -29,7 +30,7 @@ pack_to=$(basename $rootfs)
 mkdir -p "$PKG_MNT"
 
 [ -n "$LKP_SERVER" ] && {
-	mount $LKP_SERVER:$PKG_MNT $PKG_MNT || die "Failed to run mount"
+	mount_timeout $LKP_SERVER:$PKG_MNT $PKG_MNT || die "Failed to run mount"
 }
 
 get_pkg_info()

@@ -4,6 +4,7 @@
 
 . $LKP_SRC/lib/debug.sh
 . $LKP_SRC/lib/misc-base.sh
+. $LKP_SRC/lib/mount.sh
 . $LKP_SRC/lib/reproduce-log.sh
 
 [ -n "$rootfs" ] || die "rootfs is empty"
@@ -18,7 +19,7 @@ DISTRO=${DISTRO##*/}
 mkdir -p "$DEPS_MNT"
 
 [ -n "$LKP_SERVER" ] && {
-	mount $LKP_SERVER:$DEPS_MNT $DEPS_MNT || die "Failed to run mount"
+	mount_timeout $LKP_SERVER:$DEPS_MNT $DEPS_MNT || die "Failed to run mount"
 }
 
 umask 002
