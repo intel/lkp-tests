@@ -33,7 +33,13 @@ adapt_package()
 	local distro_file=$2
 	[ -z "$distro_file" ] && return 1
 	[ -f "$distro_file" ] || return 1
-	grep "^$pkg_name:" "$distro_file"
+
+	# Anchor on the value delimiter (a space, or end of line for an empty
+	# value) so a bare key like "libc6-dev" never matches a longer,
+	# arch-qualified sibling key such as "libc6-dev:i386" that happens to
+	# share it as a literal prefix. Use a basic regex so that '+' in names
+	# like "g++" or "libstdc++-dev" stays a literal character.
+	grep "^$pkg_name:\( \|\$\)" "$distro_file"
 }
 
 # To adapt packages between distributions, use Debian as the default distribution.
