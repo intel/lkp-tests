@@ -81,31 +81,45 @@ cleanup_path_record_from_patterns()
 
 }
 
-clean_path_record_from_result_root()
+# day-index files matching $1 -- shared by every path-record rewriter
+# below, since dot-prefixed "hidden" index files can exist alongside the
+# normal ones.
+find_path_record_files()
 {
 
 	local path=$1
-	local cmd
-	local path_file
-	local dot_temp_file
-
-	path=$(expand_tag_to_commit $path)
-	cmd="/${path//\//\\/}/"
-
-	[[ -d "/tmp" ]] || mkdir "/tmp" || return
-	dot_temp_file=$(mktemp -p /tmp lkp-result-cleanup-path.tmpXXXXXX)
-	chmod 664 $dot_temp_file || return
 
 	if [[ $(find $KTEST_PATHS_DIR -type f -name ".????-??-??-*" 2>/dev/null) ]]; then
-		paths=$(grep -s -l "$path" $KTEST_PATHS_DIR/*/????-??-??-* $KTEST_PATHS_DIR/*/.????-??-??-*)
+		grep -s -l "$path" $KTEST_PATHS_DIR/*/????-??-??-* $KTEST_PATHS_DIR/*/.????-??-??-*
 	else
-		paths=$(grep -s -l "$path" $KTEST_PATHS_DIR/*/????-??-??-*)
+		grep -s -l "$path" $KTEST_PATHS_DIR/*/????-??-??-*
 	fi
+}
+
+# rewrite every day-index file matching $path through awk, forwarding the
+# remaining args to awk as-is (its own -v assignments and program) -- shared
+# by clean_path_record_from_result_root() (drops the matching line) and
+# move_path_record_from_result_root() (rewrites it in place).
+rewrite_path_record_files()
+{
+
+	local path=$1
+	local path_file
+	local dot_temp_file
+	local paths
+
+	shift
+
+	[[ -d "/tmp" ]] || mkdir "/tmp" || return
+	dot_temp_file=$(mktemp -p /tmp lkp-result-edit-path.tmpXXXXXX)
+	chmod 664 $dot_temp_file || return
+
+	paths=$(find_path_record_files "$path")
 
 	for path_file in $paths; do
 		lockfile-create -q --use-pid --retry 10 --lock-name "$path_file".lock
 
-		awk "BEGIN {modified=0} $cmd {modified=1;next}; {print} END {exit 1-modified}" $path_file >$dot_temp_file &&
+		awk "$@" $path_file >$dot_temp_file &&
 			mv -f $dot_temp_file $path_file
 		chown .lkp $path_file
 
@@ -113,4 +127,32 @@ clean_path_record_from_result_root()
 	done
 
 	rm -f $dot_temp_file
+}
+
+clean_path_record_from_result_root()
+{
+
+	local path=$1
+	local cmd
+
+	path=$(expand_tag_to_commit $path)
+	cmd="/${path//\//\\/}/"
+
+	rewrite_path_record_files "$path" "BEGIN {modified=0} $cmd {modified=1;next}; {print} END {exit 1-modified}"
+}
+
+# unlike clean_path_record_from_result_root() (which drops the matching
+# line entirely), this rewrites it in place -- for a result root that was
+# relocated (e.g. archived to /result/bad/...) rather than actually gone,
+# so the day-index keeps pointing at wherever the result currently lives.
+move_path_record_from_result_root()
+{
+
+	local old_path=$1
+	local new_path=$2
+
+	old_path=$(expand_tag_to_commit $old_path)
+
+	rewrite_path_record_files "$old_path" -v old="$old_path" -v new="$new_path" \
+		'index($0, old) { sub(old, new) } { print }'
 }
