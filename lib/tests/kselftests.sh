@@ -332,7 +332,10 @@ fixup_firmware()
 		fi
 	}
 
-	sed -i "s/timeout=165/timeout=300/" firmware/settings
+	# fw_run_tests.sh runs 3 kernel configs, each against 4 firmware file
+	# states (present, missing, plain+XZ, XZ only), which takes longer than
+	# 300s on some machines, so leave ample room over the upstream 165s.
+	sed -i "s/timeout=165/timeout=600/" firmware/settings
 }
 
 fixup_gpio()
