@@ -15,6 +15,10 @@ script_name=$(basename $0)
 #   lkp rt -d 3d -f result/0.json piglit /0/
 # - to filter non-existence directory, use `-f .` option,like below:
 #   lkp rt -d 3d -f . piglit  /0/
+# - a run archived to /result/bad/... (after being reclassified as failed)
+#   is excluded by default, same as a run never archived at all would never
+#   show up as bad. Use `-b` to search bad results exclusively instead:
+#   lkp rt -b piglit /0/
 # - -d takes a day-offset spec, not just a plain count. N is a 1-indexed
 #   day count: today is day 1, today-1 is day 2, etc. <, <=, >, >= clauses
 #   may be comma-joined for an AND:
@@ -31,13 +35,15 @@ usage()
 {
 	cat <<-EOF
 		Usage:
-			lkp $script_name [-d SPEC] [-f filename] [ -p project ] [-t test_directory] [-x exclude_pattern] [patterns...]
+			lkp $script_name [-b] [-d SPEC] [-f filename] [ -p project ] [-t test_directory] [-x exclude_pattern] [patterns...]
 			  SPEC is a day-offset count N[dwm], or comma-joined <N/<=N/>N/>=N clauses
 			  exclude_pattern is a grep -E pattern; paths matching it are dropped
+			  -b searches archived-to-/result/bad results exclusively; without it, they are hidden
 		Example:
 			lkp $script_name -d 3d  lkp-ws02  xfstests /0/
 			lkp $script_name -d '>=4,<6'  lkp-ws02  xfstests /0/
 			lkp $script_name -d2 -x '/vm-[a-z]{3}(-i386|-riscv64)?/' result
+			lkp $script_name -b piglit /0/
 	EOF
 
 	exit 1
@@ -45,8 +51,9 @@ usage()
 
 [[ $# = 0 ]] && usage
 
-while getopts "f:d:p:q:t:x:" opt; do
+while getopts "bf:d:p:q:t:x:" opt; do
 	case $opt in
+	b) opt_bad=1 ;;
 	f) opt_file="$OPTARG" ;;
 	d) opt_date="$OPTARG" ;;
 	p) opt_project="$OPTARG" ;;
@@ -195,6 +202,27 @@ show_one_path()
 }
 
 while read -r path; do
+	is_bad=0
+
+	if [[ $path == /result/bad/* ]]; then
+		is_bad=1
+	elif [[ $path == /result/* && ! -e $path ]]; then
+		# pre-dates the day-index being rewritten on archival: the index
+		# still points at the original location though the result was
+		# already moved to /result/bad/...
+		bad_path="/result/bad${path#/result}"
+		if [[ -e $bad_path ]]; then
+			is_bad=1
+			path=$bad_path
+		fi
+	fi
+
+	if [[ $opt_bad ]]; then
+		((is_bad)) || continue
+	else
+		((is_bad)) && continue
+	fi
+
 	[[ ! "$opt_file" || -e "$path/$opt_file" ]] &&
 		show_one_path "$path/$opt_file"
 done <$temp_file_sort
