@@ -9,7 +9,9 @@ lkvs:
   test:
     - avx512vbmi
     - cet
-    - dma
+    # modprobe dmatest hangs forever on kernels with 2a93f5747d0e
+    # ("dmaengine: idxd: Flush all pending descriptors"), v7.0-rc6 and later
+    # - dma
     - dsa
     - edac
     - fred
