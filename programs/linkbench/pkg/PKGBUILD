@@ -10,9 +10,34 @@ md5sums=('SKIP')
 
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
+# Maven runs on the JVM, which ignores the http_proxy/https_proxy
+# environment variables that every other build tool honors, so a build
+# behind a proxy hangs downloading plugins from Maven Central. Translate
+# them into the equivalent JVM proxy properties.
+set_maven_proxy()
+{
+	local scheme proxy hostport
+
+	for scheme in http https; do
+		eval "proxy=\${${scheme}_proxy}"
+		[[ $proxy ]] || continue
+
+		hostport=${proxy#*://}
+		hostport=${hostport%%/*}
+		hostport=${hostport##*@}
+
+		MAVEN_OPTS+=" -D${scheme}.proxyHost=${hostport%%:*}"
+		[[ $hostport = *:* ]] && MAVEN_OPTS+=" -D${scheme}.proxyPort=${hostport##*:}"
+	done
+
+	export MAVEN_OPTS
+}
+
 build()
 {
 	cd_src_pkg_dir
+
+	set_maven_proxy
 
 	# pom.xml hardcodes maven-compiler-plugin source/target 1.7, which
 	# javac from JDK 8+ rejects outright ("Source option 7 is no longer
