@@ -100,12 +100,22 @@ def c_fold_key(line)
   line.bytes.map { |b| b.between?(97, 122) ? b - 32 : b }
 end
 
+# Comment/blank lines are anchors that stay at their own position instead of
+# being sorted as data -- matching spec/unit/lib/file_sorting_spec.rb, which
+# strips them out entirely before comparing order. Without this, a leading
+# explanatory comment block (e.g. etc/kconfigs.yaml's multi-line legend)
+# gets scrambled into alphabetical order by a blind whole-file sort even
+# though every real data line underneath it is already correctly sorted.
 def sort_plain_file(file, check: false)
   original = File.readlines(file)
-  sorted = original.sort_by { |line| c_fold_key(line) }
-  deduped = sorted.each_with_object([]) { |line, acc| acc << line unless acc.last == line }
+  anchor = original.map { |line| line.strip.empty? || line.strip.start_with?('#') }
+  data = original.each_index.reject { |i| anchor[i] }.map { |i| original[i] }
+  sorted_data = data.sort_by { |line| c_fold_key(line) }
+  queue = sorted_data.each_with_object([]) { |line, acc| acc << line unless acc.last == line }
 
-  return true if deduped == original
+  result = original.each_index.filter_map { |i| anchor[i] ? original[i] : queue.shift }
+
+  return true if result == original
 
   if check
     puts "would sort: #{file}"
@@ -113,7 +123,7 @@ def sort_plain_file(file, check: false)
   end
 
   tmp = "#{file}.tmp"
-  File.write(tmp, deduped.join)
+  File.write(tmp, result.join)
   FileUtils.mv(tmp, file)
   true
 end
