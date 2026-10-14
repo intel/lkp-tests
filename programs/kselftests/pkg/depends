@@ -13,6 +13,7 @@ e2fsprogs
 ebtables
 ethtool
 file
+fio
 flex
 fuse
 gawk
