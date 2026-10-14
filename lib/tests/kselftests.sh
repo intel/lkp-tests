@@ -514,6 +514,13 @@ fixup_kvm()
 {
 	# SKIP - /dev/kvm not available (errno: 2)
 	lsmod | grep -q 'kvm_intel' || modprobe kvm_intel
+
+	# selftests: kvm: mmu_stress_test # TIMEOUT 120 seconds
+	# mmu_stress_test defaults to 3/4 of the online CPUs as vCPUs and a
+	# fixed 128G of guest memory, so it runs much longer on a host with
+	# a large number of CPUs than the upstream timeout (settings:
+	# timeout=120) allows for.
+	echo 'timeout=1800' >$group/settings
 }
 
 prepare_for_selftest_mfs()
