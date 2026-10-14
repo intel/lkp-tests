@@ -70,6 +70,7 @@ libaudit-dev: audit-libs-devel
 libbabeltrace-ctf-dev: libbabeltrace-devel
 libbabeltrace-ctf1: libbabeltrace
 libbabeltrace-dev: libbabeltrace-devel
+libbabeltrace2-dev:
 libbfd-dev: binutils-devel
 libbinutils:
 libblas3: blas

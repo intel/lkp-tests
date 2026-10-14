@@ -69,6 +69,7 @@ libattr1-dev: libattr-devel
 libattr: libattr1
 libaudit-dev: audit-devel
 libbabeltrace-dev: babeltrace-devel
+libbabeltrace2-dev:
 libbfd-dev: binutils-devel
 libblkid-dev: libblkid-devel
 libbpf-dev: libbpf-devel

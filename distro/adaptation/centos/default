@@ -76,6 +76,7 @@ libatomic1: libatomic
 libattr1-dev: libattr-devel
 libaudit-dev: audit-libs-devel
 libbabeltrace-dev: libbabeltrace-devel
+libbabeltrace2-dev:
 libbfd-dev:
 libbinutils:
 libblas3: blas

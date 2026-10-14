@@ -1,6 +1,7 @@
 binutils-dev
 libaudit-dev
 libbabeltrace-dev
+libbabeltrace2-dev
 libcap-dev
 libdw-dev
 libgtk2.0-dev

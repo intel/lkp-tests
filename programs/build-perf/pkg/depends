@@ -4,6 +4,7 @@ clang
 flex
 libaudit-dev
 libbabeltrace-dev
+libbabeltrace2-dev
 libbfd-dev
 libc6-dev
 libcap-dev

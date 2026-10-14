@@ -8,6 +8,7 @@ flex
 iproute
 libaudit-dev
 libbabeltrace-dev
+libbabeltrace2-dev
 libcap-dev
 libcapstone-dev
 libclang-dev

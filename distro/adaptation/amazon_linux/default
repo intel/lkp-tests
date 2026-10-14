@@ -69,6 +69,7 @@ libasound2-dev: alsa-lib-devel
 libasound2: alsa-lib
 libattr1-dev: libattr-devel
 libaudit-dev: audit-libs-devel
+libbabeltrace2-dev:
 libbinutils: binutils
 libblas3: blas
 libblkid-dev: libblkid-devel
