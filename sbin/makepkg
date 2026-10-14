@@ -2355,14 +2355,26 @@ create_package() {
 		pkgver_cgz=$(extend_pkgver_cgz_name $CGZDEST)
 		mkdir -p "$(dirname "$pkgver_cgz")"
 
-		if [[ "$pkgver_cgz" = "$CGZDEST" ]]; then
-			find . | cpio -o -H newc --owner=root.root | gzip -n -9 > ${pkgver_cgz}.tmp
-			# atomic mv to avoid race condition
-			mv -fv ${pkgver_cgz}.tmp ${pkgver_cgz}
-		else
-			find . | cpio -o -H newc --owner=root.root | gzip -n -9 > ${pkgver_cgz}
-			ln -svf "$(basename "$pkgver_cgz")" "${CGZDEST}"
+		# Always stage to .tmp and check cpio/gzip's own exit status before
+		# the atomic rename: cpio can fail silently (e.g. disk full, killed
+		# mid-write) while gzip still exits 0 compressing whatever partial
+		# bytes it received, producing a tiny, valid-looking but truncated
+		# or empty .cgz. Checking only after the rename (or not at all, as
+		# the versioned-name branch previously did) risks publishing that
+		# file -- or a symlink pointing at a file that never got written --
+		# as if it were a real package.
+		find . | cpio -o -H newc --owner=root.root | gzip -n -9 > "${pkgver_cgz}.tmp"
+		local cgz_status=("${PIPESTATUS[@]}")
+		if [[ ${cgz_status[0]} -ne 0 || ${cgz_status[1]} -ne 0 ]]; then
+			rm -f "${pkgver_cgz}.tmp"
+			error "$(gettext "Failed to create cgz package (cpio=%s gzip=%s).")" "${cgz_status[0]}" "${cgz_status[1]}"
+			exit 1
 		fi
+
+		# atomic mv to avoid race condition
+		mv -fv "${pkgver_cgz}.tmp" "${pkgver_cgz}"
+
+		[[ "$pkgver_cgz" = "$CGZDEST" ]] || ln -svf "$(basename "$pkgver_cgz")" "${CGZDEST}"
 
 		return
 	fi
