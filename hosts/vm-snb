@@ -3,5 +3,5 @@ cpu_platform: Sandy Bridge
 nr_cpu: 4
 memory: 16G
 ssh_base_port: 23032
-kernel_cmdline_hw: rcuperf.shutdown=0 rcuscale.shutdown=0 refscale.shutdown=0 audit=0 kunit.enable=0 ia32_emulation=on
+kernel_cmdline_hw: rcuperf.shutdown=0 rcuscale.shutdown=0 refscale.shutdown=0 audit=0 kunit.enable=0 ia32_emulation=on init_on_free=0
 belongs_to: all
