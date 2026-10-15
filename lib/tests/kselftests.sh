@@ -583,6 +583,13 @@ fixup_mm()
 {
 	local run_vmtests="run_vmtests.sh"
 
+	# mm/Makefile only builds the page_frag test module when the kernel tree
+	# has Module.symvers, otherwise it just prints a warning and skips it.
+	# Such a run is not a valid result of the mm tests, so fail early instead.
+	local kdir=${KDIR:-$(realpath ../../..)}
+	grep -q 'missing Module.symvers' mm/Makefile && [[ ! -f $kdir/Module.symvers ]] &&
+		die "$kdir/Module.symvers is missing, page_frag test would be skipped"
+
 	# we need to adjust two value in $run_vmtests accroding to the nr_cpu
 	# 1) needmem=262144, in Byte
 	# 2) ./userfaultfd hugetlb *128* 32, we call it memory here, in MB
