@@ -18,10 +18,10 @@ if [[ "$group" = "group-00" ]]; then
 		"clk-gate_test" "clk_test" "cpumask_kunit" "cros_kunit_proto_test" "hid-uclogic-test" "iio-test-format"
 		"iio-test-rescale" "overflow_kunit" "soc-utils-test" "stackinit_kunit" "is_signed_type_kunit"
 		"siphash_kunit" "soc-topology-test" "fat_test" "string_kunit" "string_helpers_kunit" "usercopy_kunit"
-		"min_heap_kunit" "uuid_kunit" "blackhole_dev_kunit" "glob_kunit" "crc_kunit" "utf8_kunit")
+		"min_heap_kunit" "uuid_kunit" "blackhole_dev_kunit" "glob_kunit" "crc_kunit" "utf8_kunit" "dmabuf_kunit")
 elif [[ "$group" = "group-01" ]]; then
 	test_array=("test_div64" "test_bpf" "test_static_key_base"
-		"test_bitmap" "test_xarray" "test_rhashtable" "test_memcat_p" "dmabuf_selftests" "test_kprobes" "dmapool_test"
+		"test_bitmap" "test_xarray" "test_rhashtable" "test_memcat_p" "test_kprobes" "dmapool_test"
 		"test_udelay" "test_hmm" "test_free_pages" "test_fpu" "test_rslib" "ntb_msi_test" "kprobe_event_gen_test"
 		"test_bitops" "test_async_driver_probe" "spi-loopback-test" "test_ref_tracker" "test_lockup" "scftorture"
 		"preemptirq_delay_test" "find_bit_benchmark"
@@ -29,7 +29,7 @@ elif [[ "$group" = "group-01" ]]; then
 		"test_vmalloc" "test_meminit" "test_maple_tree" "thunderbolt_dma_test" "clocksource-wdtest"
 		"atomic64_test" "snd-soc-avs-i2s-test" "test_dynamic_debug" "raid6test" "backtracetest")
 elif [[ "$group" = "group-03" ]]; then
-	test_array=("drm_buddy_test" "kasan_test" "kfence_test" "platform-device-test" "property-entry-test"
+	test_array=("gpu_buddy_tests" "kasan_test" "kfence_test" "platform-device-test" "property-entry-test"
 		"of_test" "overlay-test" "packing_test" "printf_kunit" "scanf_kunit")
 fi
 

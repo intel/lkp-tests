@@ -37,8 +37,6 @@ need_kconfig:
 - TIME_KUNIT_TEST: m
 - UUID_KUNIT_TEST: m
 
-- DRIVER_PE_KUNIT_TEST
-
 - RTC_CLASS: y
 - RTC_LIB_KUNIT_TEST: m
 
@@ -136,16 +134,18 @@ need_kconfig:
 
 - UNICODE: m
 - UNICODE_NORMALIZATION_KUNIT_TEST: m
+
+# dmabuf_selftests was renamed upstream to the KUnit-framework
+# DMABUF_KUNIT_TEST, which only runs under kunit.enable=1
+- DMABUF_KUNIT_TEST: m
 % elsif ___.group == "group-01"
 # below are not kunit test
-- DMABUF_SELFTESTS: m
 - DMAPOOL_TEST: m
 - FIND_BIT_BENCHMARK: m
 - KPROBES_SANITY_TEST: m
 - KPROBE_EVENT_GEN_TEST: m
 - PREEMPTIRQ_DELAY_TEST: m
 - SCF_TORTURE_TEST: m
-- STRING_SELFTEST: m
 - TEST_ASYNC_DRIVER_PROBE: m
 - TEST_BITMAP: m
 - TEST_BITOPS: m
@@ -162,7 +162,6 @@ need_kconfig:
 - TEST_REF_TRACKER: m
 - TEST_RHASHTABLE: m
 - TEST_STATIC_KEYS: m
-- TEST_STRING_HELPERS: m
 - TEST_UDELAY: m
 - TEST_VMALLOC: m
 - TEST_XARRAY: m
@@ -203,11 +202,6 @@ need_kconfig:
 
 - NTB_MSI: y
 - NTB_MSI_TEST: m
-
-- DYNAMIC_DEBUG: y
-- DYNAMIC_FTRACE_WITH_REGS: y
-- LIVEPATCH: y
-- TEST_LIVEPATCH: m
 
 - DEBUG_FS: y
 - DYNAMIC_DEBUG: y
@@ -289,6 +283,10 @@ need_kconfig:
 % elsif ___.group == "group-03"
 - DRM
 - DRM_KUNIT_TEST: m
+
+# gpu_buddy_tests was renamed/moved upstream from drivers/gpu/drm/tests
+# (DRM_BUDDY_KUNIT_TEST) to drivers/gpu/tests (GPU_BUDDY_KUNIT_TEST)
+- GPU_BUDDY_KUNIT_TEST: m
 
 - KFENCE: y
 - KFENCE_KUNIT_TEST: m

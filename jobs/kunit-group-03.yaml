@@ -4,7 +4,7 @@ category: functional
 
 kunit:
   group:
-    # split drm_buddy_test from group-01 to avoid is_incomplete_run on i386
+    # split gpu_buddy_tests (formerly drm_buddy_test) from group-01 to avoid is_incomplete_run on i386
     - group-03
 
 kernel_cmdline: kunit.enable=1
