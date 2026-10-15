@@ -116,6 +116,16 @@ fixup_ltp()
 	ln -sf /usr/sbin/in.telnetd ./usr/sbin/in.telnetd
 }
 
+fixup_lkvs()
+{
+	# libc6-i386 no longer ships the legacy /lib/ld-linux.so.2 symlink
+	# that earlier releases provided alongside usr/lib32/ld-linux.so.2.
+	# "cc -m32" still hardcodes /lib/ld-linux.so.2 as its dynamic linker,
+	# so recreate the symlink against the 32-bit loader that is actually
+	# packaged.
+	ln -sf /usr/lib32/ld-linux.so.2 usr/lib/ld-linux.so.2
+}
+
 pack()
 {
 	local date=$(date +"%Y%m%d")
