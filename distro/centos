@@ -7,9 +7,39 @@ shopt -s nullglob
 . $LKP_SRC/lib/debug.sh
 . $LKP_SRC/lib/tests/pkgbuild.sh
 
+use_centos_mirror()
+{
+	local repo_file=$1
+	local repo_id=$2
+	local repo_path=$3
+
+	sed -i "/^\[$repo_id\]/,/^\[/{s#^metalink=.*#baseurl=$CENTOS_STREAM_MIRROR/$repo_path#}" $repo_file
+}
+
 fixup_distro_mirror()
 {
 	dnf config-manager --set-enabled crb
+
+	# This file is shared with the aliyun distro (distro/aliyun is a
+	# symlink to this file), whose repo layout is unrelated to CentOS
+	# Stream's, so skip the mirror override below for it.
+	[[ $DISTRO == "aliyun" ]] && return
+
+	# CentOS Stream's metalink-based GeoIP mirror selection can land on a
+	# mirror that 403s or severely throttles requests, stalling dependency
+	# installs for hours. Set CENTOS_STREAM_MIRROR (e.g. by dropping a
+	# "CENTOS_STREAM_MIRROR=..." assignment into a local, unversioned
+	# etc/distro/centos-mirror, sourced below if present) to pin the
+	# enabled repos to a fixed, directly reachable mirror of your choice.
+	local mirror_conf=$LKP_SRC/etc/distro/centos-mirror
+	[[ -f $mirror_conf ]] && . "$mirror_conf"
+
+	[[ -n $CENTOS_STREAM_MIRROR ]] || return
+
+	use_centos_mirror /etc/yum.repos.d/centos.repo baseos '$stream/BaseOS/$basearch/os/'
+	use_centos_mirror /etc/yum.repos.d/centos.repo appstream '$stream/AppStream/$basearch/os/'
+	use_centos_mirror /etc/yum.repos.d/centos.repo crb '$stream/CRB/$basearch/os/'
+	use_centos_mirror /etc/yum.repos.d/centos-addons.repo extras-common 'SIGs/$stream/extras/$basearch/extras-common/'
 }
 
 install()
