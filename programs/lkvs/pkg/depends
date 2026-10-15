@@ -58,4 +58,5 @@ trace-cmd
 uuid-dev
 vim-common
 xmlto
+xxd
 zlib1g-dev
