@@ -68,6 +68,7 @@ Spectre_v2_mitigation
 ^dmesg\.calltrace
 ^dmesg\.drm:intel_acpi_device_id_update.*
 ^dmesg\.EDAC_MC[0-9]+:#(CE|UE)
+^dmesg\.genirq:Flags_mismatch_irq##\(vm#irq\)vs\..*
 ^dmesg\.Hardware_Error\]:.*
 ^dmesg\.inconsistent[{]HARDIRQ\-ON\-W[}]\-
 ^dmesg\.inconsistent[{]IN\-HARDIRQ\-W[}]\-
