@@ -62,5 +62,14 @@ need_kconfig:
 - DEBUG_KERNEL: y
 - FAULT_INJECTION: y
 - FAULT_INJECTION_CONFIGFS: y
-- RDMA_RXE: m
+
+# blktests picks the soft-RDMA driver by use_siw: siw when set, rxe otherwise.
+# Use ___['key'] (nil if absent) instead of ___.key, which raises KeyError for
+# a param the job does not set and then drops this whole file silently.
+% if ___.test =~ /srp/ || ___['nvme_trtype'] == 'rdma'
+%   if ___['use_siw'].to_s == 'true'
 - RDMA_SIW: m
+%   else
+- RDMA_RXE: m
+%   end
+% end
