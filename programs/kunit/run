@@ -18,7 +18,14 @@ if [[ "$group" = "group-00" ]]; then
 		"clk-gate_test" "clk_test" "cpumask_kunit" "cros_kunit_proto_test" "hid-uclogic-test" "iio-test-format"
 		"iio-test-rescale" "overflow_kunit" "soc-utils-test" "stackinit_kunit" "is_signed_type_kunit"
 		"siphash_kunit" "soc-topology-test" "fat_test" "string_kunit" "string_helpers_kunit" "usercopy_kunit"
-		"min_heap_kunit" "uuid_kunit" "blackhole_dev_kunit" "glob_kunit" "crc_kunit" "utf8_kunit" "dmabuf_kunit")
+		"min_heap_kunit" "uuid_kunit" "blackhole_dev_kunit" "glob_kunit" "crc_kunit" "utf8_kunit" "dmabuf_kunit"
+		"gcd_kunit" "int_log_kunit" "int_pow_kunit" "int_sqrt_kunit" "polynomial_kunit" "prime_numbers_kunit"
+		"random32_kunit" "test_ratelimit" "seq_buf_kunit" "kfifo_kunit" "list-private-test" "hashtable_test"
+		"refcount_interrupt_test" "printk_ringbuffer_kunit_test" "dim_kunit" "irq_test"
+		"aes_cbc_macs_kunit" "aes_ccm_kunit" "aes_gcm_kunit" "blake2b_kunit" "blake2s_kunit"
+		"chacha20poly1305_kunit" "curve25519_kunit" "ghash_kunit" "md5_kunit" "mldsa_kunit" "nh_kunit"
+		"poly1305_kunit" "polyval_kunit" "sha1_kunit" "sha224_kunit" "sha256_kunit" "sha384_kunit"
+		"sha512_kunit" "sha3_kunit" "sm3_kunit" "xor_kunit" "raid6_kunit" "longest_symbol_kunit")
 elif [[ "$group" = "group-01" ]]; then
 	test_array=("test_div64" "test_bpf" "test_static_key_base"
 		"test_bitmap" "test_xarray" "test_rhashtable" "test_memcat_p" "test_kprobes" "dmapool_test"
