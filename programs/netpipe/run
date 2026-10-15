@@ -15,17 +15,6 @@ cd_benchmark
 [[ -z "$server" ]] && server=127.0.0.1
 server=${server%% *}
 
-fixup_mpi()
-{
-	# fix 'make: mpicc: No such file or directory'
-	ln -sf /usr/bin/mpicc.openmpi /usr/bin/mpicc
-
-	# fix '/bin/sh: 1: mpirun: not found'
-	ln -sf /usr/bin/mpirun.openmpi /usr/bin/mpirun
-}
-
-fixup_mpi
-
 log_cmd make CFLAGS="-fcommon" $test || die "failed to compile $test"
 
 case $test in

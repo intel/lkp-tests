@@ -126,6 +126,16 @@ fixup_lkvs()
 	ln -sf /usr/lib32/ld-linux.so.2 usr/lib/ld-linux.so.2
 }
 
+fixup_netpipe()
+{
+	# mpi-default-bin's update-alternatives symlinks (mpicc.openmpi ->
+	# mpicc, mpirun.openmpi -> mpirun) are created by a postinst that
+	# "dpkg-deb -x" never runs; recreate the plain names netpipe's
+	# Makefile and run script expect.
+	[[ -e usr/bin/mpicc.openmpi ]] && ln -sf mpicc.openmpi usr/bin/mpicc
+	[[ -e usr/bin/mpirun.openmpi ]] && ln -sf mpirun.openmpi usr/bin/mpirun
+}
+
 pack()
 {
 	local date=$(date +"%Y%m%d")
