@@ -54,7 +54,18 @@ lkvs:
     - amx
     - tpm
     - tpmi
-    - ufs
+
+---
+need_cpuid: 173
+
+# Every ufs case loops over all uncore dies, so the stress and elc cases are
+# split into their own jobs to keep each one well inside the job time budget.
+lkvs:
+  test: ufs
+  group:
+    - basic
+    - elc-low-threshold
+    - stress
 
 ---
 need_cpuid: 175
