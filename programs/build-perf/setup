@@ -30,6 +30,17 @@ build_perf()
 	# shellcheck disable=SC2154
 	local perf_build_jobs=$((nr_cpu < 128 ? nr_cpu : 128))
 
+	# pmu-events/jevents.py reads its JSON inputs through a
+	# ProcessPoolExecutor() sized to the CPU count, and each worker costs
+	# the parent several descriptors via its pipes. On a host with
+	# hundreds of CPUs this exceeds the default soft RLIMIT_NOFILE and
+	# jevents.py dies with "OSError: [Errno 24] Too many open files",
+	# leaving perf unbuilt. Raise the soft limit to the hard limit and cap
+	# the pool size (PYTHON_CPU_COUNT is honored by Python 3.13+, ignored
+	# by older interpreters).
+	ulimit -n "$(ulimit -Hn)" 2>/dev/null || ulimit -n 1048576 2>/dev/null
+	export PYTHON_CPU_COUNT=$((nr_cpu < 32 ? nr_cpu : 32))
+
 	log_cmd make -j"$perf_build_jobs" ARCH= "${capstone_args[@]}" -C "$perf_dir" 2>&1 || return
 
 	[[ -f /usr/bin/perf ]] && rm -f /usr/bin/perf
