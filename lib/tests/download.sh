@@ -8,6 +8,16 @@ download_from_url()
 	local url="$1"
 	local file="$2"
 
+	# A pre-created destination directory means $url is a directory
+	# source: wget -O cannot write to a directory (fails "Is a
+	# directory"), so mirror it recursively instead, same technique
+	# lib/wget.sh's http_get_directory uses for initrd/ucode directories.
+	if [[ -d "$file" ]]; then
+		echo "Downloading directory from: $url"
+		wget -q -r -np -nd -P "$file" "${url%/}/"
+		return
+	fi
+
 	local filename
 	filename=$(basename "$file")
 	[[ -n "$filename" ]] || return
