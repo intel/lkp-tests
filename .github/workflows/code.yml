@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image: ['amazonlinux/2023', 'centos/stream9', 'fedora/41', 'opensuse/leap', 'oraclelinux/9', 'rockylinux/9', 'ubuntu/noble']
+        image: ['amazonlinux/2023', 'centos/stream10', 'fedora/41', 'opensuse/leap', 'oraclelinux/9', 'rockylinux/9', 'ubuntu/noble']
 
     steps:
       - uses: actions/checkout@v4
