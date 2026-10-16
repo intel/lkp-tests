@@ -703,6 +703,19 @@ fixup_x86()
 	return 0
 }
 
+fixup_ublk()
+{
+	# kublk opens its loop/stripe backing files with O_DIRECT, but the rootfs
+	# (root=/dev/ram0) is a ramfs which rejects O_DIRECT with EINVAL, so
+	# every test using a backing file fails with "cmd_dev_add: command failed".
+	# The tests create their backing files under $TMPDIR (default ./ublktest-dir).
+	local tmp_dir=/tmp/ublktest-dir
+
+	mkdir -p $tmp_dir || return
+	mountpoint -q $tmp_dir || log_cmd mount -t tmpfs tmpfs $tmp_dir || return
+	export TMPDIR=$tmp_dir
+}
+
 fixup_livepatch()
 {
 	# livepatch check if dmesg meet expected exactly, so disable redirect stdout&stderr to kmsg
