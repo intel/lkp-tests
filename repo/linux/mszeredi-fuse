@@ -1,7 +1,7 @@
 url: https://git.kernel.org/pub/scm/linux/kernel/git/mszeredi/fuse.git
 integration_testing_branches: for-next
-mail_cc: fuse-devel@lists.sourceforge.net
-owner: Miklos Szeredi <mszeredi@suse.cz>
+mail_cc: fuse-devel@lists.linux.dev
+owner: Miklos Szeredi <miklos@szeredi.hu>
 subsystems:
 - fuse
 - abort
