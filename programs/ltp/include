@@ -46,7 +46,10 @@ need_kconfig:
 - AF_UNIX_OOB: y
 - CAN_BCM
 - CAN_VCAN
+- IO_URING
 - NET_NS: y
+- RDS
+- RDS_TCP
 - USER_NS: y
 - VSOCKETS_LOOPBACK
 
