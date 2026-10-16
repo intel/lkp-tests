@@ -1,0 +1,16 @@
+url: https://git.manguebit.org/linux.git
+integration_testing_branches:
+- cifs-next
+- cifs-fixes
+owner: Paulo Alcantara <pc@manguebit.org>
+mail_to:
+- Paulo Alcantara <pc@manguebit.org>
+- David Howells <dhowells@redhat.com>
+- Namjae Jeon <linkinjeon@kernel.org>
+subsystems:
+- cifs
+- netfslib
+- fscache
+- smbdirect
+notify_build_success_branch: .*
+private_report_branch: .*-wip
