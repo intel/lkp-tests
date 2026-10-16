@@ -3,7 +3,7 @@ integration_testing_branches:
 - overlayfs-next
 - next
 mail_cc: linux-unionfs@vger.kernel.org
-owner: Miklos Szeredi <mszeredi@suse.cz>
+owner: Miklos Szeredi <miklos@szeredi.hu>
 subsystems:
 - ovl
 - vfs
