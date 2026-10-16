@@ -521,6 +521,31 @@ fixup_kvm()
 	# a large number of CPUs than the upstream timeout (settings:
 	# timeout=120) allows for.
 	echo 'timeout=1800' >$group/settings
+
+	# selftests: kvm: rseq_test # Only performed N KVM_RUNs, task stalled too much?
+	# rseq_test migrates a task across CPUs while counting successful KVM_RUNs
+	# and asserts that more than half of the migrations completed one. A host
+	# whose CPUs sit in deep idle states wakes the task too slowly and trips
+	# that assertion every time. Upstream's advice is to bound the wakeup
+	# latency (its "-l <latency>" option writes /dev/cpu_dma_latency), which
+	# keeps the migration race fully exercised, unlike "-u" which drops the
+	# sanity check. The kselftest runner cannot pass per-test options, so hold
+	# the same PM QoS request for the whole group; clean_kvm releases it.
+	if [[ -e /dev/cpu_dma_latency ]]; then
+		if exec {kvm_cpu_dma_latency_fd}<>/dev/cpu_dma_latency; then
+			printf '\0\0\0\0' >&$kvm_cpu_dma_latency_fd
+		else
+			echo "${FUNCNAME[0]}: cannot open /dev/cpu_dma_latency, rseq_test may fail on deep idle wakeup latency" >&2
+		fi
+	fi
+}
+
+clean_kvm()
+{
+	if [[ -n $kvm_cpu_dma_latency_fd ]]; then
+		exec {kvm_cpu_dma_latency_fd}>&-
+		kvm_cpu_dma_latency_fd=
+	fi
 }
 
 prepare_for_selftest_mfs()
