@@ -61,6 +61,8 @@ need_kconfig:
 - ANDROID_BINDERFS: y
 - ANDROID_BINDER_IPC: y
 - PID_NS: y
+- SAMPLES: y
+- SAMPLE_CONFIGFS: m
 - USER_NS: y
 - UTS_NS: y
 
