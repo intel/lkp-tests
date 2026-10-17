@@ -64,7 +64,9 @@ lkvs:
   test: ufs
   group:
     - basic
-    - elc-low-threshold
+    # check_ufs_elc_low_threshold idles about 105s per die, 28 minutes on a
+    # host with 16 uncore dies
+    # - elc-low-threshold
     - stress
 
 ---
